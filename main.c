@@ -21,7 +21,7 @@ void main(void) {
 	memset(&g_RamTek, 	0, sizeof(TTekDriveData));
 	memset(&g_Comm, 0, sizeof(TComm));
 	memset(&g_Peref,0, sizeof(TPeref));
-
+	//
 	//Stat_Init(&g_Stat);
 	//g_Ram_Init(&g_Ram);
 	//Core_Init(&g_Core);
