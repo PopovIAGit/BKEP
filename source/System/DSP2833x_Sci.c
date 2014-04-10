@@ -35,27 +35,7 @@ void InitScicGpio();
 void SCI_init(Byte Id, Uns BaudRate, Byte Parity, Byte Length)
 {
 	volatile struct SCI_REGS *Regs = SciRegs[Id];
-	/*
-		SciaRegs.SCICCR.all =0x0007;   // 1 stop bit,  No loopback
-                                  // No parity,8 char bits,
-                                  // async mode, idle-line protocol
-	   SciaRegs.SCICTL1.all =0x0002;  // enable TX, RX, internal SCICLK,
-                                  // Disable RX ERR, SLEEP, TXWAKE
-	   SciaRegs.SCICTL2.bit.TXINTENA =0;
-	   SciaRegs.SCICTL2.bit.RXBKINTENA =0;
-	   SciaRegs.SCIHBAUD = 0x0000;
-	   SciaRegs.SCILBAUD = 200;
-	   SciaRegs.SCICCR.bit.LOOPBKENA =0; // Enable loop back
-	  // SciaRegs.SCIFFTX.all=0xC022;
-	   //SciaRegs.SCIFFRX.all=0x0022;
-	   //SciaRegs.SCIFFCT.all=0x00;
 
-	   SciaRegs.SCICTL1.all =0x0023;     // Relinquish SCI from Reset
-	   Regs->SCICTL1.bit.SWRESET = 0;
-	   Regs->SCICTL1.bit.SWRESET = 1;
-	   //SciaRegs.SCIFFTX.bit.TXFIFOXRESET=1;
-	   //SciaRegs.SCIFFRX.bit.RXFIFORESET=1;
-*/
 	Regs->SCICTL1.all = 0x0000;
 	Regs->SCICTL2.all = 0x0000;
 	Regs->SCICCR.all = (Length - 1) & 0x7;
@@ -74,6 +54,31 @@ void SCI_init(Byte Id, Uns BaudRate, Byte Parity, Byte Length)
 	Regs->SCICTL1.bit.SWRESET = 1;
 }
 
+/*void SCI_init(Uint16 Id, Uint16 BaudRate, Uint16 Parity, Uint16 Length, Uint16 StopBits)
+{
+	volatile struct SCI_REGS *Regs = SciRegs[Id];
+
+	Regs->SCICTL1.all = 0x0000;
+	Regs->SCICTL2.all = 0x0000;
+	Regs->SCICCR.all = (Length - 1) & 0x7;
+
+	switch(Parity)
+	{
+		case 0: break;
+		case 1: Regs->SCICCR.bit.PARITYENA = 1; break;
+		case 2:
+			Regs->SCICCR.bit.PARITYENA = 1;
+			Regs->SCICCR.bit.PARITY    = 1;
+		break;
+	}
+	Regs->SCICCR.bit.STOPBITS  = (StopBits == 2);
+
+	Regs->SCIHBAUD = BaudRate >> 8;
+	Regs->SCILBAUD = BaudRate & 0x00FF;
+	Regs->SCIPRI.all = 0x18;
+	Regs->SCICTL1.bit.SWRESET = 1;
+}
+*/
 
 Byte SCI_recieve(Byte Id)
 	{return SciRegs[Id]->SCIRXBUF.all;}

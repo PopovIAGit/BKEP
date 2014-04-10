@@ -16,15 +16,17 @@ void Comm_Init(TComm *p)
 	// Пульт местного управления:
 	//Comm_LocalControlInit (&p->localControl);
 
-	InitChanelBkpModbus(&g_Comm.mbBkp);
+	SciMasterConnBetweenBlockInit(&g_Comm.mbBkp);
+
 	InitChanelAsuModbus(&g_Comm.mbAsu);
 	InitChanelShnModbus(&g_Comm.mbShn);
 	InitChanelBtModbus(&g_Comm.mbBt);
 
-	SerialCommInit(&g_Comm.mbBkp);
 	SerialCommInit(&g_Comm.mbAsu);
 	SerialCommInit(&g_Comm.mbShn);
 	SerialCommInit(&g_Comm.mbBt);
+
+
 }
 //---------------------------------------------------
 void Comm_Update(TComm *p)

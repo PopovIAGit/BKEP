@@ -15,17 +15,12 @@
 //#include "comm_LocalControl.h"
 #include "comm_ModbusRtu.h"
 #include "comm_SerialComm.h"
+#include "comm_BetweenBlock.h"
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-// Источник команды управления
-#define CMD_SRC_MPU			BIT13	// Местный пост управления
-#define CMD_SRC_DIGITAL		BIT14	// Дискретный интерфейс
-#define CMD_SRC_SERIAL		BIT15	// Последовательный интерфейс
-//#define CMD_SRC_ANALOG		BIT15	// Аналогвый интерфейс
 
 //--------------------------------------------------------
 //================== КОММУНИКАЦИИ ========================
@@ -39,7 +34,7 @@ typedef struct {
 	//Uns					outputCmdReg;	// Выход: суммарный регистр команд
 	// ---
 	Uns					outputCmdSrc;	// Выход: источник команд
-	TMbPort  			mbBkp;				// ModBus - БКП
+	TMbBBPort  			mbBkp;				// ModBus - БКП
 	TMbPort  			mbAsu;				// ModBus - АСУ
 	TMbPort  			mbShn;				// ModBus - УПП
 	TMbPort  			mbBt;				// ModBus - Bluetooth
