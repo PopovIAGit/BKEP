@@ -10,8 +10,11 @@
 #define BT_TIMER				1.00 * BT_TIMER_SCALE
 
 Byte RxState = 0;
+//для драйвера Bluetooth
+char StrDev[] = {"BUR-M_000000"};
 
-void BluetoothWTInit(TBluetoothHandle);
+
+void InitChanelBtModus(TBluetoothHandle);
 void SendOneString(TBluetoothHandle, char *String);
 void SendTwoString(TBluetoothHandle, char *FirstString, char *SecondString);
 void SendCommandOne(TBluetoothHandle, char *ComStr);
@@ -22,9 +25,14 @@ void ClearValues(TBluetoothHandle);
 __inline void RxCommandMode(TBluetoothHandle);
 __inline void RxDataMode(TBluetoothHandle);
 Bool CheckString(TBluetoothHandle, char *Str);
-Bool CheckSciCommErr(TBluetoothHandle);
+Bool CheckCommError(TBluetoothHandle);
 
-void BluetoothWTInit(TBluetoothHandle bPort)
+void EnableBtRx(void);
+void EnableBtTx(void);
+Byte ReceiveBtByte(void);
+void TransmitBtByte(Byte Data);
+
+void InitChanelBtModus(TBluetoothHandle bPort)
 {
 
 	#if BT_DBG
@@ -55,7 +63,7 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 	switch (bPort->State)
 	{
 		// Иницилизация драйвера
-		case 0: BluetoothWTInit(bPort);
+		case 0: InitChanelBtModus(bPort);
 				bPort->State++;
 				break;
 				
@@ -205,7 +213,7 @@ void BluetoothRxHandler(TBluetoothHandle bPort)
 }
 
 //проверка статуса McBSP
-Bool CheckSciCommErr(TBluetoothHandle bPort)
+Bool CheckCommError(TBluetoothHandle bPort)
 {
 	//Byte Data = SCI_getstatus(BT_SCI);
 	Bool Error = false;
@@ -226,7 +234,7 @@ __inline void RxCommandMode(TBluetoothHandle bPort)
 	if (bPort->Error)
 		return;
 
-	Data = bPort->ReceiveByte();
+	Data = ReceiveBtByte();
 
 #if BT_DBG
 	bPort->RxBytesCount++;
@@ -251,7 +259,7 @@ __inline void RxDataMode(TBluetoothHandle bPort)
 	if (bPort->Error)
 		return;
 
-	Data = bPort->ReceiveByte();
+	Data = ReceiveBtByte();
 
 #if BT_DBG
 	bPort->RxBytesCount++;
@@ -336,7 +344,7 @@ void SendOneString(TBluetoothHandle bPort, char *String)
 			bPort->StrIndex++;
 			bPort->Status = BT_TRANSMIT_BUSY;				// Статус передачи
 			bPort->TxBusy = true;							// Выставляем флаг передачи
-			bPort->TransmitByte(symbol);					// Передаем на SCI
+			TransmitBtByte(symbol);					// Передаем на SCI
 		}
 	}
 }
@@ -392,7 +400,7 @@ void SendTwoString(TBluetoothHandle bPort, char *FirstString, char *SecondString
 			bPort->StrIndex++;
 			bPort->Status = BT_TRANSMIT_BUSY;				// Статус передачи
 			bPort->TxBusy = true;							// Выставляем флаг передачи
-			bPort->TransmitByte(symbol);					// Передаем на SCI
+			TransmitBtByte(symbol);					// Передаем на SCI
 		}
 	}
 }

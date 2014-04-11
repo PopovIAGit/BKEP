@@ -46,8 +46,6 @@
 #define CONCAT(First, Second) CONCAT2(First, Second)
 #define STATIC_ASSERT(expr) typedef char CONCAT(static_assert_failed_at_line_, __LINE__) [(expr) ? 1 : -1]
 
-//для драйвера Bluetooth
-char StrDev[] = {"BUR-M_000000"};
 
 // Подключение заголовочных файлов
 #include "csl\csl_spi.h"
