@@ -11,10 +11,12 @@
 #define PEREF_
 
 #include "std.h"
-//#include "peref_Filter1.h"
-//#include "peref_Filter3.h"
-//#include "peref_SensObserver.h"
-//#include "peref_SinObserver.h"
+#include "config.h"
+#include "g_Ram.h"
+#include "peref_ApFilter1.h"  	// PIA 03.04.14
+#include "peref_ApFilter3.h"  	// PIA 04.04.14
+#include "peref_SensObserver.h" // PIA 07.04.14
+#include "peref_SinObserver.h"	// PIA 08.04.14
 //#include "peref_DisplayDrv.h"
 //#include "peref_Position.h"
 //#include "peref_LedsDrv.h"
@@ -58,18 +60,23 @@ typedef struct
 //----------------------------------------------
 // Структура для работы с фильтрами переферии
 typedef struct {
-	//TPerefPosition		position;		// Энкодер, калибровка и т.д.
-	//TPerefEncoder		position;		// Энкодер, калибровка и т.д.
-	// --- Лампочки
-	//TLeds				leds;
-	// --- ТЕН
-	//TTen				ten;
-	// ---
-	//Uns					HallOpen;
-	//Uns					HallClose;
-	//Uns					HallStopMu;
-	//Uns					HallStopDu;
-	Int					tempSensor;
+	// Фильтры U
+	APFILTER3  URfltr;
+	APFILTER3  USfltr;
+	APFILTER3  UTfltr;
+	// Фильтры I
+	APFILTER3  IUfltr;
+	APFILTER3  IVfltr;
+	APFILTER3  IWfltr;
+	// ------
+	TSensObserver	sensObserver;	// Масштабирование сигналов с датчиков
+	TSinObserver	sinObserver;	// Вычисление RMS
+	TPhaseOrder		phaseOrder; 	// Чередование фаз сети
+
+	//------
+	APFILTER1 Phifltr;				// Фильтр угола фи
+	APFILTER1 Umfltr;				// Фильтр среднего напряжения
+	APFILTER1 Imfltr;				// Фильтр среднего тока
 } TPeref;
 
 void Peref_Init(TPeref *);

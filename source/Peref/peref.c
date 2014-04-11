@@ -1,24 +1,16 @@
 /*======================================================================
 Имя файла:          peref.c
-Автор:
-Версия файла:
-Дата изменения:
+Автор:				Попов И.А.
+Версия файла:		1.0
+Дата изменения:		07.04.2014
 Описание:
 Модуль обработки переферии
 ======================================================================*/
 
 #include "peref.h"
-#include "g_Ram.h"
-#include "comm.h"
 
 #define SetCs()		SetCs2()
 #define ClrCs()		ClrCs2()
-
-//#define OFFSET_ISO 33580L
-//#define GAIN_ISO 10000 
-
-LgUns OFFSET_ISO = 32450;
-Uns		GAIN_ISO = 10000;
 
 // Линейная формула преобразования кодов с АЦП по датчику температуры
 // в соответствующее сопротивление R(x) = b*x + c, где x - то, что пришло с АЦП,
@@ -31,34 +23,100 @@ Uns		GAIN_ISO = 10000;
 #define koef_C1		_IQ15(6928.57)
 #define ADC_to_R1(inpADC1)	_IQ15int(_IQ15mpy(koef_B1, _IQ15(inpADC1) ) + koef_C1)	// Для случая 2 датчика
 
+Uns Tf = 2;
+
+
+
 TPeref	g_Peref;
-Uns		loadAngleSwitch = 0;
 
 //---------------------------------------------------
 void Peref_Init(TPeref *p)
 {
-	//g_Ram.ramGroup.POSITION 	= 0;
-	//g_Ram.ramGroup.TEMP_SENS 	= 0;
-	//g_Ram.ramGroup.SENSORS.all 	= 0;
-	//g_Ram.ramGroup.COMMAND.all	= 0;
+	peref_ApFilter3Init(&p->URfltr, (LgUns)Prd18kHZ, Tf);		// Инициализируем фильтры
+	peref_ApFilter3Init(&p->USfltr, (LgUns)Prd18kHZ, Tf);
+	peref_ApFilter3Init(&p->UTfltr, (LgUns)Prd18kHZ, Tf);
+	peref_ApFilter3Init(&p->IUfltr, (LgUns)Prd18kHZ, Tf);
+	peref_ApFilter3Init(&p->IVfltr, (LgUns)Prd18kHZ, Tf);
+	peref_ApFilter3Init(&p->IWfltr, (LgUns)Prd18kHZ, Tf);
 
-	// ----Сигнализация лампочками-----------------------
-	//Peref_LedsInit(&p->leds, Prd10HZ);
-	//ADT75_Init(&p->tempSensor);
-	//обработка энкодера
-	//Peref_EncoderInit(&p->position);
+	Peref_SensObserverInit(&p->sensObserver);// Инициализируем обработку синусойды
+
+	memset(&p->sinObserver, 0, sizeof(TSinObserver));
+
+	Peref_SinObserverInit(&p->sinObserver.UR,Prd18kHZ);
+	Peref_SinObserverInit(&p->sinObserver.US,Prd18kHZ);
+	Peref_SinObserverInit(&p->sinObserver.UT,Prd18kHZ);
+	Peref_SinObserverInit(&p->sinObserver.IU,Prd18kHZ);
+	Peref_SinObserverInit(&p->sinObserver.IV,Prd18kHZ);
+	Peref_SinObserverInit(&p->sinObserver.IW,Prd18kHZ);
+
+	p->phaseOrder.UR = &p->sinObserver.UR;	 // Привязываем
+	p->phaseOrder.US = &p->sinObserver.US;
+	p->phaseOrder.UT = &p->sinObserver.UT;
+
+	p->phaseOrder.Timeout = 5;
+
+	peref_ApFilter1Init(&p->Phifltr, Prd200HZ, 0.02);
+
+
 }
 //---------------------------------------------------
 void Peref_18kHzCalc(TPeref *p) // 18 кГц
 {
+	//-------------------- Фильтруем АЦП-------------------------------
 
+	p->URfltr.Input = ADC_UR;
+	p->USfltr.Input = ADC_US;
+	p->UTfltr.Input = ADC_UT;
+	p->IUfltr.Input = ADC_IU;
+	p->IVfltr.Input = ADC_IV;
+	p->IWfltr.Input = ADC_IW;
+
+
+	peref_ApFilter3Calc(&p->URfltr);
+	peref_ApFilter3Calc(&p->USfltr);
+	peref_ApFilter3Calc(&p->UTfltr);
+	peref_ApFilter3Calc(&p->IUfltr);
+	peref_ApFilter3Calc(&p->IVfltr);
+	peref_ApFilter3Calc(&p->IWfltr);
+
+	//-------------- Обработка синусойды ------------------------------
+
+	p->sensObserver.URinp = p->URfltr.Output;
+	p->sensObserver.USinp = p->USfltr.Output;
+	p->sensObserver.UTinp = p->UTfltr.Output;
+	p->sensObserver.IUinp = p->IUfltr.Output;
+	p->sensObserver.IVinp = p->IVfltr.Output;
+	p->sensObserver.IWinp = p->IWfltr.Output;
+
+
+	Peref_SensObserverUpdate(&p->sensObserver);
+
+	//--------------- RMS угол полярность -----------------------------
+
+	p->sinObserver.UR.Input = p->sensObserver.URout;
+	p->sinObserver.US.Input = p->sensObserver.USout;
+	p->sinObserver.UT.Input = p->sensObserver.UTout;
+	p->sinObserver.IU.Input = p->sensObserver.IUout;
+	p->sinObserver.IV.Input = p->sensObserver.IVout;
+	p->sinObserver.IW.Input = p->sensObserver.IWout;
+
+	Peref_SinObserverUpdate(&p->sinObserver.UR);
+	Peref_SinObserverUpdate(&p->sinObserver.US);
+	Peref_SinObserverUpdate(&p->sinObserver.UT);
+	Peref_SinObserverUpdate(&p->sinObserver.IU);
+	Peref_SinObserverUpdate(&p->sinObserver.IV);
+	Peref_SinObserverUpdate(&p->sinObserver.IW);
+
+	Peref_PhaseOrderUpdate(&p->phaseOrder);
+
+	if (!p->sinObserver.IV.CurAngle)	p->Phifltr.Input = p->sinObserver.US.CurAngle;
 }
 
 //---------------------------------------------------
-// Обработка фильтров
 void Peref_50HzCalc(TPeref *p)	// 50 Гц
 {
-	//Peref_TenControl(p);
+	peref_ApFilter1Calc(&p->Phifltr);
 }
 
 void Peref_10HzCalc(TPeref *p)	// 10 Гц
@@ -66,78 +124,4 @@ void Peref_10HzCalc(TPeref *p)	// 10 Гц
 
 }
 
-//---------------------------------------------------
-void Peref_TenInit(TTen *p, Uns freq, Uns tenTime, Uns tenRate) 
-{
-	//p->timerTen = 0;
-	//p->timerTenTimeOut = freq*tenTime;
-	//p->tenEnableTime = (Uns)(p->timerTenTimeOut * tenRate)/100;
-}
-//---------------------------------------------------
-void Peref_TenControl(void) // 10 Гц
-{
-	// условие для аварийного отключения или включения ТЭНа надо дописать
-	//if (g_Ram.ramGroup.COMMAND.bit.ten==1) OFF_TEN=1;
-	//else if (g_Ram.ramGroup.COMMAND.bit.ten==0) OFF_TEN=0;
-
-	/*if (!g_Ram.ramGroup.TEN_ENABLE)		// Если ТЕН запрещен
-	{
-		if (!g_Comm.digitInterface.Outputs.bit.Dout5)		// Если тен включен
-			g_Comm.digitInterface.Outputs.bit.Dout5 = 1; 	// то выключаем его
-		if (!shiftReg2.data.bit.ten)		// Если тен включен
-			shiftReg2.data.bit.ten = 1; 	// то выключаем его
-		if (!shiftReg2.data.bit.ten_bubi)	// и выходим из функции
-			shiftReg2.data.bit.ten_bubi = 1;
-		return;								
-	}
-
-	if (g_Peref.tempSensor.error == true)
-	{
-		g_Comm.digitInterface.Outputs.bit.Dout5 = 0;
-		shiftReg2.data.bit.ten = 0;
-		shiftReg2.data.bit.ten_bubi = 0;
-		return;
-	}
-	// Пока что решили не вычислять интенсивность ТЕНА
-	//Peref_TenRateCalc(p);					// Вычисляем интенсивность ТЕН
-
-	if (g_Ram.ramGroupA.TEMPER_PU <= g_Ram.ramGroupC.TEN_ON_LEVEL)		// Если ТЕН включен
-	{
-		g_Comm.digitInterface.Outputs.bit.Dout5 = 0;
-		shiftReg2.data.bit.ten = 0;
-		shiftReg2.data.bit.ten_bubi = 0;
-	}
-	else if (g_Ram.ramGroupA.TEMPER_PU >= g_Ram.ramGroupC.TEN_OFF_LEVEL)									// иначе (Если ТЕН выключен)
-	{
-		if (!g_Comm.digitInterface.Outputs.bit.Dout5)		// Если тен включен
-			g_Comm.digitInterface.Outputs.bit.Dout5 = 1; 	// то выключаем его
-		if (!shiftReg2.data.bit.ten)						// Если тен включен
-			shiftReg2.data.bit.ten = 1; 					// то выключаем его
-		if (!shiftReg2.data.bit.ten_bubi)					// Если тен включен
-			shiftReg2.data.bit.ten_bubi = 1; 				// то выключаем его
-	}*/
-}
-//---------------------------------------------------
-void Peref_TenRateCalc(TTen *p)
-{
-	/*Int deltaT;
-	static Uns tenRate, prevTenRate;
-
-	deltaT = g_Ram.ramGroup.TEN_OFF_LEVEL - g_Ram.ramGroup.TEMPER_PU;
-	
-	if (deltaT <= 1)		// температура ниже 4 град
-		tenRate = 30;
-	else if (deltaT <= 5)	// температура ниже 0 град
-		tenRate = 50;
-	else if (deltaT <= 10)	// температура ниже -5 град
-		tenRate = 80;
-	else 					// температура ниже -10 град
-		tenRate = 100;		
-
-	if (tenRate != prevTenRate)
-	{
-		Peref_TenInit(p, Prd10HZ, g_Ram.ramGroup.TEN_PERIOD, tenRate);
-		prevTenRate = tenRate;
-	}*/
-} 
 //---------------------------------------------------

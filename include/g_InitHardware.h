@@ -36,18 +36,28 @@ extern "C" {
 #define WORK_DSP_LED	GpioDataRegs.GPBDAT.bit.GPIO43
 #define OFF_TEN			GpioDataRegs.GPADAT.bit.GPIO6
 
-//--- BUTTON's ---------------------------------------
-#define HALL_OPEN		AdcRegs.ADCRESULT0
-#define HALL_STOP_MU	AdcRegs.ADCRESULT1
-#define HALL_CLOSE		AdcRegs.ADCRESULT2
-#define HALL_STOP_DU	AdcRegs.ADCRESULT3
-
 //--- MODBUS -----------------------------------------
 
 #define RS485_DIR_BKD		GpioDataRegs.GPBDAT.bit.GPIO52
 #define RS485_DIR_ASU		GpioDataRegs.GPBDAT.bit.GPIO51
 #define RS485_DIR_SHN		GpioDataRegs.GPBDAT.bit.GPIO50
 #define RS485_DIR_BT		GpioDataRegs.GPBDAT.bit.GPIO53
+
+//--- BUTTON's ---------------------------------------
+#define HALL_OPEN		AdcRegs.ADCRESULT0
+#define HALL_STOP_MU	AdcRegs.ADCRESULT1
+#define HALL_CLOSE		AdcRegs.ADCRESULT2
+#define HALL_STOP_DU	AdcRegs.ADCRESULT3
+
+//--- SENSORS ---------------------------------------- PIA 03.04.14
+#define ADC_UR			AdcRegs.ADCRESULT0
+#define ADC_US			AdcRegs.ADCRESULT1
+#define ADC_UT			AdcRegs.ADCRESULT2
+
+#define ADC_IU			AdcRegs.ADCRESULT3
+#define ADC_IV			AdcRegs.ADCRESULT4
+#define ADC_IW			AdcRegs.ADCRESULT5
+
 
 //----------------------------------------
 // Toggle GPIO32 once per 500 milliseconds
