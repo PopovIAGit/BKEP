@@ -18,7 +18,7 @@ unsigned long test_counter = 0x12345678;
 /*Uns conn_enable = 1;
 Uns max_time = 0;
 Uns conn_err = 0;*/
-
+//
 static Uns CalcCRC(Byte *buf, Uns len);
 
 void SciMasterConnBetweenBlockInit(TMbBBHandle bPort)
