@@ -42,7 +42,12 @@ void main(void) {
 	{
 		ModBusUpdate(&g_Comm.mbAsu); // slave
 		ModBusUpdate(&g_Comm.mbShn); // master
-		SciMasterConnBetweenBlockUpdate(&g_Comm.mbBkp);
+		SciMasterConnBetweenBlockUpdate(&g_Comm.mbBkp);// master
+
+		BluetoothWTUpdate(&g_Comm.Bluetooth);
+		//ModBusUpdate(&g_Comm.mbBt);  // slave
+		//ImUpdate(&Im);
+
 		//ModBusUpdate(&g_Comm.mbBt);  // slave
 		//ModBusUpdate(&g_Comm.mbBkp); // master
 		//SerialCommUpdate(&Mb);
@@ -64,17 +69,15 @@ interrupt void SciaRxIsrHandler(void)
 	//g_Core.protections.existConnMB = 1; //связь по MODBUS есть
 
 	//SerialCommRxHandler(&Mb);
+	//if (SciaRegs.SCIRXST.bit.BRKDT) SCI_reset(SCIA);
 
-	if (SciaRegs.SCIRXST.bit.BRKDT) SCI_reset(SCIA);
 	SciMasterConnBetweenBlockRxHandler(&g_Comm.mbBkp);
-
 	PieCtrlRegs.PIEACK.bit.ACK9 = 1;
 }
 //-------------------------------------------------------------
 interrupt void SciaTxIsrHandler(void)
 {
 	//ModBusTxIsr(&g_Comm.mbAsu);
-
 	//SerialCommTxHandler(&Mb);
 
 	SciMasterConnBetweenBlockTxHandler(&g_Comm.mbBkp);

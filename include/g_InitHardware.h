@@ -49,18 +49,16 @@ extern "C" {
 #define RS485_DIR_SHN		GpioDataRegs.GPBDAT.bit.GPIO50
 #define RS485_DIR_BT		GpioDataRegs.GPBDAT.bit.GPIO53
 
-//-------------------------------
- // Toggle GPIO32 once per 500 milliseconds
+//----------------------------------------
+// Toggle GPIO32 once per 500 milliseconds
+//----------------------------------------
 
-
-//-------------------------------
-
-//--system config------------
+//---system config------------
 #define ADC_INT_ENABLE		1
 #define CPU0_INT_ENABLE		1
 #define SCIRX_INT_ENABLE	1
 #define SCITX_INT_ENABLE	1
-//-- common -----------------
+//---common ------------------
 #define GPIO_ON				0
 #define GPIO_OFF			1
 

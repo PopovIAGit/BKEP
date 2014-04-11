@@ -3,7 +3,7 @@
 #include "comm.h"
 #include "g_Ram.h"
 
-#define SCI_ID				SCIB
+#define SCI_ID				SCIA
 #define SCI_BAUD			SCI_BRR(1152)
 
 #define SCI_BREAK			0x20
@@ -20,7 +20,6 @@ Uns max_time = 0;
 Uns conn_err = 0;*/
 
 static Uns CalcCRC(Byte *buf, Uns len);
-
 
 void SciMasterConnBetweenBlockInit(TMbBBHandle bPort)
 {

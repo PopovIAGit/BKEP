@@ -20,7 +20,7 @@ void Comm_Init(TComm *p)
 
 	InitChanelAsuModbus(&g_Comm.mbAsu);
 	InitChanelShnModbus(&g_Comm.mbShn);
-	InitChanelBtModbus(&g_Comm.mbBt);
+	InitChanelBtModus(&g_Comm.mbBt);
 
 	SerialCommInit(&g_Comm.mbAsu);
 	SerialCommInit(&g_Comm.mbShn);

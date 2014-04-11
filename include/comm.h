@@ -16,6 +16,7 @@
 #include "comm_ModbusRtu.h"
 #include "comm_SerialComm.h"
 #include "comm_BetweenBlock.h"
+#include "comm_BluetoothWT41.h"
 
 
 #ifdef __cplusplus
@@ -38,6 +39,7 @@ typedef struct {
 	TMbPort  			mbAsu;				// ModBus - юяс
 	TMbPort  			mbShn;				// ModBus - соо
 	TMbPort  			mbBt;				// ModBus - Bluetooth
+	TBluetoothPort		Bluetooth;			// Bluetooth
 } TComm;
 //--------------------------------------------------------
 
