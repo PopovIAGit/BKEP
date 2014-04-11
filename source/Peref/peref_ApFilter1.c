@@ -1,0 +1,29 @@
+/*======================================================================
+Имя файла:          ApFilter1.c
+Автор:              Попов И.А.
+Версия файла:       01.00
+Дата изменения:		04/04/14
+======================================================================*/
+
+#include "peref_ApFilter1.h"
+
+
+void peref_ApFilter1Init(APFILTER1 *p, Uns Freq, Uns Tf)
+{
+	p->dt = _IQ15div(1LU, Freq);
+	p->Tf = _IQ15mpy(p->dt, _IQ15(Tf));
+	p->K1 = _IQdiv(p->dt, (p->dt + p->Tf));
+	p->K2 = _IQdiv(p->Tf, (p->dt + p->Tf));
+}
+
+void peref_ApFilter1Reset(APFILTER1 *p)
+{
+	p->Output  = 0;
+	p->PrevOut = 0;
+}
+
+void peref_ApFilter1Calc(APFILTER1 *p)
+{
+	p->Output  = _IQmpy(p->Input, p->K1) + _IQmpy(p->PrevOut, p->K2);
+	p->PrevOut = p->Output;
+}
