@@ -39,7 +39,6 @@ extern "C" {
 typedef struct _TBluetoothPort
 {
 	Byte UartID;               // Идентификатор UART-порта
-	Byte Mode;                 // Режим работы
 	Byte Slave;                // Адрес подчиненного устройства
 	Uns  BaudRate;             // Скорость обмена / 100
 	Uns  UartBaud;             // Расчитанная скорость для UART
@@ -61,14 +60,11 @@ typedef struct _TBluetoothPort
 	char *DeviceNameString;
 	char *DeviceAuthCodeString;
 
-	Byte (*ReceiveByte)(void);
-	void (*TransmitByte)(Byte Data);
-
 	char RxBuffer[BT_RX_BUFFER_SIZE];
 
 	#if BT_DBG
-	Uns TxBytesCount;
-	Uns RxBytesCount;
+		Uns TxBytesCount;
+		Uns RxBytesCount;
 	#endif
 			
 } TBluetoothPort,*TBluetoothHandle;
