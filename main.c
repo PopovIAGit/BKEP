@@ -25,7 +25,7 @@ void main(void) {
 	//Stat_Init(&g_Stat);
 	//g_Ram_Init(&g_Ram);
 	//Core_Init(&g_Core);
-	//Comm_Init(&g_Comm);
+	Comm_Init(&g_Comm);
 	//Peref_Init(&g_Peref);
 
 	InterruptInit();
@@ -40,11 +40,11 @@ void main(void) {
 
 	while(1)
 	{
-		ModBusUpdate(&g_Comm.mbAsu); // slave
-		ModBusUpdate(&g_Comm.mbShn); // master
-		SciMasterConnBetweenBlockUpdate(&g_Comm.mbBkp);// master
+		ModBusUpdate(&g_Comm.mbAsu); // slave канал связи с верхним уровнем АСУ
+		ModBusUpdate(&g_Comm.mbShn); // master канал связи с устройством плавного пуска
+		SciMasterConnBetweenBlockUpdate(&g_Comm.mbBkp);// master канал связи с
 
-		BluetoothWTUpdate(&g_Comm.Bluetooth);
+		BluetoothWTUpdate(&g_Comm.Bluetooth); //драйвер Bluetooth
 		//ModBusUpdate(&g_Comm.mbBt);  // slave
 		//ImUpdate(&Im);
 

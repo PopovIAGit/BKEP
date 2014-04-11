@@ -24,7 +24,6 @@ __inline void RxDataMode(TBluetoothHandle);
 Bool CheckString(TBluetoothHandle, char *Str);
 Bool CheckSciCommErr(TBluetoothHandle);
 
-
 void BluetoothWTInit(TBluetoothHandle bPort)
 {
 
