@@ -23,21 +23,17 @@
 #define koef_C1		_IQ15(6928.57)
 #define ADC_to_R1(inpADC1)	_IQ15int(_IQ15mpy(koef_B1, _IQ15(inpADC1) ) + koef_C1)	// ƒл€ случа€ 2 датчика
 
-Uns Tf = 2;
-
-
-
 TPeref	g_Peref;
 
 //---------------------------------------------------
-void Peref_Init(TPeref *p)
+void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновление
 {
-	peref_ApFilter3Init(&p->URfltr, (LgUns)Prd18kHZ, Tf);		// »нициализируем фильтры
-	peref_ApFilter3Init(&p->USfltr, (LgUns)Prd18kHZ, Tf);
-	peref_ApFilter3Init(&p->UTfltr, (LgUns)Prd18kHZ, Tf);
-	peref_ApFilter3Init(&p->IUfltr, (LgUns)Prd18kHZ, Tf);
-	peref_ApFilter3Init(&p->IVfltr, (LgUns)Prd18kHZ, Tf);
-	peref_ApFilter3Init(&p->IWfltr, (LgUns)Prd18kHZ, Tf);
+	peref_ApFilter3Init(&p->URfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);		// »нициализируем фильтры
+	peref_ApFilter3Init(&p->USfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);
+	peref_ApFilter3Init(&p->UTfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);
+	peref_ApFilter3Init(&p->IUfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
+	peref_ApFilter3Init(&p->IVfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
+	peref_ApFilter3Init(&p->IWfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
 
 	Peref_SensObserverInit(&p->sensObserver);// »нициализируем обработку синусойды
 
@@ -55,10 +51,15 @@ void Peref_Init(TPeref *p)
 	p->phaseOrder.UT = &p->sinObserver.UT;
 
 	p->phaseOrder.Timeout = 5;
+	p->Umid = 0;
+	p->Imid = 0;
+	p->AngleUI = 0;
 
-	peref_ApFilter1Init(&p->Phifltr, Prd200HZ, 0.02);
+	peref_ApFilter1Init(&p->Phifltr, Prd200HZ, 0.05);
+	peref_ApFilter1Init(&p->Umfltr, Prd200HZ, 0.05);
+	peref_ApFilter1Init(&p->Imfltr, Prd200HZ, 0.05);
 
-
+	Peref_CalibInit(&p->Position);
 }
 //---------------------------------------------------
 void Peref_18kHzCalc(TPeref *p) // 18 к√ц
@@ -117,6 +118,15 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
 void Peref_50HzCalc(TPeref *p)	// 50 √ц
 {
 	peref_ApFilter1Calc(&p->Phifltr);
+	p->AngleUI = _IQtoIQ16(p->Phifltr.Output);
+
+	p->Umfltr.Input = _IQ16toIQ(Mid3UnsValue(p->sinObserver.UR.Output, p->sinObserver.US.Output, p->sinObserver.UT.Output));
+	peref_ApFilter1Calc(&p->Umfltr);
+	p->Umid = _IQtoIQ16(p->Umfltr.Output);
+
+	p->Imfltr.Input = _IQ16toIQ(Mid3UnsValue(p->sinObserver.IU.Output, p->sinObserver.IV.Output, p->sinObserver.IW.Output));
+	peref_ApFilter1Calc(&p->Imfltr);
+	p->Imid = _IQtoIQ16(p->Imfltr.Output);
 }
 
 void Peref_10HzCalc(TPeref *p)	// 10 √ц

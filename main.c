@@ -25,11 +25,11 @@ void main(void) {
 	//Stat_Init(&g_Stat);
 	//g_Ram_Init(&g_Ram);
 	//Core_Init(&g_Core);
-	Comm_Init(&g_Comm);
-	//Peref_Init(&g_Peref);
+	//Comm_Init(&g_Comm);
+	Peref_Init(&g_Peref);
 
 	InterruptInit();
-	//MonitorInit();
+	MonitorInit();
 
 	StartCpuTimer0();
 
@@ -56,7 +56,7 @@ void main(void) {
 
 interrupt void CpuTimer0IsrHandler(void)	//	18 000
 {
-	//MonitorUpdate();
+	MonitorUpdate1();
 	InterruptUpdate();
 	PieCtrlRegs.PIEACK.bit.ACK1 = 1;
 }

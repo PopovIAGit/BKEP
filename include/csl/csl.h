@@ -36,6 +36,7 @@
 
 #include "csl\csl_spi.h"
 #include "csl\csl_sci.h"
+#include "csl/csl_dlog.h"
 
 #endif
 

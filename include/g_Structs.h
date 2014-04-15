@@ -378,19 +378,6 @@ typedef union _TOutputMask {
 	 } bit;
 } TOutputMask;
 
-/*
-// Функции Profibus DP
-typedef union _TPbFuncs {
-	Uns all;
-	struct {
-		Uns Rsvd1:1;		// 0		Резерв
-		Uns Sync:1;			// 1		Sync supported
-		Uns Freeze:1;		// 2		Freeze supported
-		Uns Rsvd:13;		// 3-15  Резерв
-	} bit;
-} TPbFuncs;*/
-
-
 // Управление работой защит
 typedef enum {
   pmOff       = 0,		// Защита выключена
@@ -431,7 +418,7 @@ typedef union _TLedsReg {	// МОИ
 	struct {
 		Uns Opened:1;     	// 0     Открыто
 		Uns Muff:1;      	// 1     Муфта
-		Uns Defect:1;       	// 2     Програмирование
+		Uns Defect:1;       // 2     Неисправность
 		Uns Closed:1;     	// 4     Закрыто
 		Uns Fault:1;     	// 3     Авария
 		Uns Pdu:1;			// 5	 ПДУ
