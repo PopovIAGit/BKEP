@@ -21,9 +21,12 @@ extern "C" {
 #define SCIC	2
 #define SCID	3
 
+#define MCBSPA	0
+#define MCBSPB	1
+
 #define SCI_PARITY_ERROR	0x04
 #define SCI_OVERRUN_ERROR	0x08
-#define SCI_FRAME_ERROR	0x10
+#define SCI_FRAME_ERROR		0x10
 #define SCI_RX_ERROR		0x1C
 
 #define SCI_BRR(Baud)			(Uint16)((Uint32)(150e6 / 800)  / (Baud) - 1)

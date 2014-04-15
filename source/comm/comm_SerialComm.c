@@ -31,7 +31,7 @@ __inline Byte WriteDataRegsTek(Uns Addr, Uns *Data, Uns Count);
 //---------------------------------------------------
 void InitChanelAsuModbus(TMbHandle hPort)
 {
-	hPort->Params.UartID   = ASU_SCI_ID;
+	hPort->Params.ChannelID   = ASU_SCI_ID;
 	hPort->Params.Mode     = MB_SLAVE;
 	hPort->Params.Slave    = 1;//g_Ram.ramGroupB.RS_STATION;
 	hPort->Params.BaudRate = BaudRates[3];//BaudRates[g_Ram.ramGroupB.RS_BAUD_RATE];
@@ -48,12 +48,17 @@ void InitChanelAsuModbus(TMbHandle hPort)
 	hPort->Params.AckTimeout  = 1000;
 	hPort->Params.TrEnable    = &AsuMbSetTr;
 	hPort->Frame.TimerPre.Timeout = 10; //  » 
+
+	hPort->Params.HardWareType	= UART_TYPE;
+
+	//hPort->HardwareSetup = SerialCommInit;
+
 }
 //---------------------------------------------------
 void InitChanelBkpModbus(TMbHandle hPort)
 {
-	hPort->Params.UartID   = ASU_SCI_ID;
-	hPort->Params.Mode     = MB_SLAVE;
+	hPort->Params.ChannelID   = ASU_SCI_ID;
+	hPort->Params.Mode     = MB_MASTER;
 	hPort->Params.Slave    = 1;//g_Ram.ramGroupB.RS_STATION;
 	hPort->Params.BaudRate = BaudRates[3];//BaudRates[g_Ram.ramGroupB.RS_BAUD_RATE];
 	hPort->Params.UartBaud = BrrValues[3];//BrrValues[g_Ram.ramGroupB.RS_BAUD_RATE];
@@ -69,12 +74,14 @@ void InitChanelBkpModbus(TMbHandle hPort)
 	hPort->Params.AckTimeout  = 1000;
 	hPort->Params.TrEnable    = &BkpMbSetTr;
 	hPort->Frame.TimerPre.Timeout = 10; //  » 
+
+	hPort->Params.HardWareType	= UART_TYPE;
 }
 //---------------------------------------------------
 void InitChanelShnModbus(TMbHandle hPort)
 {
-	hPort->Params.UartID   = ASU_SCI_ID;
-	hPort->Params.Mode     = MB_SLAVE;
+	hPort->Params.ChannelID   = ASU_SCI_ID;
+	hPort->Params.Mode     = MB_MASTER;
 	hPort->Params.Slave    = 1;//g_Ram.ramGroupB.RS_STATION;
 	hPort->Params.BaudRate = BaudRates[3];//BaudRates[g_Ram.ramGroupB.RS_BAUD_RATE];
 	hPort->Params.UartBaud = BrrValues[3];//BrrValues[g_Ram.ramGroupB.RS_BAUD_RATE];
@@ -90,15 +97,17 @@ void InitChanelShnModbus(TMbHandle hPort)
 	hPort->Params.AckTimeout  = 1000;
 	hPort->Params.TrEnable    = &ShnMbSetTr;
 	hPort->Frame.TimerPre.Timeout = 10; //  » 
+
+	hPort->Params.HardWareType	= UART_TYPE;
 }
 //---------------------------------------------------
 void InitChanelBtModbus(TMbHandle hPort)
 {
-	hPort->Params.UartID   = ASU_SCI_ID;
+	hPort->Params.ChannelID   = BT_MCBSP_ID;
 	hPort->Params.Mode     = MB_SLAVE;
 	hPort->Params.Slave    = 1;//g_Ram.ramGroupB.RS_STATION;
-	hPort->Params.BaudRate = BaudRates[3];//BaudRates[g_Ram.ramGroupB.RS_BAUD_RATE];
-	hPort->Params.UartBaud = BrrValues[3];//BrrValues[g_Ram.ramGroupB.RS_BAUD_RATE];
+	hPort->Params.BaudRate = 0;//BaudRates[g_Ram.ramGroupB.RS_BAUD_RATE];
+	hPort->Params.UartBaud = 0;//BrrValues[g_Ram.ramGroupB.RS_BAUD_RATE];
 	hPort->Params.Parity   = 0;//g_Ram.ramGroupB.RS_MODE;
 
 	hPort->Params.RetryCount  = 0;
@@ -111,6 +120,9 @@ void InitChanelBtModbus(TMbHandle hPort)
 	hPort->Params.AckTimeout  = 1000;
 	hPort->Params.TrEnable    = &BtMbSetTr;
 	hPort->Frame.TimerPre.Timeout = 10; //  » 
+
+	hPort->Params.HardWareType	= MCBSP_TYPE;
+
 }
 
 void SerialCommInit(TMbHandle hPort)
@@ -126,8 +138,6 @@ void SerialCommTimings(TMbHandle hPort)
 void ModBusSlaveReset(TMbHandle hPort)
 {
 	ModBusInit(hPort);
-	SciaRegs.SCIHBAUD = hPort->Params.UartBaud >> 8; //  » 
-	SciaRegs.SCILBAUD = hPort->Params.UartBaud & 0x00FF; //  » 
 }
 //---------------------------------------------------
 void ModBusUpdate(TMbHandle hPort)

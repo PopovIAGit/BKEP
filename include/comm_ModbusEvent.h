@@ -17,7 +17,8 @@ __inline void CrcPack(TMbPort *);
 //-------------------------------------------------------------------------------
 __inline void BreakFrameEvent(TMbPort *hPort)
 {
-	SCI_rx_disable(hPort->Params.UartID);
+	if (hPort->Params.HardWareType==UART_TYPE) SCI_rx_disable(hPort->Params.ChannelID);
+	else if (hPort->Params.HardWareType==MCBSP_TYPE) McBsp_rx_disable(hPort->Params.ChannelID);
 }
 
 //-------------------------------------------------------------------------------
@@ -32,7 +33,9 @@ __inline void NewFrameEvent(TMbPort *hPort)
 __inline void PreambleEvent(TMbPort *hPort)
 {
 	hPort->Frame.Data = hPort->Frame.Buf;
-	SCI_transmit(hPort->Params.UartID, *hPort->Frame.Data++);
+
+	if (hPort->Params.HardWareType==UART_TYPE) SCI_transmit(hPort->Params.ChannelID, *hPort->Frame.Data++);
+	else if (hPort->Params.HardWareType==MCBSP_TYPE) McBsp_transmit(hPort->Params.ChannelID, *hPort->Frame.Data++);
 }
 
 //-------------------------------------------------------------------------------
@@ -41,8 +44,15 @@ __inline void PostambleEvent(TMbPort *hPort)
 	hPort->Frame.Data = hPort->Frame.Buf;
 	hPort->Params.TrEnable(0);
 	//GpioDataRegs.GPADAT.bit.GPIO30=1;???
-	SCI_tx_disable(hPort->Params.UartID);
-	SCI_rx_enable(hPort->Params.UartID);
+
+	if (hPort->Params.HardWareType==UART_TYPE){
+		SCI_tx_disable(hPort->Params.ChannelID);
+		SCI_rx_enable(hPort->Params.ChannelID);
+	}
+	else if (hPort->Params.HardWareType==MCBSP_TYPE) {
+		McBsp_tx_disable(hPort->Params.ChannelID);
+		McBsp_rx_enable(hPort->Params.ChannelID);
+	}
 }
 
 //-------------------------------------------------------------------------------
@@ -85,7 +95,10 @@ static void SendFrame(TMbPort *hPort)
 	CrcPack(hPort);
 	hPort->Params.TrEnable(1);
 	//GpioDataRegs.GPADAT.bit.GPIO30=0;???
-	SCI_tx_enable(hPort->Params.UartID);
+
+	if (hPort->Params.HardWareType==UART_TYPE) SCI_tx_enable(hPort->Params.ChannelID);
+	else if (hPort->Params.HardWareType==MCBSP_TYPE) McBsp_tx_enable(hPort->Params.ChannelID);
+
 	StartTimer(&hPort->Frame.TimerPre);
 	hPort->Stat.TxMsgCount++;
 }

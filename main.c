@@ -24,6 +24,7 @@ void main(void) {
 	//
 	//Stat_Init(&g_Stat);
 	//g_Ram_Init(&g_Ram);
+	//g_RamTek_Init(&g_Ram);
 	//Core_Init(&g_Core);
 	Comm_Init(&g_Comm);
 	//Peref_Init(&g_Peref);
@@ -40,17 +41,7 @@ void main(void) {
 
 	while(1)
 	{
-		ModBusUpdate(&g_Comm.mbAsu); // slave канал связи с верхним уровнем АСУ
-		ModBusUpdate(&g_Comm.mbShn); // master канал связи с устройством плавного пуска
-		SciMasterConnBetweenBlockUpdate(&g_Comm.mbBkp);// master канал связи с
-
-		BluetoothWTUpdate(&g_Comm.Bluetooth); //драйвер Bluetooth
-		//ModBusUpdate(&g_Comm.mbBt);  // slave
-		//ImUpdate(&Im);
-
-		//ModBusUpdate(&g_Comm.mbBt);  // slave
-		//ModBusUpdate(&g_Comm.mbBkp); // master
-		//SerialCommUpdate(&Mb);
+		Comm_Update(&g_Comm);
 	}
 }
 
@@ -112,6 +103,25 @@ interrupt void ScicTxIsrHandler(void)
 {
 	ModBusTxIsr(&g_Comm.mbShn);
 	PieCtrlRegs.PIEACK.bit.ACK8 = 1;
+}
+//-------------------------------------------------------------
+interrupt void McbspRxAHandler(void) // прерывание приема данных
+{
+    //rdata=McbspaRegs.DRR1.all;
+    //if (rdata != ( (rdata_point) & 0x00FF) ) error();
+    //rdata_point = (rdata_point+1) & 0x00FF;
+    // To receive more interrupts from this PIE group, acknowledge this interrupt
+	BluetoothRxHandler(&g_Comm.Bluetooth, &g_Comm.mbBt);
+    PieCtrlRegs.PIEACK.all = PIEACK_GROUP6;
+}
+//-------------------------------------------------------------
+interrupt void McbspTxAHandler(void) // прерывание передачи данных
+{
+    //McbspaRegs.DXR1.all= sdata;
+    //sdata = (sdata+1)& 0x00FF ;
+    // To receive more interrupts from this PIE group, acknowledge this interrupt
+    BluetoothTxHandler(&g_Comm.Bluetooth, &g_Comm.mbBt);
+    PieCtrlRegs.PIEACK.all = PIEACK_GROUP6;
 }
 //-------------------------------------------------------------
 /*interrupt void  adc_isr(void)

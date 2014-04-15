@@ -18,6 +18,8 @@ interrupt void ScibRxIsrHandler(void);			// SCI B RX
 interrupt void ScibTxIsrHandler(void);			// SCI B TX
 interrupt void ScicRxIsrHandler(void);			// SCI C RX
 interrupt void ScicTxIsrHandler(void);			// SCI C TX
+interrupt void McbspRxAHandler(void);			// McBSP A RX
+interrupt void McbspTxAHandler(void);			// McBSP A TX
 
 void ADCCinit(void);
 
@@ -45,6 +47,7 @@ void InitHardware(void)
 	//InitI2CGpio();  	// - I2C
 	InitSciGpio();  	// - SCI - BKP-A, ASU-B, SHN-C
 	//McBSP				// - SCI - BT
+	InitMcbspaGpio();
 
 	// Disable global Interrupts and higher priority real-time debug events
 
@@ -83,6 +86,8 @@ void InitHardware(void)
 	PieVectTable.SCITXINTC = &ScicTxIsrHandler;
 	PieVectTable.ADCINT    = &adc_isr;
 	//PieVectTable.I2CINT1A  = &i2c_int1a_isr;
+	PieVectTable.MRINTA= &McbspRxAHandler;
+    PieVectTable.MXINTA= &McbspTxAHandler;
 	EDIS;
 
 	// Initialize all the Device Peripherals
@@ -96,24 +101,27 @@ void InitHardware(void)
 
 	PieCtrlRegs.PIEIER1.bit.INTx7 = 1; // TINT0
 	PieCtrlRegs.PIECTRL.bit.ENPIE = 1; // Enable the PIE block
-
+	//SCI-A
 	PieCtrlRegs.PIEIER9.bit.INTx1 = 1; // PIE Group 9, INT1 // SCIRXINTA
 	PieCtrlRegs.PIEIER9.bit.INTx2 = 1; // PIE Group 9, INT2 // SCITXINTA
-
+	//SCI-B
 	PieCtrlRegs.PIEIER9.bit.INTx3 = 1; // PIE Group 9, INT3 // SCIRXINTB
 	PieCtrlRegs.PIEIER9.bit.INTx4 = 1; // PIE Group 9, INT4 // SCITXINTB
-
+	//SCI-C
 	PieCtrlRegs.PIEIER8.bit.INTx5 = 1; // PIE Group 8, INT5 // SCIRXINTC
 	PieCtrlRegs.PIEIER8.bit.INTx6 = 1; // PIE Group 8, INT6 // SCITXINTC
+	//McBSP
+	PieCtrlRegs.PIEIER6.bit.INTx5 = 1; // PIE Group 6, INT5 // MCBSPRXA
+	PieCtrlRegs.PIEIER6.bit.INTx6 = 1; // PIE Group 6, INT6 // MCBSPTXA
 
 	//PieCtrlRegs.PIEIER1.bit.INTx1 = 1; // ADC
 	PieCtrlRegs.PIEIER1.bit.INTx6 = 1;
 	//PieCtrlRegs.PIEIER8.bit.INTx1 = 1; // I2C
 
-	// Enable CPU INT8 which is connected to PIE group 8
     //IER |= M_INT8; // הכÿ I2C
-	IER |= M_INT1; // הכÿ ְײֿ
-	IER |= 0x100;
+	IER |= M_INT1;   // הכÿ ְײֿ
+	IER |= M_INT6;   // הכÿ McBSP
+	IER |= M_INT9;   // הכÿ SCI A,B,C
 	EnableCpuTimer0();
 
 	// Configure ADC

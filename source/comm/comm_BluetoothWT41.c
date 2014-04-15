@@ -23,14 +23,19 @@ void SendCommandTwo(TBluetoothHandle, char *ComStr, char *AddStr);
 void ClearInitValues(TBluetoothHandle);
 void ClearValues(TBluetoothHandle);
 __inline void RxCommandMode(TBluetoothHandle);
-__inline void RxDataMode(TBluetoothHandle);
+__inline void RxDataMode(TBluetoothHandle,TMbHandle);
 Bool CheckString(TBluetoothHandle, char *Str);
 Bool CheckCommError(TBluetoothHandle);
 
-void EnableBtRx(void);
-void EnableBtTx(void);
-Byte ReceiveBtByte(void);
-void TransmitBtByte(Byte Data);
+//void EnableBtRx(TMbHandle);
+//void EnableBtTx(TMbHandle);
+//Byte ReceiveBtByte(void);
+//void TransmitBtByte(Byte Data);
+
+void EnableBtRx(TBluetoothHandle);
+void EnableBtTx(TBluetoothHandle);
+Byte ReceiveBtByte(TBluetoothHandle);
+void TransmitBtByte(TBluetoothHandle, Byte Data);
 
 void InitChanelBtModus(TBluetoothHandle bPort)
 {
@@ -40,19 +45,19 @@ void InitChanelBtModus(TBluetoothHandle bPort)
 	bPort->TxBytesCount = 0;
 	#endif
 
-	EnableBtRx();
-
-	bPort->BaudRate=1152;             // Скорость обмена / 100
-	bPort->UartBaud=1212;             // Расчитанная скорость для McBSP
-
 	bPort->DeviceNameString = &StrDev[0];
 	bPort->DeviceAuthCodeString = BT_AUTH_CODE_STRING;
 
 	//!!!Init здесь должна быть инициализация McBSP
-	/*SCI_init(BT_SCI, SCI_BRR(BT_SCI_BAUD), 0, 8);
-	SciaRegs.SCICCR.bit.STOPBITS = 0;
-	EnableBtRx();*/
-
+	if (bPort->HardWareType==UART_TYPE)
+	{
+		SCI_init(bPort->ChannelID, bPort->UartBaud, bPort->Parity, 8);
+		SciaRegs.SCICCR.bit.STOPBITS = 0;
+	} else
+	if (bPort->HardWareType==MCBSP_TYPE){
+		InitMcbspa();
+	}
+	EnableBtRx(bPort);
 
 	// После включения Bluetooth запускаем таймер
 	bPort->Timer = bPort->Period;
@@ -151,7 +156,9 @@ void SendCommandOne(TBluetoothHandle bPort, char *ComStr)
 {
 	switch(bPort->CmdState)
 	{
-		case 0: EnableBtTx();
+		case 0: EnableBtTx(bPort);
+				//McBsp_rx_enable(MCBSPA);
+				//McBsp_tx_enable(MCBSPA);
 				//bPort->EnableTx();
 				bPort->StrIndex = 0;
 				bPort->CmdState = 1;
@@ -163,7 +170,9 @@ void SendCommandOne(TBluetoothHandle bPort, char *ComStr)
 					bPort->CmdState = 2;
 				break;
 
-		case 2:	EnableBtRx();
+		case 2:	EnableBtRx(bPort);
+				//McBsp_tx_enable(MCBSPA);
+				//McBsp_rx_enable(MCBSPA);
 				//bPort->EnableRx();
 				bPort->StrIndex = 0;
 				bPort->CmdState = 3;
@@ -180,7 +189,9 @@ void SendCommandTwo(TBluetoothHandle bPort, char *ComStr, char *AddStr)
 {
 	switch(bPort->CmdState)
 	{
-		case 0: EnableBtTx();
+		case 0: EnableBtTx(bPort);
+				//McBsp_rx_enable(MCBSPA);
+				//McBsp_tx_enable(MCBSPA);
 				//bPort->EnableTx();
 				bPort->StrIndex = 0;
 				bPort->CmdState = 1;
@@ -191,7 +202,9 @@ void SendCommandTwo(TBluetoothHandle bPort, char *ComStr, char *AddStr)
 					bPort->CmdState = 2;
 				break;
 
-		case 2:	EnableBtRx();
+		case 2:	EnableBtRx(bPort);
+				//McBsp_tx_enable(MCBSPA);
+				//McBsp_rx_enable(MCBSPA);
 				//bPort->EnableRx();
 				bPort->StrIndex = 0;
 				bPort->CmdState = 3;
@@ -205,11 +218,11 @@ void SendCommandTwo(TBluetoothHandle bPort, char *ComStr, char *AddStr)
 
 
 
-void BluetoothRxHandler(TBluetoothHandle bPort)
+void BluetoothRxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 {
 	// Обработчик прерывания зависит от текущего режима Bluetooth
 	if 		(bPort->Mode == BT_COMMAND_MODE)	RxCommandMode(bPort);
-	else if (bPort->Mode == BT_DATA_MODE)		RxDataMode(bPort);
+	else if (bPort->Mode == BT_DATA_MODE)		RxDataMode(bPort, hPort);
 }
 
 //проверка статуса McBSP
@@ -234,7 +247,7 @@ __inline void RxCommandMode(TBluetoothHandle bPort)
 	if (bPort->Error)
 		return;
 
-	Data = ReceiveBtByte();
+	Data = ReceiveBtByte(bPort);
 
 #if BT_DBG
 	bPort->RxBytesCount++;
@@ -250,7 +263,7 @@ __inline void RxCommandMode(TBluetoothHandle bPort)
 	bPort->StrIndex++;
 }
 
-__inline void RxDataMode(TBluetoothHandle bPort)
+__inline void RxDataMode(TBluetoothHandle bPort, TMbHandle hPort)
 {
 	char Data;
 
@@ -259,7 +272,7 @@ __inline void RxDataMode(TBluetoothHandle bPort)
 	if (bPort->Error)
 		return;
 
-	Data = ReceiveBtByte();
+	Data = ReceiveBtByte(bPort);
 
 #if BT_DBG
 	bPort->RxBytesCount++;
@@ -287,7 +300,7 @@ __inline void RxDataMode(TBluetoothHandle bPort)
 	}
 }
 
-void BluetoothTxHandler(TBluetoothHandle bPort)
+void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 {
 #if BT_DBG
 	bPort->TxBytesCount++;
@@ -344,7 +357,7 @@ void SendOneString(TBluetoothHandle bPort, char *String)
 			bPort->StrIndex++;
 			bPort->Status = BT_TRANSMIT_BUSY;				// Статус передачи
 			bPort->TxBusy = true;							// Выставляем флаг передачи
-			TransmitBtByte(symbol);					// Передаем на SCI
+			TransmitBtByte(bPort, symbol);					// Передаем на SCI
 		}
 	}
 }
@@ -400,35 +413,71 @@ void SendTwoString(TBluetoothHandle bPort, char *FirstString, char *SecondString
 			bPort->StrIndex++;
 			bPort->Status = BT_TRANSMIT_BUSY;				// Статус передачи
 			bPort->TxBusy = true;							// Выставляем флаг передачи
-			TransmitBtByte(symbol);					// Передаем на SCI
+			TransmitBtByte(bPort, symbol);					// Передаем на SCI
 		}
 	}
 }
 
 //McBSP включение прерывания на приём
 // и выключение прерывания на передачу
-void EnableBtRx(void)
+void EnableBtRx(TBluetoothHandle bPort)
 {
-	//SCI_tx_disable(BT_SCI);
-	//SCI_rx_enable(BT_SCI);
+	if (bPort->HardWareType==UART_TYPE)
+	{
+		SCI_tx_disable(bPort->ChannelID);
+		SCI_rx_enable(bPort->ChannelID);
+
+	} else if (bPort->HardWareType==UART_TYPE){
+
+		McBsp_tx_disable(bPort->ChannelID);
+		McBsp_rx_enable(bPort->ChannelID);
+	}
 }
 
 //McBSP включение прерывания на передачу
 // и выключение прерывания на приём
-void EnableBtTx(void)
+void EnableBtTx(TBluetoothHandle bPort)
 {
+	if (bPort->HardWareType==UART_TYPE)
+	{
+		SCI_rx_disable(bPort->ChannelID);
+		SCI_tx_enable(bPort->ChannelID);
+
+	} else if (bPort->HardWareType==UART_TYPE){
+
+		McBsp_rx_disable(bPort->ChannelID);
+		McBsp_tx_enable(bPort->ChannelID);
+	}
+
 	//SCI_rx_disable(BT_SCI);
 	//SCI_tx_enable(BT_SCI);
 }
 
 //приём 1 байта по каналу McBSP
-Byte ReceiveBtByte(void)
+Byte ReceiveBtByte(TBluetoothHandle bPort)
 {
-	return 0;//SCI_recieve(BT_SCI);
+	if (bPort->HardWareType==UART_TYPE)
+	{
+		return SCI_recieve(bPort->ChannelID);
+
+	} else if (bPort->HardWareType==UART_TYPE){
+
+		return McBsp_recieve(bPort->ChannelID);
+	}
+
+	return 0;
 }
 
 //передача 1 байта по каналу McBSP
-void TransmitBtByte(Byte Data)
+void TransmitBtByte(TBluetoothHandle bPort, Byte Data)
 {
-	//SCI_transmit(BT_SCI, Data);
+	if (bPort->HardWareType==UART_TYPE)
+	{
+		McBsp_transmit(bPort->ChannelID, Data);
+
+	} else if (bPort->HardWareType==UART_TYPE){
+
+		McBsp_transmit(bPort->ChannelID, Data);
+	}
+
 }

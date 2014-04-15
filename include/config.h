@@ -46,10 +46,15 @@
 #define CONCAT(First, Second) CONCAT2(First, Second)
 #define STATIC_ASSERT(expr) typedef char CONCAT(static_assert_failed_at_line_, __LINE__) [(expr) ? 1 : -1]
 
+// Выбор физики для передачи данных
+#define UART_TYPE			0
+#define MCBSP_TYPE			1
+
 
 // Подключение заголовочных файлов
 #include "csl\csl_spi.h"
 #include "csl\csl_sci.h"
+#include "csl\csl_mcbsp.h"
 #include "chip\DSP2833x_Device.h"	// Заголовные файлы переферии чипа
 #include "std.h"					// Библиотека поддержки чипа
 #include "IQmathLib.h"
