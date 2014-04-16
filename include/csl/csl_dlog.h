@@ -39,8 +39,20 @@ typedef struct _TDataLog {
 	Int  *Graph2Ptr;
 } TDataLog;
 
+typedef struct {
+
+	Uns program;
+	Uns mon_index;
+	Uns dot;
+	Uns dot_max;
+	Int buffer1[256];
+	Int buffer2[256];
+
+}TMonitor;
+
 void MonitorInit(void);
 void MonitorUpdate(void);
+void MonitorUpdate1(void);
 
 void DLOG_update(TDataLog *);
 

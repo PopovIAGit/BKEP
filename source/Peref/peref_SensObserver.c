@@ -11,9 +11,6 @@
 #include "g_Ram.h"
 #include "peref.h"
 
-Uns a = 1;
-Uns b = 1;
-
 void Peref_SensObserverInit(TSensObserver *p)
 {
 	p->parSensors.p_UR_Mpy		= &g_Ram.ramGroupC.UR_Mpy;
@@ -55,13 +52,9 @@ void Peref_SensObserverUpdate(TSensObserver *p) // 18000 Гц
 	p->UTout = ADC_CONV(p->UTinp, *p->parSensors.p_UT_Mpy, *p->parSensors.p_UT_Offset);
 
 	// Преобразование токов
-/*	p->IUout = ADC_CONV(p->IUinp, *p->parSensors.p_IU_Mpy, *p->parSensors.p_IU_Offset);
+	p->IUout = ADC_CONV(p->IUinp, *p->parSensors.p_IU_Mpy, *p->parSensors.p_IU_Offset);
 	p->IVout = ADC_CONV(p->IVinp, *p->parSensors.p_IV_Mpy, *p->parSensors.p_IV_Offset);
-	p->IWout = ADC_CONV(p->IWinp, *p->parSensors.p_IW_Mpy, *p->parSensors.p_IW_Offset);*/
-
-		p->IUout = ADC_CONV(p->IUinp, a, b);
-		p->IVout = ADC_CONV(p->IVinp, a, b);
-		p->IWout = ADC_CONV(p->IWinp, a, b);
+	p->IWout = ADC_CONV(p->IWinp, *p->parSensors.p_IW_Mpy, *p->parSensors.p_IW_Offset);
 
 	// Проверили и поправили значения оффсетов
 	SetOffsets(p);

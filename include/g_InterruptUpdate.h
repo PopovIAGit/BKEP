@@ -83,7 +83,7 @@ LgUns  X, X10, X18;
 
 TPeriodicalFunction Task18kHz[] =         
 {
-//	PrdElemInit(Peref_18kHzCalc,				&g_Peref),
+	PrdElemInit(Peref_18kHzCalc,				&g_Peref),
 //	PrdElemInit(MonitorUpdate,					NULL),
 	//PrdElemInit(AvagoEncoderAEAT84ADCalc,		&g_Peref.position),
 	PrdElemInit(task1,	NULL)
@@ -105,6 +105,7 @@ TPeriodicalFunction Task2kHz[] =          //Не более 4-х задач
 TPeriodicalFunction Task200Hz[] =       	//не более  20-ти задач
 {
 //	PrdElemInit(Peref_DisplayUpdate, 			&g_Peref.display),
+	PrdElemInit(Peref_CalibUpdate, 				&g_Peref.Position),
 	PrdElemInit(SciMasterConnBetweenBlockUpdate, 	&g_Comm.mbBkp),
 };
 
@@ -112,8 +113,9 @@ TPeriodicalFunction Task200Hz[] =       	//не более  20-ти задач
 
 TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 {
-	/*PrdElemInit(Peref_50HzCalc,					&g_Peref),
-	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.protections.overHeatBlock),
+	PrdElemInit(Peref_50HzCalc,					&g_Peref),
+	PrdElemInit(Peref_SpeedCalc, &g_Peref.Position),
+	/*PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.protections.overHeatBlock),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.protections.underColdBlock),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.protections.overTemper1),
 	PrdElemInit(EleSyEncoderCalc,				&g_Peref.position.encoder),*/
@@ -139,6 +141,7 @@ TPeriodicalFunction Task10Hz[] =        //не более  200-т задач
 	//PrdElemInit(Peref_LedsUpdate,			&g_Peref.leds),
 	//PrdElemInit(Peref_TenControl,			NULL),
 	//PrdElemInit(Peref_10HzCalc,				&g_Peref),
+	PrdElemInit(Peref_Calibration, 			&g_Peref.Position),
 	PrdElemInit(task1_10Hz,	NULL)
 };
 //------------Конец файла-----------------------------------------------
