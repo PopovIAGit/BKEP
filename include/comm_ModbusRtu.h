@@ -79,7 +79,7 @@ extern "C" {
 typedef void (*TMbTrFunc)(Byte);
 
 typedef struct _TMbParams {
-	Byte UartID;               // Идентификатор UART-порта
+	Byte ChannelID;               // Идентификатор UART-порта
 	Byte Mode;                 // Режим работы
 	Byte Slave;                // Адрес подчиненного устройства
 	Uns  BaudRate;             // Скорость обмена / 100
@@ -92,6 +92,7 @@ typedef struct _TMbParams {
 	Uns  ConnTimeout;          // Тайм-аут определения связи (в мсек)
 	Uns  AckTimeout;           // Тайм-аут подтверждения (в мсек)
 	TMbTrFunc TrEnable;   		// Функция разрешения передачи
+	Uns  HardWareType;			// тип аппаратного канала передачи данных
 } TMbParams;
 
 // Структра пакета данных
@@ -129,6 +130,8 @@ typedef struct _TMbStat {
 	Uns DiagnReg;              // Регистр диагностики
 	Uns BusMsgCount;           // Счетчик сообщений
 	Uns BusErrCount;           // Счетчик ошибок связи
+	Uns SyncTxErrCount;			// Счетчик ошибок связи на приём
+	Uns SyncRxErrCount;			// Счетчик ошибок связи на передачу
 	Uns BusExcCount;           // Счетчик исключений
 	Uns SlaveMsgCount;         // Счетчик обработанных сообщений
 	Uns SlaveNoRespCount;      // Счетчик неответов
@@ -166,6 +169,14 @@ typedef struct _TMbPort {
 	TMbFrame  Frame;           // Структура кадра
 	TMbStat   Stat;            // Статистика работы
 	TSerialInterface Serial;	// Послед. интерфейс
+
+	/*void (*HardwareSetup)(TMbHandle);
+	Bool (*CheckCommError)(void);
+	void (*EnableRx)(void);
+	void (*EnableTx)(void);
+	Byte (*ReceiveByte)(void);
+	void (*TransmitByte)(Byte Data);*/
+
 } TMbPort,*TMbHandle;
 
 //typedef struct TMbPort ;

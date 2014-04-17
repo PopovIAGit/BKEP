@@ -13,7 +13,10 @@
 void ModBusRxIsr(TMbPort *hPort)
 {
 	TMbFrame *Frame = &hPort->Frame;
-	Byte Data = SCI_recieve(hPort->Params.UartID);
+	Byte Data = 0;
+
+	if (hPort->Params.HardWareType==UART_TYPE) Data = SCI_recieve(hPort->Params.ChannelID);
+	else if (hPort->Params.HardWareType==MCBSP_TYPE) Data = McBsp_recieve(hPort->Params.ChannelID);
 	
 	if ((Frame->Data - Frame->Buf) < 256)
 	{
@@ -30,8 +33,10 @@ void ModBusTxIsr(TMbPort *hPort)
 {
 	TMbFrame *Frame = &hPort->Frame;
 	
-	if ((Frame->Data - Frame->Buf) < Frame->TxLength)
-		SCI_transmit(hPort->Params.UartID, *Frame->Data++);
+	if ((Frame->Data - Frame->Buf) < Frame->TxLength){
+		if (hPort->Params.HardWareType==UART_TYPE) SCI_transmit(hPort->Params.ChannelID, *Frame->Data++);
+		else if (hPort->Params.HardWareType==MCBSP_TYPE) McBsp_transmit(hPort->Params.ChannelID, *Frame->Data++);
+	}
 	else StartTimer(&Frame->TimerPost);
 	
 	hPort->Stat.TxBytesCount++;

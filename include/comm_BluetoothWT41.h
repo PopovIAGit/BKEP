@@ -38,12 +38,14 @@ extern "C" {
 // Структура объекта драйвера
 typedef struct _TBluetoothPort
 {
-	Byte UartID;               // Идентификатор UART-порта
+	Byte ChannelID;               // Идентификатор UART-порта
 	Byte Slave;                // Адрес подчиненного устройства
 	Uns  BaudRate;             // Скорость обмена / 100
 	Uns  UartBaud;             // Расчитанная скорость для UART
 	Byte Parity;               // Режим паритета
 	Byte StopBit;               // Режим паритета
+
+	Uns  HardWareType;			// тип аппаратного канала передачи данных
 
 	Bool TxBusy;
 	Byte State;
@@ -71,8 +73,8 @@ typedef struct _TBluetoothPort
 
 // Прототипы функций
 void BluetoothWTUpdate(TBluetoothHandle);
-void BluetoothRxHandler(TBluetoothHandle);
-void BluetoothTxHandler(TBluetoothHandle);
+void BluetoothRxHandler(TBluetoothHandle, TMbHandle);
+void BluetoothTxHandler(TBluetoothHandle, TMbHandle);
 void BluetoothTimer(TBluetoothHandle);
 
 

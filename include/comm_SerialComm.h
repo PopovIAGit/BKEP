@@ -19,6 +19,8 @@
 #define ASU_SCI_ID			SCIB
 #define SHN_SCI_ID			SCIC
 
+#define BT_MCBSP_ID			MCBSPA
+
 extern Bool MbBkpConnect;
 extern Bool MbAsuConnect;
 extern Bool MbShnConnect;

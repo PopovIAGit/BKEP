@@ -45,7 +45,7 @@ __inline void SlaveResponse(TMbPort *hPort);
 
 void ModBusInit(TMbPort *hPort)
 {
-	Bool *OpenFlag = &OpenFlags[hPort->Params.UartID];
+	Bool *OpenFlag = &OpenFlags[hPort->Params.ChannelID];
 	if (*OpenFlag == false)
 	{
 		memset(&hPort->Packet, 0, sizeof(TMbPacket));
@@ -98,15 +98,30 @@ __inline void UpdateNewFrame(TMbPort *hPort)
 	TMbStat  *Stat  = &hPort->Stat;
 	Byte Status;
 	
-	Status = SCI_getstatus(hPort->Params.UartID);
-	if (Status & SCI_RX_ERROR)
-	{
-		if (Status & SCI_PARITY_ERROR)  Stat->BusParityErrCount++;
-		if (Status & SCI_OVERRUN_ERROR) Stat->BusOverrunErrCount++;
-		if (Status & SCI_FRAME_ERROR)   Stat->BusFrameErrCount++;
-		SCI_reset(hPort->Params.UartID);
-		goto FRAMING_ERROR;
+	//Status = SCI_getstatus(hPort->Params.UartID);
+
+	if (hPort->Params.HardWareType==UART_TYPE) Status = SCI_getstatus(hPort->Params.ChannelID);
+	else if (hPort->Params.HardWareType==MCBSP_TYPE) Status = McBsp_getstatus(hPort->Params.ChannelID);
+
+	//??? определение ошибок для McBsp
+	if (hPort->Params.HardWareType==UART_TYPE){
+		if (Status & SCI_RX_ERROR){
+			if (Status & SCI_PARITY_ERROR)  Stat->BusParityErrCount++;
+			if (Status & SCI_OVERRUN_ERROR) Stat->BusOverrunErrCount++;
+			if (Status & SCI_FRAME_ERROR)   Stat->BusFrameErrCount++;
+			SCI_reset(hPort->Params.ChannelID);
+			goto FRAMING_ERROR;
+		}
+	} else
+	if (hPort->Params.HardWareType==MCBSP_TYPE){
+		if (Status & MCBSP_ERROR){
+			if (Status & MCBSP_TX_SYNC_ERROR) Stat->SyncTxErrCount++;
+			if (Status & MCBSP_RX_SYNC_ERROR) Stat->SyncRxErrCount++;
+			McBsp_reset(hPort->Params.ChannelID);
+			goto FRAMING_ERROR;
+		}
 	}
+
 	
 	if (Frame->RxLength < 3)
 	{
@@ -132,7 +147,9 @@ __inline void UpdateNewFrame(TMbPort *hPort)
 	
 FRAMING_ERROR:
 	Stat->BusErrCount++;
-	SCI_rx_enable(hPort->Params.UartID);
+
+	if (hPort->Params.HardWareType==UART_TYPE) SCI_rx_enable(hPort->Params.ChannelID);
+	else if (hPort->Params.HardWareType==MCBSP_TYPE) McBsp_rx_enable(hPort->Params.ChannelID);
 }
 
 #if defined(_MASTER_)
@@ -143,8 +160,9 @@ __inline void MasterRequest(TMbPort *hPort)
 	if (!Packet->Request) return;
 	if (hPort->Frame.WaitResponse) return;
 	
-	SCI_rx_disable(hPort->Params.UartID);
-	
+	if (hPort->Params.HardWareType==UART_TYPE) SCI_rx_disable(hPort->Params.ChannelID);
+	else if (hPort->Params.HardWareType==MCBSP_TYPE) McBsp_rx_disable(hPort->Params.ChannelID);
+
 	Packet->Exception = 0;
 	switch(Packet->Request)
 	{
@@ -195,7 +213,9 @@ __inline void SlaveIndication(TMbPort *hPort)
 	Slave = hPort->Frame.Buf[0];
 	if ((Slave != 0) && (Slave != hPort->Params.Slave))
 	{
-		SCI_rx_enable(hPort->Params.UartID);
+		if (hPort->Params.HardWareType==UART_TYPE) SCI_rx_enable(hPort->Params.ChannelID);
+		else if (hPort->Params.HardWareType==MCBSP_TYPE) McBsp_rx_enable(hPort->Params.ChannelID);
+
 		return;	
 	}
 	

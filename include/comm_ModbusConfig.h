@@ -18,7 +18,8 @@ static void ResetCommumication(TMbPort *hPort, Bool ClearEventLog)
 	TMbFrame *Frame = &hPort->Frame;
 	Uns Tout1_5, Tout3_5, Scale = (Uns)Params->Scale;
 	
-	SCI_init(Params->UartID, Params->UartBaud, Params->Parity, 8);
+	if (hPort->Params.HardWareType==UART_TYPE) SCI_init(Params->ChannelID, Params->UartBaud, Params->Parity, 8);
+	else if (hPort->Params.HardWareType==MCBSP_TYPE) InitMcbspa();
 	
 	Params->TrEnable(0);
 	

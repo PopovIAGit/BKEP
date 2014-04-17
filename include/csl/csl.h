@@ -36,7 +36,8 @@
 
 #include "csl\csl_spi.h"
 #include "csl\csl_sci.h"
-#include "csl/csl_dlog.h"
+#include "csl\csl_mcbsp.h"
+#include "csl\csl_dlog.h"
 
 #endif
 
