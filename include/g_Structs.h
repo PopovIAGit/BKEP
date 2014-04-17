@@ -317,6 +317,13 @@ typedef enum {
 	spFire 		= 1 		// 1 Пожарка
 }TSettingPlace;
 
+// Управление контакторами д
+typedef enum {
+	cgStop  = 0,
+	cgOpen  = 1,
+	cgClose = 2
+} TContactorGroup;
+
 typedef enum {
 	Empty 	  = 0,
 	dt100_A25 = 1,
@@ -439,14 +446,6 @@ typedef union _THallBlock {
 		Uns Rsvd:12;      // 4-15  Резерв
 	} bit;
 } THallBlock;
-
-// Управление контакторами для БУР М
-typedef enum {
-	cgOff = 0,
-	cgStop = 1,
-	cgOpen = 2,
-	cgClose = 3
-} TContactorGroup;
 
 // Тип задвижки клин/шибер
 typedef enum {

@@ -91,8 +91,6 @@ static Byte CheckStatus(TPerefPosition *, Uns);
 
 void Peref_SpeedCalc(TPerefPosition *);
 
-void SpeedTest(void);
-
 
 #ifdef __cplusplus
 }

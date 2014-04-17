@@ -7,7 +7,7 @@
 <deviceEndianness value="little"/>
 <codegenToolVersion value="6.1.0"/>
 <isElfFormat value="false"/>
-<connection value="common/targetdb/connections/SAU510USBIsoPlusV2_Connection.xml"/>
+<connection value="common/targetdb/connections/SAU510USBIsoPlus_Connection.xml"/>
 <linkerCommandFile value="F28335.cmd"/>
 <rts value="libc.a"/>
 <templateProperties value="id=com.ti.common.project.core.emptyProjectWithMainTemplate,"/>
