@@ -13,6 +13,7 @@
 // Подключение файлов
 //#include "comm_ModbusRtu.h"
 #include "g_Structs.h"
+#include "g_InitHardware.h"
 
 // Выбор портов для связи с ПК и ПДУ
 #define BKP_SCI_ID			SCIA

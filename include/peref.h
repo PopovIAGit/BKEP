@@ -13,6 +13,7 @@
 //----------- Подключение заголовочных файлов -----------------------------
 #include "std.h"
 #include "config.h"
+#include "g_InitHardware.h"
 #include "g_Ram.h"
 #include "peref_ApFilter1.h"  	// PIA 03.04.14
 #include "peref_ApFilter3.h"  	// PIA 04.04.14

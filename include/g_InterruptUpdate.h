@@ -21,8 +21,8 @@
 #include "g_Ram.h"
 //#include "drive.h"
 #include "peref.h"
-//#include "stat.h"
-//#include "csl/csl_dlog.h"
+#include "stat.h"
+#include "csl/csl_dlog.h"
 
 //--------ÎÁÚ‗ÂËÅÍÈÅ ÌÀÊÐÎÑÎÂ------------------------------------------------
 
@@ -104,9 +104,14 @@ TPeriodicalFunction Task2kHz[] =          //Íו במכוו 4-ץ חאהאק
 
 TPeriodicalFunction Task200Hz[] =       	//םו במכוו  20-עט חאהאק
 {
-//	PrdElemInit(Peref_DisplayUpdate, 			&g_Peref.display),
-	PrdElemInit(Peref_CalibUpdate, 				&g_Peref.Position),
+//	PrdElemInit(Peref_DisplayUpdate, 				&g_Peref.display),
+	PrdElemInit(Peref_CalibUpdate, 					&g_Peref.Position),
 	PrdElemInit(SciMasterConnBetweenBlockUpdate, 	&g_Comm.mbBkp),
+	PrdElemInit(DataBufferPre,						&g_Stat),
+	PrdElemInit(LogEvControl,						&g_Stat),
+	PrdElemInit(LogCmdControl,						&g_Stat),
+	PrdElemInit(LogParamMbExec,						&g_Stat),
+	PrdElemInit(LogParamControl,					&g_Stat),
 };
 
 // ================================ 50 Ãצ ==================================
@@ -125,7 +130,7 @@ TPeriodicalFunction Task50Hz[] =        //םו במכוו  80-עט חאהאק
 	PrdElemInit(Core_CmdUpdate,					&g_Core),
 	PrdElemInit(Peref_ClockControl,				&g_Peref.clock),
 	PrdElemInit(Core_StatusUpdate,				&g_Core)*/
-	PrdElemInit(task1,	NULL)
+	PrdElemInit(GetCurrentCmd,					&g_Stat),
 };
 
 // ================================ 10 Ãצ ==================================

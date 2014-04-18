@@ -5,6 +5,7 @@
 #include "core.h"
 #include "comm.h"
 #include "peref.h"
+#include "stat.h"
 
 TRam			g_Ram;
 TTekDriveData	g_RamTek;
@@ -16,17 +17,18 @@ void main(void) {
 	
 	// —начала инициализируетс€ процессор
 	InitHardware();
-	memset(&g_Core, 0, sizeof(TCore));
-	memset(&g_Ram, 	0, sizeof(TRam));
+	memset(&g_Core, 	0, sizeof(TCore));
+	memset(&g_Ram, 	    0, sizeof(TRam));
 	memset(&g_RamTek, 	0, sizeof(TTekDriveData));
-	memset(&g_Comm, 0, sizeof(TComm));
-	memset(&g_Peref,0, sizeof(TPeref));
+	memset(&g_Comm, 	0, sizeof(TComm));
+	memset(&g_Peref,	0, sizeof(TPeref));
+	memset(&g_Stat,		0, sizeof(TStat));
 	//
-	//Stat_Init(&g_Stat);
-	//g_Ram_Init(&g_Ram);
+	Stat_Init(&g_Stat);
+	g_Ram_Init(&g_Ram);
 	//g_RamTek_Init(&g_Ram);
-	//Core_Init(&g_Core);
-	//Comm_Init(&g_Comm);
+	Core_Init(&g_Core);
+	Comm_Init(&g_Comm);
 	Peref_Init(&g_Peref);
 
 	InterruptInit();
@@ -42,12 +44,13 @@ void main(void) {
 	while(1)
 	{
 		Comm_Update(&g_Comm);
+		ImUpdate(&g_Stat.Im);
 	}
 }
 
 interrupt void CpuTimer0IsrHandler(void)	//	18 000
 {
-	MonitorUpdate1();
+	//MonitorUpdate1();
 	InterruptUpdate();
 	PieCtrlRegs.PIEACK.bit.ACK1 = 1;
 }
@@ -107,19 +110,12 @@ interrupt void ScicTxIsrHandler(void)
 //-------------------------------------------------------------
 interrupt void McbspRxAHandler(void) // прерывание приема данных
 {
-    //rdata=McbspaRegs.DRR1.all;
-    //if (rdata != ( (rdata_point) & 0x00FF) ) error();
-    //rdata_point = (rdata_point+1) & 0x00FF;
-    // To receive more interrupts from this PIE group, acknowledge this interrupt
 	BluetoothRxHandler(&g_Comm.Bluetooth, &g_Comm.mbBt);
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP6;
 }
 //-------------------------------------------------------------
 interrupt void McbspTxAHandler(void) // прерывание передачи данных
 {
-    //McbspaRegs.DXR1.all= sdata;
-    //sdata = (sdata+1)& 0x00FF ;
-    // To receive more interrupts from this PIE group, acknowledge this interrupt
     BluetoothTxHandler(&g_Comm.Bluetooth, &g_Comm.mbBt);
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP6;
 }

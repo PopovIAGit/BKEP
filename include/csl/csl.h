@@ -10,7 +10,7 @@
 
 #ifndef CSL_
 #define CSL_
-
+/*
 #ifndef HSPCLK_PRESC
 #define HSPCLK_PRESC	0
 #endif
@@ -33,7 +33,7 @@
 
 #define F_HSPCLK	(SYSCLK / HSPCLK_DIV)
 #define F_LSPCLK	(SYSCLK / LSPCLK_DIV)
-
+*/
 #include "csl\csl_spi.h"
 #include "csl\csl_sci.h"
 #include "csl\csl_mcbsp.h"

@@ -13,6 +13,12 @@
 
 #include "chip\DSP2833x_Device.h"     // DSP2833x Headerfile Include File
 //#include "DSP2833x_Examples.h"   // DSP2833x Examples Include File
+#include "std.h"
+#include "csl_spi.h"
+
+volatile struct SPI_REGS *SpiRegs[] = {
+	&SpiaRegs
+};
 
 void InitSpiaGpio();
 //---------------------------------------------------------------------------
@@ -26,6 +32,67 @@ void InitSpi(void)
 
    //tbd...
  
+}
+
+void SPI_init(Byte Id, Byte Type, Byte Mode, Uns BaudRate, Byte Length)
+{
+	volatile struct SPI_REGS *Regs = SpiRegs[Id];
+
+	Regs->SPICCR.bit.SPISWRESET = 0;
+	Regs->SPICCR.all = (Length - 1) & 0xF;
+	Regs->SPICTL.all = 0x0;
+
+	if (Type == SPI_MASTER)
+	{
+		Regs->SPICTL.bit.MASTER_SLAVE = 1;
+		Regs->SPICTL.bit.TALK = 1;
+	}
+
+	switch (Mode)
+	{
+		case 0:
+			Regs->SPICTL.bit.CLK_PHASE   = 1;
+			break;
+		case 2:
+			Regs->SPICTL.bit.CLK_PHASE   = 1;
+			Regs->SPICCR.bit.CLKPOLARITY = 1;
+			break;
+		case 3:
+			Regs->SPICCR.bit.CLKPOLARITY = 1;
+			break;
+	}
+
+	//SpiaRegs.SPIBRR =0x000F;
+	Regs->SPIBRR = 0x000f;//BaudRate;
+	Regs->SPIPRI.all = 0x0030;
+	Regs->SPICCR.bit.SPISWRESET = 1;
+}
+
+Uns SPI_send(Byte Id, Uns Data)
+{
+	volatile struct SPI_REGS *Regs = SpiRegs[Id];
+	Regs->SPITXBUF = Data << (0xF - (Regs->SPICCR.all & 0xF));
+	if (Regs->SPICTL.bit.MASTER_SLAVE)
+	{
+		while(!Regs->SPISTS.bit.INT_FLAG);
+		return Regs->SPIRXBUF;
+	}
+	return 0;
+}
+
+void SPI_transmit(Byte Id, Uns Data)
+{
+	SpiRegs[Id]->SPITXBUF = Data << (0xF - (SpiRegs[Id]->SPICCR.all & 0xF));
+}
+
+Uns SPI_recieve(Byte Id)
+{
+	return SpiRegs[Id]->SPIRXBUF;
+}
+
+Bool SPI_ready(Byte Id)
+{
+	return SpiRegs[Id]->SPISTS.bit.INT_FLAG;
 }
 
 //---------------------------------------------------------------------------

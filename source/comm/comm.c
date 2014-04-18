@@ -20,7 +20,7 @@ void Comm_Init(TComm *p)
 
 	InitChanelAsuModbus(&g_Comm.mbAsu);
 	InitChanelShnModbus(&g_Comm.mbShn);
-	InitChanelBtModus(&g_Comm.mbBt);
+	InitChanelBtModbus(&g_Comm.mbBt);
 
 	//настраиваем один и тот же физический канал для драйвера Bluetooth и Modbus
 	g_Comm.Bluetooth.HardWareType = g_Comm.mbBt.Params.HardWareType;	// физика
@@ -49,7 +49,6 @@ void Comm_Update(TComm *p)
 
 	BluetoothWTUpdate(&g_Comm.Bluetooth); //драйвер Bluetooth
 	ModBusUpdate(&g_Comm.mbBt);  // slave
-	//ImUpdate(&Im);
 
 	//ModBusUpdate(&g_Comm.mbBt);  // slave
 	//ModBusUpdate(&g_Comm.mbBkp); // master

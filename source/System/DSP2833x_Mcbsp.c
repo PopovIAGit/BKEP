@@ -39,8 +39,8 @@
 #define MCBSP_INIT_DELAY     2*(CPU_SPD/MCBSP_SRG_FREQ)                  // # of CPU cycles in 2 SRG cycles-init delay
 #define MCBSP_CLKG_DELAY     2*(CPU_SPD/(MCBSP_SRG_FREQ/(1+CLKGDV_VAL))) // # of CPU cycles in 2 CLKG cycles-init delay
 
-void InitMcbspa(void);
-void InitMcbspaGpio(void);
+//void InitMcbspa(void);
+//void InitMcbspaGpio(void);
 void InitMcbspb(void);
 void InitMcbspbGpio(void);
 

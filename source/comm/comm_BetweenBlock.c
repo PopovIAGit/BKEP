@@ -69,10 +69,10 @@ void SciMasterConnBetweenBlockUpdate(TMbBBHandle bPort)
 			if(crc != CalcCRC(bPort->buf, MAX_SCI_BUF_LEN-2))
 				bPort->conn_err++;
 			else {
-				test_counter  = (Uns)bPort->buf[3] << 24;
-				test_counter |= (Uns)bPort->buf[2] << 16;
-				test_counter |= (Uns)bPort->buf[1] << 8;
-				test_counter |= (Uns)bPort->buf[0];
+				test_counter  = ((Uns)bPort->buf[3]) << 24;
+				test_counter |= ((Uns)bPort->buf[2]) << 16;
+				test_counter |= ((Uns)(bPort->buf[1])) << 8;
+				test_counter |= ((Uns)bPort->buf[0]);
 			}
 
 			if(bPort->max_time < bPort->timer) bPort->max_time = bPort->timer;

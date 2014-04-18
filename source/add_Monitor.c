@@ -19,6 +19,8 @@ Int DlogCh1 = 0;
 Int DlogCh2 = 0;
 Uns MonSelect = 1;
 
+void DLOG_update(TDataLog *p);
+
 void MonitorInit(void)
 {
 	memset(&Monitor, 0, sizeof(TMonitor));
@@ -43,7 +45,7 @@ void MonitorInit(void)
 	Dlog.Graph2Ptr  = (Int *)0x3FBE00;
 }
 
-void MonitorUpdate1(void){
+/*void MonitorUpdate1(void){
 
 	if (!Monitor.dot) switch (Monitor.program)
 	{
@@ -67,7 +69,7 @@ void MonitorUpdate1(void){
 		if (++Monitor.mon_index > 255) Monitor.mon_index = 0;
 		Monitor.dot = 0;
 	}
-}
+}*/
 
 void MonitorUpdate(void)
 {

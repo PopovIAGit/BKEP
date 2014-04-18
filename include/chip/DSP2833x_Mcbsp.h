@@ -704,6 +704,8 @@ struct  MCBSP_REGS {
 extern volatile struct MCBSP_REGS McbspaRegs;
 extern volatile struct MCBSP_REGS McbspbRegs;
 
+void InitMcbspa(void);
+
 #ifdef __cplusplus
 }
 #endif /* extern "C" */

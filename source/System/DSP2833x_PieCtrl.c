@@ -63,7 +63,7 @@ void InitPieCtrl(void)
 //---------------------------------------------------------------------------
 // This function enables the PIE module and CPU interrupts
 //
-void EnableInterrupts()
+void EnableInterrupts(void)
 {
 
     // Enable the PIE

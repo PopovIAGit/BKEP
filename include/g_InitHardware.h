@@ -17,24 +17,24 @@ extern "C" {
 #endif
 
 //--- ENCODER ----------------------------------------
-#define ECN_DATA0		GpioDataRegs.GPADAT.bit.GPIO0
-#define ECN_DATA1		GpioDataRegs.GPADAT.bit.GPIO1
-#define ECN_DATA2		GpioDataRegs.GPADAT.bit.GPIO2
+#define ECN_DATA0			GpioDataRegs.GPADAT.bit.GPIO0
+#define ECN_DATA1			GpioDataRegs.GPADAT.bit.GPIO1
+#define ECN_DATA2			GpioDataRegs.GPADAT.bit.GPIO2
 
-#define ECN_ADDR0		GpioDataRegs.GPADAT.bit.GPIO3
-#define ECN_ADDR1		GpioDataRegs.GPADAT.bit.GPIO4
-#define ECN_ADDR2		GpioDataRegs.GPADAT.bit.GPIO5
+#define ECN_ADDR0			GpioDataRegs.GPADAT.bit.GPIO3
+#define ECN_ADDR1			GpioDataRegs.GPADAT.bit.GPIO4
+#define ECN_ADDR2			GpioDataRegs.GPADAT.bit.GPIO5
 
 //--- LED's ------------------------------------------
-#define LED0			GpioDataRegs.GPADAT.bit.GPIO7
-#define LED1			GpioDataRegs.GPADAT.bit.GPIO12
-#define LED2			GpioDataRegs.GPADAT.bit.GPIO16
-#define LED3			GpioDataRegs.GPADAT.bit.GPIO17
-#define LED4			GpioDataRegs.GPADAT.bit.GPIO18
+#define LED0				GpioDataRegs.GPADAT.bit.GPIO7
+#define LED1				GpioDataRegs.GPADAT.bit.GPIO12
+#define LED2				GpioDataRegs.GPADAT.bit.GPIO16
+#define LED3				GpioDataRegs.GPADAT.bit.GPIO17
+#define LED4				GpioDataRegs.GPADAT.bit.GPIO18
 
 //--- FUNCTION ---------------------------------------
-#define WORK_DSP_LED	GpioDataRegs.GPBDAT.bit.GPIO43
-#define OFF_TEN			GpioDataRegs.GPADAT.bit.GPIO6
+#define WORK_DSP_LED		GpioDataRegs.GPBDAT.bit.GPIO43
+#define OFF_TEN				GpioDataRegs.GPADAT.bit.GPIO6
 
 //--- MODBUS -----------------------------------------
 
@@ -44,20 +44,23 @@ extern "C" {
 #define RS485_DIR_BT		GpioDataRegs.GPBDAT.bit.GPIO53
 
 //--- BUTTON's ---------------------------------------
-#define HALL_OPEN		AdcRegs.ADCRESULT0
-#define HALL_STOP_MU	AdcRegs.ADCRESULT1
-#define HALL_CLOSE		AdcRegs.ADCRESULT2
-#define HALL_STOP_DU	AdcRegs.ADCRESULT3
+#define HALL_OPEN			AdcRegs.ADCRESULT0
+#define HALL_STOP_MU		AdcRegs.ADCRESULT1
+#define HALL_CLOSE			AdcRegs.ADCRESULT2
+#define HALL_STOP_DU		AdcRegs.ADCRESULT3
 
 //--- SENSORS ---------------------------------------- PIA 03.04.14
-#define ADC_UR			AdcRegs.ADCRESULT0
-#define ADC_US			AdcRegs.ADCRESULT1
-#define ADC_UT			AdcRegs.ADCRESULT2
+#define ADC_UR				AdcRegs.ADCRESULT0
+#define ADC_US				AdcRegs.ADCRESULT1
+#define ADC_UT				AdcRegs.ADCRESULT2
 
-#define ADC_IU			AdcRegs.ADCRESULT3
-#define ADC_IV			AdcRegs.ADCRESULT4
-#define ADC_IW			AdcRegs.ADCRESULT5
+#define ADC_IU				AdcRegs.ADCRESULT3
+#define ADC_IV				AdcRegs.ADCRESULT4
+#define ADC_IW				AdcRegs.ADCRESULT5
 
+//--- FRAM --------------------------------------------
+#define SC_EEPROM1 			GpioDataRegs.GPCDAT.bit.GPIO79
+#define SC_EEPROM2 			GpioDataRegs.GPCDAT.bit.GPIO78
 
 //----------------------------------------
 // Toggle GPIO32 once per 500 milliseconds

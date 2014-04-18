@@ -17,6 +17,7 @@
 
 
 #include "chip\DSP2833x_Device.h"     // Headerfile Include File
+#include "config.h"
 //#include "DSP2833x_Examples.h"   // Examples Include File
 
 // Functions that will be run from RAM need to be assigned to

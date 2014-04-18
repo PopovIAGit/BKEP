@@ -65,11 +65,11 @@ extern "C" {
 #define DelayUs(A)  __delay_cycles((Extended)(F_SYSCLK / 1e6) * (Extended)(A))
 
 #else
-extern void DelayUs(Uns Delay);
+//extern void DelayUs(Uns Delay);
 #endif
 
 //extern LgInt SAT_VAL(LgInt Val, LgInt Min, LgInt Max);
-extern Bool CheckRange(Uns Data, Uns Min, Uns Max);
+Bool CheckRange(Uns Data, Uns Min, Uns Max);
 extern Uns Min3UnsValue(Uns Val1, Uns Val2, Uns Val3);
 extern Int Min3IntValue(Int Val1, Int Val2, Int Val3);
 extern Uns Mid3UnsValue(Uns Val1, Uns Val2, Uns Val3);
@@ -81,20 +81,20 @@ extern Uns SkewCalc(Uns, Uns, Uns, Uns);
 
 __inline Int Sign(Int Value) {return ((Value < 0) ? -1 : 1);}
 
-extern Uns LIntersection(Uns P1_1, Uns P1_2, Uns P2_1, Uns P2_2);
+//extern Uns LIntersection(Uns P1_1, Uns P1_2, Uns P2_1, Uns P2_2);
 
 // Переменные-разделители
-extern Char FloatSeparator;
+/*extern Char FloatSeparator;
 extern Char FloatPositive;
 extern Char TimeSeparator;
-extern Char DateSeparator;
+extern Char DateSeparator;*/
 
-union _TTimeVar;
-union _TDateVar;
+/*union _TTimeVar;
+union _TDateVar;*/
 
 // Прототипы функции
 //LgInt SAT_VAL(LgInt, LgInt, LgInt);
-Byte DecToStr(Uns Value, String Str, Byte Prec, Byte RateMax, Bool Clear, Bool Sign);
+/*Byte DecToStr(Uns Value, String Str, Byte Prec, Byte RateMax, Bool Clear, Bool Sign);
 void DecToStr4s(Uns Value, String Str);
 Byte BinToStr(Uns Value, String Str, Byte RateMax, Bool BinChar);
 void BinToStr4s(Uns Value, String Str, Byte Bit);
@@ -108,7 +108,9 @@ Uns  StrToDec(String, Byte);
 Uns  StrToBin(String, Byte);
 Uns  StrToHex(String, Byte);
 Uns  StrToTime(String);
-Uns  StrToDate(String);
+Uns  StrToDate(String);*/
+
+
 
 #ifdef __cplusplus
 }

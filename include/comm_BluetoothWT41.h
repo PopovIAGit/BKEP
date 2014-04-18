@@ -64,6 +64,11 @@ typedef struct _TBluetoothPort
 
 	char RxBuffer[BT_RX_BUFFER_SIZE];
 
+	void (*EnableRx)(void);
+	void (*EnableTx)(void);
+	Byte (*ReceiveByte)(void);
+	void (*TransmitByte)(Byte Data);
+
 	#if BT_DBG
 		Uns TxBytesCount;
 		Uns RxBytesCount;
