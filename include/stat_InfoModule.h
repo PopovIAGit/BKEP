@@ -56,7 +56,7 @@ typedef struct
 	Bool IsLogTransmit;
 
 	Uns *DeviceDataPtr;
-	Uns *DownloadBuffer;
+	//Uns *DownloadBuffer;
 		
 	void (*EnableReceive)(void);
 	void (*EnableTransmit)(void);

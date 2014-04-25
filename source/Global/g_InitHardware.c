@@ -37,14 +37,15 @@ extern Uint16 RamfuncsRunStart;
 //---------------------------------------------------
 void InitHardware(void)
 {
+
 	// Initialize System Control
 	// Получаем системную частоту процессора = SYSCLK (30e6)
 	InitSysCtrl();
 
 	// Initalize peripheral
 	InitGpio();			// - GPIO
-	//InitSpiGpio();	// - SPIA
-	//InitI2CGpio();  	// - I2C
+	InitSpiGpio();		// - SPIA
+	InitI2CGpio();  	// - I2C
 	InitSciGpio();  	// - SCI - BKP-A, ASU-B, SHN-C
 	//McBSP				// - SCI - BT
 	InitMcbspaGpio();
@@ -82,17 +83,17 @@ void InitHardware(void)
 	PieVectTable.SCITXINTA = &SciaTxIsrHandler;
 	PieVectTable.SCIRXINTB = &ScibRxIsrHandler;
 	PieVectTable.SCITXINTB = &ScibTxIsrHandler;
-	PieVectTable.SCIRXINTC = &ScicRxIsrHandler;
-	PieVectTable.SCITXINTC = &ScicTxIsrHandler;
+	//PieVectTable.SCIRXINTC = &ScicRxIsrHandler;
+	//PieVectTable.SCITXINTC = &ScicTxIsrHandler;
 	PieVectTable.ADCINT    = &adc_isr;
-	//PieVectTable.I2CINT1A  = &i2c_int1a_isr;
+	PieVectTable.I2CINT1A  = &i2c_int1a_isr;
 	PieVectTable.MRINTA= &McbspRxAHandler;
     PieVectTable.MXINTA= &McbspTxAHandler;
 	EDIS;
 
 	// Initialize all the Device Peripherals
 	InitAdc();
-	//I2CA_Init();
+	I2CA_Init();
 
 	// Configure CPU-Timer 0, 1, and 2 to interrupt every second:
 	// 30MHz CPU Freq, 18кГц  (55 in uSeconds)
@@ -116,23 +117,23 @@ void InitHardware(void)
 
 	//PieCtrlRegs.PIEIER1.bit.INTx1 = 1; // ADC
 	PieCtrlRegs.PIEIER1.bit.INTx6 = 1;
-	//PieCtrlRegs.PIEIER8.bit.INTx1 = 1; // I2C
+	PieCtrlRegs.PIEIER8.bit.INTx1 = 1; // I2C
 
-    //IER |= M_INT8; // для I2C
+    IER |= M_INT8;   // для I2C
 	IER |= M_INT1;   // для АЦП
 	IER |= M_INT6;   // для McBSP
 	IER |= M_INT9;   // для SCI A,B,C
 	EnableCpuTimer0();
 
-	// Configure ADC
+		// Configure ADC
 
 		/*AdcRegs.ADCTRL1.bit.ACQ_PS = 1;  // Sequential mode: Sample rate   = 1/[(2+ACQ_PS)*ADC clock in ns]
-	                        //                     = 1/(3*40ns) =8.3MHz (for 150 MHz SYSCLKOUT)
-	                        //                     = 1/(3*80ns) =4.17MHz (for 100 MHz SYSCLKOUT)
-	                        // If Simultaneous mode enabled: Sample rate = 1/[(3+ACQ_PS)*ADC clock in ns]*/
+		//                     = 1/(3*40ns) =8.3MHz (for 150 MHz SYSCLKOUT)
+		//                     = 1/(3*80ns) =4.17MHz (for 100 MHz SYSCLKOUT)
+		// If Simultaneous mode enabled: Sample rate = 1/[(3+ACQ_PS)*ADC clock in ns]*/
 
 
-	AdcRegs.ADCREFSEL.bit.REF_SEL = 0;			// internal
+		AdcRegs.ADCREFSEL.bit.REF_SEL = 0;			// internal
 
 
 	   AdcRegs.ADCTRL3.bit.ADCCLKPS = 4;		// clock prescaler, FCLK=HSPCLK/(2*ADCCLKPS)
@@ -254,12 +255,12 @@ void InitGpio(void)
 	//GpioDataRegs.GPBDAT.bit.GPIO43	= 0;
 
 	//---------------------------
-	GpioCtrlRegs.GPAMUX2.bit.GPIO31 = 0;
-	GpioCtrlRegs.GPADIR.bit.GPIO31 = 1;
-	GpioCtrlRegs.GPBMUX1.bit.GPIO34 = 0;
-	GpioCtrlRegs.GPBDIR.bit.GPIO34 = 1;
+	//GpioCtrlRegs.GPAMUX2.bit.GPIO31 = 0;
+	//GpioCtrlRegs.GPADIR.bit.GPIO31 = 1;
+	//GpioCtrlRegs.GPBMUX1.bit.GPIO34 = 0;
+	//GpioCtrlRegs.GPBDIR.bit.GPIO34 = 1;
 	//---------------------------
-/*
+
 	//входы
 
 	GpioCtrlRegs.GPBDIR.bit.GPIO40	= 0;	//STATE_TU24
@@ -288,8 +289,9 @@ void InitGpio(void)
 
 	//выходы
 
-	GpioCtrlRegs.GPADIR.bit.GPIO19	= 1;	// WORK_DSP_LED
-	GpioDataRegs.GPADAT.bit.GPIO19	= 0;
+	GpioCtrlRegs.GPAMUX2.bit.GPIO29 = 0;
+	GpioCtrlRegs.GPADIR.bit.GPIO29	= 1;	// WORK_DSP_LED
+	GpioDataRegs.GPADAT.bit.GPIO29	= 0;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO6	= 1;	// OFF_TEN
 	GpioDataRegs.GPADAT.bit.GPIO6	= 0;
@@ -380,13 +382,13 @@ void InitGpio(void)
 
 	GpioCtrlRegs.GPADIR.bit.GPIO11	= 1;	//TS_12
 	GpioDataRegs.GPADAT.bit.GPIO11	= 0;
-*/
+
 	EDIS;
 }
 
 //------ SPI ----------------------------------------
 
-void spi_init()
+/*void spi_init()
 {
 	SpiaRegs.SPICCR.all =0x000F;	             // Reset on, rising edge, 16-bit char bits
 	SpiaRegs.SPICTL.all =0x0006;    		     // Enable master mode, normal phase,
@@ -394,20 +396,20 @@ void spi_init()
 	SpiaRegs.SPIBRR =0x007F;
     SpiaRegs.SPICCR.all =0x009F;		         // Relinquish SPI from Reset
     SpiaRegs.SPIPRI.bit.FREE = 1;                // Set so breakpoints don't disturb xmission
-}
+}*/
 
 /*void spi_xmit(Uint16 a)
 {
     SpiaRegs.SPITXBUF=a;
 } */
 
-void spi_fifo_init()
+/*void spi_fifo_init()
 {
 // Initialize SPI FIFO registers
     SpiaRegs.SPIFFTX.all=0xE040;
     SpiaRegs.SPIFFRX.all=0x204f;
     SpiaRegs.SPIFFCT.all=0x0;
-}
+}*/
 
 //--------------Конец файла--------------------------
 

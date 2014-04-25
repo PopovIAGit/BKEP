@@ -17,7 +17,7 @@
 #ifndef RTC_
 #define RTC_
 
-#include "config.h"
+//#include "config.h"
 //#include "peref_DS1305Drv.h"
 
 #ifdef __cplusplus

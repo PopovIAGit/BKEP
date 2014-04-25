@@ -112,6 +112,7 @@ typedef long double        float64;
 #include "chip\DSP2833x_EQep.h"               // Enhanced QEP
 #include "chip\DSP2833x_Gpio.h"               // General Purpose I/O Registers
 #include "chip\DSP2833x_I2c.h"                // I2C Registers
+#include "chip/DSP2833x_I2c_defines.h"                // I2C Registers
 #include "chip\DSP2833x_McBSP.h"              // McBSP
 #include "chip\DSP2833x_PieCtrl.h"            // PIE Control Registers
 #include "chip\DSP2833x_PieVect.h"            // PIE Vector Table
@@ -240,6 +241,9 @@ void InitAdc(void);
 void InitPeripheralClocks(void);
 void InitPieVectTable(void);
 void EnableInterrupts(void);
+void InitSpiGpio(void);
+void InitI2CGpio(void);
+void InitI2C(void);
 
 #endif  // end of DSP2833x_DEVICE_H definition
 

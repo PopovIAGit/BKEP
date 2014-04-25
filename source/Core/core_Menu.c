@@ -66,7 +66,7 @@ Bool UpdateCode(Uns addrPassw, Uns addrCode, Uns value, Uns def)	// â WriteValue
 	Uns *code = ToUnsPtr(&g_Ram) + addrCode;
 	Bool writeFlag = false;
 
-	//if (!IsEepromReady()) return false;
+	if (!IsMemParReady()) return false;
 	if (*password != 0)
 	{
 		if ((value == *password) || (value == def))
@@ -262,7 +262,7 @@ void SetModBusParams()
 	}
 	*/
 	//äëÿ ÀÑÓ
-	if ((g_Ram.ramGroupB.RsBaudRate == 0xFFFF) & (g_Ram.ramGroupB.RsStation == 0xFFFF))
+	if ((g_Ram.ramGroupB.RsBaudRate == 0xFFFF) & (g_Ram.ramGroupB.RsStation == 0xFFFF || g_Ram.ramGroupB.RsStation == 0))
 	{
 		g_Ram.ramGroupB.RsBaudRate= br19200;
 		g_Ram.ramGroupB.RsStation	= 1;

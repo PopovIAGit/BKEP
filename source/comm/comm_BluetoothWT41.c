@@ -31,7 +31,7 @@ Bool CheckCommError(TBluetoothHandle);
 void EnableBtRx(void);
 void EnableBtTx(void);
 Byte ReceiveBtByte(void);
-void TransmitBtByte(Byte Data);
+void TransmitBtByte(Uns Data);
 /*
 void EnableBtRx(TBluetoothHandle);
 void EnableBtTx(TBluetoothHandle);
@@ -76,7 +76,7 @@ void InitChanelBt(TBluetoothHandle bPort)
 		SciaRegs.SCICCR.bit.STOPBITS = 0;
 	} else
 	if (bPort->HardWareType==MCBSP_TYPE){
-		InitMcbspa();
+		//InitMcbspa();
 	}
 	bPort->EnableRx();
 
@@ -115,14 +115,14 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 				}
 				break;
 				
-		case 4:	SendCommandTwo(bPort, CMD_CONTROL_NAME, bPort->DeviceNameString);
+		case 4:	SendCommandOne(bPort, CMD_CONTROL_NAME);//SendCommandTwo(bPort, CMD_CONTROL_NAME, bPort->DeviceNameString);
 				if (bPort->Status == BT_RECEIVE_COMPLETE)
 				{ 
 					ClearValues(bPort);	bPort->State++;
 				}
 				break;
 
-		case 5: SendCommandTwo(bPort, CMD_CONTROL_AUTH, bPort->DeviceAuthCodeString);
+		case 5: SendCommandOne(bPort, CMD_CONTROL_AUTH);//SendCommandTwo(bPort, CMD_CONTROL_AUTH, bPort->DeviceAuthCodeString);
 				if (bPort->Status == BT_RECEIVE_COMPLETE)
 				{ 
 					ClearValues(bPort);	bPort->State++;
@@ -348,7 +348,7 @@ void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 	bPort->TxBusy = false;
 }
 
-void BtTimer(TBluetoothHandle bPort)
+void BluetoothTimer(TBluetoothHandle bPort)
 {
 	if (bPort->Timer > 0) bPort->Timer--;
 }
@@ -381,9 +381,10 @@ Bool CheckString(TBluetoothHandle bPort, char *Str)
 
 void SendOneString(TBluetoothHandle bPort, char *String)
 {
-	char symbol = 0;
+	char symbol1 = 0;
+	char symbol2 = 0;
 
-	if (!bPort->TxBusy)
+	/*if (!bPort->TxBusy)
 	{
 		symbol = String[bPort->StrIndex];					// Загружаем текущий символ
 		if (symbol == '\0')								// Достигли конца строки
@@ -396,12 +397,101 @@ void SendOneString(TBluetoothHandle bPort, char *String)
 			bPort->StrIndex++;
 			bPort->Status = BT_TRANSMIT_BUSY;				// Статус передачи
 			bPort->TxBusy = true;							// Выставляем флаг передачи
+			//DELAY_US(10);
 			TransmitBtByte(symbol);					// Передаем на SCI
+
+		}
+	}*/
+
+	if (!bPort->TxBusy)
+	{
+		symbol1 = String[bPort->StrIndex];					// Загружаем текущий символ
+		symbol2 = String[bPort->StrIndex+1];					// Загружаем текущий символ
+
+		if (symbol1 == '\0')								// Достигли конца строки
+		{
+			bPort->Status = BT_TRANSMIT_COMPLETE;			// Статус завершения передачи
+			bPort->StrIndex = 0;
+		}
+		else
+		{
+			bPort->StrIndex+=2;
+			bPort->Status = BT_TRANSMIT_BUSY;				// Статус передачи
+			bPort->TxBusy = true;							// Выставляем флаг передачи
+			TransmitBtByte(symbol1|((symbol2<<8)&0xFF00));					// Передаем на SCI
+
+		}
+
+		/*if (symbol2 == '\0')								// Достигли конца строки
+		{
+			bPort->Status = BT_TRANSMIT_COMPLETE;			// Статус завершения передачи
+			bPort->StrIndex = 0;
+		}*/
+
+	}
+}
+
+
+void SendTwoString(TBluetoothHandle bPort, char *FirstString, char *SecondString)
+{
+	char symbol1 = 0;
+	char symbol2 = 0;
+
+	static Bool isFirstStr = true;
+	static Bool isEndSymbols = false;
+	static Byte len1 = 0;
+	static Byte len2 = 0;
+
+	if (!bPort->TxBusy)
+	{
+		if (bPort->Status != BT_TRANSMIT_BUSY)
+		{
+			len1 = strlen(FirstString);
+			len2 = strlen(SecondString);
+		}
+
+		if (isFirstStr && (bPort->StrIndex >= len1))
+		{
+			bPort->StrIndex = 0;
+			isFirstStr = false;
+		}
+
+		if (!isFirstStr && (bPort->StrIndex >= len2))
+		{ 
+			isEndSymbols = true;
+			bPort->StrIndex = 0;
+		}
+
+		symbol1 = (isFirstStr) ? FirstString[bPort->StrIndex] : SecondString[bPort->StrIndex];
+		symbol2 = (isFirstStr) ? FirstString[bPort->StrIndex+1] : SecondString[bPort->StrIndex+1];
+
+		if (isEndSymbols && bPort->StrIndex < 2)
+			symbol1 = (bPort->StrIndex == 0) ? '\r' : '\n';
+		else if (isEndSymbols && bPort->StrIndex >= 2)
+			symbol1 = '\0';
+
+		if (symbol1 == '\0')								// Достигли конца строки
+		{
+			bPort->Status = BT_TRANSMIT_COMPLETE;			// Статус завершения передачи
+			bPort->StrIndex = 0;
+			isFirstStr = true;
+			isEndSymbols = false;
+			len1 = 0;
+			len2 = 0;
+		}
+		else
+		{
+			bPort->StrIndex+=2;
+			bPort->Status = BT_TRANSMIT_BUSY;				// Статус передачи
+			bPort->TxBusy = true;							// Выставляем флаг передачи
+			//TransmitBtByte(symbol);					// Передаем на SCI
+			TransmitBtByte(symbol1|((symbol2<<8)&0xFF00));
 		}
 	}
 }
 
 
+/*
 void SendTwoString(TBluetoothHandle bPort, char *FirstString, char *SecondString)
 {
 	char symbol = 0;
@@ -426,7 +516,7 @@ void SendTwoString(TBluetoothHandle bPort, char *FirstString, char *SecondString
 		}
 
 		if (!isFirstStr && (bPort->StrIndex >= len2))
-		{ 
+		{
 			isEndSymbols = true;
 			bPort->StrIndex = 0;
 		}
@@ -456,7 +546,7 @@ void SendTwoString(TBluetoothHandle bPort, char *FirstString, char *SecondString
 		}
 	}
 }
-
+*/
 //McBSP включение прерывания на приём
 // и выключение прерывания на передачу
 //void EnableBtRx(TBluetoothHandle bPort)
@@ -510,7 +600,7 @@ Byte ReceiveBtByte(void)
 }*/
 
 //передача 1 байта по каналу McBSP
-void TransmitBtByte(Byte Data)
+void TransmitBtByte(Uns Data)
 {
 	McBsp_transmit(MCBSPA, Data);
 }

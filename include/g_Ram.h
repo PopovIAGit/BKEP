@@ -147,8 +147,10 @@ typedef struct _TRamGroupA
 	Int             CurWay;             // 20.Текущий ход
 	Uns             CycleCnt;           // 21.Счетчик циклов
 	Int             Temper;             // 22.Температура блока
-	Uns             VersionPO;       	// 23.Версия ПО
-	Uns Rsvd[16];
+	Int             TemperBKP;          // 23.Температура блока БКП
+	Uns             VersionPO;       	// 24.Версия ПО
+	Uns             VersionPOBkp;      	// 25.Версия ПО БКП
+	Uns Rsvd[14];
 } TRamGroupA;
 
 // Группа B (Адрес = 40, Количество = 50) - Параметры пользователя
@@ -409,7 +411,8 @@ typedef struct _TRamGroupH
 	TContactorGroup ContGroup;			 // 126. Управление контакторами
 	TBurCmd 		LogControlWord;		 // 127. Команды БУР
 	Uns				LogReset;			 // 128. Сброс журналов
-	Uns 			Rsvd3[11];			 // 129-139.Резерв
+	Uns 			BkpIndication;		 // 129. Индикация на БКП
+	Uns 			Rsvd3[10];			 // 130-139.Резерв
 } TRamGroupH;
 
 // Группа E (Адрес 400, Количество 32)

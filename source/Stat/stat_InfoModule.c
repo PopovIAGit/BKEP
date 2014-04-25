@@ -415,8 +415,8 @@ __inline Bool FuncFive(TInfoModule *p, Byte LogType, Uns RecordNum)
 
 						for (i = 0; i < IM_LOGEV_MAIN_CELL_DATA_CNT; i++)
 						{
-							p->WrBuffer[CurrentIndex++] = p->DownloadBuffer[ImIndex + i] >> 8;
-							p->WrBuffer[CurrentIndex++] = p->DownloadBuffer[ImIndex + i] & 0xFF;
+							p->WrBuffer[CurrentIndex++] = p->ImReadBuf[ImIndex + i] >> 8;
+							p->WrBuffer[CurrentIndex++] = p->ImReadBuf[ImIndex + i] & 0xFF;
 						}
 					}
 					else if (CellIndex >= 2)
@@ -430,8 +430,8 @@ __inline Bool FuncFive(TInfoModule *p, Byte LogType, Uns RecordNum)
 							else
 							{	ImIndex = IM_LOGEV_MAIN_CELL_DATA_CNT + IM_DOWNLOAD_BUFFER_SIZE + (IM_LOGEV_BUF_CELL_DATA_CNT * (CellIndex - 2));	}
 								
-							p->WrBuffer[CurrentIndex++] = p->DownloadBuffer[ImIndex + i] >> 8;
-							p->WrBuffer[CurrentIndex++] = p->DownloadBuffer[ImIndex + i] & 0xFF;
+							p->WrBuffer[CurrentIndex++] = p->ImReadBuf[ImIndex + i] >> 8;
+							p->WrBuffer[CurrentIndex++] = p->ImReadBuf[ImIndex + i] & 0xFF;
 						}
 					}
 				}
@@ -447,8 +447,8 @@ __inline Bool FuncFive(TInfoModule *p, Byte LogType, Uns RecordNum)
 
 				for (i = 0; i < IM_LOGCMD_CELL_DATA_CNT; i++)
 				{
-					p->WrBuffer[CurrentIndex++] = p->DownloadBuffer[ImIndex + i] >> 8;
-					p->WrBuffer[CurrentIndex++] = p->DownloadBuffer[ImIndex + i] & 0xFF;
+					p->WrBuffer[CurrentIndex++] = p->ImReadBuf[ImIndex + i] >> 8;
+					p->WrBuffer[CurrentIndex++] = p->ImReadBuf[ImIndex + i] & 0xFF;
 				}
 				
 			break;
@@ -462,8 +462,8 @@ __inline Bool FuncFive(TInfoModule *p, Byte LogType, Uns RecordNum)
 
 				for (i = 0; i < IM_LOGPAR_CELL_DATA_CNT; i++)
 				{
-					p->WrBuffer[CurrentIndex++] = p->DownloadBuffer[ImIndex + i] >> 8;
-					p->WrBuffer[CurrentIndex++] = p->DownloadBuffer[ImIndex + i] & 0xFF;
+					p->WrBuffer[CurrentIndex++] = p->ImReadBuf[ImIndex + i] >> 8;
+					p->WrBuffer[CurrentIndex++] = p->ImReadBuf[ImIndex + i] & 0xFF;
 				}
 
 			break;

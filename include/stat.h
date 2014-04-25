@@ -15,7 +15,7 @@
 #include "stat_LogEvent.h"
 #include "stat_InfoModuleParams.h"
 #include "stat_InfoModule.h"
-#include "g_InitHardware.h"
+
 
 
 // Переопределение для работы с памятью
@@ -27,10 +27,6 @@
 // Макросы флеш
 //#define IsMemParReady()				(!Eeprom1.Func)
 //#define IsMemLogReady()				(!Eeprom2.Func)
-
-//выбор микросхем
-__inline void Eeprom1CsSet(Byte Lev)  {SC_EEPROM1 = Lev;}
-__inline void Eeprom2CsSet(Byte Lev)  {SC_EEPROM2 = Lev;}
 
 //#define IsMainFlashReady()		(!g_MainFlash.func)
 //#define IsMemParReady()			(!g_Eeprom.func)

@@ -10,7 +10,7 @@
 #ifndef INITHARDWARE_
 #define INITHARDWARE_
 
-#include "config.h"
+//#include "config.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,7 +33,7 @@ extern "C" {
 #define LED4				GpioDataRegs.GPADAT.bit.GPIO18
 
 //--- FUNCTION ---------------------------------------
-#define WORK_DSP_LED		GpioDataRegs.GPBDAT.bit.GPIO43
+#define WORK_DSP_LED		GpioDataRegs.GPATOGGLE.bit.GPIO29 // GpioDataRegs.GPBDAT.bit.GPIO43
 #define OFF_TEN				GpioDataRegs.GPADAT.bit.GPIO6
 
 //--- MODBUS -----------------------------------------

@@ -55,7 +55,7 @@ void InitChanelAsuModbus(TMbHandle hPort)
 
 }
 //---------------------------------------------------
-void InitChanelBkpModbus(TMbHandle hPort)
+/*void InitChanelBkpModbus(TMbHandle hPort)
 {
 	hPort->Params.ChannelID   = ASU_SCI_ID;
 	hPort->Params.Mode     = MB_MASTER;
@@ -76,11 +76,11 @@ void InitChanelBkpModbus(TMbHandle hPort)
 	hPort->Frame.TimerPre.Timeout = 10; //  ИК
 
 	hPort->Params.HardWareType	= UART_TYPE;
-}
+}*/
 //---------------------------------------------------
 void InitChanelShnModbus(TMbHandle hPort)
 {
-	hPort->Params.ChannelID   = ASU_SCI_ID;
+	/*hPort->Params.ChannelID   = SHN_SCI_ID;
 	hPort->Params.Mode     = MB_MASTER;
 	hPort->Params.Slave    = 1;//g_Ram.ramGroupB.RS_STATION;
 	hPort->Params.BaudRate = BaudRates[3];//BaudRates[g_Ram.ramGroupB.RS_BAUD_RATE];
@@ -98,7 +98,7 @@ void InitChanelShnModbus(TMbHandle hPort)
 	hPort->Params.TrEnable    = &ShnMbSetTr;
 	hPort->Frame.TimerPre.Timeout = 10; //  ИК
 
-	hPort->Params.HardWareType	= UART_TYPE;
+	hPort->Params.HardWareType	= UART_TYPE;*/
 }
 //---------------------------------------------------
 void InitChanelBtModbus(TMbHandle hPort)
@@ -256,17 +256,17 @@ __inline Byte WriteData(Uns Addr, Uns *Data, Uns Count)
 	//if (!g_Core.menu.EnableEdit(Val->PaswwPrt)) return FR_SUCCESS;
 
 	//проверка на обработку записи значения в память
-	//if (Nvm && !IsEepromReady()) return EX_SLAVE_DEVICE_BUSY;
+	if (Nvm && !IsMemParReady()) return EX_SLAVE_DEVICE_BUSY;
 
 	memcpy(Dest, Data, Count);
 
 	if (Nvm)
 	{
-		/*if ( WriteToEeprom(Addr, Dest, Count) )
+		if ( WriteToEeprom(Addr, Dest, Count) )
 		{
 			RefreshParams(Addr);
 			return FR_SUCCESS;
-		}*/
+		}
 	}
 
 	return FR_SUCCESS;

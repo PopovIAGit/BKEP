@@ -3,9 +3,6 @@
 #include "csl\csl_memory.h"
 #include "stat_fm25v10.h"
 
-TFM25V10 Eeprom1;
-TFM25V10 Eeprom2;
-
 // Коды функций
 #define WRSR		0x01
 #define WRITE		0x02

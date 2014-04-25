@@ -37,8 +37,8 @@ void Stat_Init(TStat *s)
 {
 	int i=0;
 
-	InitInfoModule(&s->Im);
 	InitLogEvent(&s->LogEvent);
+	InitInfoModule(&s->Im);
 
 	memset(&s->LogEventBuffer[0],	0, sizeof(LOG_EV_BUF_CELL_COUNT));//???		// Буфер журнала событий
 
@@ -84,10 +84,10 @@ void Stat_Init(TStat *s)
 	//AT25XXX_Init(&g_Eeprom);
 
 	// Инициализация епром
-	Eeprom1.CsFunc = &Eeprom1CsSet;
+	/*Eeprom1.CsFunc = &Eeprom1CsSet;
 	FM25V10_Init(&Eeprom1);
 	Eeprom2.CsFunc = &Eeprom2CsSet;
-	FM25V10_Init(&Eeprom2);
+	FM25V10_Init(&Eeprom2);*/
 }
 //---------------------------------------------------
 void InitTables(void)
@@ -143,6 +143,8 @@ void InitTables(void)
 
 void InitInfoModule(TInfoModule *im)
 {
+	//memset(&im,	0, sizeof(TInfoModule));
+
 	im->ControlMode=RECEIVE_FUNC_MODE;
 
 	im->FuncState		= imInit;
@@ -158,11 +160,11 @@ void InitInfoModule(TInfoModule *im)
 	im->IsBufReady		= False;
 	im->IsLogTransmit	= False;
 
-	im->DeviceDataPtr = (Uns *)&g_Ram;
-	//im->DownloadBuffer = &ImReadBuf[0];
+	im->DeviceDataPtr   = (Uns *)&g_Ram;
+	//im->DownloadBuffer  = &ImReadBuf[0];
 	memset(&im->ImReadBuf[0],	0, sizeof(IM_READ_BUF_SIZE*2)); // Буфер информационного модуля
 
-	memset(&im,	0, sizeof(TInfoModule));
+
 	memset(&im->RdBuffer[0],	0, sizeof(IM_RD_BUFFER_SIZE));
 	memset(&im->WrBuffer[0],	0, sizeof(IM_WR_BUFFER_SIZE));
 
@@ -407,23 +409,7 @@ void LogEvControl(TStat *s)
 			// После записи основной ячейки, формируем начальный адрес буфера
 			Addr = LOG_EV_BUF_START_ADDR + g_Ram.ramGroupH.LogEvAddr * LOG_EV_BUF_DATA_CNT * LOG_EV_BUF_DATA_CELL;
 		}
-		else if (Menu.EvLogFlag)									// Чтение журнала из меню
-		{
-			if (ReadLogFlag)
-			{
-				Menu.EvLogFlag = False;
-				ReadLogFlag = False;
-			}
-			else
-			{
-				// Формируем адрес на чтение из ПЗУ в зависимости от текущего положения в меню
-				Addr = LOG_EV_START_ADDR + Menu.EvLog.Position * LOG_EV_DATA_CNT * LOG_EV_DATA_CELL;
-				// Отправляем запрос драйверу на чтение. В качестве буфера - группа E Ram
-				ReadPar(Addr, ToUnsPtr(&g_Ram) + LOG_EV_RAM_DATA_ADR, LOG_EV_DATA_CNT);
 
-				ReadLogFlag = True;
-			}
-		}
 	}
 
 	if ((IsMemLogReady()) && (LogEvMainDataFlag))
@@ -451,7 +437,7 @@ void LogEvControl(TStat *s)
 
 void GetCurrentCmd(TStat *s)
 {
-	TBurCmd LogControlWord = bcmNone;
+	/*TBurCmd LogControlWord = bcmNone;
 	static Uns PrevEvLogValue = 0;
 	static Bool FirstCmd = true;
 
@@ -479,6 +465,7 @@ void GetCurrentCmd(TStat *s)
 		case CMD_DEFSTOP:		LogControlWord = bcmDefStop;			break;
 		case CDM_DISCROUT_TEST: LogControlWord = bcmDiscrOutTest;		break;
 		case CMD_DISCRIN_TEST: 	LogControlWord = bcmDiscrInTest; 		break;
+		default: LogControlWord = bcmNone; break;
 	}
 
 	if (Mcu.EvLog.Value != 0)
@@ -497,7 +484,7 @@ void GetCurrentCmd(TStat *s)
 
 	Mcu.EvLog.Value = 0;
 
-	s->LogCmd.CmdReg = LogControlWord;
+	s->LogCmd.CmdReg = LogControlWord;*/
 }
 
 void LogCmdControl(TStat *s)

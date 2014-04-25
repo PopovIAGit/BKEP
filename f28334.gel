@@ -1,8 +1,8 @@
 /********************************************************************/
-/* f28335.gel                                                       */
+/* f28334.gel                                                       */
 /* Version 3.30.5                                                   */
 /*                                                                  */
-/* This GEL file is to be used with the TMS320F28335 DSP.           */
+/* This GEL file is to be used with the TMS320F28334 DSP.           */
 /* Changes may be required to support specific hardware designs.    */
 /*                                                                  */
 /* Code Composer Studio supports six reserved GEL functions that    */
@@ -25,7 +25,6 @@ StartUp()
 /* uncomment, and copy the peripheral header .gel file to 		*/
 /* same directory as device .gel file.                          */
 //  GEL_LoadGel("$(GEL_file_dir)\\DSP2833x_Peripheral.gel");
-
 }
 
 OnReset(int nErrorCode)
@@ -33,7 +32,6 @@ OnReset(int nErrorCode)
     C28x_Mode();
     Unlock_CSM();
     ADC_Cal();
-
 }
 
 OnRestart(int nErrorCode)
@@ -66,7 +64,7 @@ OnFileLoaded(int nErrorCode, int bSymbolsOnly)
 OnTargetConnect()
 {
     C28x_Mode();
-    F28335_Memory_Map();            /* Initialize the CCS memory map */
+    F28334_Memory_Map();            /* Initialize the CCS memory map */
 
 /* Check to see if CCS has been started-up with the DSP already */
 /* running in real-time mode.  The user can add whatever        */
@@ -159,9 +157,9 @@ hotmenu Full_Halt_with_Reset()
 
 
 /********************************************************************/
-/*                         F28335 Memory Map                        */
+/*                         F28334 Memory Map                        */
 /*                                                                  */
-/*   Note: M0M1MAP and VMAP signals tied high on F28335 core        */
+/*   Note: M0M1MAP and VMAP signals tied high on F28334 core        */
 /*                                                                  */
 /*   0x000000 - 0x0003ff   M0 SARAM                (Prog and Data)  */
 /*   0x000400 - 0x0007ff   M1 SARAM                (Prog and Data)  */
@@ -179,8 +177,8 @@ hotmenu Full_Halt_with_Reset()
 /*   0x00E000 - 0x00Efff   L6 SARAM                (Prog and Data)  */
 /*   0x00F000 - 0x00Ffff   L7 SARAM                (Prog and Data)  */
 /*   0x100000 - 0x1fffff   XINTF Zone 6            (Prog and Data)  */
-/*   0x200000 - 0x2fffff   XINTF Zone 7            (Prog and Data   */
-/*   0x300000 - 0x33ffff   Flash                   (Prog and Data)  */
+/*   0x200000 - 0x2fffff   XINTF Zone 7            (Prog and Data)  */
+/*   0x320000 - 0x33ffff   Flash                   (Prog and Data)  */
 /*   0x380080 - 0x380088   ADC_cal function        (Prog and Data)  */
 /*   0x380090 - 0x380090   PARTID value            (Prog and Data)  */
 /*   0x380400 - 0x3807ff   OTP                     (Prog and Data)  */
@@ -192,7 +190,7 @@ hotmenu Full_Halt_with_Reset()
 /********************************************************************/
 menuitem "Initialize Memory Map";
 
-hotmenu F28335_Memory_Map()
+hotmenu F28334_Memory_Map()
 {
     GEL_MapReset();
     GEL_MapOn();
@@ -211,7 +209,7 @@ hotmenu F28335_Memory_Map()
     GEL_MapAdd(0xF000,0,0x1000,1,1);             /* L7 SARAM        */
     GEL_MapAdd(0x100000,0,0x100000,1,1);         /* Zone 6          */
     GEL_MapAdd(0x200000,0,0x100000,1,1);         /* Zone 7          */
-    GEL_MapAdd(0x300000,0,0x40000,1,0);          /* FLASH           */
+    GEL_MapAdd(0x320000,0,0x20000,1,0);          /* FLASH           */
     GEL_MapAdd(0x380080,0,0x00009,1,0);          /* ADC_cal function*/
     GEL_MapAdd(0x380090,0,0x00001,1,0);          /* PARTID value    */
     GEL_MapAdd(0x380400,0,0x00400,1,0);          /* OTP             */
@@ -224,7 +222,7 @@ hotmenu F28335_Memory_Map()
     /* Data memory map */
     GEL_MapAdd(0x000,1,0x400,1,1);               /* M0 SARAM        */
     GEL_MapAdd(0x400,1,0x400,1,1);               /* M1 SARAM        */
-    GEL_MapAdd(0x800,1,0x1800,1,1);               /* PF0             */
+    GEL_MapAdd(0x800,1,0x1800,1,1);              /* PF0             */
     GEL_MapAdd(0x4000,1,0x1000,1,1);             /* Zone 0          */
     GEL_MapAdd(0x5000,1,0x1000,1,1);             /* PF3             */
     GEL_MapAdd(0x6000,1,0x1000,1,1);             /* PF1             */
@@ -239,10 +237,10 @@ hotmenu F28335_Memory_Map()
     GEL_MapAdd(0xF000,1,0x1000,1,1);             /* L7 SARAM        */
     GEL_MapAdd(0x100000,1,0x100000,1,1);         /* Zone 6          */
     GEL_MapAdd(0x200000,1,0x100000,1,1);         /* Zone 7          */
-    GEL_MapAdd(0x300000,1,0x40000,1,0);          /* FLASH           */
-    GEL_MapAdd(0x380400,1,0x00400,1,0);          /* OTP             */
+    GEL_MapAdd(0x320000,1,0x20000,1,0);          /* FLASH           */
     GEL_MapAdd(0x380080,1,0x00009,1,0);          /* ADC_cal function*/
     GEL_MapAdd(0x380090,1,0x00001,1,0);          /* PARTID value    */
+    GEL_MapAdd(0x380400,1,0x00400,1,0);          /* OTP             */
     GEL_MapAdd(0x3f8000,1,0x1000,1,1);           /* L0 SARAM Mirror */
     GEL_MapAdd(0x3f9000,1,0x1000,1,1);           /* L1 SARAM Mirror */
     GEL_MapAdd(0x3fA000,1,0x1000,1,1);           /* L2 SARAM Mirror */
@@ -255,7 +253,7 @@ hotmenu F28335_Memory_Map()
 /* The ESTOP0 fill functions are useful for debug.  They fill the   */
 /* RAM with software breakpoints that will trap runaway code.       */
 /********************************************************************/
-hotmenu Fill_F28335_RAM_with_ESTOP0()
+hotmenu Fill_F28334_RAM_with_ESTOP0()
 {
     GEL_MemoryFill(0x000000,1,0x000800,0x7625);      /* Fill M0/M1  */
     GEL_MemoryFill(0x008000,1,0x002000,0x7625);      /* Fill L0/L1  */
@@ -551,20 +549,18 @@ hotmenu ADC_Cal()
     XAR0 = *0x33FFFE;
     XAR0 = *0x33FFFF;
 
-
     if(((*0x0AEF) & 0x0001) == 0)
     {
         XAR0 = *0x701C;
         *0x701C |= 0x0008;
-    	*0x711C = *0x380083;
+	*0x711C = *0x380083;
         *0x711D = *0x380085;
         *0x701C = XAR0;
-	    XAR0 = 0;
-
+	XAR0 = 0;
     }
     else
     {
-        GEL_TextOut("\nADC Calibration not complete, check if device is unlocked and recalibrate.");
+        GEL_TextOut("\nADC Calibration not complete, device is secure");
     }
 }
 
@@ -608,15 +604,10 @@ hotmenu XINTF_Enable()
 // *(unsigned long *)0x0B2C = 0x0041FFFF;    /* x32 */
 // *(unsigned long *)0x0B2E = 0x0041FFFF;    /* x32 */
 
-
 }
 
-
-
-
-
 /********************************************************************/
-/* The below are used to display the symbolic names of the F28335   */
+/* The below are used to display the symbolic names of the F28334   */
 /* memory mapped registers in the watch window. To view these       */
 /* registers, click on the GEL menu button in Code Composer Studio, */
 /* then select which registers or groups of registers you want to   */
@@ -762,7 +753,6 @@ hotmenu All_Clocking_and_Low_Power_Regs()
     GEL_WatchAdd("*0x7021,x","PLLCR");
 }
 
-
 /********************************************************************/
 /* Code Security Module Registers                                   */
 /********************************************************************/
@@ -838,6 +828,7 @@ hotmenu All_Emulation_Regs()
     GEL_WatchAdd("*0x0885,x","PROTRANGE");
     GEL_WatchAdd("*0x380090,x","PARTID");
 }
+
 /********************************************************************/
 /* DMA Registers                                                    */
 /********************************************************************/
@@ -1902,7 +1893,6 @@ hotmenu eCAP6_All_Regs()
     GEL_WatchAdd("*0x6AB9,x","eCAP6 ECFRC");
 }
 
-
 /********************************************************************/
 /* Enhanced PWM Registers                                           */
 /********************************************************************/
@@ -2884,6 +2874,7 @@ hotmenu SCI_B_All_Regs()
     GEL_WatchAdd("*0x775C,x","SCIFFCTB");
     GEL_WatchAdd("*0x775F,x","SCIPRIB");
 }
+
 hotmenu SCI_B_FIFO_Registers()
 {
     GEL_WatchAdd("*0x775A,x","SCIFFTXB");

@@ -112,7 +112,7 @@ Bool SPI_ready(Byte Id)
 // Only one GPIO pin should be enabled for SPISTEA operation. 
 // Comment out other unwanted lines.
 
-void InitSpiGpio()
+void InitSpiGpio(void)
 {
 
    InitSpiaGpio();

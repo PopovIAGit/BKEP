@@ -21,9 +21,21 @@
 //
 void InitI2C(void)
 {
-	// Initialize I2C-A:
+// Initialize I2C
+   I2caRegs.I2CSAR = 0x0048;		// Slave address - EEPROM control code
 
-	//tbd...
+   //#if (CPU_FRQ_150MHZ)             // Default - For 150MHz SYSCLKOUT
+		I2caRegs.I2CPSC.all = 14;   // Prescaler - need 7-12 Mhz on module clk (150/15 = 10MHz)
+   //#endif
+
+   I2caRegs.I2CCLKL = 10;			// NOTE: must be non zero
+   I2caRegs.I2CCLKH = 5;			// NOTE: must be non zero
+   I2caRegs.I2CIER.all = 0x24;		// Enable SCD & ARDY interrupts
+
+   I2caRegs.I2CMDR.all = 0x0020;	// Take I2C out of reset
+									// Stop I2C when suspended
+   I2caRegs.I2CFFTX.all = 0x6000;	// Enable FIFO mode and TXFIFO
+   I2caRegs.I2CFFRX.all = 0x2040;	// Enable RXFIFO, clear RXFFINT,
 }	
 
 //---------------------------------------------------------------------------
@@ -40,7 +52,7 @@ void InitI2C(void)
 // Only one GPIO pin shoudl be enabled for SCLA operation. 
 // Comment out other unwanted lines.
 
-void InitI2CGpio()
+void InitI2CGpio(void)
 {
 
    EALLOW;
