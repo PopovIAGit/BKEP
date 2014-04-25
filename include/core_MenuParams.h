@@ -821,7 +821,6 @@ const struct MENU_STRING AddStr[] = {
 	"  лнлемрш   нй  ", // 31
 };
 
-
 #endif
 
 #endif

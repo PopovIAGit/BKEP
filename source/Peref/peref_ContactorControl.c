@@ -7,7 +7,7 @@
 Модуль Управления контакторами
 ======================================================================*/
 
-#include "peref_ContactorControl.h"
+#include "peref.h"
 
 
 void ContactorInit(TContactorControl *p)
@@ -15,7 +15,7 @@ void ContactorInit(TContactorControl *p)
 	p->ContactorGroup = ToPtr(&g_Ram.ramGroupH.ContGroup);
 }
 
-void ContactorControl(TContactorControl *p)
+void ContactorControlUpdate(TContactorControl *p)
 {
 	switch (*p->ContactorGroup)
 	{

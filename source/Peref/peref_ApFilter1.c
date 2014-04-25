@@ -5,7 +5,7 @@
 Дата изменения:		04/04/14
 ======================================================================*/
 
-#include "peref_ApFilter1.h"
+#include "peref.h"
 
 
 void peref_ApFilter1Init(APFILTER1 *p, Uns Freq, Uns Tf)

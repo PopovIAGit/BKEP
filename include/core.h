@@ -13,69 +13,77 @@ Outputs
 #ifndef CORE_
 #define CORE_
 
+//----------- Подключение заголовочных файлов ------------------------------
+
 //#include "core_Protections.h"
 #include "core_Menu.h"
+#include "core_VlvDrvCtrl.h"
+#include "core_TorqueObserver.h"
 #include "g_Ram.h"
-//#include "core_Commands.h"
-//#include "core_MotorControl.h"
-//#include "core_HeatMotor.h"
 
-// Параметры для останова
-typedef enum {
-	brakeOff 	= 0,	// Не тормозить
-	brakeOn		= 1		// Тормозить
-} TBrake;
-//--------------------------------------------------------
-//параметры 
-typedef struct {
-	Uns		timerMaxTorque;		// таймер для Максимальной нагрузки
-	Uns 	timeOutMaxTorque;	// предел таймера для максимальной нагрузки
-	Uns 	timerNoMove;		// таймер для отсутствия движения (в УПОРе и в Движении)
-	Uns 	timeOutNoMove;		// предел таймера для отсутствия движения (в Движении)
-	Uns		timerBraking;		// таймер при торможении
-	Uns		timeOutBraking;		// предел таймера для торможения
-	Uns		brakingLevel;		// уровень торможения
-	Uns		brakingEnable;		// торможение вкл/откл
-	Uns		uporTimer;			// ?????? ??? ?????
-	Uns		uporEnable;			// Упор вкл/откл
-	Uns		speed2uporTimer;	//
-	Uns   	DynBrakeComplite;	//Бит завершения динамического торможения
-	Uns		braking;			//Притормаживание. [0, 1]
-	Uns		speed_ctrl;			//Режим управления скоростью
-	Int		startTimer;			//При пуске не выводим аварии сети
-} TCoreParams;
-//--------------------------------------------------------
+//--------------------- Константы-------------------------------------------
+#define CMD_DEFAULTS_USER	0x0010	// Пользовательские параметры по умолчанию
+#define CMD_RES_CLB			0x0020	// Сброс калибровки датчика положения
+#define CMD_RES_FAULT		0x0040	// Сброс защит
+#define CMD_CLR_LOG			0x0080	// Очистка журнала
+#define CMD_RES_CYCLE		0x0100	// Сброс счетчика циклов
+#define CMD_PAR_CHANGE		0x0200	// Изменение параметров
+#define CMD_DEFAULTS_FACT 	0x0400	// Заводские параметры по умолчанию
+
+#define START_DELAY_TIME		(2.000 * Prd50HZ)		// Ограничение времени паузы между остановом и след. запуском
+//--------------------- Макросы --------------------------------------------
+//-------------------- Структуры -------------------------------------------
+
 //================== ЯДРО ============================
-//--------------------------------------------------------
+
+// Режимы работы при цифровом управлении приводом
+typedef enum {
+	wmStop       = 1,					// Режим стоп
+	wmMove     	 = 2					// Режим движения
+} TWorkMode;
+
+// Структура для цифрового управления приводом
+typedef struct _TDmControl {
+	TWorkMode	WorkMode;				// Режим работы
+	Int		 	RequestDir;				// Заданное направление вращения
+	LgInt	 	TargetPos;				// Целевое положение
+	Uns		 	TorqueSet;				// Задание момента
+	Uns		 	TorqueSetPr;			// Задание момента в %
+	Uns 		BreakFlag;				// Флаг определяющий возможность уплотнения
+	Uns 		OverWayFlag;			// Флаг показывающий что уплотнение не достигнуто
+} TDmControl;
 
 typedef struct {
 	// ---
-	//TCoreStatus 		status;			// Статус работы
+	TStatusReg 			Status;			// Статус работы
 	// ---
 	//TCoreProtections	protections;	// Защиты
 	// ---
-	//TCoreParams			params;			// Параметры
+	//TCoreParams		params;			// Параметры
 	// ---
 	TCoreMenu			menu;			// Меню
 	// ---
-	/*TTorque				torque;			// Расчет момента
+	TTorqObs			TorqObs;		// Расчет момента
 	// ---
-	TCoreCommands		commands;		// Команды
+	TCoreVlvDrvCtrl		VlvDrvCtrl;		// Управление задвижкой
 	// ---
-	THeatMotor			heatMotor;		// Нагрев двигателя*/
-	Uns					timerHeatMotor;	// Таймер нагрева двигателя
+	TDmControl			MotorControl;	// Управление двигателем
 } TCore;
 
-//--------------------------------------------------------
+//------------------- Глобальные переменные --------------------------------
+//------------------- Протатипы функций ------------------------------------
 
 void Core_Init(TCore *);
 void Core_CmdUpdate(TCore *);
-void Core_StatusUpdate(TCore *);
-__inline void Core_StopHeatMotor(TCore *);
-Bool HeatMotorControl(TCore *);
-void StopByCommand(TCore *, Int);
-void StopByFault(TCore *);
-void StartByCommand(TCore *, Int, Uns);
+void Core_StatusUpdate(TCore *);			//
+
+void StopPowerControl(void);					// действия при стопе
+void StartPowerControl(TValveCmd ControlWord);  // Действия при старте
+
+void Core_CalibControl(TCore *);			// Управление калибровкой
+void Core_CalibStop(TCore *);				// стоп по калибровке
+void Core_DefineCtrlParams(TCore *);		// Задача контролируемых параметров (Моменты - Движения, трогания, уплотнения. Определение текущей зоны и т.д)
+void Core_ControlMode(TCore *);				// Стэйт машина
 
 extern TCore g_Core;
 extern volatile Uns setTorque;

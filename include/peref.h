@@ -51,7 +51,7 @@ typedef struct {
 	//------
 	APFILTER1 Phifltr;					// Фильтр угола фи
 	APFILTER1 Umfltr;					// Фильтр среднего напряжения
-	APFILTER1 Imfltr;					// Фильтр среднего тока
+	APFILTER3 Imfltr;					// Фильтр среднего тока
 
 	TPerefPosition Position;			// Калибровка датчика положения и расчет скорости
 	TContactorControl ContactorControl;	// Управление контакторами

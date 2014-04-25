@@ -38,27 +38,31 @@ extern "C" {
 #define STATUS_SLEEP			BIT15
 
 //-------------------Статус работы----------------------------
-typedef union {
+// Статус работы
+#define STATUS_RESET_MASK	0x2082
+#define STATUS_EVLOG_MASK	0x56F
+#define STATUS_MOVE_MASK	0xC
+typedef union _TStatusReg {
 	Uns all;
 	struct {
-   		Uns opened:1;		// 0     Открыто
-		Uns fault:1;		// 1     Авария
-		Uns progMode:1;		// 2	 Режим программирования
-    	Uns closed:1;		// 3     Закрыто
-		Uns muDu:1;			// 4     Местное управление
-		Uns stop:1;			// 5     Стоп
-	    Uns closing:1;    	// 6     Идет закрытие
-	    Uns opening:1;		// 7     Идет открытие
-    	Uns test:1;			// 8     Идет тест (двигателя)
-     	Uns ten:1;        	// 9     Включен ТЕН
-     	Uns power:1;      	// 10    Резервное питание
-		Uns testOpenClose:1;// 11	 откр/закр в тесте
-		Uns heatMotor:1;	// 12	 Нагрев двигателя
-		Uns upor:1;			// 13	 Режим: УПОР
-		Uns braking:1;		// 14	 Режим: Торможение
-		Uns sleepMode:1;	// 15	 Дежурный режим
+		Uns Stop:1;			// 0     Стоп
+		Uns Fault:1;		// 1     Авария
+     	Uns Closing:1;    	// 2     Идет закрытие
+     	Uns Opening:1;		// 3     Идет открытие
+    	Uns Test:1;			// 4     Идет тест
+     	Uns Closed:1;		// 5     Закрыто
+     	Uns Opened:1;		// 6     Открыто
+		Uns Mufta:1;		// 7     Муфта
+		Uns MuDu:1;			// 8     Местное управление
+     	Uns Ten:1;        	// 9     Включен ТЕН
+     	Uns Power:1;     	// 10    Резервное питание
+		Uns BlkIndic:1;		// 11	 Авария на блоке
+		Uns TsIndic:1;		// 12	 Авария на ТС
+		Uns Defect:1;		// 13	 Неисправность
+		Uns BlkDefect:1;	// 14 	 Неисправность на блоке
+		Uns TsDefect:1;		// 15 	 Неисправность на ТС
 	} bit;
-} TCoreStatus;
+} TStatusReg;
 
 // Управление работой защит
 typedef union _TAlarmMode {
@@ -108,32 +112,6 @@ typedef struct _TPduData {
 	Uns Type;            // Тип меню
 	Uns Key;             // Код клавиши
 } TPduData;
-
-// Статус работы
-#define STATUS_RESET_MASK	0x2082
-#define STATUS_EVLOG_MASK	0x56F
-#define STATUS_MOVE_MASK	0xC
-typedef union _TStatusReg {
-	Uns all;
-	struct {
-		Uns Stop:1;			// 0     Стоп
-		Uns Fault:1;		// 1     Авария
-     	Uns Closing:1;    	// 2     Идет закрытие
-     	Uns Opening:1;		// 3     Идет открытие
-    	Uns Test:1;			// 4     Идет тест
-     	Uns Closed:1;		// 5     Закрыто
-     	Uns Opened:1;		// 6     Открыто
-		Uns Mufta:1;		// 7     Муфта
-		Uns MuDu:1;			// 8     Местное управление
-     	Uns Ten:1;        	// 9     Включен ТЕН
-     	Uns Power:1;     	// 10    Резервное питание
-		Uns BlkIndic:1;		// 11	 Авария на блоке
-		Uns TsIndic:1;		// 12	 Авария на ТС
-		Uns Defect:1;		// 13	 Неисправность
-		Uns BlkDefect:1;	// 14 	 Неисправность на блоке
-		Uns TsDefect:1;		// 15 	 Неисправность на ТС
-	} bit;
-} TStatusReg;
 
 // Диагностика процесса
 #define PROC_NOMOVE_MASK	0x0001
@@ -461,76 +439,6 @@ typedef enum {
 	tmHandControl 	= 3		// Ручное управление
 }TTenMode;
 
-// Режимы работы при цифровом управлении приводом
-#define wmMuffEnable	(wmUporStart|wmMove|wmPause|wmUporFinish)
-#define wmPhlDisable	(wmPause|wmTestPh)
-#define wmShCDisable	(wmPause|wmKick)
-typedef enum {
-	wmStop       = 0x1,					// Режим стоп
-	wmTestPh     = 0x2,					// Режим тестирования фаз, угол открытия тиристоров 115 град
-	wmUporStart  = 0x4,					// Режим ограничения момента при старте (упор)
-	wmMove       = 0x8,					// Режим движения, угол открытия тиристоров 0 град
-	wmPause      = 0x10,				// Режим паузы перед дожатием, угол открытия 140 град
-	wmUporFinish = 0x20,				// Режим ограничения момента после старта, отсутствует переход в режим KickMode
-	wmKick       = 0x40,				// Режим ударного момента
-	wmSpeedTest  = 0x80,				// Режим теста, угол открытия задается пользователем
-	wmDynBrake   = 0x100,				// Режим динамического торможения
-	wmTestThyr   = 0x200				// Режим теста тиристоров
-} TWorkMode;
-
-// Структура для цифрового управления приводом
-typedef struct _TDmControl {
-	TWorkMode WorkMode;					// Режим работы
-	Int		 RequestDir;				// Заданное направление вращения
-	LgInt	 TargetPos;					// Целевое положение
-	Uns		 TorqueSet;					// Задание момента
-	Uns		 TorqueSetPr;				// Задание момента в %
-} TDmControl;
-
-// Структуры для работы с кубом
-typedef struct {
-	Int X;
-	Int Y;
-	Int Z;
-} TCubPoint;
-
-#define CUB_COUNT1		4
-#define CUB_COUNT2		5
-typedef struct {
-	Int Data[CUB_COUNT1][CUB_COUNT2];
-} TCubArray;
-
-typedef struct {
-	Int *X_Value;
-	Int *X_Array;
-	Int *Y_Value;
-	Int *Y_Array;
-} TCubConfig;
-
-typedef struct {
-	TCubPoint  Input;
-	Int        Output;
-	Uns        Num1;
-	Uns        Num2;
-	Int        PtR;
-	Int        PtT;
-	Int       *InputX;
-	Int       *InputY;
-	TCubPoint  Min;
-	TCubPoint  Max;
-	TCubPoint  Points[CUB_COUNT1][CUB_COUNT2];
-} TCubStr;
-
-// Структуры для расчета момета
-typedef struct {
-	Bool    ObsEnable;		// Разрешение расчета
-	Uns     SetAngle;		// Задание угла на СИФУ
-	Uns     Indication;		// Индикация значения момента
-	TCubStr Cub1;
-	TCubStr Cub2;
-	TCubStr Cub3;
-} TTorqObs;
-
 // Структуры для ТЭКовского модбаса
 
 // Регистры ТЭКа
@@ -624,7 +532,6 @@ typedef union _TTEK_Discrete
 		Uns IsDiscrInActive:1;	// 15 	Состояние режима тестирования входов
 	} bit;
 } TTEK_Discrete;
-
 
 
 #ifdef __cplusplus

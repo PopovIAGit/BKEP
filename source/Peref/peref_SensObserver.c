@@ -8,7 +8,6 @@
 Выход - Приведенные значения I и U   в
 ======================================================================*/
 
-#include "g_Ram.h"
 #include "peref.h"
 
 void Peref_SensObserverInit(TSensObserver *p)

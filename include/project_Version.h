@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-// Источник команды управления
+
 
 #ifdef __cplusplus
 }

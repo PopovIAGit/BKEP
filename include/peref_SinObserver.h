@@ -12,7 +12,7 @@
 #define PEREF_SIN_OBSERVER_
 
 //----------- Подключение заголовочных файлов -----------------------------
-#include "std.h"
+#include "config.h"
 
 #ifdef __cplusplus
 extern "C" {

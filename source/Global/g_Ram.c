@@ -11,7 +11,7 @@
 #include "core.h"
 //#include "drive.h"
 //#include "comm.h"
-//#include "peref.h"
+#include "peref.h"
 //#include "stat.h"
 
 //extern LgUns KakByMetkiEncodera;

@@ -4,7 +4,7 @@
 Версия файла:
 Дата изменения:
 Описанте: 
-	Заголовочный файл для организации работы функций блока БУ-50.
+	Заголовочный файл для организации работы функций блока БКД
 Функции раскиданы по группам прерываний: 18кГц, 2кГц, 200Гц, 50Гц, 10 Гц.
 Эти частоты заданы жестко, менять их - не рекомендуется.
 Максимальное количество задач (функций) для каждой группы прерываний:
@@ -84,7 +84,6 @@ LgUns  X, X10, X18;
 TPeriodicalFunction Task18kHz[] =         
 {
 	PrdElemInit(Peref_18kHzCalc,				&g_Peref),
-//	PrdElemInit(MonitorUpdate,					NULL),
 	//PrdElemInit(AvagoEncoderAEAT84ADCalc,		&g_Peref.position),
 	PrdElemInit(task1,	NULL)
 };
@@ -106,6 +105,7 @@ TPeriodicalFunction Task200Hz[] =       	//не более  20-ти задач
 {
 //	PrdElemInit(Peref_DisplayUpdate, 			&g_Peref.display),
 	PrdElemInit(Peref_CalibUpdate, 				&g_Peref.Position),
+	PrdElemInit(Core_CalibStop, 				&g_Core),
 	PrdElemInit(SciMasterConnBetweenBlockUpdate, 	&g_Comm.mbBkp),
 };
 
@@ -114,7 +114,13 @@ TPeriodicalFunction Task200Hz[] =       	//не более  20-ти задач
 TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 {
 	PrdElemInit(Peref_50HzCalc,					&g_Peref),
-	PrdElemInit(Peref_SpeedCalc, &g_Peref.Position),
+	PrdElemInit(Peref_SpeedCalc, 				&g_Peref.Position),
+	PrdElemInit(ContactorControlUpdate, 		&g_Peref.ContactorControl),
+	PrdElemInit(Core_DefineCtrlParams, 			&g_Core),
+	PrdElemInit(Core_ControlMode, 				&g_Core),
+	PrdElemInit(Core_TorqueCalc, 				&g_Core.TorqObs),
+	PrdElemInit(Core_ValveDriveUpdate, 			&g_Core.VlvDrvCtrl),
+	PrdElemInit(Core_CalibControl, 				&g_Core),
 	/*PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.protections.overHeatBlock),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.protections.underColdBlock),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.protections.overTemper1),
@@ -132,6 +138,8 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 
 TPeriodicalFunction Task10Hz[] =        //не более  200-т задач
 {
+	PrdElemInit(Peref_Calibration, 		&g_Peref.Position),
+	PrdElemInit(CalcClbCycle, 			&g_Peref.Position),
 	/*PrdElemInit(Core_ProtectionsUpdate,		&g_Core.protections),
 	PrdElemInit(g_Ram_Update,				&g_Ram),
 //	PrdElemInit(Peref_SpeedCalc,			&g_Peref.position),
@@ -140,8 +148,7 @@ TPeriodicalFunction Task10Hz[] =        //не более  200-т задач
 //	PrdElemInit(Drive_Update,				&g_Drive),
 	//PrdElemInit(Peref_LedsUpdate,			&g_Peref.leds),
 	//PrdElemInit(Peref_TenControl,			NULL),
-	//PrdElemInit(Peref_10HzCalc,				&g_Peref),
-	PrdElemInit(Peref_Calibration, 			&g_Peref.Position),
+	//PrdElemInit(Peref_10HzCalc,			&g_Peref),
 	PrdElemInit(task1_10Hz,	NULL)
 };
 //------------Конец файла-----------------------------------------------

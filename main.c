@@ -6,6 +6,7 @@
 #include "comm.h"
 #include "peref.h"
 
+
 TRam			g_Ram;
 TTekDriveData	g_RamTek;
 
@@ -23,9 +24,9 @@ void main(void) {
 	memset(&g_Peref,0, sizeof(TPeref));
 	//
 	//Stat_Init(&g_Stat);
-	//g_Ram_Init(&g_Ram);
+	g_Ram_Init(&g_Ram);
 	//g_RamTek_Init(&g_Ram);
-	//Core_Init(&g_Core);
+	Core_Init(&g_Core);
 	//Comm_Init(&g_Comm);
 	Peref_Init(&g_Peref);
 
@@ -47,7 +48,7 @@ void main(void) {
 
 interrupt void CpuTimer0IsrHandler(void)	//	18 000
 {
-	MonitorUpdate1();
+	MonitorUpdate();
 	InterruptUpdate();
 	PieCtrlRegs.PIEACK.bit.ACK1 = 1;
 }

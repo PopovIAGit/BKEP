@@ -43,7 +43,7 @@ void MonitorInit(void)
 	Dlog.Graph2Ptr  = (Int *)0x3FBE00;
 }
 
-void MonitorUpdate1(void){
+void MonitorUpdate(void){
 
 	if (!Monitor.dot) switch (Monitor.program)
 	{
@@ -69,7 +69,7 @@ void MonitorUpdate1(void){
 	}
 }
 
-void MonitorUpdate(void)
+void DlogUpdate(void)
 {
 	Dlog.Mode     = DLOG_CONT;
 

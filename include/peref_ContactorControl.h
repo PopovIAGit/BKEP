@@ -12,7 +12,6 @@
 
 //----------- Подключение заголовочных файлов ------------------------------
 #include "config.h"
-#include "g_Ram.h"
 //--------------------- Константы-------------------------------------------
 #define CONT_ERR_TIME	(0.200 * Prd50HZ) // Время задержки на включение выключение контактора
 //--------------------- Макросы --------------------------------------------
@@ -30,7 +29,7 @@ typedef struct
 //------------------- Протатипы функций ------------------------------------
 
 void ContactorInit(TContactorControl *);
-void ContactorControl(TContactorControl *);
+void ContactorControlUpdate(TContactorControl *);
 void ContactorErrClear(TContactorControl *);
 
 #endif

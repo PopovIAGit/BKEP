@@ -5,7 +5,7 @@
 Дата изменения:		14/04/14
 ======================================================================*/
 
-#include "peref_Calibs.h"
+#include "peref.h"
 
 LgUns TmpRevolution = 0;
 
@@ -236,7 +236,7 @@ void CalcClbCycle(TPerefPosition *p)
 }
 
 
-// Расчет скорости 50 Гц ???
+// Расчет скорости 50 Гц
 void Peref_SpeedCalc(TPerefPosition *p)
 {
 		static   Uns   Timer = 0;

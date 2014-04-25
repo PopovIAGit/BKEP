@@ -7,7 +7,7 @@
 Вход  - Синусоидальные значения тока и напряжения
 Выход - RMS значения I и U, полярность, угол фаз
 ======================================================================*/
-#include "peref_SinObserver.h"
+#include "peref.h"
 
 void Peref_SinObserverInit(TSinPhaseObserver *p, Uns Freq)
 {

@@ -7,9 +7,9 @@
 ======================================================================*/
 
 #include "core.h"
-//#include "peref.h"
+#include "peref.h"
 #include "g_Structs.h"
-#include "g_Ram.h"
+//#include "g_Ram.h"
 //#include "comm.h"
 //#include "stat.h"
 
@@ -17,397 +17,243 @@
 						p->protections.netAlarmsExist|		\
 						p->protections.loadAlarmsExist|		\
 						p->protections.deviceAlarmsExist )
-
-#define 	NETALARM_MASK	0x1FF
-#define 	LOADALARM_MASK	0x7
-
 TCore	g_Core;
 
-/*
-//LgInt Tmp1_LgIntQ15 = 0;
-//Uns  Tmp2_Q0 = 0;
-Uns		Tmp3_Q0 = 0;
-
-Uns			SifuControl = 90;
-//static Bool fl_DirectionIsSetted = false;
-
-Uns TestRun = 0;
-Uns TestOut = 0;
-Uns TestStart = 140;
-Uns TestEnd = 90;
-Uns TestTime = 20; 
-
-volatile Uns setTorque;
-
-Uns AngleInterp(Uns StartValue, Uns EndValue, Uns Time);
-Uns TimerInterp = 0;
-extern	Uns		PilaR;	//Для теста
-extern	Uns		PilaS;	//Для теста
-extern	Uns		PilaT;	//Для теста
-*/
 //---------------------------------------------------
 void Core_Init(TCore *p)
 {
-	/*// Значения параметров присваиваются
-	Core_MenuInit(&p->menu);
-	Core_CommandsInit(&p->commands);
-	Core_ProtectionsInit(&p->protections);
-	Core_MotorControlInit(&g_Sifu);
-	Core_HeatMotorMotorInit(&p->heatMotor);
-	Core_TorqueInit(&p->torque);
+	//Core_MenuInit(&p->menu);
+	Core_ValveDriveInit(&p->VlvDrvCtrl);	// Управление задвижкой
+	Core_TorqueInit(&p->TorqObs);			// Расчет моментов
+	//Core_CommandsInit(&p->commands);		// Получение команд, настройка калибровки
+	//Core_ProtectionsInit(&p->protections);// Защиты
 
-	p->status.bit.stop = 1;
-
-//	p->params.uporEnable = 0; // Для теста
-	p->params.timeOutMaxTorque = Prd50HZ * 2; // 2 секунды
-	p->params.speed2uporTimer = 0;
-	p->params.brakingEnable = 0; //Дин торм выкл
-	p->params.DynBrakeComplite = 1;
-	p->params.timerBraking = 0;
-	p->params.braking = 0;
-	p->params.startTimer = 0;
-	//g_Sifu.dynBrakeLevelNEW = _IQ15(g_Ram.ramGroupB.LEVEL_DYN_BRAKE_BIG);*/
+	p->Status.bit.Stop = 1;					// При включение выставляем стоп
 }
-//-------СТОП ПО КОМАНДЕ--------------------------------------------
-void StopByCommand(TCore *p, Int brake)
-{	
-	/*if ((brake == brakeOn)&&			// Если торможение включено
-		(!p->status.bit.testOpenClose)&&// и электропривод не в режиме тестового движения
-		(!p->status.bit.upor)&&	  		// и привод не находится в состоянии упора
-		(!p->params.DynBrakeComplite))	// бит завершения динамического торможения		
-	{									// то тормозим
-		p->status.bit.braking = 1;		//уходим в торможение
-		AlarmElem_Off(currSkew);
-		AlarmElem_Off(breakCurrU);
-		AlarmElem_Off(breakCurrV);
-		AlarmElem_Off(breakCurrW);
-		AlarmElem_Off(minSpeed);
+
+// Функция задания параметров момента в зависимости от положения и направления движения
+void Core_DefineCtrlParams(TCore *p) // 50 hz
+{
+	Int MaxZone, CloseZone, OpenZone;	// максимальный размер зоны, зона открытия, зона закрытия
+
+	if(g_Ram.ramGroupB.ValveType == vtShiber)		// Если задвижка шиберная
+	{
+		g_Ram.ramGroupB.BreakMode = vtNone;			// всегда работаем без уплотнения
+	}
+
+	MaxZone = (g_Ram.ramGroupA.FullWay >> 1) - 1;	// определяем максимальный размер зон открыто/закрыто
+
+	CloseZone = g_Ram.ramGroupB.CloseZone;
+	if (CloseZone > MaxZone) CloseZone = MaxZone; // если заданя больше максимума задаем максимум
+
+	OpenZone = g_Ram.ramGroupB.OpenZone;
+	if (OpenZone > MaxZone) OpenZone = MaxZone;   // если заданя больше максимума задаем максимум
+	OpenZone = g_Ram.ramGroupA.FullWay - OpenZone;
+
+	if(!p->MotorControl.RequestDir) p->MotorControl.TorqueSet = 0; // Если не задано необходиоме направление вращения то задние момента 0
+	else if(p->MotorControl.RequestDir > 0)	 // Выставляем задание на момент в зависимости от направления и калибровки
+	{
+		p->MotorControl.TorqueSet = g_Ram.ramGroupB.MoveOpenTorque;
+		p->MotorControl.BreakFlag = 0;
+
+		if(g_Ram.ramGroupH.CalibState == csCalib)
+		{
+			if(g_Ram.ramGroupA.CurWay <= CloseZone)
+			{
+				p->MotorControl.TorqueSet = g_Ram.ramGroupB.StartCloseTorque;
+				p->MotorControl.BreakFlag = 0;
+			}
+			else if (g_Ram.ramGroupA.CurWay >= CloseZone)
+			{
+				p->MotorControl.TorqueSet = g_Ram.ramGroupB.BreakOpenTorque;
+				p->MotorControl.BreakFlag = 1;
+			}
+		}
 	}
 	else
 	{
-		g_Sifu.Direction = dmStop;
-		g_Sifu.SetAngle = 180;
-		g_Sifu.OpenAngle = 180;
-		p->params.DynBrakeComplite = 1;
-		g_Sifu.zazorTimer = 0;
-		g_Sifu.regSifuOut.bit.sifu_ENB = 0;
-		shiftReg2.data.bit.dsp_enb_bf = 1;	//микросхема Васи (OFF)
-		p->status.bit.closing = 0;
-		p->status.bit.opening = 0;
-		p->status.bit.braking = 0;
-		p->status.bit.upor = 0;
-		if (p->status.bit.testOpenClose) 	// Если находились в тестовом режиме
+		p->MotorControl.TorqueSet = g_Ram.ramGroupB.MoveCloseTorque;
+		p->MotorControl.BreakFlag = 0;
+
+		if(g_Ram.ramGroupH.CalibState == csCalib)
 		{
-			p->status.bit.testOpenClose = 0;// Снимаем тестовый режим
-			EnableDisableAlarmsForTests(&p->protections,false);					// Включить защиты, которые не учитывались при тестовом движении
+			if(g_Ram.ramGroupA.CurWay <= CloseZone)
+			{
+				p->MotorControl.TorqueSet = g_Ram.ramGroupB.BreakCloseTorque;
+				p->MotorControl.BreakFlag = 1;
+			}
+			else if (g_Ram.ramGroupA.CurWay >= CloseZone)
+			{
+				p->MotorControl.TorqueSet = g_Ram.ramGroupB.StartOpenTorque;
+				p->MotorControl.BreakFlag = 0;
+			}
 		}
-		if (g_Ram.ramGroupC.SIFU_TEST == 2)	// Искусственная пила
-		{
-			EnableDisableAlarmsForTests(&p->protections,false);	// Включить защиты, которые не учитывались при тестовом движении
-		}
+	}
 
-		// Записываем в журнал
-		g_Stat.cmdValue = CMD_STOP;
-	
-		p->status.bit.stop = 1;
-
-		fl_DirectionIsSetted = false;
-		//g_Sifu.dynBrakeLevelNEW = _IQ15(g_Ram.ramGroupB.LEVEL_DYN_BRAKE_BIG);
-
-		// Выключение аварий, пассивных в СТОПе
-		AlarmElem_Off(overCurrentU);
-		AlarmElem_Off(overCurrentV);
-		AlarmElem_Off(overCurrentW);
-		AlarmElem_Off(currSkew);
-		AlarmElem_Off(breakCurrU);
-		AlarmElem_Off(breakCurrV);
-		AlarmElem_Off(breakCurrW);
-		AlarmElem_Off(minSpeed);
-	}*/
+	// пересчитываем задание на момент
+	p->MotorControl.TorqueSetPr = (p->MotorControl.TorqueSet * 100)/p->TorqObs.TorqueMax;
 }
-//-------СТОП ПО АВАРИИ---------------------------------------------
-void StopByFault(TCore *p)
+
+// Остановка по калибровке
+void Core_CalibStop (TCore *p)
 {
-	/*g_Sifu.Direction = dmStop;				// СИФУ - вырубить все
-	g_Sifu.regSifuOut.bit.sifu_ENB = 0;
-	shiftReg2.data.bit.dsp_enb_bf = 1;	//микросхема Васи (OFF)
-	g_Sifu.SetAngle = 180;
-	g_Sifu.OpenAngle = 180;
-	g_Sifu.zazorTimer = 0;
-	p->status.bit.braking = 0;	
-	p->status.bit.closing = 0;
-	p->status.bit.opening = 0;
-	p->status.bit.upor = 0;
-	p->status.bit.stop = 1;
-	fl_DirectionIsSetted = false;
-	//g_Sifu.dynBrakeLevelNEW = _IQ15(g_Ram.ramGroupB.LEVEL_DYN_BRAKE_BIG);
+	Bool StopFlag = False; // внутенний флаг остановки
 
-	p->params.DynBrakeComplite = 1;	//Запрещен дин торм
-
-	if (p->status.bit.testOpenClose) 		// Если находились в тестовом режиме
+	if(p->VlvDrvCtrl.Valve.Position == POS_UNDEF) //Если целевое положение не определено то уходим
 	{
-		p->status.bit.testOpenClose = 0;	// Снимаем тестовый режим
-		EnableDisableAlarmsForTests(&p->protections,false);	// Включить защиты, которые не учитывались при тестовом движении
+		p->MotorControl.TargetPos = POS_UNDEF;
+		return;
 	}
-	if (g_Ram.ramGroupC.SIFU_TEST == 2)		// Искусственная пила
-	{
-		EnableDisableAlarmsForTests(&p->protections,false);	// Включить защиты, которые не учитывались при тестовом движении
-	}
-	// Записываем в журнал
-	g_Stat.cmdValue = CMD_STOP;
+	p->MotorControl.TargetPos = g_Peref.Position.LinePos - p->VlvDrvCtrl.Valve.Position;
 
-	// Выключение аварий, пассивных в СТОПе
-	AlarmElem_Off(overCurrentU);
-	AlarmElem_Off(overCurrentV);
-	AlarmElem_Off(overCurrentW);
-	AlarmElem_Off(currSkew);
-	AlarmElem_Off(breakCurrU);
-	AlarmElem_Off(breakCurrV);
-	AlarmElem_Off(breakCurrW);
-	AlarmElem_Off(minSpeed);*/
+	if(p->Status.bit.Stop) return;
+
+	if((p->MotorControl.RequestDir < 0) && (p->MotorControl.TargetPos <= 0)) StopFlag = True;
+	if((p->MotorControl.RequestDir > 0) && (p->MotorControl.TargetPos >= 0)) StopFlag = True;
+
+	if (StopFlag)	// Если пора останавливаться
+	{
+		if(p->VlvDrvCtrl.Valve.BreakFlag) p->MotorControl.OverWayFlag = 1;	//
+		else	// Если
+			{
+				Core_ValveDriveStop(&p->VlvDrvCtrl);
+				p->VlvDrvCtrl.EvLog.Value = CMD_STOP;
+			}
+	}
 }
-//------СТАРТ ПО КОМАНДЕ-----------------------------
-void StartByCommand(TCore *p, Int direction, Uns command)
+
+// Управление калибровкой
+void Core_CalibControl(TCore *p)
 {
-	/*
+	g_Peref.Position.ResetFlag = !p->Status.bit.Stop;
 
-	 //--------Управление СИФУ---------
-	Core_ProtectionsReset(&p->protections,false); 					// Сброс защит
-	Core_ProtectionsStopTestsMotorTestIso(&p->protections);			// СТОП Тест Двигателя
-	// Если искусственная пила или тестовое движение, то не смотрим на аварии
-	if ((g_Ram.ramGroupC.SIFU_TEST != 2)&&(command != CMD_OPEN_TEST)&&(command != CMD_CLOSE_TEST))
+	if(g_Peref.Position.CancelFlag)
 	{
-		if(IsAlarmsExist & (LedTsNotStartStop|LedTsNotStartNotStop))	// Если есть аварии, запрещающие СТАРТ
-			return;
-	} else							// Искусственная пила
-	{
-		PilaR = 0;		//Для теста
-		PilaS = 60;		//Для теста
-		PilaT = 120;	//Для теста
-		EnableDisableAlarmsForTests(&p->protections,true);
-	}	
-	// Сначала закрываем СИФУ	
-	g_Sifu.regSifuOut.all = DISABLE_SIFU;
-	GPIO_UPDATE();
-
-	// Записываем в журнал
-	g_Stat.cmdValue = command;
-
-	if (command == CMD_OPEN)							// команда "Открыть"
-	{
-		if (direction == DIRECT_RST)					// Включить группу "ВПЕРЕД" = "ОТКРЫТЬ" c alfa = upor
-		{
-			if (!(g_Ram.ramGroupB.REVERS & 0x1))		// Если реверс выключен ...
-				g_Sifu.Direction = dmForward;			// R S T
-			else										// Если реверс включен ...
-				g_Sifu.Direction = dmBackward;
-
-			if (g_Ram.ramGroupC.SIFU_TEST)
-				g_Sifu.SetAngle = g_Ram.ramGroupC.SET_ANGLE;
-			else
-				g_Sifu.SetAngle = SifuControl;
-
-			g_Sifu.OpenAngle = 120;
-			g_Sifu.regSifuOut.bit.sifu_ENB = 1;
-			shiftReg2.data.bit.dsp_enb_bf = 0;	//микросхема Васи (ON)
-		}
-		else if (direction == REVERSE_SRT)				// Включить группу "НАЗАД" = "ОТКРЫТЬ" c alfa = upor
-		{
-			if (!(g_Ram.ramGroupB.REVERS & 0x1))		// Если реверс выключен ...
-				g_Sifu.Direction = dmBackward;			// RT S TR
-			else										// Если реверс включен ...
-				g_Sifu.Direction = dmForward;
-
-			if (g_Ram.ramGroupC.SIFU_TEST)
-				g_Sifu.SetAngle = g_Ram.ramGroupC.SET_ANGLE;
-			else
-				g_Sifu.SetAngle = SifuControl;
-
-			g_Sifu.OpenAngle = 120;
-			g_Sifu.regSifuOut.bit.sifu_ENB = 1;
-			shiftReg2.data.bit.dsp_enb_bf = 0;	//микросхема Васи (ON)
-		}
-		p->status.bit.opening = 1;
-		g_Ram.ramGroupF.COUNT_RUN++;
+		p->VlvDrvCtrl.Mpu.CancelFlag = true;
+		g_Peref.Position.CancelFlag = false;
 	}
-	else if (command == CMD_CLOSE)						// Команда "Закрыть"
+
+		p->Status.bit.Closed = p->Status.bit.Stop && ((g_Peref.Position.Zone & CLB_CLOSE) != 0);
+		p->Status.bit.Opened = p->Status.bit.Stop && ((g_Peref.Position.Zone & CLB_OPEN)  != 0);
+
+	if(g_Ram.ramGroupD.CalibReset != 0)
 	{
-		if (direction == DIRECT_RST) 					// Включить группу "ВПЕРЕД" = "ЗАКРЫТЬ" c alfa = upor
+		if (!p->Status.bit.Stop )
 		{
-			if (!(g_Ram.ramGroupB.REVERS & 0x1))		// Если реверс выключен ...
-				g_Sifu.Direction = dmBackward;			// R S T
-			else										// Если реверс включен ...
-				g_Sifu.Direction = dmForward;
-
-			if (g_Ram.ramGroupC.SIFU_TEST)
-				g_Sifu.SetAngle = g_Ram.ramGroupC.SET_ANGLE;
-			else
-				g_Sifu.SetAngle = SifuControl;
-
-			g_Sifu.OpenAngle = 120;
-			g_Sifu.regSifuOut.bit.sifu_ENB = 1;
-			shiftReg2.data.bit.dsp_enb_bf = 0;	//микросхема Васи (ON)
+			p->VlvDrvCtrl.Mpu.CancelFlag = true;
 		}
-		else if (direction == REVERSE_SRT)				// Включить группу "НАЗАД" = "ЗАКРЫТЬ" c alfa = upor
-		{
-			if (!(g_Ram.ramGroupB.REVERS & 0x1))		// Если реверс выключен ...
-				g_Sifu.Direction = dmForward;			// RT S TR
-			else										// Если реверс включен ...
-				g_Sifu.Direction = dmBackward;
-
-			if (g_Ram.ramGroupC.SIFU_TEST)
-				g_Sifu.SetAngle = g_Ram.ramGroupC.SET_ANGLE;
-			else
-				g_Sifu.SetAngle = SifuControl;
-
-			g_Sifu.OpenAngle = 120;
-			g_Sifu.regSifuOut.bit.sifu_ENB = 1;
-			shiftReg2.data.bit.dsp_enb_bf = 0;	//микросхема Васи (ON)
-		}
-		p->status.bit.closing = 1;
-		g_Ram.ramGroupF.COUNT_RUN++;
-	}
-	else if (command == CMD_OPEN_TEST)// команда "Открыть тест"
-	{
-		direction = 1;
-		g_Sifu.Direction = dmForward;					// R S T
-		
-		if (g_Ram.ramGroupC.SIFU_TEST)
-			g_Sifu.SetAngle = g_Ram.ramGroupC.SET_ANGLE;
 		else
-			g_Sifu.SetAngle = SifuControl;
-		g_Sifu.OpenAngle = 120;
-		g_Sifu.regSifuOut.bit.sifu_ENB = 1;
-		shiftReg2.data.bit.dsp_enb_bf = 0;	//микросхема Васи (ON)
-		p->status.bit.opening = 1;
-		p->status.bit.testOpenClose = 1;				// Включить режим тестового движения, когда енкодер не вращается
-		EnableDisableAlarmsForTests(&p->protections,true); 	//для теста
-		//Убираем ранее выставленные аварии
-		p->protections.processAlarmsExist = 0;
-		p->protections.netAlarmsExist = 0;
-		p->protections.loadAlarmsExist = 0;
-		p->protections.deviceAlarmsExist = 0;
-	}
-	else if (command == CMD_CLOSE_TEST)// команда "Закрыть тест"
-	{
-		direction = 1;
-		g_Sifu.Direction = dmBackward;					// R S T
+		{
+			g_Ram.ramGroupD.TaskClose = trReset;
+			g_Ram.ramGroupD.TaskClose = trReset;
 
-		if (g_Ram.ramGroupC.SIFU_TEST)
-			g_Sifu.SetAngle = g_Ram.ramGroupC.SET_ANGLE;
-		else
-			g_Sifu.SetAngle = SifuControl;
-		g_Sifu.OpenAngle = 120;
-		g_Sifu.regSifuOut.bit.sifu_ENB = 1;
-		shiftReg2.data.bit.dsp_enb_bf = 0;	//микросхема Васи (ON)
-		p->status.bit.closing = 1;
-		p->status.bit.testOpenClose = 1;				// Включить режим тестового движения, когда енкодер не вращается
-		EnableDisableAlarmsForTests(&p->protections,true); 	//для теста
-		//Убираем ранее выставленные аварии
-		p->protections.processAlarmsExist = 0;
-		p->protections.netAlarmsExist = 0;
-		p->protections.loadAlarmsExist = 0;
-		p->protections.deviceAlarmsExist = 0;
-	}
-
-	p->status.bit.stop = 0;
-	p->status.bit.upor = 1;				// Со старта всегда уходим в УПОР
-	p->params.DynBrakeComplite = 0;		// Для того чтобы привод зашел в дин торм	
-	p->params.startTimer = 3*2000;		// При пуске отсчитываем таймер и не выводим аварии сети				
-
-	if (IsAlarm_On(overCurrMode))
-	{
-		AlarmElem_On(overCurrentU);
-		AlarmElem_On(overCurrentV);
-		AlarmElem_On(overCurrentW);
-	}
-	if (IsAlarm_On(breakCurrMode))
-	{
-		AlarmElem_On(breakCurrU);
-		AlarmElem_On(breakCurrV);
-		AlarmElem_On(breakCurrW);
-	}
-
-	if (IsAlarm_On(currSkewMode)) AlarmElem_On(currSkew);
-	// Включаем аварию Нет движения
-	if ((IsAlarm_On(noMoveMode))&&(!p->protections.outAlarms.processAlarms.bit.noCalib)) AlarmElem_On(minSpeed);
-	*/
-}
-//------------ОБРАБОТКА КОМАНД----------------------- // 50 Гц
-void Core_CmdUpdate(TCore *p)	//вызываем нужную ф-ию, в зависимости от текущего статуса
-{
-	/*
-	// Задержка на подачу команд
-	if (p->commands.ignoreTimer) 						// Если сейчас время игнорирования команд
-	{		
-		p->commands.ignoreTimer--;						// уменьшаем таймер на единицу,
-		return; 								//выходим
-	}
-	if (p->commands.cmdCommand)
-	{
-		switch (p->commands.cmdCommand)
-		{	 
-			case CMD_STOP:
-				if (!IsStopped()) 			//Команда "СТОП" если находимся не в стопе
-				{
-					if (g_Ram.ramGroupB.BRAKING_ENABLE == 2)	// Если разрешено торможение по команде
-						StopByCommand(p, brakeOn);
-					else
-						StopByCommand(p, brakeOff);
-				}
-				break;
-
-			case CMD_CLOSE:
-				if (!(p->status.bit.closing||p->status.bit.closed||p->status.bit.braking)) //Команда "ЗАКРЫТЬ" если находимся не в закрытом состоянии или не закрываемся
-				{
-					if (p->status.bit.opening) 									// Если блок в состоянии "открывается"
-					{
-						if (g_Ram.ramGroupB.BRAKING_ENABLE == 2)	// Если разрешено торможение по команде
-							StopByCommand(p, brakeOn);
-						else
-							StopByCommand(p, brakeOff);
-					}
-					else														// В остальных случаях 
-						StartByCommand(p, g_Peref.phaseOrder.Direction, CMD_CLOSE); // даем "старт"
-				}
-				break;
-
-			case CMD_OPEN:
-				if (!(p->status.bit.opening||p->status.bit.opened||p->status.bit.braking)) //Команда "ОТКРЫТЬ" если находимся не в открытом состоянии или не открываемся
-				{
-					if (p->status.bit.closing) 									// Если блок в состоянии "закрывается"
-					{
-						if (g_Ram.ramGroupB.BRAKING_ENABLE == 2)	// Если разрешено торможение по команде
-							StopByCommand(p, brakeOn);
-						else
-							StopByCommand(p, brakeOff);
-					}
-					else														// В остальных случаях 
-						StartByCommand(p, g_Peref.phaseOrder.Direction, CMD_OPEN);  // даем "старт"
-				}
-				break;
-
-			case CMD_CLOSE_TEST:			//поехали закрывать в тестовом режиме
-				if (IsStopped()) 			//тест только из стопа
-				{
-					if (!p->status.bit.closed)
-						StartByCommand(p, g_Peref.phaseOrder.Direction, CMD_CLOSE_TEST); // даем "старт"
-				}
-				break;
-
-			case CMD_OPEN_TEST:			//поехали открывать в тестовом режиме
-				if (IsStopped()) 			//тест только из стопа
-				{
-					if (!p->status.bit.opened)
-						StartByCommand(p, g_Peref.phaseOrder.Direction, CMD_OPEN_TEST); // даем "старт"
-				}
-				break;
+			p->VlvDrvCtrl.EvLog.Value = CMD_RES_CLB;
 		}
-		// Задержка на подачу команд
-		p->commands.ignoreTimer = IGNORE_TIME;
-		p->commands.cmdCommand = 0; 				//очищаем регистр комманд
-	}*/
+		g_Ram.ramGroupD.CalibReset = 0;
+	}
+
+	// Команда на сброс счетчика циклов
+	if(g_Ram.ramGroupD.CycleReset != 0 )
+	{
+		if (!p->Status.bit.Stop )
+		{
+			p->VlvDrvCtrl.Mpu.CancelFlag = true;
+		}
+		else
+		{
+			g_Ram.ramGroupH.CycleCnt = 0;
+			g_Peref.Position.CycleData = 0;
+			p->VlvDrvCtrl.EvLog.Value = CMD_RES_CYCLE;
+		}
+	}
+
+	/*Добавить Запись параметров калибровки и числа циклов
+
+	if (IsMemParReady())													// если есть готовность к записи параметров
+	{
+		if (GrH->CycleCnt != PrevCycle)										// если счетчик циклов обновился
+		{
+			WritePar(REG_CYCLE_CNT, &GrH->CycleCnt, 1);						// записали параметр счетчик циклов
+			PrevCycle = GrH->CycleCnt;										// запомнили записанный параметр, для последующей проверки
+		}
+		else if (GrH->CalibState != GrA->CalibState)						// если состояние калибровки изменилось
+		{
+			WritePar(REG_CALIB_STATE, &GrH->CalibState, sizeof(ClbIndication));// то записали состояние калибровки
+			GrA->CalibState = GrH->CalibState;								// запоминаем записанный параметр, для последующей проверки
+		}
+	}
+	  */
 }
+
+// Действия выполняемые при стопе
+void StopPowerControl(void)
+{
+	g_Core.Status.bit.Stop 		= 1;	// выставили статус стоп
+	g_Core.Status.bit.Opening 	= 0;
+	g_Core.Status.bit.Closing 	= 0;
+	g_Core.Status.bit.Test 		= 0;
+
+	g_Ram.ramGroupH.ContGroup 	 = cgStop;	// Подали команду на стоп контакторам
+	g_Core.MotorControl.WorkMode = wmStop;  // Переходим в стейт машину стоп
+	g_Core.VlvDrvCtrl.StartDelay = (Uns) START_DELAY_TIME; // Выставляем задержку перед следующим пуском
+}
+
+// Действия при пуске
+void StartPowerControl(TValveCmd ControlWord)
+{
+	//Если КЗ то return
+
+	switch (ControlWord)
+	{
+		case vcwClose:
+			g_Core.MotorControl.RequestDir = -1;
+			g_Core.MotorControl.WorkMode = wmMove;
+			g_Ram.ramGroupH.ContGroup = cgClose;
+			break;
+		case vcwOpen:
+			g_Core.MotorControl.RequestDir = 1;
+			g_Core.MotorControl.WorkMode = wmMove;
+			g_Ram.ramGroupH.ContGroup = cgOpen;
+			break;
+		case vcwTestClose:
+			g_Core.MotorControl.RequestDir = -1;
+			g_Core.MotorControl.WorkMode = wmMove;
+			g_Core.Status.bit.Test = 1;
+			g_Ram.ramGroupH.ContGroup = cgOpen;
+			break;
+		case vcwTestOpen:
+			g_Core.MotorControl.RequestDir = 1;
+			g_Core.MotorControl.WorkMode = wmMove;
+			g_Core.Status.bit.Test = 1;
+			g_Ram.ramGroupH.ContGroup = cgOpen;
+			break;
+	}
+
+	// сброс аварий необходимый для пуска
+	//	ProtectionsReset();
+
+	g_Core.Status.bit.Stop 			= 0;
+	g_Core.MotorControl.TorqueSet 	= 0xFFFF;
+	if(g_Core.MotorControl.RequestDir < 0) g_Core.Status.bit.Closing = 1;
+	if(g_Core.MotorControl.RequestDir > 0) g_Core.Status.bit.Opening = 1;
+
+}
+
+// Стэйт машина, Добавить логику работы с СофтСтартером
+void Core_ControlMode(TCore *p)
+{
+	switch(p->MotorControl.WorkMode)
+	{
+	case wmStop:
+		p->MotorControl.RequestDir = 0;		// сбрасываем необходимое направение движения
+		g_Ram.ramGroupA.Torque = 0;			// отображаем момент
+		break;
+	case wmMove:
+		g_Ram.ramGroupA.Torque = p->TorqObs.Indication; // отображаем текущий момент
+		break;
+	}
+}
+
 //---------------ОБРАБОТКА СТАТУСОВ---------------------------
 void Core_StatusUpdate(TCore *p) // 50 Гц
 {
@@ -794,85 +640,8 @@ void Core_StatusUpdate(TCore *p) // 50 Гц
 	p->status.bit.heatMotor = p->heatMotor.status.bit.active;
 }
 //--------------------------------------------------------
-// Обработка нагрева двигателя
-Bool HeatMotorControl(TCore *p)
-{
-	// Если в СТОПе и неактивны тесты двигателя
-	if (IsStopped())
-	{
-		if (g_Ram.ramGroupC.HEAT_MOTOR_REG)
-		{	// Если нет темп. аварий
-			if (!IsTempAlarmsExist())
-			{
-				switch (g_Ram.ramGroupC.HEAT_MOTOR_REG)
-				{
-					case HM_CMD_START:
-						if (!p->heatMotor.status.bit.active)
-						{
-							// Останавливаем Тесты Двигателя
-							Core_ProtectionsStopTestsMotorTestIso(&p->protections);
-							p->heatMotor.status.all = HM_ACTIVE;
-							p->heatMotor.voltageLevel = 170 - (Uns)_IQmpy(_IQdiv(g_Ram.ramGroupC.HEAT_MOTOR_VOLT_LEVEL,100),170); // 170 - 0.1 (10%) * 170 = 153 градуса // / 100 в IQ24
-							// Ограничение на угол открытия
-							if (p->heatMotor.voltageLevel < 20) p->heatMotor.voltageLevel = 20;			//Не выходим за пределы
-							else if (p->heatMotor.voltageLevel > 170) p->heatMotor.voltageLevel = 170;
-							p->heatMotor.phaseNumber = 0;
-							p->timerHeatMotor = 0;
-						}
-						break;
-					case HM_CMD_STOP:
-						return false;
-				}
-			}
-			else p->commands.cancelFlag = true;
 
-			g_Ram.ramGroupC.HEAT_MOTOR_REG = 0;
-			// Обновление нижней строки дисплея
-			p->menu.updateLowStr = true;
-		}
-		if (p->heatMotor.status.bit.active)
-		{
-			// 1 с за 50 Гц = 1.0 с * 5
-			if ( (++p->timerHeatMotor > (g_Ram.ramGroupC.HEAT_MOTOR_TIME * 5))
-				|| (g_Ram.ramGroupA.TEMP_MOTOR >= (Int)g_Ram.ramGroupC.HEAT_MOTOR_LEVEL) )
-				return false;
-		}
-		return true;
-	} 
-	else return false;
-	*/
+}*/
+
+
 }
-//--------------------------------------------------------
-// СТОП Нагрев Двигателя
-/*__inline void Core_StopHeatMotor(TCore *p)
-{
-	p->heatMotor.voltage = 0;
-	p->heatMotor.status.all = 0;
-	p->timerHeatMotor = 0;
-}*/
-//--------------------------------------------------------
-
-
-/*Uns AngleInterp(Uns StartValue, Uns EndValue, Uns Time)
-{
-
-static LgInt OutputQ15 = 0;
-
-	//timeQ15 = (LgInt)Time * 3277;
-	//nQ15 = _IQ15mpy((LgInt)Time * 3277, _IQ15(50.0));
-	//FullDelta = StartValue - EndValue;
-	//DeltaQ15 = _IQ15div(_IQ0toIQ15((LgInt)(StartValue - EndValue)), _IQ15mpy((LgInt)Time * 3277, _IQ15(50.0)));
-
-	if (TimerInterp == 0) OutputQ15 = (LgInt)StartValue << 15;
-	else OutputQ15 = OutputQ15 - _IQ15div(((LgInt)(StartValue - EndValue) << 15), _IQ15mpy((LgInt)Time * 3277, _IQ15(50.0)));
-
-	TimerInterp++;
-	
-	if (OutputQ15 <= ((LgInt)EndValue << 15)) return EndValue;
-	else if (OutputQ15 >= ((LgInt)StartValue << 15)) return StartValue;
-		 else return (Uns)(OutputQ15 >> 15);
-
-}*/
-
-
-
