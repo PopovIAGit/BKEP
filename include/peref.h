@@ -15,11 +15,12 @@
 #include "config.h"
 #include "g_InitHardware.h"
 #include "g_Ram.h"
-#include "peref_ApFilter1.h"  	// PIA 03.04.14
-#include "peref_ApFilter3.h"  	// PIA 04.04.14
-#include "peref_SensObserver.h" // PIA 07.04.14
-#include "peref_SinObserver.h"	// PIA 08.04.14
-#include "peref_Calibs.h"
+#include "peref_ApFilter1.h"  		// PIA 03.04.14
+#include "peref_ApFilter3.h"  		// PIA 04.04.14
+#include "peref_SensObserver.h" 	// PIA 07.04.14
+#include "peref_SinObserver.h"		// PIA 08.04.14
+#include "peref_Calibs.h"			// PIA 14.04.14
+#include "peref_ContactorControl.h"	// PIA 17.04.14
 //#include "peref_DisplayDrv.h"
 //#include "peref_LedsDrv.h"
 //#include "peref_TempObserver.h"
@@ -45,15 +46,16 @@ typedef struct {
 	APFILTER3  IVfltr;
 	APFILTER3  IWfltr;
 	// ------
-	TSensObserver	sensObserver;	// Масштабирование сигналов с датчиков
-	TSinObserver	sinObserver;	// Вычисление RMS
-	TPhaseOrder		phaseOrder; 	// Чередование фаз сети
+	TSensObserver	sensObserver;		// Масштабирование сигналов с датчиков
+	TSinObserver	sinObserver;		// Вычисление RMS
+	TPhaseOrder		phaseOrder; 		// Чередование фаз сети
 	//------
-	APFILTER1 Phifltr;				// Фильтр угола фи
-	APFILTER1 Umfltr;				// Фильтр среднего напряжения
-	APFILTER1 Imfltr;				// Фильтр среднего тока
+	APFILTER1 Phifltr;					// Фильтр угола фи
+	APFILTER1 Umfltr;					// Фильтр среднего напряжения
+	APFILTER3 Imfltr;					// Фильтр среднего тока
 
-	TPerefPosition Position;
+	TPerefPosition Position;			// Калибровка датчика положения и расчет скорости
+	TContactorControl ContactorControl;	// Управление контакторами
 
 	Uns Umid;
 	Uns Imid;

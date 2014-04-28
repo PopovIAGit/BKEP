@@ -7,6 +7,7 @@
 #include "peref.h"
 #include "stat.h"
 
+
 TRam			g_Ram;
 TTekDriveData	g_RamTek;
 
@@ -36,8 +37,10 @@ void main(void) {
 	Peref_Init(&g_Peref);
 	Stat_Init(&g_Stat);
 
-	InterruptInit();
 	MonitorInit();
+
+	InterruptInit();
+
 
 	StartCpuTimer0();
 
@@ -53,13 +56,13 @@ void main(void) {
 
 		if (PassCount==1)
 		{
-		   DELAY_US(50000);
+		   //DELAY_US(50000);
 		   I2CA_setCommand();
 		   //I2CA_ReadTemper();
 		}
 		if (PassCount==2)
 		{
-		   DELAY_US(50000);
+		   //DELAY_US(50000);
 		   I2CA_ReadTemper();
 		}
 
@@ -68,7 +71,6 @@ void main(void) {
 
 interrupt void CpuTimer0IsrHandler(void)	//	18 000
 {
-	//MonitorUpdate1();
 	InterruptUpdate();
 	PieCtrlRegs.PIEACK.bit.ACK1 = 1;
 }
@@ -195,7 +197,7 @@ Uns I2CA_ReadTemper(void)
 
 interrupt void i2c_int1a_isr(void)     // I2C-A
 {
-   Uns IntSource, i;
+   Uns IntSource;
    Uns Temper1=0;
    Uns Temper2=0;
    Uns Temper=0;

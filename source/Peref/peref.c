@@ -54,9 +54,10 @@ void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновлени
 
 	peref_ApFilter1Init(&p->Phifltr, Prd200HZ, 0.05);
 	peref_ApFilter1Init(&p->Umfltr, Prd200HZ, 0.05);
-	peref_ApFilter1Init(&p->Imfltr, Prd200HZ, 0.05);
+	peref_ApFilter3Init(&p->Imfltr, Prd200HZ, 0.05);
 
 	Peref_CalibInit(&p->Position);
+	ContactorInit(&p->ContactorControl);
 }
 //---------------------------------------------------
 void Peref_18kHzCalc(TPeref *p) // 18 к√ц
@@ -122,8 +123,9 @@ void Peref_50HzCalc(TPeref *p)	// 50 √ц
 	p->Umid = _IQtoIQ16(p->Umfltr.Output);
 
 	p->Imfltr.Input = _IQ16toIQ(Mid3UnsValue(p->sinObserver.IU.Output, p->sinObserver.IV.Output, p->sinObserver.IW.Output));
-	peref_ApFilter1Calc(&p->Imfltr);
+	peref_ApFilter3Calc(&p->Imfltr);
 	p->Imid = _IQtoIQ16(p->Imfltr.Output);
+
 }
 
 void Peref_10HzCalc(TPeref *p)	// 10 √ц

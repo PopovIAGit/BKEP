@@ -103,7 +103,7 @@ void SciMasterConnBetweenBlockUpdate(TMbBBHandle bPort, TBKPDataHandle Data)
 			{
 				bPort->IsConnected = 1;
 				Data->BkpVersion     = bPort->Buffer[0]; //гр А
-				Data->BkpEncPostion  = (Uns)bPort->Buffer[4] << 24;//с h
+				Data->BkpEncPostion  = (Uns)bPort->Buffer[4] << 24;//
 				Data->BkpEncPostion |= (Uns)bPort->Buffer[3] << 16;
 				Data->BkpEncPostion |= (Uns)bPort->Buffer[2] << 8;
 				Data->BkpEncPostion |= (Uns)bPort->Buffer[1] << 0;

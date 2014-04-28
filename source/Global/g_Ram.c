@@ -188,7 +188,7 @@ void RefreshParams(Uns addr)
 
 }
 //---------------------------------------------------
-void CubRefresh(TCubStr *v, TCubArray *Array)	//
+/*void CubRefresh(TCubStr *v, TCubArray *Array)	//
 {
 	register TCubPoint *Pt;
 	register Uns i, j;
@@ -201,7 +201,7 @@ void CubRefresh(TCubStr *v, TCubArray *Array)	//
 			Pt->Z = Array->Data[i][j];
 		}
 	}
-}
+}*/
 //---------------------------------------------------
 Int MinMax3IntValue (Int val1, Int val2, Int val3)
 {

@@ -176,7 +176,7 @@ Byte McBsp_recieve(Byte Id)
 void McBsp_transmit(Byte Id, Uns Data)
 {
 	Byte DataN=0,i=0;
-	Uns D=0;
+
 	Uns Data1=0;
 	Uns Data2=0;
 	LgUns Data3=0;

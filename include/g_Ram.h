@@ -12,8 +12,8 @@
 
 #include "config.h"				// Структуры
 #include "g_Structs.h"			// Структуры
-#include "g_DriveControl.h"		// Структуры управления
 #include "peref_Clock.h"		// Библиотека для преобразований чисел/строк
+#include "core.h"
 //#include "core_Protections.h" 	//структура защит
 //#include "comm_LocalControl.h"
 
@@ -325,7 +325,7 @@ typedef struct _TRamGroupD
 	TValveCmd	   ControlWord;         // 6.Команда управления
 	Uns			   PrtReset;      		// 7.Сброс защит
 	Uns            SetDefaults;         // 8.Задание параметров по умолчанию
-	Uns Rsvd1;//отчистка журнала событий
+	Uns 		   Rsvd1;				// 9.отчистка журнала событий
 	Uns            CycleReset;			// 10.Сброс счетчика циклов
 	Uns			   RsReset;				// 11. Сброс связи
 	Uns 		   Rsvd[8];				// 12-19.Резерв
@@ -386,7 +386,8 @@ typedef struct _TRamGroupH
 	Uns             Imid;				 // 91.Средний ток
   	Uns             ISkewValue;          // 92.Асиметрия токов нагрузки
 	Uns             Position;            // 93.Положение
-	Uns				Rsvd2[2];			 // 94 - 95 Резерв
+	LgUns  			FullStep;        	 // 94.Полный ход
+	Uns				Imidpr;			 	 // 95 Резерв
 	TReverseType	ReverseType;         // 96.Тип реверса
 	Uns				DemoPosition1;       // 97.Демо положение 1
 	Uns				DemoPosition2;       // 98.Демо положение 2

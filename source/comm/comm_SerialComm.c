@@ -262,7 +262,8 @@ __inline Byte WriteData(Uns Addr, Uns *Data, Uns Count)
 
 	if (Nvm)
 	{
-		if ( WriteToEeprom(Addr, Dest, Count) )
+		//if ( WriteToEeprom(Addr, Dest, Count) )
+		if (ReadWriteEeprom(&Eeprom1,F_WRITE,Addr,Dest,Count))
 		{
 			RefreshParams(Addr);
 			return FR_SUCCESS;

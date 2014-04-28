@@ -15,7 +15,7 @@ Byte RxState = 0;
 char StrDev[] = {"BUR-M_000000"};
 
 
-void InitChanelBt(TBluetoothHandle);
+//void InitChanelBt(TBluetoothHandle);
 void SendOneString(TBluetoothHandle, char *String);
 void SendTwoString(TBluetoothHandle, char *FirstString, char *SecondString);
 void SendCommandOne(TBluetoothHandle, char *ComStr);

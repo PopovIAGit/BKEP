@@ -1,21 +1,35 @@
 /*======================================================================
-Имя файла:          g_DriveControl.h
-Автор:
-Версия файла:
-Дата изменения:
-Применяемость:
+Имя файла:          core_VlvDrvCtrl.h
+Автор:				Попов И.А.
+Версия файла:		1.00
+Дата изменения:		16.04.2014
 Описание:
-Библиотека реализации алгоритмов управления приводом задвижки
+модуль управления задвижкой
 ======================================================================*/
 
 #ifndef VLV_DRV_CNTRL_
 #define VLV_DRV_CNTRL_
+//----------- Подключение заголовочных файлов ------------------------------
+#include "config.h"
+#include "g_Structs.h"
+#include "core_Menu.h"
 
-#include "std.h"
+//--------------------- Константы-------------------------------------------
+// Коды команд управления
+#define CMD_STOP				0x0001	// Стоп
+#define CMD_CLOSE				0x0002	// Закрыть
+#define CMD_OPEN				0x0004	// Открыть
+#define CMD_MOVE				0x0008	// Переместить
+#define CMD_DEFSTOP				0x0800	// Стоп при аварии(не является командой, добавлено для журнала)  : Добавил PIA 12.09.2012
+#define CDM_DISCROUT_TEST		0x1000	// Тест дискретных выходов
+#define CMD_DISCRIN_TEST		0x2000	// Тест дискретных входов
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+// Источник команды управления
+#define CMD_SRC_PDU				0x0800	// Пульт дистанционного управления
+#define CMD_SRC_MPU				0x1000	// Местный пост управления
+#define CMD_SRC_DIGITAL			0x2000	// Дискретный интерфейс
+#define CMD_SRC_SERIAL			0x4000	// Последовательный интерфейс
+#define CMD_SRC_ANALOG			0x8000	// Аналогвый интерфейс
 
 // Константы для работы с положением
 #define POS_UNDEF	0x7FFFFFFF
@@ -23,8 +37,12 @@ extern "C" {
 
 // Состояния входов ТУ
 #define TU_OPEN		0x1
-#define TU_CLOSE		0x2
+#define TU_CLOSE	0x2
 #define TU_STOP		0x4
+
+#define VLV_CLB_FLAG    0x03
+//--------------------- Макросы --------------------------------------------
+//-------------------- Структуры -------------------------------------------
 
 // Команда управления
 typedef enum {
@@ -38,27 +56,27 @@ typedef enum {
   vcwTestEng		// Тест двигателя
 } TValveCmd;
 
+// Настройка режима МУ/ДУ
+typedef enum {
+  mdOff=0,			// Выключен
+  mdSelect,			// Выбор режима МУ/ДУ
+  mdMuOnly,			// Только режим МУ
+  mdDuOnly			// Только режим ДУ
+} TMuDuSetup;
+
 // Тип уплотнения
 typedef enum {
-  vtNone=1,		// Без уплотнения
+  vtNone=1,			// Без уплотнения
   vtClose,			// Уплотнение в закрыто
   vtOpen,			// Уплотнение в открыто
   vtBoth			// Уплотнение в закрыто и открыто
 } TBreakMode;
 
-// Настройка режима МУ/ДУ
-typedef enum {
-  mdOff=0,			// Выключен
-  mdSelect,		// Выбор режима МУ/ДУ
-  mdMuOnly,		// Только режим МУ
-  mdDuOnly			// Только режим ДУ
-} TMuDuSetup;
-
 // Источник команд для режима ДУ
 typedef enum {
 	mdsAll=0,		// Все интерфейсы
 	mdsDigital,		// Только дискретный
-  mdsSerial		// Только последовательный
+	mdsSerial		// Только последовательный
 } TDuSource;
 
 // Тип реверса
@@ -82,42 +100,24 @@ typedef struct {
 	Bool				 LocalFlag;			// Флаг TRUE, если управление местное
 	Uns				 	 State;				// Состояние входов телеуправления
 	Bool				 Ready;				// Готовность обработки команд ТУ на движение
-	Bool				 ReleStop;			// Стоп в релейном режиме
-	Bool				 ReleStopEnable;	// Разрешение стопа в релейном режиме
-	Uns					*ReleMode;			// Признак релейного режима
 	Uns					*LockSeal;			// Блокировка залипания
 } TTeleControl;
-
-// Структура для работы с плавным регулированием
-typedef struct {
-	Bool				 Enable;			// Наличие плавного регулирования
-	Bool				 Active;			// Признак работы плавного регулирования
-} TSmoothControl;
-
-// Структура для работы с демо-режимом
-typedef struct {
-	Bool				 Enable;			// Наличие демо-режима
-	Bool				 Active;			// Признак работы демо-режима
-	Uns				 	Timer;				// Таймер отсчета времени
-	Uns				 	Timeout;			// Тайм-аут демо-режима
-	Uns				 	TaskPos;			// Текущее задание положения
-	Uns					*UpPos;				// Верхнее положение в %
-	Uns					*DownPos;			// Нижнее положение в %
-} TDemoControl;
 
 // Структура при работе с задвижкой
 typedef struct {
 	Bool				PosRegEnable;		// Наличие режима позиционирования
 	Bool            	BreakFlag;			// Флаг работы с уплотнением SVS.1
 	LgInt				Position;			// Целевое положение
-	Uns				 	BreakDelta;		// Максимальное смещение при работе с уплотнением
+	Uns				 	BreakDelta;			// Максимальное смещение при работе с уплотнением
 	TBreakMode			*BreakMode;			// Режим работы с уплотнением
-	Ptr					CalibData;			// Данные по калибровке
+	TCalibState			*CalibStates;		// Статус калибровки
+	LgUns				*CalibFullStep;		// Данные о колличестве меток энкодера необходимых для прохождения пути
+
 } TValveControl;
 
 // Структура для работы с журналом событий
 typedef struct {
-	Uns				 Value;				// Значение команды управления для журнала событий
+	Uns				 Value;					// Значение команды управления для журнала событий
 	Uns				 Source;				// Источник команды управления для журнала событий
 } TEvLogControl;
 
@@ -134,25 +134,9 @@ typedef union {
 		Uns Opened:1;		// 6		Открыто
 		Uns Rsvd2:1;		// 7		Резерв
 		Uns MuDu:1;			// 8		Местное управление
-		Uns Rsvd:7;			// 9-15 Резерв
+		Uns Rsvd:7;			// 9-15 	Резерв
 	} bit;
 } TVlvStatusReg;
-
-// Коды команд управления
-#define CMD_STOP				0x0001	// Стоп
-#define CMD_CLOSE				0x0002	// Закрыть
-#define CMD_OPEN				0x0004	// Открыть
-#define CMD_MOVE				0x0008	// Переместить
-#define CMD_DEFSTOP				0x0800	// Стоп при аварии(не является командой, добавлено для журнала)  : Добавил PIA 12.09.2012
-#define CDM_DISCROUT_TEST		0x1000	// Тест дискретных выходов
-#define CMD_DISCRIN_TEST		0x2000	// Тест дискретных входов
-
-// Источник команды управления
-#define CMD_SRC_PDU			0x0800	// Пульт дистанционного управления
-#define CMD_SRC_MPU			0x1000	// Местный пост управления
-#define CMD_SRC_DIGITAL		0x2000	// Дискретный интерфейс
-#define CMD_SRC_SERIAL		0x4000	// Последовательный интерфейс
-#define CMD_SRC_ANALOG		0x8000	// Аналогвый интерфейс
 
 // Структура управления приводом
 typedef struct {
@@ -163,8 +147,6 @@ typedef struct {
 	TReverseType	*ReverseType;		// Тип реверса
 	TMpuControl		 Mpu;				// Местное управление
 	TTeleControl	 Tu;				// Телеуправление
-	TSmoothControl	 Smooth;			// Плавное регисрование
-	TDemoControl	 Demo;				// Демо-режим
 	TValveControl	 Valve;				// Управление задвижкой
 	TEvLogControl	 EvLog;				// Журнал событий
 	TValveCmd		 Command;			// Внутренняя команда
@@ -174,17 +156,15 @@ typedef struct {
 	Uns 			 IgnorComFlag;		// Флаг игнорирования команды управления если уже находимся в крайнем положении
 	void (*StopControl)(void);			// Функция останова управления
 	void (*StartControl)(TValveCmd ControlWord); // Функция старта управления
-} TVlvDrvCtrl;
+} TCoreVlvDrvCtrl;
 
-void ValveDriveUpdate(TVlvDrvCtrl *);
-void ValveDriveStop(TVlvDrvCtrl *, Bool Flag);
-void ValveDriveMove(TVlvDrvCtrl *, Uns Percent);
+//------------------- Глобальные переменные --------------------------------
+//------------------- Протатипы функций ------------------------------------
 
-#ifdef __cplusplus
-}
-#endif // extern "C"
+void Core_ValveDriveInit(TCoreVlvDrvCtrl *);
+void Core_ValveDriveStop(TCoreVlvDrvCtrl *);
+void Core_ValveDriveUpdate(TCoreVlvDrvCtrl *);
+
+
 
 #endif
-
-
-

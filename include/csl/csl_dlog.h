@@ -51,8 +51,8 @@ typedef struct {
 }TMonitor;
 
 void MonitorInit(void);
+void DlogUpdate(void);
 void MonitorUpdate(void);
-void MonitorUpdate1(void);
 
 void DLOG_update(TDataLog *);
 

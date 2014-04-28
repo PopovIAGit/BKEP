@@ -43,6 +43,14 @@ extern "C" {
 #define RS485_DIR_SHN		GpioDataRegs.GPBDAT.bit.GPIO50
 #define RS485_DIR_BT		GpioDataRegs.GPBDAT.bit.GPIO53
 
+//----CONTACTORS -------------------------------------
+
+#define CONTACTOR_1_CONTROL GpioDataRegs.GPBDAT.bit.GPIO44
+#define CONTACTOR_2_CONTROL GpioDataRegs.GPBDAT.bit.GPIO45
+
+#define CONTACTOR_1_ENABLE  GpioDataRegs.GPADAT.bit.GPIO10
+#define CONTACTOR_2_ENABLE  GpioDataRegs.GPADAT.bit.GPIO11
+
 //--- BUTTON's ---------------------------------------
 #define HALL_OPEN			AdcRegs.ADCRESULT0
 #define HALL_STOP_MU		AdcRegs.ADCRESULT1

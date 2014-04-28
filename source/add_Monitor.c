@@ -45,7 +45,8 @@ void MonitorInit(void)
 	Dlog.Graph2Ptr  = (Int *)0x3FBE00;
 }
 
-/*void MonitorUpdate1(void){
+
+void MonitorUpdate(void){
 
 	if (!Monitor.dot) switch (Monitor.program)
 	{
@@ -69,9 +70,10 @@ void MonitorInit(void)
 		if (++Monitor.mon_index > 255) Monitor.mon_index = 0;
 		Monitor.dot = 0;
 	}
-}*/
+}
 
-void MonitorUpdate(void)
+
+void DlogUpdate(void)
 {
 	Dlog.Mode     = DLOG_CONT;
 

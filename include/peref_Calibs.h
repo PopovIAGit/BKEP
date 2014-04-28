@@ -16,7 +16,6 @@ extern "C" {
 
 //----------- Подключение заголовочных файлов -----------------------------
 #include "config.h"
-#include "g_Ram.h"
 
 //--------------------- Константы-------------------------------------------
 // Статусы калибровки
@@ -90,8 +89,6 @@ void  CalcClbCycle(TPerefPosition *);
 static Byte CheckStatus(TPerefPosition *, Uns);
 
 void Peref_SpeedCalc(TPerefPosition *);
-
-void SpeedTest(void);
 
 
 #ifdef __cplusplus

@@ -16,9 +16,6 @@
 // Маска для самых старших бит
 #define ADDRESS_HIGH_MASK		0x10000
 
-//выбор микросхем
-//__inline void Eeprom1CsSet(Byte Lev)  {SC_EEPROM1 = Lev;}
-//__inline void Eeprom2CsSet(Byte Lev)  {SC_EEPROM2 = Lev;}
 
 
 void FM25V10_Init(TFM25V10 *p)

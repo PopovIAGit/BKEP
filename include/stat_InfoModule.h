@@ -60,7 +60,7 @@ typedef struct
 		
 	void (*EnableReceive)(void);
 	void (*EnableTransmit)(void);
-	void (*TransmitByte)(Byte Data);
+	void (*TransmitByte)(Uns Data);
 
 	Byte RdBuffer[IM_RD_BUFFER_SIZE];
 	Byte WrBuffer[IM_WR_BUFFER_SIZE];
