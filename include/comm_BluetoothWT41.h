@@ -30,8 +30,8 @@ extern "C" {
 //#define CMD_CONTROL_CONFIG 		"AT\r\n"
 #define CMD_CONTROL_CONFIG 		"SET CONTROL CONFIG 0000 0040 0080\r\n"
 #define CMD_CONTROL_ECHO 		"SET CONTROL ECHO 0004\r\n"
-#define CMD_CONTROL_NAME 		"SET BT NAME MAY"
-#define CMD_CONTROL_AUTH		"SET BT AUTH * 5124"
+#define CMD_CONTROL_NAME 		"SET BT NAME MAY\r\n"
+#define CMD_CONTROL_AUTH		"SET BT AUTH * 5124\r\n"
 #define CMD_CONTROL_BAUD		"SET CONTROL BAUD 115200,8N1\r\n"
 
 #define BT_AUTH_CODE_STRING		"5124"	// Строка с кодом авторизации Bluetooth
