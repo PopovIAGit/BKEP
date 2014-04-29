@@ -156,7 +156,7 @@ TPeriodicalFunction Task10Hz[] =        //не более  200-т задач
 	PrdElemInit(ADT7301_Update,				&g_Peref.tempSensor),*/
 	//PrdElemInit(ADT75_Update,				NULL),
 //	PrdElemInit(Drive_Update,				&g_Drive),
-	//PrdElemInit(Peref_LedsUpdate,			&g_Peref.leds),
+	PrdElemInit(Peref_LedsUpdate,			&g_Peref.leds),
 	//PrdElemInit(Peref_TenControl,			NULL),
 	//PrdElemInit(Peref_10HzCalc,				&g_Peref),
 	PrdElemInit(Peref_Calibration, 						&g_Peref.Position),

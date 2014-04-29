@@ -291,7 +291,7 @@ void InitGpio(void)
 
 	GpioCtrlRegs.GPAMUX2.bit.GPIO29 = 0;
 	GpioCtrlRegs.GPADIR.bit.GPIO29	= 1;	// WORK_DSP_LED
-	GpioDataRegs.GPADAT.bit.GPIO29	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO29	= 1;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO6	= 1;	// OFF_TEN
 	GpioDataRegs.GPADAT.bit.GPIO6	= 0;
@@ -306,25 +306,25 @@ void InitGpio(void)
 	GpioDataRegs.GPADAT.bit.GPIO5	= 0;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO22	= 1;	//LED0
-	GpioDataRegs.GPADAT.bit.GPIO22	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO22	= 1;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO23	= 1;	//LED1
-	GpioDataRegs.GPADAT.bit.GPIO23	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO23	= 1;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO24	= 1;	//LED2
-	GpioDataRegs.GPADAT.bit.GPIO24	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO24	= 1;
 
 	GpioCtrlRegs.GPBDIR.bit.GPIO34	= 1;	//LED3
-	GpioDataRegs.GPBDAT.bit.GPIO34	= 0;
+	GpioDataRegs.GPBDAT.bit.GPIO34	= 1;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO25	= 1;	//LED4
-	GpioDataRegs.GPADAT.bit.GPIO25	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO25	= 1;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO26	= 1;	//LED5
-	GpioDataRegs.GPADAT.bit.GPIO26	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO26	= 1;
 
-	GpioCtrlRegs.GPADIR.bit.GPIO27	= 1;	//LED6
-	GpioDataRegs.GPADAT.bit.GPIO27	= 0;
+	GpioCtrlRegs.GPADIR.bit.GPIO27	= 1;	//ENABLE_BLUETOOTH
+	GpioDataRegs.GPADAT.bit.GPIO27	= 1;
 
 	GpioCtrlRegs.GPBDIR.bit.GPIO50	= 1;	//RS485_DIR_SHN - соо
 	GpioDataRegs.GPBDAT.bit.GPIO50	= 0;

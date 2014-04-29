@@ -11,8 +11,8 @@
 // $Release Date: August 4, 2009 $
 //###########################################################################
 
-#include "chip\DSP2833x_Device.h"     // DSP2833x Headerfile Include File
-#include "csl\csl_mcbsp.h"
+#include "DSP2833x_Device.h"     // DSP2833x Headerfile Include File
+#include "csl_mcbsp.h"
 //#include "DSP2833x_Examples.h"   // DSP2833x Examples Include File
 
 //---------------------------------------------------------------------------
@@ -99,6 +99,7 @@ void InitMcbspa(void)
 
 	//---------------------------
 	McbspaRegs.SRGR2.all = 0;
+	McbspaRegs.SPCR2.bit.FREE = 1;
 	McbspaRegs.SRGR2.bit.CLKSM = 1;
 	McbspaRegs.SRGR1.bit.CLKGDV = CLKGDV_VAL;
 
@@ -107,10 +108,12 @@ void InitMcbspa(void)
 
 	McbspaRegs.PCR.all = 0;
 	McbspaRegs.PCR.bit.FSXM = 1;
+	McbspaRegs.PCR.bit.FSRM = 1;
 	McbspaRegs.PCR.bit.CLKXM = 1;
-	McbspaRegs.PCR.bit.CLKRM = 1;
+	McbspaRegs.PCR.bit.CLKRM = 1;//???
 	McbspaRegs.PCR.bit.FSXP = 0;
 	McbspaRegs.PCR.bit.FSRP = 0;
+
 
 	//*****************************
 	McbspaRegs.XCR2.bit.XPHASE   =0;
@@ -132,7 +135,8 @@ void InitMcbspa(void)
 	McbspaRegs.RCR1.bit.RFRLEN1 = 0;
 	McbspaRegs.RCR1.bit.RWDLEN1 = 3;
 
-	McbspaRegs.SPCR1.bit.RJUST = 2;
+	//McbspaRegs.SPCR1.bit.RJUST = 2;
+	//McbspaRegs.SPCR1.bit.
 	/*McbspaRegs.XCR2.bit.XPHASE  = 1;
 	McbspaRegs.RCR1.bit.RFRLEN1 = 8;
 	McbspaRegs.RCR2.bit.RFRLEN2 = 1;
@@ -169,9 +173,37 @@ void InitMcbspa(void)
 }
 
 //-------------------------------------------------------------------------------------------
-Byte McBsp_recieve(Byte Id)
-	{ if (McBspRegs[Id]->SPCR1.bit.RRDY==1) return McBspRegs[Id]->DRR1.all;
-	  else return 0; }
+Uns McBsp_recieve(Byte Id)
+{
+	Uns Data=0;
+	Uns Data1=0;
+	Uns Data2=0;
+	LgUns LgData=0;
+
+			//Data1 = McBspRegs[Id]->DRR1.all;
+			//Data2 = McBspRegs[Id]->DRR2.all;
+
+	if (McBspRegs[Id]->SPCR1.bit.RRDY==1 && McBspRegs[Id]->MFFINT.bit.RINT==1)
+	{
+
+
+		Data2 = McBspRegs[Id]->DRR2.all;
+		Data1 = McBspRegs[Id]->DRR1.all;
+		McBspRegs[Id]->SPCR1.bit.RRST = 0;
+
+		LgData = (LgUns)Data1 | ((LgUns)(Data2) << 16);
+
+		Data1 = (Uns)((LgData>>1)&0x000F);
+		Data2 = (Uns)((LgData>>11)&0x000F);
+
+		Data = Data1 | (Data2<<8);
+		McBspRegs[Id]->SPCR1.bit.RRST = 1;
+
+		return Data;//McBspRegs[Id]->DRR1.all;
+	}
+	else return 0;
+
+}
 
 void McBsp_transmit(Byte Id, Uns Data)
 {
@@ -250,11 +282,11 @@ void McBsp_reset(Byte Id)
 void McBsp_rx_enable(Byte Id)
 	{McBspRegs[Id]->MFFINT.bit.RINT = 1; McBspRegs[Id]->SPCR1.bit.RRST=1;}
 void McBsp_rx_disable(Byte Id)
-	{}//{McBspRegs[Id]->MFFINT.bit.RINT = 0; McBspRegs[Id]->SPCR1.bit.RRST=0;}
+	{McBspRegs[Id]->MFFINT.bit.RINT = 0; McBspRegs[Id]->SPCR1.bit.RRST=0;}
 void McBsp_tx_enable(Byte Id)
 	{McBspRegs[Id]->MFFINT.bit.XINT = 1; McBspRegs[Id]->SPCR2.bit.XRST=1;}
 void McBsp_tx_disable(Byte Id)
-	{}//{McBspRegs[Id]->MFFINT.bit.XINT = 0; McBspRegs[Id]->SPCR2.bit.XRST=0;}
+	{McBspRegs[Id]->MFFINT.bit.XINT = 0; McBspRegs[Id]->SPCR2.bit.XRST=0;}
 //-------------------------------------------------------------------------------------------
 
 #if (DSP28_MCBSPB)
@@ -282,7 +314,8 @@ void InitMcbspb(void)
     McbspbRegs.SRGR1.bit.CLKGDV = CLKGDV_VAL;	// CLKG frequency = LSPCLK/(CLKGDV+1)
 
    	McbspbRegs.PCR.bit.FSXM = 1;		// FSX generated internally, FSR derived from an external source
-	McbspbRegs.PCR.bit.CLKXM = 1;		// CLKX generated internally, CLKR derived from an external source
+   	McbspbRegs.PCR.bit.FSRM = 1;//*
+   	McbspbRegs.PCR.bit.CLKXM = 1;		// CLKX generated internally, CLKR derived from an external source
     delay_loop();                // Wait at least 2 SRG clock cycles
     McbspbRegs.SPCR2.bit.GRST=1; // Enable the sample rate generator
 	clkg_delay_loop();           // Wait at least 2 CLKG cycles
@@ -397,7 +430,7 @@ void InitMcbspaGpio(void)
 	//for my     GpioCtrlRegs.GPAMUX1.bit.GPIO7 = 2;		// GPIO7 is MCLKRA pin (Comment as needed)
 	//GpioCtrlRegs.GPBMUX2.bit.GPIO58 = 1;	// GPIO58 is MCLKRA pin (Comment as needed)
 	//for my 	 GpioCtrlRegs.GPAMUX2.bit.GPIO23 = 2;	// GPIO23 is MFSXA pin
-	//for my 	 GpioCtrlRegs.GPAMUX1.bit.GPIO5 = 2;		// GPIO5 is MFSRA pin (Comment as needed)
+	//for my 	GpioCtrlRegs.GPAMUX1.bit.GPIO5 = 2;		// GPIO5 is MFSRA pin (Comment as needed)
 	GpioCtrlRegs.GPBMUX2.bit.GPIO59 = 1;	// GPIO59 is MFSRA pin (Comment as needed)
 
 /* Enable internal pull-up for the selected pins */
@@ -411,7 +444,7 @@ void InitMcbspaGpio(void)
 	//for my 	 GpioCtrlRegs.GPAPUD.bit.GPIO7 = 0;      // Enable pull-up on GPIO7 (MCLKRA) (Comment as needed)
 	//GpioCtrlRegs.GPBPUD.bit.GPIO58 = 0;   // Enable pull-up on GPIO58 (MCLKRA) (Comment as needed)
 	//for my   	 GpioCtrlRegs.GPAPUD.bit.GPIO23 = 0;     // Enable pull-up on GPIO23 (MFSXA)
-	//for my 	 GpioCtrlRegs.GPAPUD.bit.GPIO5 = 0;      // Enable pull-up on GPIO5 (MFSRA) (Comment as needed)
+	//GpioCtrlRegs.GPAPUD.bit.GPIO5 = 0;      // Enable pull-up on GPIO5 (MFSRA) (Comment as needed)
 	GpioCtrlRegs.GPBPUD.bit.GPIO59 = 0;   // Enable pull-up on GPIO59 (MFSRA) (Comment as needed)
 
 /* Set qualification for selected input pins to asynch only */
