@@ -287,6 +287,24 @@ Uns StrToDate(String Str)
 	return Date.all;
 }
 //--------------------------------------------------------
-
+//-----‘ункци€ вычислени€ ассиметрии дл€ тока и напр€жени€--------
+Uns SkewCalc(Uns value1, Uns value2, Uns value3, Uns valueMid)
+{	// ѕромежуточные переменные:
+	Uns diff1,		// –азница между напр€жением (током) фазы R(U) и средним напр€жением (током)
+		diff2,		// –азница между напр€жением (током) фазы S(V) и средним напр€жением (током)
+		diff3,		// –азница между напр€жением (током) фазы T(W) и средним напр€жением (током)
+		maxDiff;	// ћаксимальна€ разница напр€жений
+	if (!valueMid)	// ≈сли среднее значение = 0
+		return 0;	// ¬озвращаем 0, чтобы избежать деление на 0
+	else
+	{
+		diff1 = abs(value1 - valueMid);
+		diff2 = abs(value2 - valueMid);
+		diff3 = abs(value3 - valueMid);
+		maxDiff = Max3UnsValue(diff1, diff2, diff3);
+		//return ValueToPU0(maxDiff, valueMid);
+		return ((maxDiff*100)/valueMid);
+	}
+}
 
 

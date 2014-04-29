@@ -217,11 +217,7 @@ typedef struct _TRamGroupC
 	TLedsReg        LedsReg;            // 16.Состояние светодиодов блока
 	THallBlock      HallBlock;          // 17.Состояние датчиков холла блока
 	Uns             SetDefaults;        // 18.Задание параметров по умолчанию
-#if BUR_M
-	TPrtMode       	RST_Err;           	// 19.Неверное чередование фаз сети для БУР М
-#else
 	Uns       	    Rsvd1;           	// 19.Резерв
-#endif
 	TPrtMode        DriveTemper;        // 20.Защита от перегрева двигателя. (дописать защиту перегрева блока в H)
 	Uns             OvLevel_max;        // 21.Уровень превышения напряжения при 47% превышения (320В)
 	Uns             OvTime_max;     	// 22.Время превышения напряжения при 47% превышения (1с)

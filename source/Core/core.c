@@ -9,7 +9,6 @@
 #include "core.h"
 #include "peref.h"
 #include "g_Structs.h"
-//#include "g_Ram.h"
 //#include "comm.h"
 //#include "stat.h"
 
@@ -26,12 +25,12 @@ void Core_Init(TCore *p)
 	Core_ValveDriveInit(&p->VlvDrvCtrl);	// Управление задвижкой
 	Core_TorqueInit(&p->TorqObs);			// Расчет моментов
 	//Core_CommandsInit(&p->commands);		// Получение команд, настройка калибровки
-	//Core_ProtectionsInit(&p->protections);// Защиты
+	Core_ProtectionsInit(&p->Protections);	// Защиты
 
 	p->Status.bit.Stop = 1;					// При включение выставляем стоп
 }
 
-// Функция задания параметров момента в зависимости от положения и направления движения
+// Функция задания момента в зависимости от положения и направления движения
 void Core_DefineCtrlParams(TCore *p) // 50 hz
 {
 	Int MaxZone, CloseZone, OpenZone;	// максимальный размер зоны, зона открытия, зона закрытия
@@ -230,7 +229,7 @@ void StartPowerControl(TValveCmd ControlWord)
 	}
 
 	// сброс аварий необходимый для пуска
-	//	ProtectionsReset();
+		Core_ProtectionsReset(&g_Core.Protections);
 
 	g_Core.Status.bit.Stop 			= 0;
 	g_Core.MotorControl.TorqueSet 	= 0xFFFF;

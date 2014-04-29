@@ -37,28 +37,28 @@ extern "C" {
 // Структура для работы с фильтрами переферии
 typedef struct {
 	// Фильтры U
-	APFILTER3  URfltr;
-	APFILTER3  USfltr;
-	APFILTER3  UTfltr;
+	APFILTER3  			URfltr;
+	APFILTER3  			USfltr;
+	APFILTER3  			UTfltr;
 	// Фильтры I
-	APFILTER3  IUfltr;
-	APFILTER3  IVfltr;
-	APFILTER3  IWfltr;
+	APFILTER3  			IUfltr;
+	APFILTER3  			IVfltr;
+	APFILTER3  			IWfltr;
 	// ------
-	TSensObserver	sensObserver;		// Масштабирование сигналов с датчиков
-	TSinObserver	sinObserver;		// Вычисление RMS
-	TPhaseOrder		phaseOrder; 		// Чередование фаз сети
+	TSensObserver		sensObserver;		// Масштабирование сигналов с датчиков
+	TSinObserver		sinObserver;		// Вычисление RMS
+	TPhaseOrder			phaseOrder; 		// Чередование фаз сети
 	//------
-	APFILTER1 Phifltr;					// Фильтр угола фи
-	APFILTER1 Umfltr;					// Фильтр среднего напряжения
-	APFILTER3 Imfltr;					// Фильтр среднего тока
+	APFILTER1 			Phifltr;			// Фильтр угола фи
+	APFILTER1 			Umfltr;				// Фильтр среднего напряжения
+	APFILTER3 			Imfltr;				// Фильтр среднего тока
 
-	TPerefPosition Position;			// Калибровка датчика положения и расчет скорости
-	TContactorControl ContactorControl;	// Управление контакторами
+	TPerefPosition 		Position;			// Калибровка датчика положения и расчет скорости
+	TContactorControl 	ContactorControl;	// Управление контакторами
 
-	Uns Umid;
-	Uns Imid;
-	Uns AngleUI;
+	Uns 				Umid;
+	Uns 				Imid;
+	Uns 				AngleUI;
 } TPeref;
 
 //------------------- Протатипы функций ------------------------------------

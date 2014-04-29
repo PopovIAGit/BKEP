@@ -15,7 +15,7 @@ Outputs
 
 //----------- Подключение заголовочных файлов ------------------------------
 
-//#include "core_Protections.h"
+#include "core_Protections.h"
 #include "core_Menu.h"
 #include "core_VlvDrvCtrl.h"
 #include "core_TorqueObserver.h"
@@ -57,7 +57,7 @@ typedef struct {
 	// ---
 	TStatusReg 			Status;			// Статус работы
 	// ---
-	//TCoreProtections	protections;	// Защиты
+	TCoreProtections	Protections;	// Защиты
 	// ---
 	//TCoreParams		params;			// Параметры
 	// ---

@@ -84,7 +84,6 @@ LgUns  X, X10, X18;
 TPeriodicalFunction Task18kHz[] =         
 {
 	PrdElemInit(Peref_18kHzCalc,				&g_Peref),
-	//PrdElemInit(AvagoEncoderAEAT84ADCalc,		&g_Peref.position),
 	PrdElemInit(task1,	NULL)
 };
 

@@ -20,22 +20,22 @@ extern "C" {
 //================== СТАТУСЫ ============================
 //--------------------------------------------------------
 // статусный регистр
-#define STATUS_OPENED			BIT0
+#define STATUS_STOP				BIT0
 #define STATUS_FAULT			BIT1
-#define STATUS_PROG_MODE		BIT2
-#define STATUS_CLOSED			BIT3
-#define STATUS_MU_DU			BIT4
-#define STATUS_STOP				BIT5
-#define STATUS_CLOSING			BIT6
-#define STATUS_OPENING			BIT7
-#define STATUS_TEST				BIT8
+#define STATUS_CLOSING			BIT2
+#define STATUS_OPENING			BIT3
+#define STATUS_TEST				BIT4
+#define STATUS_CLOSED			BIT5
+#define STATUS_OPENED			BIT6
+#define STATUS_MUFTA			BIT7
+#define STATUS_MU_DU			BIT8
 #define STATUS_TEN				BIT9
 #define STATUS_POWER			BIT10
-#define STATUS_TEST_OPEN_CLOSE	BIT11
-#define STATUS_TEST_BLOCK		BIT12
-#define STATUS_UPOR				BIT13
-#define STATUS_BRAKING			BIT14
-#define STATUS_SLEEP			BIT15
+#define STATUS_ALARM_BLK_INDIC	BIT11
+#define STATUS_ALARM_TS			BIT12
+#define STATUS_DEFECT			BIT13
+#define STATUS_DEFECT_BLK_INDIC	BIT14
+#define STATUS_DEFECT_TS		BIT15
 
 //-------------------Статус работы----------------------------
 // Статус работы
@@ -130,7 +130,7 @@ typedef union _TProcessReg {
      	Uns NoOpen:1;	   	// 3     Не задано положение открыто
 		Uns NoCalib:1;		// 4     Калибровка не выполнена
      	Uns Overway:1;		// 5     Уплотнение не достигнуто
-		Uns Drv_T:1;		// 6	 Перегрев двигателя
+		Uns Rsvd1:1;		// 6	 Резерв
 		Uns MuDuDef:1;		// 7     Ошибка по дискретным входам Му/Ду
 		Uns Rsvd:8;			// 8-15  Резерв
 	} bit;
@@ -168,12 +168,7 @@ typedef union _TNetReg {
 		Uns OvR_max:1;		// 11    Превышение напряжения в фазе R на 47%
 		Uns OvS_max:1;		// 12    Превышение напряжения в фазе S на 47%
 		Uns OvT_max:1;		// 13    Превышение напряжения в фазе T на 47%
-		#if BUR_M
-		Uns RST_Err:1;		// 14   неверное чередование входных фаз БУР М
-		Uns Rsvd:1;			// 15 Резерв
-		#else
 		Uns Rsvd:2;			// 14-15 Резерв
-		#endif
 	} bit;
 } TNetReg;
 
@@ -196,8 +191,7 @@ typedef union _TLoadReg {
 		Uns ShCU:1;			// 5	 Короткое замыкание в фазе U
 		Uns ShCV:1;			// 6	 Короткое замыкание в фазе V
 		Uns ShCW:1;			// 7	 Короткое замыкание в фазе W
-		Uns Rsvd2:2;		// 8-9	 Резерв
-		Uns IUnLoad:1;		// 10    Отсутствие нагрузки
+		Uns Rsvd2:3;		// 8-10	 Резерв
 		Uns ISkew:1;		// 11    Ассиметрия тока
 		Uns Rsvd:4;			// 12-15 Резерв
 	} bit;
@@ -207,11 +201,7 @@ typedef union _TLoadReg {
 #define DEV_ERR_MASK		0x009F
 #define DEV_TMP_MASK		0x0060
 #define DEV_RSC_MASK		0x0800
-#if BUR_M
-#define DEV_EVLOG_MASK		0x0000
-#else
 #define DEV_EVLOG_MASK		0x0100
-#endif
 typedef union _TDeviceReg {
 	Uns all;
   struct {
@@ -220,17 +210,11 @@ typedef union _TDeviceReg {
 		Uns Memory2:1;		// 2     Сбой памяти 2
 		Uns Rtc:1;			// 3     Сбой часов реального времени
 		Uns TSens:1;		// 4     Сбой датчика температуры
-		Uns Th:1;			// 5     Перегрев блока
-		Uns Tl:1;			// 6     Переохлождение блока
-		Uns AVRcon:1;		// 7     связь до АВРки
-	#if BUR_M
-		Uns Rsvd1:3;		// 8-10  Резерв
-	#else
-		Uns LowPower:1;		// 8 	 Режим сохранения энергии
-		Uns Rsvd1:2;		// 9-10  Резерв
-	#endif
-		Uns Th_Err:1;		// 11 	 Температура блока свыше 110 град
-     	Uns Rsvd:4;       	// 12-15 Резерв
+		Uns Th_BCP:1;		// 5     Перегрев блока БКП
+		Uns Tl_BCP:1;		// 6     Переохлождение блока БКП
+		Uns Th_BCD:1;		// 7     Перегрев блока БКД
+		Uns Tl_BCD:1;		// 8     Переохлождение блока БКД
+     	Uns Rsvd:6;       	// 9-15  Резерв
   } bit;
 } TDeviceReg;
 
