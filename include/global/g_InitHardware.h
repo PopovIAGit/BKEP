@@ -30,7 +30,7 @@ extern "C" {
 #define LED_MUFTA			GpioDataRegs.GPADAT.bit.GPIO23
 #define LED_DEFECT			GpioDataRegs.GPADAT.bit.GPIO24
 #define LED_FAULT			GpioDataRegs.GPBDAT.bit.GPIO34
-#define LED_CLOSE			GpioDataRegs.GPADAT.bit.GPIO25
+#define LED_CLOSE		    GpioDataRegs.GPADAT.bit.GPIO25
 
 #define LED_CONNECT			GpioDataRegs.GPADAT.bit.GPIO26
 

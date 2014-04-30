@@ -84,9 +84,9 @@ LgUns  X, X10, X18;
 TPeriodicalFunction Task18kHz[] =         
 {
 	PrdElemInit(Peref_18kHzCalc,						&g_Peref),
-	PrdElemInit(MonitorUpdate,							NULL),
+	//PrdElemInit(MonitorUpdate,						NULL),
 	//PrdElemInit(AvagoEncoderAEAT84ADCalc,				&g_Peref.position),
-	PrdElemInit(task1,	NULL)
+	//PrdElemInit(task1,	NULL)
 };
 
 //Сюда вставляем функции для соответствующей группы

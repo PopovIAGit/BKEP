@@ -67,7 +67,7 @@ typedef struct _TBluetoothPort
 
 	void (*EnableRx)(void);
 	void (*EnableTx)(void);
-	Byte (*ReceiveByte)(void);
+	Uns (*ReceiveByte)(void);
 	void (*TransmitByte)(Uns Data);
 
 	#if BT_DBG

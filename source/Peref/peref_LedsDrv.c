@@ -215,9 +215,9 @@ void Peref_LedsUpdate(pLeds p)
 	LED_MUFTA	= p->leds.bit.Mufta;
 	LED_DEFECT	= p->leds.bit.Defect;
 	LED_FAULT	= p->leds.bit.Fault;
-	LED_CLOSE	= p->leds.bit.Close;
+	LED_CLOSE = p->leds.bit.Close;
 
-	ENABLE_BLUETOOTH = p->leds.bit.Bluetooth;
+	//ENABLE_BLUETOOTH = p->leds.bit.Bluetooth;
 
 	g_Ram.ramGroupH.BkpIndication = 0;
 

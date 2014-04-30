@@ -30,7 +30,7 @@ Bool CheckCommError(TBluetoothHandle);
 
 void EnableBtRx(void);
 void EnableBtTx(void);
-Byte ReceiveBtByte(void);
+Uns ReceiveBtByte(void);
 void TransmitBtByte(Uns Data);
 /*
 void EnableBtRx(TBluetoothHandle);
@@ -279,12 +279,12 @@ Bool CheckCommError(TBluetoothHandle bPort)
 
 __inline void RxCommandMode(TBluetoothHandle bPort)
 {
-	char Data;
+	Uns Data;
 
-	bPort->Error = CheckCommError(bPort);
+	//bPort->Error = CheckCommError(bPort);
 
-	if (bPort->Error)
-		return;
+	//if (bPort->Error)
+	//	return;
 
 	Data = ReceiveBtByte();
 
@@ -580,7 +580,7 @@ void EnableBtTx(void)
 }
 
 //приём 1 байта по каналу McBSP
-Byte ReceiveBtByte(void)
+Uns ReceiveBtByte(void)
 {
 	return McBsp_recieve(MCBSPA);
 }

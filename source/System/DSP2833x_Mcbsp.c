@@ -103,16 +103,18 @@ void InitMcbspa(void)
 	McbspaRegs.SRGR2.bit.CLKSM = 1;
 	McbspaRegs.SRGR1.bit.CLKGDV = CLKGDV_VAL;
 
+	McbspaRegs.SPCR1.bit.RINTM = 0;
+
 	McbspaRegs.SPCR2.all = 0;
 	McbspaRegs.SPCR2.bit.FREE = 1;
 
 	McbspaRegs.PCR.all = 0;
 	McbspaRegs.PCR.bit.FSXM = 1;
-	McbspaRegs.PCR.bit.FSRM = 1;
+	McbspaRegs.PCR.bit.FSRM = 0;
 	McbspaRegs.PCR.bit.CLKXM = 1;
 	McbspaRegs.PCR.bit.CLKRM = 1;//???
 	McbspaRegs.PCR.bit.FSXP = 0;
-	McbspaRegs.PCR.bit.FSRP = 0;
+	McbspaRegs.PCR.bit.FSRP = 1;
 
 
 	//*****************************
@@ -126,7 +128,16 @@ void InitMcbspa(void)
 	McbspaRegs.XCR1.bit.XWDLEN1 = 3;
 
 	//*****************************
-	McbspaRegs.RCR2.bit.RPHASE   =0;
+	McbspaRegs.RCR2.bit.RPHASE = 1;//. Enable dual-phase frame mode.
+	McbspaRegs.RCR1.bit.RFRLEN1 = 8;//. Nine elements in the first phase of the frame.
+	McbspaRegs.RCR2.bit.RFRLEN2 = 1;//. Two elements in the second phase of the frame.
+	McbspaRegs.RCR1.bit.RWDLEN1 = 0;//. 16-bit words in the first phase (Start bit, data bits).
+    McbspaRegs.RCR2.bit.RWDLEN2=0;//. 8-bit words in the second phase (Stop bits).
+    McbspaRegs.RCR2.bit.RCOMPAND=0;//. No companding.
+    McbspaRegs.RCR2.bit.RFIG = 1;//. For reception, since data line transitions are seen on the FSR pin, unexpected frame
+    McbspaRegs.RCR2.bit.RDATDLY=1;//. 1-bit data delay.
+
+	/*McbspaRegs.RCR2.bit.RPHASE   =0;
 	McbspaRegs.RCR2.bit.RFRLEN2  =0;
 	McbspaRegs.RCR2.bit.RWDLEN2  =0;
 	McbspaRegs.RCR2.bit.RCOMPAND =0;
@@ -134,6 +145,8 @@ void InitMcbspa(void)
 	McbspaRegs.RCR2.bit.RDATDLY  =0;
 	McbspaRegs.RCR1.bit.RFRLEN1 = 0;
 	McbspaRegs.RCR1.bit.RWDLEN1 = 3;
+	*/
+	//McbspaRegs.RCR1.bit.RWDLEN1=2;      // 16-bit word
 
 	//McbspaRegs.SPCR1.bit.RJUST = 2;
 	//McbspaRegs.SPCR1.bit.
@@ -152,11 +165,11 @@ void InitMcbspa(void)
 	McbspaRegs.SRGR1.all=0x0100;
 	 */
 
-	//McbspaRegs.SPCR1.bit.RRST=0;
-	McbspaRegs.SRGR2.bit.CLKSM = 1;		// CLKSM=1 (If SCLKME=0, i/p clock to SRG is LSPCLK)
-    //McbspaRegs.SRGR1.bit.FWID = 0;              // Frame Width = 1 CLKG period
-	McbspaRegs.SPCR1.bit.CLKSTP = 1;
-    McbspaRegs.SRGR1.bit.CLKGDV = CLKGDV_VAL;	// CLKG frequency = LSPCLK/(CLKGDV+1)
+	////McbspaRegs.SPCR1.bit.RRST=0;
+	//McbspaRegs.SRGR2.bit.CLKSM = 1;		// CLKSM=1 (If SCLKME=0, i/p clock to SRG is LSPCLK)
+    ////McbspaRegs.SRGR1.bit.FWID = 0;              // Frame Width = 1 CLKG period
+	//McbspaRegs.SPCR1.bit.CLKSTP = 1;
+    //McbspaRegs.SRGR1.bit.CLKGDV = CLKGDV_VAL;	// CLKG frequency = LSPCLK/(CLKGDV+1)
 
     delay_loop();                // Wait at least 2 SRG clock cycles
 
@@ -167,6 +180,7 @@ void InitMcbspa(void)
 	//************ Disable TX/RX unit
     McbspaRegs.SPCR2.bit.XRST=1;
     McbspaRegs.SPCR1.bit.RRST=1;
+    asm(" RPT #249 || NOP");
     // Frame Sync Generator reset
     McbspaRegs.SPCR2.bit.FRST=1;
 
@@ -180,21 +194,20 @@ Uns McBsp_recieve(Byte Id)
 	Uns Data2=0;
 	LgUns LgData=0;
 
-			//Data1 = McBspRegs[Id]->DRR1.all;
-			//Data2 = McBspRegs[Id]->DRR2.all;
-
-	if (McBspRegs[Id]->SPCR1.bit.RRDY==1 && McBspRegs[Id]->MFFINT.bit.RINT==1)
+	if (McBspRegs[Id]->SPCR1.bit.RRDY==1)
 	{
 
-
+		Data1 = McBspRegs[Id]->DRR1.all;
 		Data2 = McBspRegs[Id]->DRR2.all;
 		Data1 = McBspRegs[Id]->DRR1.all;
+		Data2 = McBspRegs[Id]->DRR2.all;
+
 		McBspRegs[Id]->SPCR1.bit.RRST = 0;
 
 		LgData = (LgUns)Data1 | ((LgUns)(Data2) << 16);
 
-		Data1 = (Uns)((LgData>>1)&0x000F);
-		Data2 = (Uns)((LgData>>11)&0x000F);
+		Data1 = (Uns)((LgData>>1)&0x00FF);
+		Data2 = (Uns)((LgData>>11)&0x00FF);
 
 		Data = Data1 | (Data2<<8);
 		McBspRegs[Id]->SPCR1.bit.RRST = 1;
@@ -445,7 +458,7 @@ void InitMcbspaGpio(void)
 	//GpioCtrlRegs.GPBPUD.bit.GPIO58 = 0;   // Enable pull-up on GPIO58 (MCLKRA) (Comment as needed)
 	//for my   	 GpioCtrlRegs.GPAPUD.bit.GPIO23 = 0;     // Enable pull-up on GPIO23 (MFSXA)
 	//GpioCtrlRegs.GPAPUD.bit.GPIO5 = 0;      // Enable pull-up on GPIO5 (MFSRA) (Comment as needed)
-	GpioCtrlRegs.GPBPUD.bit.GPIO59 = 0;   // Enable pull-up on GPIO59 (MFSRA) (Comment as needed)
+	GpioCtrlRegs.GPBPUD.bit.GPIO59 = 1;   // Enable pull-up on GPIO59 (MFSRA) (Comment as needed)
 
 /* Set qualification for selected input pins to asynch only */
 // This will select asynch (no qualification) for the selected pins.
@@ -470,7 +483,7 @@ void InitMcbspbGpio(void)
 /* Configure McBSP-A pins using GPIO regs*/
 // This specifies which of the possible GPIO pins will be McBSP functional pins.
 // Comment out other unwanted lines.
-
+/*
 	//GpioCtrlRegs.GPAMUX1.bit.GPIO12 = 3;	// GPIO12 is MDXB pin (Comment as needed)
 	GpioCtrlRegs.GPAMUX2.bit.GPIO24 = 3;	// GPIO24 is MDXB pin (Comment as needed)
 	//GpioCtrlRegs.GPAMUX1.bit.GPIO13 = 3;	// GPIO13 is MDRB pin (Comment as needed)
@@ -483,12 +496,12 @@ void InitMcbspbGpio(void)
 	GpioCtrlRegs.GPAMUX2.bit.GPIO27 = 3;	// GPIO27 is MFSXB pin (Comment as needed)
 	GpioCtrlRegs.GPAMUX1.bit.GPIO1 = 3;		// GPIO1 is MFSRB pin (Comment as needed)
 	//GpioCtrlRegs.GPBMUX2.bit.GPIO61 = 1;	// GPIO61 is MFSRB pin (Comment as needed)
-
+*/
 /* Enable internal pull-up for the selected pins */
 // Pull-ups can be enabled or disabled by the user.
 // This will enable the pullups for the specified pins.
 // Comment out other unwanted lines.
-	GpioCtrlRegs.GPAPUD.bit.GPIO24 = 0;	    // Enable pull-up on GPIO24 (MDXB) (Comment as needed)
+/*	GpioCtrlRegs.GPAPUD.bit.GPIO24 = 0;	    // Enable pull-up on GPIO24 (MDXB) (Comment as needed)
 	//GpioCtrlRegs.GPAPUD.bit.GPIO12 = 0;	// Enable pull-up on GPIO12 (MDXB) (Comment as needed)
 	GpioCtrlRegs.GPAPUD.bit.GPIO25 = 0;	    // Enable pull-up on GPIO25 (MDRB) (Comment as needed)
 	//GpioCtrlRegs.GPAPUD.bit.GPIO13 = 0;	// Enable pull-up on GPIO13 (MDRB) (Comment as needed)
@@ -500,12 +513,12 @@ void InitMcbspbGpio(void)
 	//GpioCtrlRegs.GPAPUD.bit.GPIO15 = 0;	// Enable pull-up on GPIO15 (MFSXB) (Comment as needed)
 	GpioCtrlRegs.GPAPUD.bit.GPIO1 = 0;		// Enable pull-up on GPIO1 (MFSRB) (Comment as needed)
 	//GpioCtrlRegs.GPBPUD.bit.GPIO61 = 0;	// Enable pull-up on GPIO61 (MFSRB) (Comment as needed)
-
+*/
 
 /* Set qualification for selected input pins to asynch only */
 // This will select asynch (no qualification) for the selected pins.
 // Comment out other unwanted lines.
-     GpioCtrlRegs.GPAQSEL2.bit.GPIO25 = 3;   // Asynch input GPIO25 (MDRB) (Comment as needed)
+/*     GpioCtrlRegs.GPAQSEL2.bit.GPIO25 = 3;   // Asynch input GPIO25 (MDRB) (Comment as needed)
     //GpioCtrlRegs.GPAQSEL1.bit.GPIO13 = 3; // Asynch input GPIO13 (MDRB) (Comment as needed)
     GpioCtrlRegs.GPAQSEL2.bit.GPIO26 = 3;   // Asynch input GPIO26(MCLKXB) (Comment as needed)
     //GpioCtrlRegs.GPAQSEL1.bit.GPIO14 = 3; // Asynch input GPIO14 (MCLKXB) (Comment as needed)
@@ -515,7 +528,7 @@ void InitMcbspbGpio(void)
 	//GpioCtrlRegs.GPAQSEL1.bit.GPIO15 = 3; // Asynch input GPIO15 (MFSXB) (Comment as needed)
 	GpioCtrlRegs.GPAQSEL1.bit.GPIO1 = 3;    // Asynch input GPIO1 (MFSRB) (Comment as needed)
 	//GpioCtrlRegs.GPBQSEL2.bit.GPIO61 = 3; // Asynch input GPIO61 (MFSRB) (Comment as needed)
-
+*/
 
 	EDIS;
 }
