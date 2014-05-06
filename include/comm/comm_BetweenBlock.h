@@ -15,8 +15,9 @@ extern "C" {
 #endif
 
 #define BKP_MAX_SCI_BUF_LEN	10
-#define BKP_SCI_RX_TIMEOUT	(Uns)(0.0175 * 18000)//(Uns)(0.00175 * 18000)
-#define BKP_SCI_TX_TIMEOUT	(Uns)(0.0001 * 18000)
+#define BKP_SCI_RX_TIMEOUT	(Uns)(0.00175 * 18000)//(Uns)(0.00175 * 18000)
+#define BKP_SCI_TX_TIMEOUT	(Uns)(0.00017 * 18000)
+#define BKP_CONN_TIMEOUT	(Uns)(1.00000 * 18000)
 //#define BKP_SCI_ID			SCIA
 #define BKP_SCI_BAUD		SCI_BRR(1152)
 #define SCI_BREAK			0x20
@@ -37,6 +38,8 @@ typedef struct _TMbBBPort {
 	Uns ConnErr;
 	Uns RxByteCount;
 	Uns TxByteCount;
+	Uns ConnTimer;
+	Uns ConnTimeout;
 	Uns Buffer[BKP_MAX_SCI_BUF_LEN];
 } TMbBBPort,*TMbBBHandle;
 

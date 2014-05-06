@@ -128,7 +128,17 @@ void InitMcbspa(void)
 	McbspaRegs.XCR1.bit.XWDLEN1 = 3;
 
 	//*****************************
-	McbspaRegs.RCR2.bit.RPHASE = 1;//. Enable dual-phase frame mode.
+	McbspaRegs.RCR2.bit.RPHASE   = 0;
+	McbspaRegs.RCR2.bit.RFRLEN2  = 0;
+	McbspaRegs.RCR2.bit.RWDLEN2  = 0;
+	McbspaRegs.RCR2.bit.RCOMPAND = 0;
+	McbspaRegs.RCR2.bit.RFIG 	 = 1;
+	McbspaRegs.RCR2.bit.RDATDLY  = 0;
+	McbspaRegs.RCR1.bit.RFRLEN1 =  0;
+	McbspaRegs.RCR1.bit.RWDLEN1 =  3;
+
+
+/*	McbspaRegs.RCR2.bit.RPHASE = 1;//. Enable dual-phase frame mode.
 	McbspaRegs.RCR1.bit.RFRLEN1 = 8;//. Nine elements in the first phase of the frame.
 	McbspaRegs.RCR2.bit.RFRLEN2 = 1;//. Two elements in the second phase of the frame.
 	McbspaRegs.RCR1.bit.RWDLEN1 = 0;//. 16-bit words in the first phase (Start bit, data bits).
@@ -136,7 +146,7 @@ void InitMcbspa(void)
     McbspaRegs.RCR2.bit.RCOMPAND=0;//. No companding.
     McbspaRegs.RCR2.bit.RFIG = 1;//. For reception, since data line transitions are seen on the FSR pin, unexpected frame
     McbspaRegs.RCR2.bit.RDATDLY=1;//. 1-bit data delay.
-
+*/
 	/*McbspaRegs.RCR2.bit.RPHASE   =0;
 	McbspaRegs.RCR2.bit.RFRLEN2  =0;
 	McbspaRegs.RCR2.bit.RWDLEN2  =0;
@@ -202,7 +212,7 @@ Uns McBsp_recieve(Byte Id)
 		Data1 = McBspRegs[Id]->DRR1.all;
 		Data2 = McBspRegs[Id]->DRR2.all;
 
-		McBspRegs[Id]->SPCR1.bit.RRST = 0;
+		//McBspRegs[Id]->SPCR1.bit.RRST = 0;
 
 		LgData = (LgUns)Data1 | ((LgUns)(Data2) << 16);
 
@@ -210,7 +220,7 @@ Uns McBsp_recieve(Byte Id)
 		Data2 = (Uns)((LgData>>11)&0x00FF);
 
 		Data = Data1 | (Data2<<8);
-		McBspRegs[Id]->SPCR1.bit.RRST = 1;
+		//McBspRegs[Id]->SPCR1.bit.RRST = 1;
 
 		return Data;//McBspRegs[Id]->DRR1.all;
 	}

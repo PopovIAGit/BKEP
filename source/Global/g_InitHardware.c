@@ -163,11 +163,11 @@ void InitHardware(void)
    	   AdcRegs.ADCCHSELSEQ4.bit.CONV14 = 0xE; // Setup ADCINA2 as 2nd SEQ1 conv.
    	   AdcRegs.ADCCHSELSEQ4.bit.CONV15 = 0xF; // Setup ADCINA2 as 2nd SEQ1 conv.
 
-   	   AdcRegs.ADCTRL2.bit.EPWM_SOCA_SEQ1 = 1;// Enable SOCA from ePWM to start SEQ1
-   	   AdcRegs.ADCTRL2.bit.INT_ENA_SEQ1 = 1;  // Enable SEQ1 interrupt (every EOS)
+   	   //AdcRegs.ADCTRL2.bit.EPWM_SOCA_SEQ1 = 1;// Enable SOCA from ePWM to start SEQ1
+   	   //AdcRegs.ADCTRL2.bit.INT_ENA_SEQ1 = 1;  // Enable SEQ1 interrupt (every EOS)
 
-	   AdcRegs.ADCTRL2.bit.EPWM_SOCB_SEQ2 = 1;// Enable SOCA from ePWM to start SEQ1
-   	   AdcRegs.ADCTRL2.bit.INT_ENA_SEQ2 = 1;  // Enable SEQ1 interrupt (every EOS)
+	   //AdcRegs.ADCTRL2.bit.EPWM_SOCB_SEQ2 = 1;// Enable SOCA from ePWM to start SEQ1
+   	   //AdcRegs.ADCTRL2.bit.INT_ENA_SEQ2 = 1;  // Enable SEQ1 interrupt (every EOS)
 
    	   // Assumes ePWM1 clock is already enabled in InitSysCtrl();
 	   EPwm1Regs.ETSEL.bit.SOCAEN = 1;        // Enable SOC on A group
