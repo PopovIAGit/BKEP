@@ -27,10 +27,11 @@ extern "C" {
 #define BT_RECEIVE_COMPLETE		43
 #define BT_RECEIVE_BUSY			44
 
+//#define CMD_CONTROL_CONFIG 		"AT\r\n"
 #define CMD_CONTROL_CONFIG 		"SET CONTROL CONFIG 0000 0040 0080\r\n"
 #define CMD_CONTROL_ECHO 		"SET CONTROL ECHO 0004\r\n"
-#define CMD_CONTROL_NAME 		"SET BT NAME "
-#define CMD_CONTROL_AUTH		"SET BT AUTH * "
+#define CMD_CONTROL_NAME 		"SET BT NAME MAY1\r\n"
+#define CMD_CONTROL_AUTH		"SET BT AUTH * 5124\r\n"
 #define CMD_CONTROL_BAUD		"SET CONTROL BAUD 115200,8N1\r\n"
 
 #define BT_AUTH_CODE_STRING		"5124"	// Строка с кодом авторизации Bluetooth
@@ -64,6 +65,11 @@ typedef struct _TBluetoothPort
 
 	char RxBuffer[BT_RX_BUFFER_SIZE];
 
+	void (*EnableRx)(void);
+	void (*EnableTx)(void);
+	Byte (*ReceiveByte)(void);
+	void (*TransmitByte)(Uns Data);
+
 	#if BT_DBG
 		Uns TxBytesCount;
 		Uns RxBytesCount;
@@ -72,6 +78,7 @@ typedef struct _TBluetoothPort
 } TBluetoothPort,*TBluetoothHandle;
 
 // Прототипы функций
+void InitChanelBt(TBluetoothHandle);
 void BluetoothWTUpdate(TBluetoothHandle);
 void BluetoothRxHandler(TBluetoothHandle, TMbHandle);
 void BluetoothTxHandler(TBluetoothHandle, TMbHandle);

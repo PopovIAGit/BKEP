@@ -20,6 +20,12 @@ Outputs
 #include "core_VlvDrvCtrl.h"
 #include "core_TorqueObserver.h"
 #include "g_Ram.h"
+#include "g_InitHardware.h"
+#include "csl\csl_memory.h"
+#include "stat_fm25v10.h"
+//#include "core_Commands.h"
+//#include "core_MotorControl.h"
+//#include "core_HeatMotor.h"
 
 //--------------------- Константы-------------------------------------------
 #define CMD_DEFAULTS_USER	0x0010	// Пользовательские параметры по умолчанию

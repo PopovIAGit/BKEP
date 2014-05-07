@@ -20,6 +20,8 @@ extern "C" {
 #define DLOG_CONT	1
 #define DLOG_ONCE	2
 
+#define MON_CHAN_SIZE	0x100
+
 typedef struct _TDataLog {
 	Uns   Mode;
 	Uns   CntrMax;
@@ -45,8 +47,7 @@ typedef struct {
 	Uns mon_index;
 	Uns dot;
 	Uns dot_max;
-	Int buffer1[256];
-	Int buffer2[256];
+	Float MonBuffer[MON_CHAN_SIZE*2];
 
 }TMonitor;
 

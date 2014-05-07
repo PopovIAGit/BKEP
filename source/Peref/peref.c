@@ -9,9 +9,6 @@
 
 #include "peref.h"
 
-#define SetCs()		SetCs2()
-#define ClrCs()		ClrCs2()
-
 // Ћинейна€ формула преобразовани€ кодов с ј÷ѕ по датчику температуры
 // в соответствующее сопротивление R(x) = b*x + c, где x - то, что пришло с ј÷ѕ,
 // R - сопротивление, b и c - коэффициенты, которые задаютс€ ниже:
@@ -28,12 +25,19 @@ TPeref	g_Peref;
 //---------------------------------------------------
 void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновление
 {
-	peref_ApFilter3Init(&p->URfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);		// »нициализируем фильтры
+  /*peref_ApFilter3Init(&p->URfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);		// »нициализируем фильтры
 	peref_ApFilter3Init(&p->USfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);
 	peref_ApFilter3Init(&p->UTfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);
 	peref_ApFilter3Init(&p->IUfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
 	peref_ApFilter3Init(&p->IVfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
-	peref_ApFilter3Init(&p->IWfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
+	peref_ApFilter3Init(&p->IWfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);*/
+
+	peref_ApFilter3Init(&p->URfltr, (Uns)Prd18kHZ, 0.02);		// »нициализируем фильтры
+	peref_ApFilter3Init(&p->USfltr, (Uns)Prd18kHZ, 0.02);
+	peref_ApFilter3Init(&p->UTfltr, (Uns)Prd18kHZ, 0.02);
+	peref_ApFilter3Init(&p->IUfltr, (Uns)Prd18kHZ, 0.02);
+	peref_ApFilter3Init(&p->IVfltr, (Uns)Prd18kHZ, 0.02);
+	peref_ApFilter3Init(&p->IWfltr, (Uns)Prd18kHZ, 0.02);
 
 	Peref_SensObserverInit(&p->sensObserver);// »нициализируем обработку синусойды
 
@@ -67,7 +71,7 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
 {
 	//-------------------- ‘ильтруем ј÷ѕ-------------------------------
 
-	p->URfltr.Input = ADC_UR;
+/*	p->URfltr.Input = ADC_UR;
 	p->USfltr.Input = ADC_US;
 	p->UTfltr.Input = ADC_UT;
 	p->IUfltr.Input = ADC_IU;
@@ -80,16 +84,24 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
 	peref_ApFilter3Calc(&p->UTfltr);
 	peref_ApFilter3Calc(&p->IUfltr);
 	peref_ApFilter3Calc(&p->IVfltr);
-	peref_ApFilter3Calc(&p->IWfltr);
+	peref_ApFilter3Calc(&p->IWfltr);*/
 
 	//-------------- ќбработка синусойды ------------------------------
 
-	p->sensObserver.URinp = p->URfltr.Output;
+/*	p->sensObserver.URinp = p->URfltr.Output;
 	p->sensObserver.USinp = p->USfltr.Output;
 	p->sensObserver.UTinp = p->UTfltr.Output;
 	p->sensObserver.IUinp = p->IUfltr.Output;
 	p->sensObserver.IVinp = p->IVfltr.Output;
-	p->sensObserver.IWinp = p->IWfltr.Output;
+	p->sensObserver.IWinp = p->IWfltr.Output;*/
+
+		p->sensObserver.URinp = ADC_UR;
+		p->sensObserver.USinp = ADC_US;
+		p->sensObserver.UTinp = ADC_UT;
+		p->sensObserver.IUinp = ADC_IU;
+		p->sensObserver.IVinp = ADC_IV;
+		p->sensObserver.IWinp = ADC_IW;
+
 
 
 	Peref_SensObserverUpdate(&p->sensObserver);
@@ -119,6 +131,7 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
 void Peref_50HzCalc(TPeref *p)	// 50 √ц
 {
 	peref_ApFilter1Calc(&p->Phifltr);
+	if (!g_Core.Status.bit.Stop)
 	p->AngleUI = _IQtoIQ16(p->Phifltr.Output);
 
 	p->Umfltr.Input = _IQ16toIQ(Mid3UnsValue(p->sinObserver.UR.Output, p->sinObserver.US.Output, p->sinObserver.UT.Output));

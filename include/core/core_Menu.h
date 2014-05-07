@@ -19,8 +19,8 @@
 
 #define GetDcr(Adr, pDcr)	Core_MenuReadDcr(&g_Core.menu, pDcr, Adr)
 
-//#define IsPassword1()		(g_Ram.ramGroupF.PASSW1 != 0)
-//#define IsPassword2()		(g_Ram.ramGroupF.PASSW2 != 0)
+#define IsPassword1()		(g_Ram.ramGroupH.Password1 != 0)
+#define IsPassword2()		(g_Ram.ramGroupH.Password2 != 0)
 
 #define KEY_NONE       0  // Открыть			// Не используется
 #define KEY_OPEN       1  // Открыть			// Не используется
@@ -117,7 +117,7 @@ Bool UpdateCode(Uns, Uns, Uns, Uns);
 Bool SleepMode(TCoreMenu *);
 void StartState(TCoreMenu *);
 
-__inline Bool ReadLog(TCoreMenu *);
+//__inline Bool ReadLog(TCoreMenu *);
 
 void SelectGroup(TCoreMenu *);
 void SelectParam(TCoreMenu *);
@@ -144,7 +144,6 @@ Bool WriteValue(Uns, Uns, Uns *);
 void SetDefaultValues(TCoreMenu *, Byte *);
 void ShowAddStrings(TCoreMenu *, Uns, Uns);
 void SetModBusParams(void);
-void UpdateStringsDisplay(pCoreMenu);
 void SetModBusParams(void);
 
 extern void PFUNC_strRead(Char *, Char *);

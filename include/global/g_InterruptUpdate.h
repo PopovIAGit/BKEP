@@ -21,8 +21,8 @@
 #include "g_Ram.h"
 //#include "drive.h"
 #include "peref.h"
-//#include "stat.h"
-//#include "csl/csl_dlog.h"
+#include "stat.h"
+#include "csl/csl_dlog.h"
 
 //--------ÎÁÚ‗ÂËÅÍÈÅ ÌÀÊÐÎÑÎÂ------------------------------------------------
 
@@ -83,7 +83,9 @@ LgUns  X, X10, X18;
 
 TPeriodicalFunction Task18kHz[] =         
 {
-	PrdElemInit(Peref_18kHzCalc,				&g_Peref),
+	PrdElemInit(Peref_18kHzCalc,						&g_Peref),
+	PrdElemInit(MonitorUpdate,							NULL),
+	//PrdElemInit(AvagoEncoderAEAT84ADCalc,				&g_Peref.position),
 	PrdElemInit(task1,	NULL)
 };
 
@@ -94,18 +96,26 @@ TPeriodicalFunction Task18kHz[] =
 TPeriodicalFunction Task2kHz[] =          //Íו במכוו 4-ץ חאהאק
 {
 	//PrdElemInit(Core_ProtectionsRefresh,	&g_Core.protections),
-	PrdElemInit(SerialCommTimings,			&g_Comm.mbAsu),
-	PrdElemInit(SerialCommTimings,			&g_Comm.mbShn),
-	PrdElemInit(SerialCommTimings,			&g_Comm.mbBt),
+	PrdElemInit(SerialCommTimings,						&g_Comm.mbAsu),
+	//PrdElemInit(SerialCommTimings,						&g_Comm.mbShn),
+	PrdElemInit(SerialCommTimings,						&g_Comm.mbBt),
+	PrdElemInit(FM25V10_Update,							&Eeprom1),
+	PrdElemInit(FM25V10_Update,							&Eeprom1),
+	PrdElemInit(SciMasterConnBetweenBlockCommTimer,		&g_Comm.mbBkp),
+	//PrdElemInit(SciMasterConnBetweenBlockUpdate,		&g_Comm.mbBkp),
+
 };
 // ================================ 200 Ãצ ==================================
 
 TPeriodicalFunction Task200Hz[] =       	//םו במכוו  20-עט חאהאק
 {
-//	PrdElemInit(Peref_DisplayUpdate, 			&g_Peref.display),
-	PrdElemInit(Peref_CalibUpdate, 				&g_Peref.Position),
-	PrdElemInit(Core_CalibStop, 				&g_Core),
-	PrdElemInit(SciMasterConnBetweenBlockUpdate, 	&g_Comm.mbBkp),
+//	PrdElemInit(Peref_DisplayUpdate, 					&g_Peref.display),
+	PrdElemInit(Peref_CalibUpdate, 						&g_Peref.Position),
+	PrdElemInit(DataBufferPre,							&g_Stat),
+	PrdElemInit(LogEvControl,							&g_Stat),
+	PrdElemInit(LogCmdControl,							&g_Stat),
+	PrdElemInit(LogParamMbExec,							&g_Stat),
+	PrdElemInit(LogParamControl,						&g_Stat),
 };
 
 // ================================ 50 Ãצ ==================================
@@ -130,7 +140,8 @@ TPeriodicalFunction Task50Hz[] =        //םו במכוו  80-עט חאהאק
 	PrdElemInit(Core_CmdUpdate,					&g_Core),
 	PrdElemInit(Peref_ClockControl,				&g_Peref.clock),
 	PrdElemInit(Core_StatusUpdate,				&g_Core)*/
-	PrdElemInit(task1,	NULL)
+	PrdElemInit(GetCurrentCmd,							&g_Stat),
+	PrdElemInit(Core_MenuDisplay,						&g_Core.menu),
 };
 
 // ================================ 10 Ãצ ==================================
@@ -147,8 +158,10 @@ TPeriodicalFunction Task10Hz[] =        //םו במכוו  200-ע חאהאק
 //	PrdElemInit(Drive_Update,				&g_Drive),
 	//PrdElemInit(Peref_LedsUpdate,			&g_Peref.leds),
 	//PrdElemInit(Peref_TenControl,			NULL),
-	//PrdElemInit(Peref_10HzCalc,			&g_Peref),
-	PrdElemInit(task1_10Hz,	NULL)
+	//PrdElemInit(Peref_10HzCalc,				&g_Peref),
+	PrdElemInit(Peref_Calibration, 						&g_Peref.Position),
+	PrdElemInit(BluetoothTimer,							&g_Comm.Bluetooth),
+	PrdElemInit(task1_10Hz,								NULL)
 };
 //------------Êמםוצ פאיכא-----------------------------------------------
 

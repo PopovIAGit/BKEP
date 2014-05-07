@@ -24,6 +24,8 @@ extern "C" {
 #define SPIC			2
 #define SPID			3
 
+#define SPI_BRR(Baud)			(Uns)((LgUns)(150e6/12 / 1000) / (Baud) - 1)
+
 extern void SPI_init(Byte Id, Byte Type, Byte Mode, Uns BaudRate, Byte Length);
 extern Uns  SPI_send(Byte Id, Uns Data);
 extern void SPI_transmit(Byte Id, Uns Data);

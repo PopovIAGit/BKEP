@@ -22,6 +22,8 @@ void Core_ProtectionsAlarmUpdate(TAlarmElem *p)
 
 	if(!p->Cfg.bit.Enable)	// Если защита выключена
 	{
+		if (p->Cfg.bit.CanBeReseted)
+			*p->Output &= ~BitMask;
 		p->Timer = 0;
 		return;
 	}

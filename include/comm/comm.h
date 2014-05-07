@@ -11,6 +11,7 @@
 #define COMM_
 
 #include "std.h"
+//#include "config.h"
 //#include "comm_DigitalInputs.h"
 //#include "comm_LocalControl.h"
 #include "comm_ModbusRtu.h"
@@ -40,6 +41,7 @@ typedef struct {
 	TMbPort  			mbShn;				// ModBus - УПП
 	TMbPort  			mbBt;				// ModBus - Bluetooth
 	TBluetoothPort		Bluetooth;			// Bluetooth
+	TBKPData			BkpData;			//структура обмена данными с БКП
 } TComm;
 //--------------------------------------------------------
 

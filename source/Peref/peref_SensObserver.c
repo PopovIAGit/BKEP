@@ -14,7 +14,7 @@ void Peref_SensObserverInit(TSensObserver *p)
 {
 	p->parSensors.p_UR_Mpy		= &g_Ram.ramGroupC.UR_Mpy;
 	p->parSensors.p_US_Mpy 		= &g_Ram.ramGroupC.US_Mpy;
-	p->parSensors.p_US_Mpy 		= &g_Ram.ramGroupC.UT_Mpy;
+	p->parSensors.p_UT_Mpy 		= &g_Ram.ramGroupC.UT_Mpy;
 	p->parSensors.p_UR_Offset 	= &g_Ram.ramGroupC.UR_Offset;
 	p->parSensors.p_US_Offset 	= &g_Ram.ramGroupC.US_Offset;
 	p->parSensors.p_UT_Offset 	= &g_Ram.ramGroupC.UT_Offset;

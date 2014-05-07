@@ -16,7 +16,6 @@
 #define SUBVERSION			3		// Подверсия проекта
 
 #define SYSCLK				150e6	// Системная частота (кол-во операций в сек)
-//#define CLKIN				30e6	// Частота кварца
 #define CLKIN				30e6	// Частота кварца
 
 // Конфигурация операционной системы
@@ -35,7 +34,7 @@
 //#define LSPCLK_PRESC		0			// Делитель частоты LSPCLK
 
 #define HSPCLK_DIV			1
-#define LSPCLK_DIV			2
+#define LSPCLK_DIV			12
 
 #define F_HSPCLK			(SYSCLK / HSPCLK_DIV)
 #define F_LSPCLK			(SYSCLK / LSPCLK_DIV)
@@ -52,13 +51,15 @@
 
 
 // Подключение заголовочных файлов
+//#include "g_InitHardware.h"
+#include "g_DeviceModification.h"		// Модификация блока
 #include "csl\csl_spi.h"
 #include "csl\csl_sci.h"
 #include "csl\csl_mcbsp.h"
 #include "chip\DSP2833x_Device.h"	// Заголовные файлы переферии чипа
 #include "std.h"					// Библиотека поддержки чипа
 #include "IQmathLib.h"
-#include "g_InitHardware.h"
+
 
 #endif
 

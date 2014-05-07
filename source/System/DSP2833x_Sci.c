@@ -24,9 +24,9 @@ volatile struct SCI_REGS *SciRegs[] = {
 //---------------------------------------------------------------------------
 // InitSci: 
 //---------------------------------------------------------------------------
-void InitSciaGpio();
-void InitScibGpio();
-void InitScicGpio();
+void InitSciaGpio(void);
+void InitScibGpio(void);
+void InitScicGpio(void);
 //---------------------------------------------------------------------------
 // InitSci:
 //---------------------------------------------------------------------------
@@ -115,15 +115,11 @@ void SCI_tx_disable(Byte Id)
 void InitSciGpio()
 {
    InitSciaGpio();
-#if DSP28_SCIB   
    InitScibGpio();
-#endif // if DSP28_SCIB  
-#if DSP28_SCIC
    InitScicGpio();
-#endif // if DSP28_SCIC
 }
 
-void InitSciaGpio()
+void InitSciaGpio(void)
 {
    EALLOW;
 
@@ -156,8 +152,7 @@ void InitSciaGpio()
     EDIS;
 }
 
-#if DSP28_SCIB 
-void InitScibGpio()
+void InitScibGpio(void)
 {
    EALLOW;
 	
@@ -202,10 +197,9 @@ void InitScibGpio()
 	
     EDIS;
 }
-#endif // if DSP28_SCIB 
 
-#if DSP28_SCIC
-void InitScicGpio()
+
+void InitScicGpio(void)
 {
    EALLOW;
 
@@ -230,7 +224,7 @@ void InitScicGpio()
 	
     EDIS;
 }
-#endif // if DSP28_SCIC 
+
 
 	
 //===========================================================================

@@ -19,6 +19,8 @@ Int DlogCh1 = 0;
 Int DlogCh2 = 0;
 Uns MonSelect = 1;
 
+void DLOG_update(TDataLog *p);
+
 void MonitorInit(void)
 {
 	memset(&Monitor, 0, sizeof(TMonitor));
@@ -43,31 +45,47 @@ void MonitorInit(void)
 	Dlog.Graph2Ptr  = (Int *)0x3FBE00;
 }
 
+
 void MonitorUpdate(void){
 
-	if (!Monitor.dot) switch (Monitor.program)
+	Float Data1, Data2;
+
+	if(Monitor.dot < Monitor.dot_max)
+	{
+		Monitor.dot++;
+		return;
+	}
+	Monitor.dot = 0;
+
+	switch (Monitor.program)
 	{
 		 case 1:
-			 	 	 Monitor.buffer1[Monitor.mon_index] = g_Peref.IWfltr.Input;
-			 	 	 Monitor.buffer2[Monitor.mon_index] = g_Peref.IWfltr.Output;		break;
+			 	 	 Data1 = g_Peref.sensObserver.URinp;
+			 	 	 Data2 = g_Peref.sensObserver.URinp;		break;
 		 case 2:
-					 Monitor.buffer1[Monitor.mon_index] = g_Peref.sensObserver.IWinp;
-					 Monitor.buffer2[Monitor.mon_index] = g_Peref.sensObserver.IWout;		break;
+					 Data1 = g_Peref.sensObserver.URout;
+					 Data2 = g_Peref.sensObserver.URout;		break;
 		 case 3:
-					 Monitor.buffer1[Monitor.mon_index] = g_Peref.sinObserver.IW.Input;
-					 Monitor.buffer2[Monitor.mon_index] = g_Peref.sinObserver.IW.Output;		break;
+		 					 Data1 = g_Peref.sensObserver.IUinp;
+		 					 Data2 = g_Peref.sensObserver.IUinp;		break;
 		 case 4:
-					 Monitor.buffer1[Monitor.mon_index] = g_Peref.sinObserver.IW.Polarity;
-					 Monitor.buffer2[Monitor.mon_index] = g_Peref.sinObserver.IW.CurAngle;		break;
+		 					 Data1 = g_Peref.sensObserver.IUout;
+		 					 Data2 = g_Peref.sensObserver.IUout;		break;
+		 case 5:
+		 					 Data1 = g_Peref.sinObserver.IU.Output;
+		 					 Data2 = g_Peref.sinObserver.IU.Output;		break;
+		 case 6:
+		 					 Data1 = g_Peref.sensObserver.URout;
+		 					 Data2 = g_Peref.sensObserver.URout;		break;
 
 	}
 
-	if (++Monitor.dot > Monitor.dot_max)
-	{
-		if (++Monitor.mon_index > 255) Monitor.mon_index = 0;
-		Monitor.dot = 0;
-	}
+	Monitor.MonBuffer[Monitor.mon_index+0]             = Data1;
+	Monitor.MonBuffer[Monitor.mon_index+MON_CHAN_SIZE] = Data2;
+
+	if (++Monitor.mon_index > MON_CHAN_SIZE) Monitor.mon_index = 0;
 }
+
 
 void DlogUpdate(void)
 {

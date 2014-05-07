@@ -17,7 +17,8 @@
 #include "config.h"
 //--------------------- Константы-------------------------------------------
 //--------------------- Макросы --------------------------------------------
-#define ADC_CONV(Value, Gain, Offset) 	(((LgInt)(Value - Offset) * Gain) >> 13)
+//#define ADC_CONV(Value, Gain, Offset) 	(((LgInt)(Value - Offset) * Gain) >> 13)
+#define ADC_CONV(Value, Gain, Offset) 		(0.00001 * (int16)((Value) - (Offset)) * (Gain))
 //#define ADC_CONV(Value, Gain, Offset) 	((LgInt)(Value - Offset) * Gain)
 //-------------------- Структуры ------------------------------------------
 // Параметры датчиков
@@ -47,18 +48,18 @@ typedef enum{
 typedef struct {
 	TSensorsParams		parSensors;		// Параметр: параметры датчиков
 	TOffsetMode		    pOffsetMode;	// Параметр: способ вычисления сдвига (Offset)
-	LgInt				URinp;			// Вход: напряжение R
-	LgInt 				USinp;			// Вход: напряжение S
-	LgInt 				UTinp;			// Вход: напряжение T
-	LgInt				IUinp;			// Вход: ток U
-	LgInt 				IVinp;			// Вход: ток V
-	LgInt	 			IWinp;			// Вход: ток W
-	LgInt				URout;			// Выход: напряжение R
-	LgInt 				USout;			// Выход: напряжение S
-	LgInt 				UTout;			// Выход: напряжение T
-	LgInt				IUout;			// Выход: ток U
-	LgInt 				IVout;			// Выход: ток V
-	LgInt 				IWout;			// Выход: ток W
+	float32				URinp;			// Вход: напряжение R
+	float32 			USinp;			// Вход: напряжение S
+	float32 			UTinp;			// Вход: напряжение T
+	float32				IUinp;			// Вход: ток U
+	float32 			IVinp;			// Вход: ток V
+	float32	 			IWinp;			// Вход: ток W
+	float32				URout;			// Выход: напряжение R
+	float32 			USout;			// Выход: напряжение S
+	float32 			UTout;			// Выход: напряжение T
+	float32				IUout;			// Выход: ток U
+	float32 			IVout;			// Выход: ток V
+	float32 			IWout;			// Выход: ток W
 } TSensObserver;
 
 //------------------- Глобальные переменные -------------------------------------

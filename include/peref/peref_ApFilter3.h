@@ -19,20 +19,20 @@ extern "C" {
 
 // Структура для работы с фильтром
 typedef struct APFILTER3 {
-	LgInt Input;   // Входной сигнал
-	LgInt Output;  // Выходной сигнал
-	LgInt Output1; // Входной сигнал
-	LgInt PrevOut1;// Выходной сигнал
-	LgInt Output2; // Входной сигнал
-	LgInt PrevOut2;// Выходной сигнал
+	Float Input;   // Входной сигнал lgint
+	Float Output;  // Выходной сигнал
+	Float Output1; // Входной сигнал
+	Float PrevOut1;// Выходной сигнал
+	Float Output2; // Входной сигнал
+	Float PrevOut2;// Выходной сигнал lgint
 	Float dt;      // Постоянная времени семплирования
 	Float Tf;      // Постоянная времени фильтра
 	Float K1;      // Коэффициент фильтра
 	Float K2;      // Коэффициент фильтра
-	LgInt PrevOut; // Предыдущее значение выходного сигнала
+	Float PrevOut; // Предыдущее значение выходного сигнала
 } APFILTER3;
 
-void peref_ApFilter3Init(APFILTER3 *p, Uns Freq, Uns Tf);
+void peref_ApFilter3Init(APFILTER3 *p, Uns Freq, Float Tf);
 void peref_ApFilter3Calc(APFILTER3 *);
 void peref_ApFilter3Reset(APFILTER3 *);
 

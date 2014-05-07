@@ -147,8 +147,10 @@ typedef struct _TRamGroupA
 	Int             CurWay;             // 20.Текущий ход
 	Uns             CycleCnt;           // 21.Счетчик циклов
 	Int             Temper;             // 22.Температура блока
-	Uns             MkuPoVersion;       // 23.Версия ПО
-	Uns Rsvd[16];
+	Int             TemperBKP;          // 23.Температура блока БКП
+	Uns             VersionPO;       	// 24.Версия ПО
+	Uns             VersionPOBkp;      	// 25.Версия ПО БКП
+	Uns Rsvd[14];
 } TRamGroupA;
 
 // Группа B (Адрес = 40, Количество = 50) - Параметры пользователя
@@ -175,12 +177,8 @@ typedef struct _TRamGroupB
 	TDuSource		DuSource;			// 18.Источник команд ДУ
 	Uns             TuLockSeal;         // 19.Блокировка залипани
 	Uns             TuTime;             // 20.Время команды
-	#if BUR_M
-	Uns 			Rsvd1[2];
-	#else
 	TInputType 		InputType;			// 21.Тип входного сигнала 24/220
 	TInputMask	    InputMask;			// 22.Маска дискретных входов
-	#endif
 	TOutputMask 	OutputMask;			// 23.Маска дискретных выходов
 	TBaudRate       RsBaudRate;         // 24.Скорость связи
 	Uns             RsStation;          // 25.Адрес станции
@@ -256,7 +254,7 @@ typedef struct _TRamGroupC
 	TPrtMode        PhOrd;          	// 54.Защита от неверного чередования фаз двигателя
 	Uns             OvDTime;     		// 55.Время превышения напряжения
 	Uns             UvDTime;     		// 56.Время превышения напряжения
-	Uns             MkuPoSubVersion;    // 24.Подверсия ПО
+	Uns             SubVersionPO;	    // 24.Подверсия ПО
 	TPrtMode        IUnLoad;            // 58.Защита от малой нагрузки
 	Uns             IUnLevel;           // 59.Ток малой нагрузки
 	Uns             IUnTime;            // 60.Время малой нагрузки
@@ -354,8 +352,8 @@ typedef struct _TRamGroupH
 {
 	TCalibState     CalibState;          // 0.Состояние калибровки
 	Uns             CalibRsvd;           // 1.Резерв для калибровки
-	Uns             ClosePosition[2];    // 2-3.Положение закрыто
-	Uns             OpenPosition[2];     // 4-5.Положение открыто
+	LgUns             ClosePosition;    // 2-3.Положение закрыто		???
+	LgUns             OpenPosition;     // 4-5.Положение открыто		???
 										 // Дальше адрес +2
 	Uns             Password1;           // 6.Основной пароль
 	Uns             Password2;           // 7.Заводской пароль
@@ -410,7 +408,8 @@ typedef struct _TRamGroupH
 	TContactorGroup ContGroup;			 // 126. Управление контакторами
 	TBurCmd 		LogControlWord;		 // 127. Команды БУР
 	Uns				LogReset;			 // 128. Сброс журналов
-	Uns 			Rsvd3[11];			 // 129-139.Резерв
+	Uns 			BkpIndication;		 // 129. Индикация на БКП
+	Uns 			Rsvd3[10];			 // 130-139.Резерв
 } TRamGroupH;
 
 // Группа E (Адрес 400, Количество 32)
@@ -435,7 +434,7 @@ typedef struct _TRamGroupE
 } TRamGroupE;
 
 
-typedef struct _TRamLog
+typedef struct _TRamLogBuff
 {
 	TStatusReg     	LogStatus;          // 0.Статус работы
 	Int            	LogPositionPr;		// 1.Положение %
@@ -449,7 +448,7 @@ typedef struct _TRamLog
 	Int            	LogTemper;          // 9.Температура блока
 	Uns      		LogInputs;        	// 10.Состояние дискретных входов
 	Uns				LogOutputs;			// 11.Состояние дискретных выходов
-} TRamLog;
+} TRamLogBuff;
 
 
 
@@ -488,7 +487,6 @@ typedef struct TRam
   TRamGroupG		ramGroupG;
   TRamGroupH		ramGroupH;
   TRamGroupE		ramGroupE;
-  TRamLog			ramLog;
 } TRam;
 
 // Структура параметров устройства
@@ -517,7 +515,29 @@ typedef struct _TTEKDriveData
 #define GetAdr(Elem)		((LgUns)&(((TRam *)RAM_ADR)->Elem))
 
 //-------- НАСТРОЙКИ ГРУПП					
-#define REG_CODE			GetAdr(ramGroupA.PASSWORD1)
+#define REG_CODE				GetAdr(ramGroupB.MainCode)
+#define REG_FCODE				GetAdr(ramGroupC.FactCode)
+
+#define REG_GEAR_RATIO			GetAdr(ramGroupC.GearRatio)
+
+#define REG_COEF_VOLT_FILTER	GetAdr(ramGroupC.CoefVoltFltr)
+#define REG_CURRENT_FILTER		GetAdr(ramGroupC.CoefCurrFltr)
+
+#define REG_INPUT_MASK			GetAdr(ramGroupB.InputMask.all)
+#define REG_DRIVE_TYPE			GetAdr(ramGroupC.DriveType)
+
+#define REG_TORQUE_CURR 		GetAdr(ramGroupH.TqCurr)
+#define REG_TORQUE_ANGLE_UI		GetAdr(ramGroupH.TqAngUI)
+#define REG_TORQUE_ANG_SF		GetAdr(ramGroupH.TqAngSf)
+
+#define REG_TASK_TIME			GetAdr(ramGroupB.DevTime)
+#define REG_TASK_DATE			GetAdr(ramGroupB.DevDate)
+
+#define REG_PASSW1_NEW			GetAdr(ramGroupH.Password1)
+#define REG_PASSW2_NEW			GetAdr(ramGroupH.Password2)
+
+#define REG_OVERWAY_ZONE		GetAdr(ramGroupB.OverwayZone)
+
 /*
 #define GLOBAL_REG_GR		0
 #define GLOBAL_COUNT_GR		1
@@ -525,6 +545,12 @@ typedef struct _TTEKDriveData
 #define REG_GR				GetAdr(ramGroup.STATUS)
 #define COUNT_GR			30
 */
+#define REG_CALIB_CLOSE		GetAdr(ramGroupH.ClosePosition)
+#define REG_CALIB_OPEN		REG_CALIB_CLOSE+2
+
+#define REG_FACTORY_NUMBER	GetAdr(ramGroupC.FactoryNumber)
+#define REG_PRODUCT_DATE	GetAdr(ramGroupC.ProductYear)
+
 /*
 #define REG_TASK_TIME		GetAdr(ramGroupD.TASK_TIME)
 #define REG_TASK_DATE		GetAdr(ramGroupD.TASK_DATE)
@@ -576,11 +602,11 @@ typedef struct _TTEKDriveData
 #define REG_TEMP_SENS_TYPE	GetAdr(ramGroupB.TEMP_SENS_TYPE)
 #define REG_LEVEL_DYN_BRAKE_BIG	GetAdr(ramGroupB.LEVEL_DYN_BRAKE_BIG)
 */
-#define REG_RS_BAUD_RATE	GetAdr(ramGroup.RS_BAUD_RATE)
+#define REG_RS_BAUD_RATE	GetAdr(ramGroupB.RsBaudRate)
 
 // Глобальные переменные модуля
-#define REG_VER_PO			GetAdr(ramGroupA.VER_PO)
-#define REG_SUBVER_PO		GetAdr(ramGroupA.SUBVER_PO)
+#define REG_VER_PO			GetAdr(ramGroupA.VersionPO)
+#define REG_SUBVER_PO		GetAdr(ramGroupC.SubVersionPO)
 
 #define IsImpulseMode()		(!g_Ram.ramGroupA.DIGITAL_CMD_MODE)
 #define IsPotentialMode()	(g_Ram.ramGroupA.DIGITAL_CMD_MODE)
@@ -591,6 +617,14 @@ typedef struct _TTEKDriveData
 #define LOCK_RS485			BIT2	// Блокировка RS485
 #define IsLockMPU() 		(g_Ram.ramGroupA.LOCK_CONTROL & LOCK_MPU)
 #define IsLockTU()			(g_Ram.ramGroupA.LOCK_CONTROL & LOCK_TU)
+
+#define CMD_DEFAULTS_USER	0x0010	// Пользовательские параметры по умолчанию
+#define CMD_RES_CLB			0x0020	// Сброс калибровки датчика положения
+#define CMD_RES_FAULT		0x0040	// Сброс защит
+#define CMD_CLR_LOG			0x0080	// Очистка журнала
+#define CMD_RES_CYCLE		0x0100	// Сброс счетчика циклов
+#define CMD_PAR_CHANGE		0x0200	// Изменение параметров
+#define CMD_DEFAULTS_FACT 	0x0400	// Заводские параметры по умолчанию
 
 void g_Ram_Init(TRam *);
 void g_Ram_Update(TRam *);

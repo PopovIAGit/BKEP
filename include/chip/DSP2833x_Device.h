@@ -112,6 +112,7 @@ typedef long double        float64;
 #include "chip\DSP2833x_EQep.h"               // Enhanced QEP
 #include "chip\DSP2833x_Gpio.h"               // General Purpose I/O Registers
 #include "chip\DSP2833x_I2c.h"                // I2C Registers
+#include "chip/DSP2833x_I2c_defines.h"                // I2C Registers
 #include "chip\DSP2833x_McBSP.h"              // McBSP
 #include "chip\DSP2833x_PieCtrl.h"            // PIE Control Registers
 #include "chip\DSP2833x_PieVect.h"            // PIE Vector Table
@@ -225,14 +226,28 @@ typedef long double        float64;
 /*-----------------------------------------------------------------------------
       Specify the PLL control register (PLLCR) and divide select (DIVSEL) value.
 -----------------------------------------------------------------------------*/
-#define SYSCLK				150e6	// Системная частота (кол-во операций в сек)
-#define CLKIN				30e6	// Частота кварца
 
 
 #define DSP28_DIVSEL     2 // Enable /2 for SYSCLKOUT
 #define DSP28_PLLCR   	 (SYSCLK*2/CLKIN)    // Uncomment for 150 MHz devices [150 MHz = (30MHz * 10)/2]
 
 extern void InitSysCtrl(void);
+void InitSciGpio(void);
+void InitMcbspaGpio(void);
+void MemCopy(Uint16 *SourceAddr, Uint16* SourceEndAddr, Uint16* DestAddr);
+void InitFlash(void);
+void InitPieCtrl(void);
+void InitAdc(void);
+void InitPeripheralClocks(void);
+void InitPieVectTable(void);
+void EnableInterrupts(void);
+void InitSpiGpio(void);
+void InitI2CGpio(void);
+void InitI2C(void);
+
+//???
+void ADC_cal(void);
+
 
 #endif  // end of DSP2833x_DEVICE_H definition
 

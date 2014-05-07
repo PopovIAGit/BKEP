@@ -63,7 +63,7 @@ void InitPieCtrl(void)
 //---------------------------------------------------------------------------
 // This function enables the PIE module and CPU interrupts
 //
-void EnableInterrupts()
+void EnableInterrupts(void)
 {
 
     // Enable the PIE
@@ -76,7 +76,7 @@ void EnableInterrupts()
     EINT;
 
     // Enable interrupts
-   	SetDBGIER(IER);			 // Configure the DBGIER for realtime debug - my
+    SetDBGIER(IER);			 // Configure the DBGIER for realtime debug - my
    	asm(" CLRC INTM, DBGM"); // Enable global interrupts and realtime debug - my
 
 }

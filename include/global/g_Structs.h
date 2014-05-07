@@ -40,8 +40,8 @@ extern "C" {
 //-------------------Статус работы----------------------------
 // Статус работы
 #define STATUS_RESET_MASK	0x2082
-#define STATUS_EVLOG_MASK	0x56F
 #define STATUS_MOVE_MASK	0xC
+
 typedef union _TStatusReg {
 	Uns all;
 	struct {
@@ -143,13 +143,7 @@ typedef union _TProcessReg {
 #define NET_VSK_MASK		0x0080
 #define NET_BV_MASK			0x0700
 #define NET_OV_MAX_MASK		0x3800
-#if BUR_M
-#define NET_EVLOG_MASK		0x7F7F
-#define NET_RTSERR_MASK 	0x4000
-#define NET_RESET_MASK      0x38FF
-#else
 #define NET_EVLOG_MASK		0x3F7F
-#endif
 
 typedef union _TNetReg {
 	Uns all;
@@ -178,8 +172,8 @@ typedef union _TNetReg {
 #define LOAD_SHC_MASK		0x00E0
 #define LOAD_UNL_MASK		0x0400
 #define LOAD_ISK_MASK		0x0800
-#define LOAD_RESET_MASK		0x0FE7
-#define LOAD_EVLOG_MASK		0x0FE7
+#define LOAD_RESET_MASK		0x0807
+#define LOAD_EVLOG_MASK		0x0807
 typedef union _TLoadReg {
 	Uns all;
 	struct {

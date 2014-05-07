@@ -17,6 +17,7 @@
 
 
 #include "chip\DSP2833x_Device.h"     // Headerfile Include File
+#include "config.h"
 //#include "DSP2833x_Examples.h"   // Examples Include File
 
 // Functions that will be run from RAM need to be assigned to
@@ -219,7 +220,7 @@ void InitPll(Uint16 val, Uint16 divsel)
 	{
 		EALLOW;
 	    SysCtrlRegs.PLLSTS.bit.DIVSEL = 2;
-	    DELAY_US(50L);
+	    DelayUs(50L);
 	    SysCtrlRegs.PLLSTS.bit.DIVSEL = 3;
 	    EDIS;
     }

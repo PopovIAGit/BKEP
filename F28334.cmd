@@ -1,15 +1,15 @@
 /*
-// TI File $Revision: /main/10 $
-// Checkin $Date: July 9, 2008   13:43:56 $
+// TI File $Revision: /main/9 $
+// Checkin $Date: July 9, 2008   13:43:49 $
 //###########################################################################
 //
-// FILE:	F28335.cmd
+// FILE:	F28334.cmd
 //
-// TITLE:	Linker Command File For F28335 Device
+// TITLE:	Linker Command File For F28334 Device
 //
 //###########################################################################
-// $TI Release:$
-// $Release Date:$
+// $TI Release: DSP2833x/DSP2823x C/C++ Header Files V1.31 $
+// $Release Date: August 4, 2009 $
 //###########################################################################
 */
 
@@ -47,12 +47,12 @@
    library search path (-i).
 /*========================================================= */
 
-/* Define the memory block start/length for the F28335  
+/* Define the memory block start/length for the F28334  
    PAGE 0 will be used to organize program sections
    PAGE 1 will be used to organize data sections
 
     Notes: 
-          Memory blocks on F28335 are uniform (ie same
+          Memory blocks on F28334 are uniform (ie same
           physical memory) in both PAGE 0 and PAGE 1.  
           That is the same memory region should not be
           defined for both PAGE 0 and PAGE 1.
@@ -79,15 +79,15 @@ PAGE 0:    /* Program Memory */
    RAML1       : origin = 0x009000, length = 0x001000     /* on-chip RAM block L1 */
    RAML2       : origin = 0x00A000, length = 0x001000     /* on-chip RAM block L2 */
    RAML3       : origin = 0x00B000, length = 0x001000     /* on-chip RAM block L3 */
-   ZONE6       : origin = 0x0100000, length = 0x100000    /* XINTF zone 6 */ 
-   ZONE7A      : origin = 0x0200000, length = 0x00FC00    /* XINTF zone 7 - program space */ 
-   FLASHH      : origin = 0x300000, length = 0x008000     /* on-chip FLASH */
-   FLASHG      : origin = 0x308000, length = 0x008000     /* on-chip FLASH */
-   FLASHF      : origin = 0x310000, length = 0x008000     /* on-chip FLASH */
-   FLASHE      : origin = 0x318000, length = 0x008000     /* on-chip FLASH */
-   FLASHD      : origin = 0x320000, length = 0x008000     /* on-chip FLASH */
-   FLASHC      : origin = 0x328000, length = 0x008000     /* on-chip FLASH */
-   FLASHA      : origin = 0x338000, length = 0x007F80     /* on-chip FLASH */
+   ZONE6       : origin = 0x100000, length = 0x0100000    /* XINTF zone 6 */ 
+   ZONE7A      : origin = 0x200000, length = 0x000FC00    /* XINTF zone 7 - program space */ 
+   FLASHH      : origin = 0x320000, length = 0x004000     /* on-chip FLASH */
+   FLASHG      : origin = 0x324000, length = 0x004000     /* on-chip FLASH */
+   FLASHF      : origin = 0x328000, length = 0x004000     /* on-chip FLASH */
+   FLASHE      : origin = 0x32C000, length = 0x004000     /* on-chip FLASH */
+   FLASHD      : origin = 0x330000, length = 0x000100     /* on-chip FLASH */
+   FLASHC      : origin = 0x330100, length = 0x000100     /* on-chip FLASH */
+   FLASHA      : origin = 0x330200, length = 0x00BF80     /* on-chip FLASH */
    CSM_RSVD    : origin = 0x33FF80, length = 0x000076     /* Part of FLASHA.  Program with all 0x0000 when CSM is in use. */
    BEGIN       : origin = 0x33FFF6, length = 0x000002     /* Part of FLASHA.  Used for "boot to Flash" bootloader mode. */
    CSM_PWL     : origin = 0x33FFF8, length = 0x000008     /* Part of FLASHA.  CSM password locations in FLASHA */
@@ -97,7 +97,7 @@ PAGE 0:    /* Program Memory */
    IQTABLES    : origin = 0x3FE000, length = 0x000b50     /* IQ Math Tables in Boot ROM */
    IQTABLES2   : origin = 0x3FEB50, length = 0x00008c     /* IQ Math Tables in Boot ROM */  
    FPUTABLES   : origin = 0x3FEBDC, length = 0x0006A0     /* FPU Tables in Boot ROM */
-   ROM         : origin = 0x3FF27C, length = 0x000D44     /* Boot ROM */        
+   ROM         : origin = 0x3FF27C, length = 0x000D44     /* Boot ROM */          
    RESET       : origin = 0x3FFFC0, length = 0x000002     /* part of boot ROM  */
    VECTORS     : origin = 0x3FFFC2, length = 0x00003E     /* part of boot ROM  */
 
@@ -108,12 +108,12 @@ PAGE 1 :   /* Data Memory */
    BOOT_RSVD   : origin = 0x000000, length = 0x000050     /* Part of M0, BOOT rom will use this for stack */
    RAMM0       : origin = 0x000050, length = 0x0003B0     /* on-chip RAM block M0 */
    RAMM1       : origin = 0x000400, length = 0x000400     /* on-chip RAM block M1 */
-   RAML4       : origin = 0x00C000, length = 0x001000     /* on-chip RAM block L1 */
-   RAML5       : origin = 0x00D000, length = 0x001000     /* on-chip RAM block L1 */
+   RAML4       : origin = 0x00C000, length = 0x001F00     /* on-chip RAM block L1 */
+   RAML5       : origin = 0x00DF00, length = 0x000100     /* on-chip RAM block L1 */
    RAML6       : origin = 0x00E000, length = 0x001000     /* on-chip RAM block L1 */
    RAML7       : origin = 0x00F000, length = 0x001000     /* on-chip RAM block L1 */
    ZONE7B      : origin = 0x20FC00, length = 0x000400     /* XINTF zone 7 - data space */
-   FLASHB      : origin = 0x330000, length = 0x008000     /* on-chip FLASH */
+   FLASHB      : origin = 0x338000, length = 0x004000     /* on-chip FLASH */
 }
 
 /* Allocate sections to memory blocks.
@@ -172,7 +172,7 @@ SECTIONS
    */
    
    FPUmathTables    : > FPUTABLES, PAGE = 0, TYPE = NOLOAD 
-         
+      
    /* Allocate DMA-accessible RAM sections: */
    DMARAML4         : > RAML4,     PAGE = 1
    DMARAML5         : > RAML5,     PAGE = 1

@@ -10,6 +10,7 @@
 #include "core.h"
 #include "peref.h"
 #include "g_Ram.h"
+#include "stat.h"
 #include "project_Version.h"
 
 Byte 	showLog = 0, 
@@ -34,32 +35,20 @@ extern Uns predNoMoveTime2;
 extern Uns predNoMoveTime3;
 extern Uns MAX_TORQUE;
 Bool fl_TestIndicator = false;
-//__inline void ReadWriteAllParams(Byte, TCoreMenu *);
+
+__inline void ReadWriteAllParams(Byte, TCoreMenu *);
 //---------------------------------------------------
 void Core_MenuInit(TCoreMenu *p)
 {
 	p->Data = ToPtr(&g_Ram);      	// Указатель на буфер данных
-	
 	p->Group.Count = GROUP_COUNT;    // Количество групп
-
-	p->EvLogSelected = false;		// Флаг выбора записи
-	p->EvLogGroup = p->Group.Count - 1;	// Номер группы журнала
-	//p->EvLogNumber = REG_LOG_NUMBER;// Адрес номера последней записи в журнал
-	//p->EvLogTime = REG_LOG_TIME;    // Адрес параметра времени записи журнала
-	//p->EvLogDate = REG_LOG_DATE;    // Адрес параметра даты записи журнала
-
-	//p->EvLog.Count = EVLOG_CNT;     // Количество записей журнала
-	
-	//p->Groups = groups;   			// Указатель на структуры групп
-	//p->SubGroups = subgroups;		// Указатель на структуры подгрупп
 	p->Params = params;   			// Указатель на структуры параметров
 	p->Values = values;   			// Указатель на структуры строковых значений
-	
 	p->EnableEdit = EnableEdit;
 	p->WriteValue = WriteValue;
 
 	// Чтение всех параметров из Eeprom
-	//ReadWriteAllParams(F_READ,p);
+	ReadWriteAllParams(F_READ,p);
 	// Проверяем настроен ли ModBus
 	SetModBusParams();
 	// Номер версии
@@ -68,31 +57,16 @@ void Core_MenuInit(TCoreMenu *p)
 	//while (g_Ram.ramGroupA.SUBVER_PO >= 100) g_Ram.ramGroupA.SUBVER_PO -= 100;
 }
 //---------------------------------------------------
-// Чтение журнала
-/*__inline Bool ReadLog(TCoreMenu *p)	// в SelectGroup()
-{
-	LgUns addr;
-
-	addr = EVLOG_DATA_START_ADR + p->EvLog.Position * EVLOG_DATA_CNT;
-	if ( ReadWriteClearFlash(&g_MainFlash, F_READ, addr, (Uns *)&g_Ram.logRecord, EVLOG_DATA_CNT) )
-		{WaitForMainFlash();}
-	else return false;
-	// Обнулим неиспользуемые записи
-	if ((g_Ram.logRecord.LogDate.all == 0xFFFF)&&(g_Ram.logRecord.LogPositionPr < 0))
-		memset(&g_Ram.logRecord, 0,sizeof(TStatRecord));
-	return true;
-}*/
-//---------------------------------------------------
 
 //------------------------------------------------------------------
 // Подтверждение или изменение паролей
 Bool UpdateCode(Uns addrPassw, Uns addrCode, Uns value, Uns def)	// в WriteValue()
 {
-	/*Uns *password = ToUnsPtr(&g_Ram) + addrPassw;
+	Uns *password = ToUnsPtr(&g_Ram) + addrPassw;
 	Uns *code = ToUnsPtr(&g_Ram) + addrCode;
 	Bool writeFlag = false;
 
-	//if (!IsEepromReady()) return false;
+	if (!IsMemParReady()) return false;
 	if (*password != 0)
 	{
 		if ((value == *password) || (value == def))
@@ -107,9 +81,14 @@ Bool UpdateCode(Uns addrPassw, Uns addrCode, Uns value, Uns def)	// в WriteValue
 		writeFlag = true;
 	}
 	
-	if (writeFlag) 
-		if ( WriteToEeprom(addrPassw, password, 1)) return true;
-	*/
+	if (writeFlag)
+	{
+		if (ReadWriteEeprom(&Eeprom1,F_WRITE,addrPassw,password,1))
+		{
+			return true;
+		}
+	}
+
 	return false;
 }
 //---------------------------------------------------
@@ -145,50 +124,65 @@ void Core_MenuReadDcr(TCoreMenu *p, struct MENU_DCR *Dcr, Uns Addr) // в ReadDcr
 // Запись параметра
 Bool WriteValue(Uns memory, Uns param, Uns *value) // в EditParam()
 {
-	/*
-	if (memory && !IsEepromReady()) return false;
+	if (memory && !IsMemParReady()) return false;
 	
 	if (param == REG_CODE)
 	{
-		if ( UpdateCode(REG_PASSW1_NEW, param, *value, g_Ram.ramGroupA.VER_PO) )
+		if ( UpdateCode(REG_PASSW1_NEW, param, *value, g_Ram.ramGroupA.VersionPO) )
 			return true;
 	}
 	else if (param == REG_FCODE)
 	{
-		if ( UpdateCode(REG_PASSW2_NEW, param, *value, g_Ram.ramGroupA.VER_PO) )
+		if ( UpdateCode(REG_PASSW2_NEW, param, *value, g_Ram.ramGroupA.VersionPO) )
 			return true;
 	}
 
 	*(ToUnsPtr(&g_Ram) + param) = *value;
 	if (memory)
 	{
-		if ( WriteToEeprom(param, value, 1) )
+		//if ( WriteToEeprom(param, value, 1) )
+		if (ReadWriteEeprom(&Eeprom1,F_WRITE,param,value,1))
+
 		{ 
 			RefreshParams(param);
 			return true;
 		}
-//		Mcu.EvLog.Value = CMD_PAR_CHANGE;
 	}
 	else return true;
-*/
 	return false;
 }
 //---------------------------------------------------
 // Разрешение редактирования
 Bool EnableEdit(Uns password)
 {
-	/*switch (password)
+	switch (password)
 	{
 		case 1: if (IsPassword1()) return false; break;
 		case 2: if (IsPassword2()) return false; break;
-	}*/
+	}
+
 	return true;
+}
+//---------------------------------------------------
+void Core_MenuDisplay(TCoreMenu *p)	// 50 Гц
+{
+	// Меняем заводские параметры (группа C), защищённые паролем 2
+	if (g_Ram.ramGroupC.FactCode)
+	{
+		p->setDefaultGroupNumber = GROUP_FACT_PAR;
+		g_Ram.ramGroupH.Password2 = 0;
+		g_Ram.ramGroupC.FactCode = 0;
+	}
+
+	// По умолчанию
+	if (p->setDefaultGroupNumber)
+		SetDefaultValues(p, &p->setDefaultGroupNumber);
 }
 //---------------------------------------------------
 // Установка значений по умолчанию
 void SetDefaultValues(TCoreMenu *p, Byte *groupNumber) // в Core_MenuDisplay()
 {
-	/*struct MENU_DCR Dcr;
+	struct MENU_DCR Dcr;
 	static LgUns DefAddr = 0; 
 	Byte DefCode = 0;
 
@@ -207,7 +201,6 @@ void SetDefaultValues(TCoreMenu *p, Byte *groupNumber) // в Core_MenuDisplay()
 		if ((((Dcr.Config.all & DefCode) == DefCode)
 				&&(DefAddr != REG_DRIVE_TYPE) // Не тип привода
 				&&(DefAddr != REG_GEAR_RATIO) // Не тип редуктора
-				&&(DefAddr != REG_INDICATOR_TYPE) // Не тип индикатора
 				&&(DefAddr != REG_FACTORY_NUMBER) // Не номер
 				&&(DefAddr != REG_PRODUCT_DATE) // Не дата изготовления
 				&&(DefAddr != REG_TASK_TIME)
@@ -215,23 +208,19 @@ void SetDefaultValues(TCoreMenu *p, Byte *groupNumber) // в Core_MenuDisplay()
 			||(DefAddr == REG_CODE)||(DefAddr == REG_FCODE))
 	 		*(ToUnsPtr(&g_Ram) + DefAddr) = Dcr.Def;
 		DefAddr++;
-		// Пишем "УСТРОЙСТВО ЗАНЯТО ...%"
-		ShowAddStrings(p, 0, _IQmpy(_IQdiv(DefAddr,RAM_DATA_SIZE),100LU));
 		return;
 	}
 	
-	if (IsEepromReady())
+	if (IsMemParReady())
 	{
 		// Запись всех параметров в Eeprom
 		ReadWriteAllParams(F_WRITE,p);
 		DefAddr = 0;
 		*groupNumber = 0;
-
-		UpdateStringsDisplay(p);
-	}*/
+	}
 }
 //--------------------------------------------------------
-/*void ReadWriteAllParams(Byte cmd, TCoreMenu *p)	// в Core_MenuInit()
+void ReadWriteAllParams(Byte cmd, TCoreMenu *p)	// в Core_MenuInit()
 {
 	struct MENU_DCR Dcr;
 	Uns DefAddr = 0, count;
@@ -251,32 +240,53 @@ void SetDefaultValues(TCoreMenu *p, Byte *groupNumber) // в Core_MenuDisplay()
 		{
 			*(ToUnsPtr(&g_Ram) + DefAddr) = 0;
 		}
-		else ReadWriteEeprom(&g_Eeprom,cmd,DefAddr,ToUnsPtr(&g_Ram) + DefAddr,count);
-		while (!IsEepromReady()) {AT25XXX_Update(&g_Eeprom); DelayUs(1000);}
+		else ReadWriteEeprom(&Eeprom1,cmd,DefAddr,ToUnsPtr(&g_Ram) + DefAddr,count);
+		while (!IsMemParReady()) {FM25V10_Update(&Eeprom1); DelayUs(1000);}
 		// Инициализация фильтров, масштабов и т.д.
 		RefreshParams(DefAddr);
 		DefAddr += count;
 	}
-}*/
+}
 //---------------------------------------------------
 // Установка значений ModBus
 void SetModBusParams()
 {
-	/* надо будет вставить
-	 * if ((g_Ram.ramGroupB.RS_BAUD_RATE == 0xFFFF) & (g_Ram.ramGroupB.RS_STATION == 0xFFFF))
+	//для БКД
+	/*
+	if ((g_Ram.ramGroupB.RS_BAUD_RATE == 0xFFFF) & (g_Ram.ramGroupB.RS_STATION == 0xFFFF))
 	{
 		g_Ram.ramGroupB.RS_BAUD_RATE= br19200;
 		g_Ram.ramGroupB.RS_STATION	= 1;
 		g_Ram.ramGroupB.RS_MODE		= pmNone;
-		ReadWriteEeprom(&g_Eeprom,F_WRITE,REG_RS_BAUD_RATE,ToUnsPtr(&g_Ram) + REG_RS_BAUD_RATE,3);
-	}*/
+		ReadWriteEeprom(&Eeprom1,F_WRITE,REG_RS_BAUD_RATE,ToUnsPtr(&g_Ram) + REG_RS_BAUD_RATE,3); // запись параметров в Eeprom
+	}
+	*/
+	//для АСУ
+	if ((g_Ram.ramGroupB.RsBaudRate == 0xFFFF) & (g_Ram.ramGroupB.RsStation == 0xFFFF || g_Ram.ramGroupB.RsStation == 0))
+	{
+		g_Ram.ramGroupB.RsBaudRate= br19200;
+		g_Ram.ramGroupB.RsStation	= 1;
+		g_Ram.ramGroupB.RsMode		= pmNone;
+		ReadWriteEeprom(&Eeprom1,F_WRITE,REG_RS_BAUD_RATE,ToUnsPtr(&g_Ram) + REG_RS_BAUD_RATE,3); // запись параметров в Eeprom
+	}
+	/*
+	//для УПП
+	if ((g_Ram.ramGroupB.RS_BAUD_RATE == 0xFFFF) & (g_Ram.ramGroupB.RS_STATION == 0xFFFF))
+	{
+		g_Ram.ramGroupB.RS_BAUD_RATE= br19200;
+		g_Ram.ramGroupB.RS_STATION	= 1;
+		g_Ram.ramGroupB.RS_MODE		= pmNone;
+		ReadWriteEeprom(&Eeprom1,F_WRITE,REG_RS_BAUD_RATE,ToUnsPtr(&g_Ram) + REG_RS_BAUD_RATE,3); // запись параметров в Eeprom
+	}
+	//для Bluetooth
+	if ((g_Ram.ramGroupB.RS_BAUD_RATE == 0xFFFF) & (g_Ram.ramGroupB.RS_STATION == 0xFFFF))
+	{
+		g_Ram.ramGroupB.RS_BAUD_RATE= br19200;
+		g_Ram.ramGroupB.RS_STATION	= 1;
+		g_Ram.ramGroupB.RS_MODE		= pmNone;
+		ReadWriteEeprom(&Eeprom1,F_WRITE,REG_RS_BAUD_RATE,ToUnsPtr(&g_Ram) + REG_RS_BAUD_RATE,3); // запись параметров в Eeprom
+	}
+	*/
 }
-//---------------------------------------------------
-// Обновление строк дисплея
-void UpdateStringsDisplay(pCoreMenu p)
-{
-	if (p->State == MS_START) p->logoIsShown = false;
-	// Обновление верхней и нижней строки дисплея
-	p->updateHiStr = p->updateLowStr = p->updateMainValues = true;
-}
+
 //---------Конец файла------------------------------------

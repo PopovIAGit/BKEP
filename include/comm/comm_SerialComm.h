@@ -13,6 +13,7 @@
 // Подключение файлов
 //#include "comm_ModbusRtu.h"
 #include "g_Structs.h"
+#include "g_InitHardware.h"
 
 // Выбор портов для связи с ПК и ПДУ
 #define BKP_SCI_ID			SCIA
@@ -26,10 +27,10 @@ extern Bool MbAsuConnect;
 extern Bool MbShnConnect;
 extern Bool MbBtConnect;
 
-__inline void BkpMbSetTr(Byte Lev)  {RS485_DIR_BKD = !Lev;}
-__inline void AsuMbSetTr(Byte Lev)  {RS485_DIR_ASU = !Lev;}
-__inline void ShnMbSetTr(Byte Lev)  {RS485_DIR_SHN = !Lev;}
-__inline void BtMbSetTr(Byte Lev)   {RS485_DIR_BT = !Lev;}
+//__inline void BkpMbSetTr(Byte Lev)  {RS485_DIR_BKD = Lev;}
+__inline void AsuMbSetTr(Byte Lev)  {RS485_DIR_ASU = Lev;}
+//__inline void ShnMbSetTr(Byte Lev)  {RS485_DIR_SHN = Lev;}
+__inline void BtMbSetTr(Byte Lev)   {/*RS485_DIR_BT = !Lev;*/}
 
 // Прототипы функций
 void SerialCommInit(TMbHandle);
@@ -37,7 +38,7 @@ void ModBusSlaveReset(TMbHandle);
 
 void SerialCommTimings(TMbHandle);
 
-void InitChanelBkpModbus(TMbHandle);
+//void InitChanelBkpModbus(TMbHandle);
 void InitChanelAsuModbus(TMbHandle);
 void InitChanelShnModbus(TMbHandle);
 void InitChanelBtModbus(TMbHandle);

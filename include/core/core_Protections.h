@@ -75,45 +75,56 @@ typedef struct {
 	// Входы --------------------------------------------------
 	// -------- Диагностика процесса ------------
 	// -------- Диагностика сети ----------------
-		TAlarmElem 			underVoltageR;	// Понижение напряжения R
-		TAlarmElem 			underVoltageS;	// Понижение напряжения S
-		TAlarmElem 			underVoltageT;	// Понижение напряжения T
-		TAlarmElem 			overVoltageR;	// Превышение напряжения R
-		TAlarmElem 			overVoltageS;	// Превышение напряжения S
-		TAlarmElem 			overVoltageT;	// Превышение напряжения T
-		TAlarmElem			voltSkew;		// Асимметрия напряжения входной сети
-		TAlarmElem 			breakVoltR;		// Обрыв фазы R
-		TAlarmElem 			breakVoltS;		// Обрыв фазы S
-		TAlarmElem 			breakVoltT;		// Обрыв фазы T
+		TAlarmElem 			underVoltageR;		// Понижение напряжения R  - авария
+		TAlarmElem 			underVoltageS;		// Понижение напряжения S  - авария
+		TAlarmElem 			underVoltageT;		// Понижение напряжения T  - авария
+		TAlarmElem 			underDefVoltageR;	// Понижение напряжения R  - неисправность
+		TAlarmElem 			underDefVoltageS;	// Понижение напряжения S  - неисправность
+		TAlarmElem 			underDefVoltageT;	// Понижение напряжения T  - неисправность
+		TAlarmElem 			overVoltageR;		// Превышение напряжения R - авария
+		TAlarmElem 			overVoltageS;		// Превышение напряжения S - авария
+		TAlarmElem 			overVoltageT;		// Превышение напряжения T - авария
+		TAlarmElem 			overDefVoltageR;	// Превышение напряжения R - неисправность
+		TAlarmElem 			overDefVoltageS;	// Превышение напряжения S - неисправность
+		TAlarmElem 			overDefVoltageT;	// Превышение напряжения T - неисправность
+		TAlarmElem 			overMax_VoltageR;	// Превышение напряжения R на 47% - авария
+		TAlarmElem 			overMax_VoltageS;	// Превышение напряжения S на 47% - авария
+		TAlarmElem 			overMax_VoltageT;	// Превышение напряжения T на 47% - авария
+		TAlarmElem			voltSkew;			// Асимметрия напряжения входной сети - неисправность
+		TAlarmElem 			breakVoltR;			// Обрыв фазы R - авария
+		TAlarmElem 			breakVoltS;			// Обрыв фазы S - авария
+		TAlarmElem 			breakVoltT;			// Обрыв фазы T - авария
 	// -------- Диагностика нагруски ------------
-		TAlarmElem			breakCurrU;		// Обрыв фазы U
-		TAlarmElem			breakCurrV;		// Обрыв фазы V
-		TAlarmElem			breakCurrW;		// Обрыв фазы W
-		TAlarmElem			currSkew;		// Ассиметрия тока
-		TAlarmI2T 			I2t;			// Время-токовая перегрузка
-		TAlarmSHC			ShC_U;			// Короткое замыкание фазы U
-		TAlarmSHC			ShC_V;			// Короткое замыкание фазы V
-		TAlarmSHC			ShC_W;			// Короткое замыкание фазы W
+		TAlarmElem			breakCurrU;			// Обрыв фазы U	- неисправность
+		TAlarmElem			breakCurrV;			// Обрыв фазы V - неисправность
+		TAlarmElem			breakCurrW;			// Обрыв фазы W - неисправность
+		TAlarmElem			currSkew;			// Ассиметрия тока - неисправность
+		TAlarmI2T 			I2t;				// Время-токовая перегрузка - авария
+		TAlarmSHC			ShC_U;				// Короткое замыкание фазы U - авария
+		TAlarmSHC			ShC_V;				// Короткое замыкание фазы V - авария
+		TAlarmSHC			ShC_W;				// Короткое замыкание фазы W - авария
 	// -------- Диагностика устройства ----------
-		TAlarmElem			overHeatBCP;	// Перегрев	БКП
-		TAlarmElem			underColdBCP; 	// Переохлаждение БКП
-		TAlarmElem			overHeatBCD;	// Перегрев БКД
-		TAlarmElem			underColdBCD; 	// Переохлаждение БКД
+		TAlarmElem			overHeatBCP;		// Перегрев	БКП - авария
+		TAlarmElem			underColdBCP; 		// Переохлаждение БКП - неисправность
+		TAlarmElem			overHeatBCD;		// Перегрев БКД - неисправность
+		TAlarmElem			underColdBCD; 		// Переохлаждение БКД - неисправность
 	// Выходы ---------------------------------------------------------
-		TFltUnion			outFaults;
+		TFltUnion			outFaults;			// Аварии
+		TFltUnion			outDefects;			// Неисправности
 
 }TCoreProtections;
 
 //------------------- Глобальные переменные --------------------------------
 //------------------- Протатипы функций ------------------------------------
 
-void Core_ProtectionsInit(TCoreProtections *);
-void Core_ProtectionsUpdate(TCoreProtections *);
-void Core_ProtectionsReset(TCoreProtections *);
-void Core_ProtectionsClear(TCoreProtections *);
-void Core_ProtectionsEnable(TCoreProtections *);
-Bool IsFaultExist(TPrtMode Mode);
-Bool IsDefectExist(TPrtMode Mode);
-void Core_FaultIndication(TCoreProtections *);
+void Core_ProtectionsInit(TCoreProtections *);		// Инициализация модуля защит
+void Core_ProtectionsUpdate(TCoreProtections *);	// Реакция системы на срабатывание защит
+void Core_ProtectionsReset(TCoreProtections *);		// Сброс защит при повторном пуске
+void Core_ProtectionsClear(TCoreProtections *);		// Сброс всех защит
+void Core_ProtectionsEnable(TCoreProtections *);	// Включение/Выключение защит
+Bool IsFaultExist(TCoreProtections *, TPrtMode);	// Проверка срабатывания аварийных защит
+Bool IsDefectExist(TPrtMode);					// Проверка срабатывания защит по неисправности
+void Core_DevProc_FaultIndic(TCoreProtections *);	// Индикация ошибок устройства и технологического процесса
+void EngPhOrdPrt(TCoreProtections *);				// неверное чередование фаз двигателя
 
 #endif

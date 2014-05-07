@@ -29,7 +29,7 @@ extern "C" {
 #define SCI_FRAME_ERROR		0x10
 #define SCI_RX_ERROR		0x1C
 
-#define SCI_BRR(Baud)			(Uint16)((Uint32)(150e6 / 800)  / (Baud) - 1)
+#define SCI_BRR(Baud)			(Uint16)((Uint32)(150e6/12 / 800)  / (Baud) - 1)
 
 //---------------------------------------------------------------------------
 #define SCI_DEFAULT_BAUD_RATES { \

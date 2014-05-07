@@ -55,6 +55,8 @@ void InitAdc(void)
 
     AdcRegs.ADCTRL3.all = 0x00E0;  // Power up bandgap/reference/ADC circuits
     DELAY_US(ADC_usDELAY);         // Delay before converting ADC channels
+
+
 }
 
 //===========================================================================
