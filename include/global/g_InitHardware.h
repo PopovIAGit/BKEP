@@ -26,14 +26,17 @@ extern "C" {
 #define ECN_ADDR2			GpioDataRegs.GPADAT.bit.GPIO5
 
 //--- LED's ------------------------------------------
-#define LED0				GpioDataRegs.GPADAT.bit.GPIO7
-#define LED1				GpioDataRegs.GPADAT.bit.GPIO12
-#define LED2				GpioDataRegs.GPADAT.bit.GPIO16
-#define LED3				GpioDataRegs.GPADAT.bit.GPIO17
-#define LED4				GpioDataRegs.GPADAT.bit.GPIO18
+#define LED_OPEN			GpioDataRegs.GPADAT.bit.GPIO22
+#define LED_MUFTA			GpioDataRegs.GPADAT.bit.GPIO23
+#define LED_DEFECT			GpioDataRegs.GPADAT.bit.GPIO24
+#define LED_FAULT			GpioDataRegs.GPBDAT.bit.GPIO34
+#define LED_CLOSE		    GpioDataRegs.GPADAT.bit.GPIO25
 
-//--- FUNCTION ---------------------------------------
-#define WORK_DSP_LED		GpioDataRegs.GPATOGGLE.bit.GPIO29 // GpioDataRegs.GPBDAT.bit.GPIO43
+#define LED_CONNECT			GpioDataRegs.GPADAT.bit.GPIO26
+
+#define WORK_DSP_LED		GpioDataRegs.GPADAT.bit.GPIO29 // GpioDataRegs.GPBDAT.bit.GPIO43
+#define ENABLE_BLUETOOTH    GpioDataRegs.GPADAT.bit.GPIO27
+//----Function----------------------------------
 #define OFF_TEN				GpioDataRegs.GPADAT.bit.GPIO6
 
 //--- MODBUS -----------------------------------------

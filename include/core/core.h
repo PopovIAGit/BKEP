@@ -62,6 +62,7 @@ typedef struct _TDmControl {
 typedef struct {
 	// ---
 	TStatusReg 			Status;			// Статус работы
+	TStatusReg 			TestStatus;		// переменная для проверки
 	// ---
 	TCoreProtections	Protections;	// Защиты
 	// ---

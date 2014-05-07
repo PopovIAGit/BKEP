@@ -30,7 +30,7 @@ extern "C" {
 #define STATUS_MUFTA			BIT7
 #define STATUS_MU_DU			BIT8
 #define STATUS_TEN				BIT9
-#define STATUS_POWER			BIT10
+#define STATUS_BLUETOOTH		BIT10
 #define STATUS_ALARM_BLK_INDIC	BIT11
 #define STATUS_ALARM_TS			BIT12
 #define STATUS_DEFECT			BIT13
@@ -45,22 +45,23 @@ extern "C" {
 typedef union _TStatusReg {
 	Uns all;
 	struct {
-		Uns Stop:1;			// 0     Стоп
-		Uns Fault:1;		// 1     Авария
-     	Uns Closing:1;    	// 2     Идет закрытие
-     	Uns Opening:1;		// 3     Идет открытие
-    	Uns Test:1;			// 4     Идет тест
-     	Uns Closed:1;		// 5     Закрыто
-     	Uns Opened:1;		// 6     Открыто
-		Uns Mufta:1;		// 7     Муфта
-		Uns MuDu:1;			// 8     Местное управление
-     	Uns Ten:1;        	// 9     Включен ТЕН
-     	Uns Power:1;     	// 10    Резервное питание
-		Uns BlkIndic:1;		// 11	 Авария на блоке
-		Uns TsIndic:1;		// 12	 Авария на ТС
-		Uns Defect:1;		// 13	 Неисправность
-		Uns BlkDefect:1;	// 14 	 Неисправность на блоке
-		Uns TsDefect:1;		// 15 	 Неисправность на ТС
+		
+		Uns Stop:1;				// 0     Стоп
+		Uns Fault:1;			// 1     Авария
+     	Uns Closing:1;    		// 2     Идет закрытие
+     	Uns Opening:1;			// 3     Идет открытие
+    	Uns Test:1;				// 4     Идет тест
+     	Uns Closed:1;			// 5     Закрыто
+     	Uns Opened:1;			// 6     Открыто
+		Uns Mufta:1;			// 7     Муфта
+		Uns MuDu:1;				// 8     Местное управление
+     	Uns Ten:1;        		// 9     Включен ТЕН
+     	Uns EnableBluetooth:1;  // 10    Резервное питание
+		Uns BlkIndic:1;			// 11	 Авария на блоке
+		Uns TsIndic:1;			// 12	 Авария на ТС
+		Uns Defect:1;			// 13	 Неисправность
+		Uns BlkDefect:1;		// 14 	 Неисправность на блоке
+		Uns TsDefect:1;			// 15 	 Неисправность на ТС
 	} bit;
 } TStatusReg;
 

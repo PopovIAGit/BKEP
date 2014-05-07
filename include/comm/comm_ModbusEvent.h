@@ -35,7 +35,7 @@ __inline void PreambleEvent(TMbPort *hPort)
 	hPort->Frame.Data = hPort->Frame.Buf;
 
 	if (hPort->Params.HardWareType==UART_TYPE) SCI_transmit(hPort->Params.ChannelID, *hPort->Frame.Data++);
-	else if (hPort->Params.HardWareType==MCBSP_TYPE) McBsp_transmit(hPort->Params.ChannelID, *hPort->Frame.Data++);
+	else if (hPort->Params.HardWareType==MCBSP_TYPE) McBsp_transmit(hPort->Params.ChannelID, *hPort->Frame.Data++, 0);
 }
 
 //-------------------------------------------------------------------------------

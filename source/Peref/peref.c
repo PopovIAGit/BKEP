@@ -65,6 +65,8 @@ void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновлени
 
 	Peref_CalibInit(&p->Position);
 	ContactorInit(&p->ContactorControl);
+	// ----—игнализаци€ лампочками-----------------------
+	Peref_LedsInit(&p->leds, Prd10HZ);
 }
 //---------------------------------------------------
 void Peref_18kHzCalc(TPeref *p) // 18 к√ц

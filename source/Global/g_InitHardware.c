@@ -166,11 +166,11 @@ void InitHardware(void)
    	   AdcRegs.ADCCHSELSEQ4.bit.CONV14 = 0xE; // Setup ADCINA2 as 2nd SEQ1 conv.
    	   AdcRegs.ADCCHSELSEQ4.bit.CONV15 = 0xF; // Setup ADCINA2 as 2nd SEQ1 conv.
 
-   //	   AdcRegs.ADCTRL2.bit.EPWM_SOCA_SEQ1 = 1;// Enable SOCA from ePWM to start SEQ1
-   	 //  AdcRegs.ADCTRL2.bit.INT_ENA_SEQ1 = 1;  // Enable SEQ1 interrupt (every EOS)
+   	   //AdcRegs.ADCTRL2.bit.EPWM_SOCA_SEQ1 = 1;// Enable SOCA from ePWM to start SEQ1
+   	   //AdcRegs.ADCTRL2.bit.INT_ENA_SEQ1 = 1;  // Enable SEQ1 interrupt (every EOS)
 
-	//   AdcRegs.ADCTRL2.bit.EPWM_SOCB_SEQ2 = 1;// Enable SOCA from ePWM to start SEQ1
-   	//   AdcRegs.ADCTRL2.bit.INT_ENA_SEQ2 = 1;  // Enable SEQ1 interrupt (every EOS)
+	   //AdcRegs.ADCTRL2.bit.EPWM_SOCB_SEQ2 = 1;// Enable SOCA from ePWM to start SEQ1
+   	   //AdcRegs.ADCTRL2.bit.INT_ENA_SEQ2 = 1;  // Enable SEQ1 interrupt (every EOS)
 
    	   // Assumes ePWM1 clock is already enabled in InitSysCtrl();
 	   EPwm1Regs.ETSEL.bit.SOCAEN = 1;        // Enable SOC on A group
@@ -294,8 +294,9 @@ void InitGpio(void)
 	//выходы
 
 	GpioCtrlRegs.GPAMUX2.bit.GPIO29 = 0;
+	GpioCtrlRegs.GPAPUD.bit.GPIO29	= 1;
 	GpioCtrlRegs.GPADIR.bit.GPIO29	= 1;	// WORK_DSP_LED
-	GpioDataRegs.GPADAT.bit.GPIO29	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO29	= 1;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO6	= 1;	// OFF_TEN
 	GpioDataRegs.GPADAT.bit.GPIO6	= 0;
@@ -309,26 +310,33 @@ void InitGpio(void)
 	GpioCtrlRegs.GPADIR.bit.GPIO5	= 1;	// ENC_ADDR2
 	GpioDataRegs.GPADAT.bit.GPIO5	= 0;
 
+	GpioCtrlRegs.GPAPUD.bit.GPIO22	= 1;
 	GpioCtrlRegs.GPADIR.bit.GPIO22	= 1;	//LED0
-	GpioDataRegs.GPADAT.bit.GPIO22	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO22	= 1;
 
+	GpioCtrlRegs.GPAPUD.bit.GPIO23	= 1;
 	GpioCtrlRegs.GPADIR.bit.GPIO23	= 1;	//LED1
-	GpioDataRegs.GPADAT.bit.GPIO23	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO23	= 1;
 
+	GpioCtrlRegs.GPAPUD.bit.GPIO24	= 1;
 	GpioCtrlRegs.GPADIR.bit.GPIO24	= 1;	//LED2
-	GpioDataRegs.GPADAT.bit.GPIO24	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO24	= 1;
 
+	GpioCtrlRegs.GPBPUD.bit.GPIO34	= 1;
 	GpioCtrlRegs.GPBDIR.bit.GPIO34	= 1;	//LED3
-	GpioDataRegs.GPBDAT.bit.GPIO34	= 0;
+	GpioDataRegs.GPBDAT.bit.GPIO34	= 1;
 
+	GpioCtrlRegs.GPAPUD.bit.GPIO25	= 1;
 	GpioCtrlRegs.GPADIR.bit.GPIO25	= 1;	//LED4
-	GpioDataRegs.GPADAT.bit.GPIO25	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO25	= 1;
 
+	GpioCtrlRegs.GPAPUD.bit.GPIO26	= 1;
 	GpioCtrlRegs.GPADIR.bit.GPIO26	= 1;	//LED5
-	GpioDataRegs.GPADAT.bit.GPIO26	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO26	= 1;
 
-	GpioCtrlRegs.GPADIR.bit.GPIO27	= 1;	//LED6
-	GpioDataRegs.GPADAT.bit.GPIO27	= 0;
+	GpioCtrlRegs.GPAPUD.bit.GPIO27	= 1;
+	GpioCtrlRegs.GPADIR.bit.GPIO27	= 1;	//ENABLE_BLUETOOTH
+	GpioDataRegs.GPADAT.bit.GPIO27	= 1;
 
 	GpioCtrlRegs.GPBDIR.bit.GPIO50	= 1;	//RS485_DIR_SHN - УПП
 	GpioDataRegs.GPBDAT.bit.GPIO50	= 0;

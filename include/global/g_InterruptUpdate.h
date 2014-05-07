@@ -84,9 +84,10 @@ LgUns  X, X10, X18;
 TPeriodicalFunction Task18kHz[] =         
 {
 	PrdElemInit(Peref_18kHzCalc,						&g_Peref),
-	PrdElemInit(MonitorUpdate,							NULL),
+	PrdElemInit(SciMasterConnBetweenBlockCommTimer,		&g_Comm.mbBkp),
+	//PrdElemInit(MonitorUpdate,						NULL),
 	//PrdElemInit(AvagoEncoderAEAT84ADCalc,				&g_Peref.position),
-	PrdElemInit(task1,	NULL)
+	//PrdElemInit(task1,	NULL)
 };
 
 //Сюда вставляем функции для соответствующей группы
@@ -101,7 +102,7 @@ TPeriodicalFunction Task2kHz[] =          //Не более 4-х задач
 	PrdElemInit(SerialCommTimings,						&g_Comm.mbBt),
 	PrdElemInit(FM25V10_Update,							&Eeprom1),
 	PrdElemInit(FM25V10_Update,							&Eeprom1),
-	PrdElemInit(SciMasterConnBetweenBlockCommTimer,		&g_Comm.mbBkp),
+	//PrdElemInit(SciMasterConnBetweenBlockCommTimer,		&g_Comm.mbBkp),
 	//PrdElemInit(SciMasterConnBetweenBlockUpdate,		&g_Comm.mbBkp),
 
 };
@@ -156,12 +157,12 @@ TPeriodicalFunction Task10Hz[] =        //не более  200-т задач
 	PrdElemInit(ADT7301_Update,				&g_Peref.tempSensor),*/
 	//PrdElemInit(ADT75_Update,				NULL),
 //	PrdElemInit(Drive_Update,				&g_Drive),
-	//PrdElemInit(Peref_LedsUpdate,			&g_Peref.leds),
+	PrdElemInit(Peref_LedsUpdate,			&g_Peref.leds),
 	//PrdElemInit(Peref_TenControl,			NULL),
 	//PrdElemInit(Peref_10HzCalc,				&g_Peref),
-	PrdElemInit(Peref_Calibration, 						&g_Peref.Position),
+	//PrdElemInit(Peref_Calibration, 						&g_Peref.Position),
 	PrdElemInit(BluetoothTimer,							&g_Comm.Bluetooth),
-	PrdElemInit(task1_10Hz,								NULL)
+	//PrdElemInit(task1_10Hz,								NULL)
 };
 //------------Конец файла-----------------------------------------------
 

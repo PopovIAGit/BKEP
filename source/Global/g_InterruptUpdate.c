@@ -120,7 +120,7 @@ void task1_10Hz(void) // Мигание светодиода
 	if (++X10 > 10)
 	{
 		//OUT_TOGGLE(GpioDataRegs.GPADAT.bit.GPIO7);
-		WORK_DSP_LED = 1;
+		//WORK_DSP_LED = 1;
 		X10 = 0;
 	}
 }

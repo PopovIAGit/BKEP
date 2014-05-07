@@ -22,7 +22,7 @@
 #include "peref_Calibs.h"			// PIA 14.04.14
 #include "peref_ContactorControl.h"	// PIA 17.04.14
 //#include "peref_DisplayDrv.h"
-//#include "peref_LedsDrv.h"
+#include "peref\peref_LedsDrv.h"
 //#include "peref_TempObserver.h"
 //#include "peref_Clock.h"
 //#include "peref_SDModDrv.h"
@@ -37,29 +37,31 @@ extern "C" {
 //-------------------- Структуры -------------------------------------------
 // Структура для работы с фильтрами переферии
 typedef struct {
-	// Фильтры U
+	//--- Фильтры U -----------------
 	APFILTER3  			URfltr;
 	APFILTER3  			USfltr;
 	APFILTER3  			UTfltr;
-	// Фильтры I
+	//--- Фильтры I -----------------
 	APFILTER3  			IUfltr;
 	APFILTER3  			IVfltr;
 	APFILTER3  			IWfltr;
-	// ------
+	// ------------------------------
 	TSensObserver		sensObserver;		// Масштабирование сигналов с датчиков
 	TSinObserver		sinObserver;		// Вычисление RMS
 	TPhaseOrder			phaseOrder; 		// Чередование фаз сети
-	//------
+	//-------------------------------
 	APFILTER1 			Phifltr;			// Фильтр угола фи
 	APFILTER1 			Umfltr;				// Фильтр среднего напряжения
 	APFILTER3 			Imfltr;				// Фильтр среднего тока
-
+	//-------------------------------
 	TPerefPosition 		Position;			// Калибровка датчика положения и расчет скорости
 	TContactorControl 	ContactorControl;	// Управление контакторами
-
+	//-------------------------------
 	Uns 				Umid;
 	Uns 				Imid;
 	Uns 				AngleUI;
+	//---------------------------
+	TLeds				leds;
 } TPeref;
 
 //------------------- Протатипы функций ------------------------------------
