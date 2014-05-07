@@ -40,7 +40,7 @@ extern "C" {
 
 //extern void SCI_init(Byte Id, Uns BaudRate, Byte Parity, Byte Length);
 extern Uns McBsp_recieve(Byte Id);
-extern void McBsp_transmit(Byte Id, Uns Data);
+extern void McBsp_transmit(Byte Id, Uns Data, Uns Stop);
 extern Byte McBsp_getstatus(Byte Id);
 extern void McBsp_reset(Byte Id);
 extern void McBsp_rx_enable(Byte Id);

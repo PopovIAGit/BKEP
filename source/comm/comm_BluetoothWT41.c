@@ -293,11 +293,26 @@ __inline void RxCommandMode(TBluetoothHandle bPort)
 #endif
 
 	if (bPort->StrIndex <= BT_RX_BUFFER_SIZE)
-		bPort->RxBuffer[bPort->StrIndex] = Data;
+	{
+		bPort->RxBuffer[bPort->StrIndex] = (char)(Data&0x00FF);
+		bPort->StrIndex++;
+		bPort->RxBuffer[bPort->StrIndex] = (char)(Data>>8)&0x00ff;
+	}
 
 	// Самая маленькая посылка - 2 символа "ОК", иногда присылает сразу "\r\n", поэтому ждем первые символы
 	// if ((p->StrIndex >= 2) && (Data == '\n'))
-	bPort->Status = (Data == '\n') ? BT_RECEIVE_COMPLETE : BT_RECEIVE_BUSY;
+	if ((((Data)&0x00ff) == '\n') || (((Data>>8)&0x00ff) == '\n'))
+	{
+		bPort->Status = BT_RECEIVE_COMPLETE;
+	}
+	else
+	{
+		bPort->Status = BT_RECEIVE_BUSY;
+	}
+
+	//bPort->Status = (((Data)&0x00ff) == '\n') ? BT_RECEIVE_COMPLETE : BT_RECEIVE_BUSY;
+	//bPort->Status = (((Data>>8)&0x00ff) == '\n') ? BT_RECEIVE_COMPLETE : BT_RECEIVE_BUSY;
+
 
 	bPort->StrIndex++;
 }
@@ -381,8 +396,8 @@ Bool CheckString(TBluetoothHandle bPort, char *Str)
 
 void SendOneString(TBluetoothHandle bPort, char *String)
 {
-	char symbol1 = 0;
-	char symbol2 = 0;
+	char symbol1 = 255;
+	char symbol2 = 255;
 
 	/*if (!bPort->TxBusy)
 	{
@@ -408,6 +423,39 @@ void SendOneString(TBluetoothHandle bPort, char *String)
 		symbol1 = String[bPort->StrIndex];					// Загружаем текущий символ
 		symbol2 = String[bPort->StrIndex+1];					// Загружаем текущий символ
 
+		/*if ()
+		{
+			bPort->StrIndex+=2;
+			bPort->Status = BT_TRANSMIT_BUSY;				// Статус передачи
+			bPort->TxBusy = true;							// Выставляем флаг передачи
+			TransmitBtByte(symbol1|((symbol2<<8)&0xFF00));					// Передаем на SCI
+		}
+		else if (symbol1 == '\0') {
+			bPort->Status = BT_TRANSMIT_COMPLETE;			// Статус завершения передачи
+			bPort->StrIndex = 0;
+		}
+
+
+		if (symbol1 == '\0')								// Достигли конца строки
+		{
+			bPort->Status = BT_TRANSMIT_COMPLETE;			// Статус завершения передачи
+			bPort->StrIndex = 0;
+
+			return;
+		}
+
+		if (symbol2 == '\0')
+		{
+			symbol2 = '\n';
+		}
+
+		bPort->StrIndex+=2;
+		bPort->Status = BT_TRANSMIT_BUSY;				// Статус передачи
+		bPort->TxBusy = true;							// Выставляем флаг передачи
+		TransmitBtByte(symbol1|((symbol2<<8)&0xFF00));					// Передаем на SCI
+		*/
+
+
 		if (symbol1 == '\0')								// Достигли конца строки
 		{
 			bPort->Status = BT_TRANSMIT_COMPLETE;			// Статус завершения передачи
@@ -418,7 +466,9 @@ void SendOneString(TBluetoothHandle bPort, char *String)
 			bPort->StrIndex+=2;
 			bPort->Status = BT_TRANSMIT_BUSY;				// Статус передачи
 			bPort->TxBusy = true;							// Выставляем флаг передачи
+			if (symbol2 == '\0') g_Comm.Bluetooth.Stop = 1;
 			TransmitBtByte(symbol1|((symbol2<<8)&0xFF00));					// Передаем на SCI
+			g_Comm.Bluetooth.Stop = 0;
 
 		}
 
@@ -602,7 +652,7 @@ Uns ReceiveBtByte(void)
 //передача 1 байта по каналу McBSP
 void TransmitBtByte(Uns Data)
 {
-	McBsp_transmit(MCBSPA, Data);
+	McBsp_transmit(MCBSPA, Data, g_Comm.Bluetooth.Stop);
 }
 /*void TransmitBtByte(TBluetoothHandle bPort, Byte Data)
 {

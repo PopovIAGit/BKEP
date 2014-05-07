@@ -202,33 +202,45 @@ Uns McBsp_recieve(Byte Id)
 	Uns Data=0;
 	Uns Data1=0;
 	Uns Data2=0;
+	Byte Data11=0;
+	Byte Data22=0;
 	LgUns LgData=0;
+	Uns Result=0;
+	Uns i=0;
 
 	if (McBspRegs[Id]->SPCR1.bit.RRDY==1)
 	{
 
 		Data1 = McBspRegs[Id]->DRR1.all;
 		Data2 = McBspRegs[Id]->DRR2.all;
-		Data1 = McBspRegs[Id]->DRR1.all;
-		Data2 = McBspRegs[Id]->DRR2.all;
 
-		//McBspRegs[Id]->SPCR1.bit.RRST = 0;
+		LgData = (LgUns)Data1 | (((LgUns)(Data2)<<16)&0xFFFF0000);
 
-		LgData = (LgUns)Data1 | ((LgUns)(Data2) << 16);
+		Data1 = (Uns)((LgData>>11)&0x00ff);
+		Data2 = (Uns)((LgData>>1)&0x00ff);
 
-		Data1 = (Uns)((LgData>>1)&0x00FF);
-		Data2 = (Uns)((LgData>>11)&0x00FF);
+		for (i=0; i<8;i++)
+		{
+			if ((Data1>>7-i)&0x01==1) Data11 |=(1<<i);
+		}
+		for (i=0; i<8;i++)
+		{
+			if ((Data2>>7-i)&0x01==1) Data22 |=(1<<i);
+		}
 
-		Data = Data1 | (Data2<<8);
-		//McBspRegs[Id]->SPCR1.bit.RRST = 1;
+		//Data1 = (Uns)((LgData>>1)&0x00FF);
+		//Data2 = (Uns)((LgData>>11)&0x00FF);
 
-		return Data;//McBspRegs[Id]->DRR1.all;
+
+		Result = (Uns)Data11 | (Uns)((Data22<<8)&0xFF00);
+
+		return Result;
 	}
 	else return 0;
 
 }
 
-void McBsp_transmit(Byte Id, Uns Data)
+void McBsp_transmit(Byte Id, Uns Data, Uns Stop)
 {
 	Byte DataN=0,i=0;
 
@@ -258,6 +270,7 @@ void McBsp_transmit(Byte Id, Uns Data)
 
 		Data3 = (LgUns)(Data2&0x03ff) | ((LgUns)(Data1&0x03ff)<<10);
 
+		if (Stop==1) Data3 |= 0x03ff;
 		McBspRegs[Id]->DXR1.all = (Uns)(Data3&0x0000FFFF);
 		McBspRegs[Id]->DXR2.all = (Uns)((Data3>>16)&0x0000FFFF);
 	}

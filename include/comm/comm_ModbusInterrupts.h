@@ -35,7 +35,7 @@ void ModBusTxIsr(TMbPort *hPort)
 	
 	if ((Frame->Data - Frame->Buf) < Frame->TxLength){
 		if (hPort->Params.HardWareType==UART_TYPE) SCI_transmit(hPort->Params.ChannelID, *Frame->Data++);
-		else if (hPort->Params.HardWareType==MCBSP_TYPE) McBsp_transmit(hPort->Params.ChannelID, *Frame->Data++);
+		else if (hPort->Params.HardWareType==MCBSP_TYPE) McBsp_transmit(hPort->Params.ChannelID, *Frame->Data++, 0);
 	}
 	else StartTimer(&Frame->TimerPost);
 	

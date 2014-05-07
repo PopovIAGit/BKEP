@@ -28,9 +28,13 @@ extern "C" {
 #define BT_RECEIVE_BUSY			44
 
 //#define CMD_CONTROL_CONFIG 		"AT\r\n"
-#define CMD_CONTROL_CONFIG 		"SET CONTROL CONFIG 0000 0040 0080\r\n"
-#define CMD_CONTROL_ECHO 		"SET CONTROL ECHO 0004\r\n"
-#define CMD_CONTROL_NAME 		"SET BT NAME MAY1\r\n"
+//#define CMD_CONTROL_CONFIG 		"SET CONTROL CONFIG 0000 0040 0080\r\n\n"
+//#define CMD_CONTROL_ECHO 		"SET CONTROL ECHO 0004\r\n\n"
+
+#define CMD_CONTROL_ECHO 		"SET CONTROL CONFIG 0000 0040 0080\r\n"
+#define CMD_CONTROL_CONFIG 		"SET CONTROL ECHO 0004\r\n"
+
+#define CMD_CONTROL_NAME 		"SET BT NAME M11\r\n"
 #define CMD_CONTROL_AUTH		"SET BT AUTH * 5124\r\n"
 #define CMD_CONTROL_BAUD		"SET CONTROL BAUD 115200,8N1\r\n"
 
@@ -56,7 +60,7 @@ typedef struct _TBluetoothPort
 	Uns StrIndex;
 	Uns Timer;
 	Uns Period;
-
+	Uns Stop;		//флаг того что в посылке будет вторая половина не посылаемая
 	Bool IsConnected;
 	Bool Error;
 
