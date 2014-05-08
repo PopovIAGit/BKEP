@@ -97,7 +97,7 @@ TPeriodicalFunction Task18kHz[] =
 TPeriodicalFunction Task2kHz[] =          //Не более 4-х задач
 {
 	//PrdElemInit(Core_ProtectionsRefresh,	&g_Core.protections),
-	PrdElemInit(SerialCommTimings,						&g_Comm.mbAsu),
+	//PrdElemInit(SerialCommTimings,						&g_Comm.mbAsu),
 	//PrdElemInit(SerialCommTimings,						&g_Comm.mbShn),
 	PrdElemInit(SerialCommTimings,						&g_Comm.mbBt),
 	PrdElemInit(FM25V10_Update,							&Eeprom1),

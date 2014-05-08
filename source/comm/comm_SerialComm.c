@@ -106,20 +106,20 @@ void InitChanelBtModbus(TMbHandle hPort)
 	hPort->Params.ChannelID   = BT_MCBSP_ID;
 	hPort->Params.Mode     = MB_SLAVE;
 	hPort->Params.Slave    = 1;//g_Ram.ramGroupB.RS_STATION;
-	hPort->Params.BaudRate = 0;//BaudRates[g_Ram.ramGroupB.RS_BAUD_RATE];
+	hPort->Params.BaudRate = 1152;//BaudRates[g_Ram.ramGroupB.RS_BAUD_RATE];
 	hPort->Params.UartBaud = 0;//BrrValues[g_Ram.ramGroupB.RS_BAUD_RATE];
 	hPort->Params.Parity   = 0;//g_Ram.ramGroupB.RS_MODE;
 
 	hPort->Params.RetryCount  = 0;
 	hPort->Params.Scale       = MB_SCALE;
 //	hPort->Params.ConnTimeout = Serial->RsIndicTime * 100;
-	hPort->Params.ConnTimeout = 10;//  ÈÊ
-	hPort->Params.RxDelay     = 10;
+	hPort->Params.ConnTimeout = 1;//  ÈÊ
+	hPort->Params.RxDelay     = 1;
 //	hPort->Params.TxDelay     = Serial->RsWaitTime - 3;
-	hPort->Params.TxDelay     = 10;//  ÈÊ
-	hPort->Params.AckTimeout  = 1000;
+	hPort->Params.TxDelay     = 1;//  ÈÊ
+	hPort->Params.AckTimeout  = 1;//1000;
 	hPort->Params.TrEnable    = &BtMbSetTr;
-	hPort->Frame.TimerPre.Timeout = 10; //  ÈÊ
+	hPort->Frame.TimerPre.Timeout = 1; //  ÈÊ
 
 	hPort->Params.HardWareType	= MCBSP_TYPE;
 

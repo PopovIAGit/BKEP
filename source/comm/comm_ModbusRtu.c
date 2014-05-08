@@ -7,7 +7,7 @@
 Модуль ModBus
 ======================================================================*/
 
-#define _MASTER_
+//#define _MASTER_
 #define _SLAVE_
 
 #include "comm_ModbusRtu.h"
@@ -71,12 +71,12 @@ void ModBusInvoke(TMbPort *hPort)
 	}
 	else
 	{
-		#if defined(_MASTER_)
-		if (IsMaster()) MasterRequest(hPort);
-		#endif
-		#if defined(_SLAVE_)
+		//#if defined(_MASTER_)
+		//if (IsMaster()) MasterRequest(hPort);
+		//#endif
+		//#if defined(_SLAVE_)
 		if (IsSlave())  SlaveResponse(hPort);
-		#endif
+		//#endif
 	}
 }
 

@@ -49,7 +49,7 @@ void InitChanelBt(TBluetoothHandle bPort)
 	bPort->Mode 	= BT_COMMAND_MODE;
 	bPort->StrIndex	= 0;
 	bPort->Timer	= 0;
-	bPort->Period	= 10;//(1.00 * PRD3)
+	bPort->Period	= 15;//(1.00 * PRD3)
 
 	bPort->IsConnected 	= false;
 	bPort->Error		= false;
@@ -72,8 +72,8 @@ void InitChanelBt(TBluetoothHandle bPort)
 	//!!!Init здесь должна быть инициализация McBSP
 	if (bPort->HardWareType==UART_TYPE)
 	{
-		SCI_init(bPort->ChannelID, bPort->UartBaud, bPort->Parity, 8);
-		SciaRegs.SCICCR.bit.STOPBITS = 0;
+		//SCI_init(bPort->ChannelID, bPort->UartBaud, bPort->Parity, 8);
+		//SciaRegs.SCICCR.bit.STOPBITS = 0;
 	} else
 	if (bPort->HardWareType==MCBSP_TYPE){
 		//InitMcbspa();
@@ -188,15 +188,21 @@ void SendCommandOne(TBluetoothHandle bPort, char *ComStr)
 		case 1: SendOneString(bPort, ComStr);
 
 				if (bPort->Status == BT_TRANSMIT_COMPLETE)
+				{
 					bPort->CmdState = 2;
+				}
 				break;
 
-		case 2:	EnableBtRx();
+		case 2:
+
+					EnableBtRx();
+					bPort->StrIndex = 0;
+					bPort->CmdState = 3;
+
 				//McBsp_tx_enable(MCBSPA);
 				//McBsp_rx_enable(MCBSPA);
 				//bPort->EnableRx();
-				bPort->StrIndex = 0;
-				bPort->CmdState = 3;
+
 				break;
 				
 		case 3:	if (bPort->Status == BT_RECEIVE_COMPLETE)		// Ждем завершение приема, т.к. при успешной команде модуль отвечает
@@ -223,7 +229,9 @@ void SendCommandTwo(TBluetoothHandle bPort, char *ComStr, char *AddStr)
 					bPort->CmdState = 2;
 				break;
 
-		case 2:	EnableBtRx();
+		case 2:
+
+			    EnableBtRx();
 				//McBsp_tx_enable(MCBSPA);
 				//McBsp_rx_enable(MCBSPA);
 				//bPort->EnableRx();
@@ -320,19 +328,40 @@ __inline void RxCommandMode(TBluetoothHandle bPort)
 __inline void RxDataMode(TBluetoothHandle bPort, TMbHandle hPort)
 {
 	char Data;
+	TMbFrame *Frame = &hPort->Frame;
 
-	bPort->Error = CheckCommError(bPort);
+	//bPort->Error = CheckCommError(bPort);
 
-	if (bPort->Error)
-		return;
+	//if (bPort->Error)
+	//	return;
 
 	Data = ReceiveBtByte();
+
+	if (bPort->Mode != BT_COMMAND_MODE)
+	{
+		if ((Frame->Data - Frame->Buf) < 256)
+		{
+			if (hPort->Params.HardWareType==MCBSP_TYPE)
+			{
+				*Frame->Data++ = (char)(Data&0x00FF);
+				*Frame->Data++ = (char)(Data>>8)&0x00ff;
+			}else
+			{
+				*Frame->Data++ = Data;
+			}
+			StartTimer(&Frame->Timer1_5);
+			StartTimer(&Frame->Timer3_5);
+		}
+
+		hPort->Stat.RxBytesCount++;
+	}
 
 #if BT_DBG
 	bPort->RxBytesCount++;
 #endif
 
-	switch (++RxState)
+	/*RxState+=2;
+	switch (RxState)
 	{
 		case 0: if (Data != 'N')	RxState = 0;	break;
 		case 1: if (Data != 'O')	RxState = 0;	break;
@@ -351,16 +380,62 @@ __inline void RxDataMode(TBluetoothHandle bPort, TMbHandle hPort)
 	{	
 		bPort->Mode = BT_COMMAND_MODE;
 		RxState = 0;
-	}
+	}*/
 }
 
 void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 {
-#if BT_DBG
-	bPort->TxBytesCount++;
-#endif
+	TMbFrame *Frame = &hPort->Frame;
+	Uns DataSend=0;
+	Uns Stop=0;
 
 	bPort->TxBusy = false;
+
+	if (bPort->Mode == BT_COMMAND_MODE) return;
+
+	if ((Frame->Data - Frame->Buf) < Frame->TxLength){
+		if (hPort->Params.HardWareType==UART_TYPE) SCI_transmit(hPort->Params.ChannelID, *Frame->Data++);
+		else if (hPort->Params.HardWareType==MCBSP_TYPE)
+		{
+			if (((Frame->TxLength)&0x01) && ((Frame->Data - Frame->Buf)>=(Frame->TxLength-1)))
+			{
+				Stop = 1;
+				DataSend = ((*Frame->Data++)&0x00FF)|(((*Frame->Data++)<<8)&0xFF00);
+				McBsp_transmit(hPort->Params.ChannelID, DataSend, Stop);
+			} else
+			{
+				DataSend = ((*Frame->Data++)&0x00FF)|(((*Frame->Data++)<<8)&0xFF00);
+				McBsp_transmit(hPort->Params.ChannelID, DataSend, 0);
+			}
+
+			Stop=0;
+
+		}
+	}
+	else StartTimer(&Frame->TimerPost);
+
+	/*if ((Frame->Data - Frame->Buf) < Frame->TxLength){
+		if (hPort->Params.HardWareType==UART_TYPE) SCI_transmit(hPort->Params.ChannelID, *Frame->Data++);
+		else if (hPort->Params.HardWareType==MCBSP_TYPE)
+		{
+			if (((Frame->TxLength)&0x01) && ((Frame->Data - Frame->Buf)==1))
+			{
+				Stop = 1;
+				DataSend = ((*Frame->Data++)&0x00FF)|((*(Frame->Data+1)<<8)&0xFF00);
+				McBsp_transmit(hPort->Params.ChannelID, DataSend, Stop);
+			} else
+			{
+				DataSend = ((*Frame->Data++)&0x00FF)|((*Frame->Data++<<8)&0xFF00);
+				McBsp_transmit(hPort->Params.ChannelID, DataSend, 0);
+			}
+
+			Stop=0;
+		}
+	}
+	else StartTimer(&Frame->TimerPost);*/
+
+	hPort->Stat.TxBytesCount++;
+
 }
 
 void BluetoothTimer(TBluetoothHandle bPort)
@@ -420,8 +495,6 @@ void SendOneString(TBluetoothHandle bPort, char *String)
 
 	if (!bPort->TxBusy)
 	{
-		symbol1 = String[bPort->StrIndex];					// Загружаем текущий символ
-		symbol2 = String[bPort->StrIndex+1];					// Загружаем текущий символ
 
 		/*if ()
 		{
@@ -455,6 +528,15 @@ void SendOneString(TBluetoothHandle bPort, char *String)
 		TransmitBtByte(symbol1|((symbol2<<8)&0xFF00));					// Передаем на SCI
 		*/
 
+		//bPort->StrIndex+=2;
+		symbol1 = String[bPort->StrIndex]; bPort->StrIndex++;					// Загружаем текущий символ
+		symbol2 = String[bPort->StrIndex]; bPort->StrIndex++;					// Загружаем текущий символ
+
+		if (g_Comm.Bluetooth.Stop == 1)
+		{
+			g_Comm.Bluetooth.Stop = 0;
+			symbol1 = '\0';
+		}
 
 		if (symbol1 == '\0')								// Достигли конца строки
 		{
@@ -463,12 +545,19 @@ void SendOneString(TBluetoothHandle bPort, char *String)
 		}
 		else
 		{
-			bPort->StrIndex+=2;
 			bPort->Status = BT_TRANSMIT_BUSY;				// Статус передачи
 			bPort->TxBusy = true;							// Выставляем флаг передачи
-			if (symbol2 == '\0') g_Comm.Bluetooth.Stop = 1;
-			TransmitBtByte(symbol1|((symbol2<<8)&0xFF00));					// Передаем на SCI
-			g_Comm.Bluetooth.Stop = 0;
+			if (symbol2 == '\0')
+			{
+				g_Comm.Bluetooth.Stop = 1;
+				TransmitBtByte(symbol1|((symbol2<<8)&0xFF00));					// Передаем на SCI
+				//bPort->Status = BT_TRANSMIT_COMPLETE;			// Статус завершения передачи
+				//bPort->StrIndex = 0;
+			} else
+			{
+				TransmitBtByte(symbol1|((symbol2<<8)&0xFF00));					// Передаем на SCI
+			}
+			//g_Comm.Bluetooth.Stop = 0;
 
 		}
 
@@ -602,6 +691,8 @@ void SendTwoString(TBluetoothHandle bPort, char *FirstString, char *SecondString
 //void EnableBtRx(TBluetoothHandle bPort)
 void EnableBtRx(void)
 {
+	LgUns i=0;
+	for(i=0; i<15000; i++){}
 	McBsp_tx_disable(MCBSPA);
 	McBsp_rx_enable(MCBSPA);
 }

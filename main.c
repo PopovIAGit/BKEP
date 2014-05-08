@@ -52,7 +52,7 @@ void main(void) {
 	while(1)
 	{
 		Comm_Update(&g_Comm);
-		ImUpdate(&g_Stat.Im);
+		//ImUpdate(&g_Stat.Im);
 
 		if (PassCount==1)
 		{
@@ -136,7 +136,7 @@ interrupt void McbspRxAHandler(void) // прерывание приема данных
 //-------------------------------------------------------------
 interrupt void McbspTxAHandler(void) // прерывание передачи данных
 {
-	//DELAY_US(10);
+
 	BluetoothTxHandler(&g_Comm.Bluetooth, &g_Comm.mbBt);
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP6;
 }
