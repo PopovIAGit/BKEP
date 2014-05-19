@@ -27,6 +27,7 @@ __inline void NewFrameEvent(TMbPort *hPort)
 {
 	hPort->Frame.NewMessage = true;
 	hPort->Frame.RxLength   = hPort->Frame.Data - hPort->Frame.Buf;
+	//hPort->Frame.RxLength = hPort->Frame.RxLength-1;//test blue при приёме насчитывает на один байт больше ???
 	hPort->Frame.Data       = hPort->Frame.Buf;
 }
 

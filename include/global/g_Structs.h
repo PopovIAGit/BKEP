@@ -249,24 +249,8 @@ typedef enum
 	bcmDiscrInTest				// Тест дискретных входов
 } TBurCmd;
 
-// Состояние дискретных входов
-typedef union _TInputReg {
-  Uns all;
-	struct {
-		Uns Open:1;       	// 0     Открыть
-		Uns Close:1;      	// 1     Закрыть
-		Uns Stop:1;       	// 2     Стоп
-		Uns Mu:1;			// 3	 Местное
-		Uns Du:1;			// 4	 Дистанция
-		Uns Rsvd:11;      	// 5-15  Резерв
-	} bit;
-} TInputReg;
 
-// Тип входного сигнала
-typedef enum {
-	it24  =  0,		// 0 Тип сигнала 24 В
-	it220 = 1 		// 1 Тип сигнала 220 В
-}TInputType;
+
 
 // Место установки БУР (пожарка - Линейная часть/Автоматика и телемеханика)
 typedef enum {
@@ -281,6 +265,7 @@ typedef enum {
 	cgClose = 2
 } TContactorGroup;
 
+// тип привода
 typedef enum {
 	Empty 	  = 0,
 	dt100_A25 = 1,
@@ -295,52 +280,10 @@ typedef enum {
 	dt10000_D12 = 10
 }TDriveType;
 
-// Маска дискретных входов
-typedef union _TInputMask {
-	Uns all;
-	 struct {
-		Uns Open:1;       	// 0     Открыть
-		Uns Close:1;      	// 1     Закрыть
-		Uns Stop:1;       	// 2     Стоп
-		Uns Mu:1;			// 3	 Му
-		Uns Du:1;			// 4	 Ду
-		Uns Rsvd:11;      	// 5-15  Резерв
-	 } bit;
-} TInputMask;
-
-// Состояние дискретных выходов
-typedef union _TOutputReg {
-	Uns all;
-	struct {
-	 	Uns Dout0:1;		// 0 - Авария
-		Uns Dout1:1;		// 1 - Закрыто
-		Uns Dout2:1;		// 2 - Открыто
-		Uns Dout3:1;		// 3 - Авария
-		Uns Dout4:1;		// 4 - Закрывается/ Блок включен
-		Uns Dout5:1;		// 5 - Открывается/ КВО
-		Uns Dout6:1;		// 6 - Резерв/	КВЗ
-		Uns Dout7:1;		// 7 - Му/Ду/ ---
-		Uns Dout8:1;		// 8 - --/неисправность
-		Uns Rsvd:7;      	// 7-15  Резерв
-	} bit;
-} TOutputReg;
 
 
-// Маска дискретных выходов
-typedef union _TOutputMask {
-	Uns all;
-	 struct {
-	 	Uns Dout0:1;		// 0 - Открыто
-		Uns Dout1:1;		// 1 - Закрыто
-		Uns Dout2:1;		// 2 - Муфта
-		Uns Dout3:1;		// 3 - Авария
-		Uns Dout4:1;		// 4 - Открывается/ Блок включен
-		Uns Dout5:1;		// 5 - Закрывается/ КВО
-		Uns Dout6:1;		// 6 - Му/Ду /	КВЗ
-		Uns Dout7:1;		// 7 - Питание/ ---
-		Uns Rsvd:8;      	// 8-15  Резерв
-	 } bit;
-} TOutputMask;
+
+
 
 // Управление работой защит
 typedef enum {

@@ -55,10 +55,16 @@ extern "C" {
 #define CONTACTOR_2_ENABLE  GpioDataRegs.GPADAT.bit.GPIO11
 
 //--- BUTTON's ---------------------------------------
-#define HALL_OPEN			AdcRegs.ADCRESULT0
-#define HALL_STOP_MU		AdcRegs.ADCRESULT1
-#define HALL_CLOSE			AdcRegs.ADCRESULT2
-#define HALL_STOP_DU		AdcRegs.ADCRESULT3
+#define TS_1	GpioDataRegs.GPADAT.bit.GPIO0
+#define TS_2	GpioDataRegs.GPADAT.bit.GPIO1
+#define TS_3	GpioDataRegs.GPADAT.bit.GPIO2
+#define TS_4	GpioDataRegs.GPADAT.bit.GPIO3
+#define TS_5	GpioDataRegs.GPADAT.bit.GPIO4
+#define TS_6	GpioDataRegs.GPADAT.bit.GPIO5
+#define TS_7	GpioDataRegs.GPADAT.bit.GPIO6
+#define TS_8	GpioDataRegs.GPADAT.bit.GPIO7
+#define TS_9	GpioDataRegs.GPADAT.bit.GPIO8
+#define TS_10	GpioDataRegs.GPADAT.bit.GPIO9
 
 //--- SENSORS ---------------------------------------- PIA 03.04.14
 #define ADC_UR				AdcRegs.ADCRESULT2
@@ -68,6 +74,16 @@ extern "C" {
 #define ADC_IU				AdcRegs.ADCRESULT0
 #define ADC_IV				AdcRegs.ADCRESULT1
 #define ADC_IW				AdcRegs.ADCRESULT3
+
+#define TU_SIG_OPEN			AdcRegs.ADCRESULT15
+#define TU_SIG_CLOSE		AdcRegs.ADCRESULT14
+#define TU_SIG_STOP			AdcRegs.ADCRESULT13
+#define TU_SIG_MU			0//AdcRegs.ADCRESULT11
+#define TU_SIG_RESETALARM	0//AdcRegs.ADCRESULT12
+#define TU_SIG_READYTU		0//AdcRegs.ADCRESULT13
+#define TU_SIG_DU			0//AdcRegs.ADCRESULT14
+#define TU_SIG_RZVD			0//AdcRegs.ADCRESULT15
+
 
 //--- FRAM --------------------------------------------
 #define SC_EEPROM1 			GpioDataRegs.GPCDAT.bit.GPIO79

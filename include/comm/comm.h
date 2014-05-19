@@ -12,12 +12,13 @@
 
 #include "std.h"
 //#include "config.h"
-//#include "comm_DigitalInputs.h"
+#include "comm_DigitalInputs.h"
 //#include "comm_LocalControl.h"
 #include "comm_ModbusRtu.h"
 #include "comm_SerialComm.h"
 #include "comm_BetweenBlock.h"
 #include "comm_BluetoothWT41.h"
+#include "comm_TuTs.h"
 
 
 #ifdef __cplusplus
@@ -30,12 +31,15 @@ extern "C" {
 
 typedef struct {
 	//TCommMPU			localControl;	// Пульт местного управления
+	//----
+	TDigitalInput 		digitInput;		// Цифровой вход: телеуправлен
 	// ---
-
+	TDigitalInterface	digitInterface;	// Дискретный интерфейс: Телесигнализация и телеуправление
 	// ---
-	//Uns					outputCmdReg;	// Выход: суммарный регистр команд
+	Uns					outputCmdReg;	// Выход: суммарный регистр команд
 	// ---
 	Uns					outputCmdSrc;	// Выход: источник команд
+	// ---
 	TMbBBPort  			mbBkp;				// ModBus - БКП
 	TMbPort  			mbAsu;				// ModBus - АСУ
 	TMbPort  			mbShn;				// ModBus - УПП

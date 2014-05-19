@@ -198,9 +198,11 @@ void SciMasterConnBetweenBlockUpdate(TMbBBHandle bPort, TBKPDataHandle Data)
 				Data->BkpTemper         = (Int)bPort->Buffer[6];
 				Data->BkpOffTen         = bPort->Buffer[7];
 
-				g_Ram.ramGroupA.VersionPOBkp = Data->BkpVersion;
-				g_Ram.ramGroupC.Position	 = (Uns)Data->BkpEncPostion;
-				g_Ram.ramGroupA.TemperBKP = Data->BkpTemper;
+				g_Ram.ramGroupA.VersionPOBkp 	= Data->BkpVersion;
+				g_Ram.ramGroupC.Position	 	= (Uns)Data->BkpEncPostion;
+				g_Ram.ramGroupA.TemperBKP 	 	= Data->BkpTemper;
+				g_Ram.ramGroupC.HallBlock.all   = Data->BkpHallReg.all;
+				g_Core.Status.bit.Ten 		 	= Data->BkpOffTen;
 			}
 		}
 		bPort->WaitResponse = 0;

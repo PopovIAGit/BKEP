@@ -8,17 +8,24 @@
 ======================================================================*/
 
 #include "comm.h"
+#include "g_Ram.h"
 
 TComm	g_Comm;
+
+void CommandUpdate(TComm *p);
+Uns DigitCmdModeUpdate (Uns *Output);
 //---------------------------------------------------
 void Comm_Init(TComm *p)
 {
+	// Теле-сигнализация
+	Comm_TuTsInit(&p->digitInterface);
+
 	// Пульт местного управления:
 	//Comm_LocalControlInit (&p->localControl);
 
 	SciMasterConnBetweenBlockInit(&g_Comm.mbBkp);
 
-	//InitChanelAsuModbus(&g_Comm.mbAsu);
+	InitChanelAsuModbus(&g_Comm.mbAsu);
 	//InitChanelShnModbus(&g_Comm.mbShn);
 	InitChanelBtModbus(&g_Comm.mbBt);
 
@@ -32,7 +39,7 @@ void Comm_Init(TComm *p)
 	SerialCommInit(&g_Comm.mbBt);
 	InitChanelBt(&g_Comm.Bluetooth);
 
-	//SerialCommInit(&g_Comm.mbAsu);
+	SerialCommInit(&g_Comm.mbAsu);
 	//SerialCommInit(&g_Comm.mbShn);
 
 
@@ -43,7 +50,7 @@ void Comm_Update(TComm *p)
 {
 	//	КОМАНДЫ С МПУ !!!
 	//Comm_LocalControlUpdate(&p->localControl); // Ф-я обр-ки сигналов с ПДУ
-	//ModBusUpdate(&g_Comm.mbAsu); // slave канал связи с верхним уровнем АСУ
+	ModBusUpdate(&g_Comm.mbAsu); // slave канал связи с верхним уровнем АСУ
 	//ModBusUpdate(&g_Comm.mbShn); // master канал связи с устройством плавного пуска
 
 	SciMasterConnBetweenBlockUpdate(&g_Comm.mbBkp, &g_Comm.BkpData);// master канал связи с
@@ -51,9 +58,96 @@ void Comm_Update(TComm *p)
 	BluetoothWTUpdate(&g_Comm.Bluetooth); //драйвер Bluetooth
 	ModBusUpdate(&g_Comm.mbBt);  // slave
 
-	//ModBusUpdate(&g_Comm.mbBt);  // slave
-	//ModBusUpdate(&g_Comm.mbBkp); // master
 	//SerialCommUpdate(&Mb);
+
+	CommandUpdate(&g_Comm);
 }
 
+//-----------обработка источников команд -----------------------------
+void CommandUpdate(TComm *p)
+{
+	p->outputCmdReg = 0;//CMD_NO;
+
+	//здесь не только обработка ТС но и вывод ТС
+	Comm_TuTsUpdate(&p->digitInterface);				// Телеуправление, телесигнализация
+
+	//если телеуправление разрешено
+	p->digitInput.input = p->digitInterface.Inputs.all;
+	DigitalInpUpdate(&p->digitInput);					// Вызов функции обработки цифрового сигнала, защита от помех
+	g_Ram.ramGroupA.StateTu.all     = p->digitInput.output;
+	p->outputCmdReg |= DigitCmdModeUpdate(&p->digitInput.output);
+	if (p->outputCmdReg)
+	{
+		p->outputCmdSrc = CMD_SRC_DIGITAL;
+	}
+}
+//---------------------------------------------------
+// Функция обработки режима работы команд дискретного интерфейса (режим - импульсный, потенциальный)
+Uns DigitCmdModeUpdate (Uns *Output)
+{
+	static Uns prevOutput;
+	Uns result=0;
+	Uns i=0;
+
+	for(i=0; i<7; i++)
+	{
+		if((g_Ram.ramGroupB.DigitalMode.all>>i)&0x01) //потенциальный
+		{
+
+			if ((*Output)&0x03)	    									// Если выходе есть команды на движение
+			{
+				if ((((*Output)>>i)&0x01) != (((prevOutput)>>i)&0x01))	// Если сигнал изменился
+					result |= (0x01<<i);//*Output;						// Что нажали - туда и едем
+				else													// Иначе (Сигнал не изменился)
+					result &= ~(0x01<<i);								// Никаких команд не подаем
+			}
+			else														// Если сигнал ушел
+			{
+				if ((*Output)&0x03)										// Но на предыдущей итерации были команды на движение
+					result |= DIN_STOP_BIT;    							// Считаем, что пришла команда стоп
+				else 													// Иначе (Сигнал не изменился)
+					result &= ~(0x01<<i);								// Никаких команд не подаем
+			}
+		}else
+		{
+			if ((((*Output)>>i)&0x01) != (((prevOutput)>>i)&0x01))		// Если сигнал изменился
+				result |= (0x01<<i);//*Output;							// Что нажали - туда и едем
+			else														// Иначе (Сигнал не изменился)
+				result &= ~(0x01<<i);									// Никаких команд не подаем
+		}
+	}
+
+	prevOutput = *Output;						// Запоминаем предыдущие значение сигнала с ТУ
+	return result;
+
+
+	//--------------------------------------------------------------------
+	/*if (IsImpulseMode())						// Если режим - импульсный
+	{
+		if (*Output != prevOutput)				// Если сигнал изменился
+			result = *Output;					// Что нажали - туда и едем
+		else									// Иначе (Сигнал не изменился)
+			result = 0;							// Никаких команд не подаем
+	}
+	else if (IsPotentialMode())					// Если режим - потенциальный
+	{
+		if (*Output >> 1)						// Если выходе есть команды на движение
+		{
+			if (*Output != prevOutput)			// Если сигнал изменился
+				result = *Output;				// Что нажали - туда и едем
+			else								// Иначе (Сигнал не изменился)
+				result = 0;						// Никаких команд не подаем
+		}
+		else									// Если сигнал ушел
+		{
+			if (prevOutput >> 1)				// Но на предыдущей итерации были команды на движение
+				result = CMD_STOP_ESCAPE; 		// Считаем, что пришла команда стоп
+			else 								// Иначе (Сигнал не изменился)
+				result = 0;						// Никаких команд не подаем
+		}
+	}
+
+	prevOutput = *Output;						// Запоминаем предыдущие значение сигнала с ТУ
+	return result;*/
+}
 //---------------------------------------------------

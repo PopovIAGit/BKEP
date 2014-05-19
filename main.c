@@ -15,11 +15,13 @@ Uns PassCount=1;
 
 extern void InterruptInit  (void);
 extern void InterruptUpdate(void);
+/*extern*/ Uns CrcTable[256];
+static Uns CalcFrameCrc1(Byte *Buf, Uns Count);
 Uns I2CA_setCommand(void);
 Uns I2CA_ReadTemper(void);
 
 void main(void) {
-	
+	Uns Crc=0;
 	// Сначала инициализируется процессор
 	InitHardware();
 	memset(&g_Core, 	0, sizeof(TCore));
@@ -51,9 +53,23 @@ void main(void) {
 
 	while(1)
 	{
+
 		Comm_Update(&g_Comm);
 		//ImUpdate(&g_Stat.Im);
 
+
+/*
+		g_Comm.mbBt.Frame.Buf[0]=1;
+		g_Comm.mbBt.Frame.Buf[1]=3;
+		g_Comm.mbBt.Frame.Buf[2]=2;
+		g_Comm.mbBt.Frame.Buf[3]=0;
+		g_Comm.mbBt.Frame.Buf[4]=40;
+
+		g_Comm.mbBt.Frame.TxLength=5;
+		Crc = CalcFrameCrc1((&g_Comm.mbBt.Frame.Buf[0]), g_Comm.mbBt.Frame.TxLength);
+		g_Comm.mbBt.Frame.Buf[g_Comm.mbBt.Frame.TxLength++] = (Byte)(Crc & 0xFF);
+		g_Comm.mbBt.Frame.Buf[g_Comm.mbBt.Frame.TxLength++] = (Byte)(Crc >> 8);
+*/
 		if (PassCount==1)
 		{
 		   //DELAY_US(50000);
@@ -67,6 +83,18 @@ void main(void) {
 		}
 
 	}
+}
+
+static Uns CalcFrameCrc1(Byte *Buf, Uns Count)
+{
+	/*Uns Crc = INIT_CRC;
+	do {Crc = (Crc >> 8) ^ CrcTable[(Crc ^ (Uns)*Buf++) & 0x00FF];}
+	while (--Count);
+	return Crc;*/
+	Uns Crc = 0xFFFF;
+	do {Crc = (Crc >> 8) ^ CrcTable[(Crc ^ (Uns)*Buf++) & 0x00FF];}
+	while (--Count);
+	return Crc;
 }
 
 interrupt void CpuTimer0IsrHandler(void)	//	18 000
@@ -141,19 +169,6 @@ interrupt void McbspTxAHandler(void) // прерывание передачи данных
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP6;
 }
 //-------------------------------------------------------------
-/*interrupt void  adc_isr(void)
-{
-	g_Comm.localControl.btn1Param.Level = AdcResult.ADCRESULT0;
-	g_Comm.localControl.btn2Param.Level = AdcResult.ADCRESULT1;
-	g_Comm.localControl.btn3Param.Level = AdcResult.ADCRESULT2;
-	g_Comm.localControl.btn4Param.Level = AdcResult.ADCRESULT3;
-
-	AdcRegs.ADCINTFLGCLR.bit.ADCINT1 = 1;		//Clear ADCINT1 flag reinitialize for next SOC
-	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;   // Acknowledge interrupt to PIE
-
-  return;
-}*/
-
 Uns I2CA_setCommand(void)
 {
    // Wait until the STP bit is cleared from any previous master communication.

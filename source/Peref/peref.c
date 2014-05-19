@@ -32,6 +32,30 @@ void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновлени
 	peref_ApFilter3Init(&p->IVfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
 	peref_ApFilter3Init(&p->IWfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);*/
 
+
+	//----для  Телеуправления---------------------------------------------------------------------------
+	memset(&p->InDigSignal, 0, sizeof(TSinSignalObserver));
+
+	peref_ApFilter3Init(&p->UfltrOpen, 		 (Uns)Prd18kHZ, 0.02);		// Инициализируем фильтры
+	peref_ApFilter3Init(&p->UfltrClose, 	 (Uns)Prd18kHZ, 0.02);
+	peref_ApFilter3Init(&p->UfltrStop, 		 (Uns)Prd18kHZ, 0.02);
+	peref_ApFilter3Init(&p->UfltrMu, 		 (Uns)Prd18kHZ, 0.02);
+	peref_ApFilter3Init(&p->UfltrResetAlarm, (Uns)Prd18kHZ, 0.02);
+	peref_ApFilter3Init(&p->UfltrReadyTU, 	 (Uns)Prd18kHZ, 0.02);
+	peref_ApFilter3Init(&p->UfltrDU, 		 (Uns)Prd18kHZ, 0.02);
+
+	Peref_SensTuObserverInit(&p->InDigSignalObserver);// Инициализируем обработку синусойды
+
+	Peref_SinObserverInit(&p->InDigSignal.sigOpen,		Prd18kHZ);
+	Peref_SinObserverInit(&p->InDigSignal.sigClose,		Prd18kHZ);
+	Peref_SinObserverInit(&p->InDigSignal.sigStop,		Prd18kHZ);
+	Peref_SinObserverInit(&p->InDigSignal.sigMU,		Prd18kHZ);
+	Peref_SinObserverInit(&p->InDigSignal.sigResetAlarm,Prd18kHZ);
+	Peref_SinObserverInit(&p->InDigSignal.sigReadyTU,	Prd18kHZ);
+	Peref_SinObserverInit(&p->InDigSignal.sigDU,		Prd18kHZ);
+
+	//----------------------------------------------------------------------------------------------
+
 	peref_ApFilter3Init(&p->URfltr, (Uns)Prd18kHZ, 0.02);		// Инициализируем фильтры
 	peref_ApFilter3Init(&p->USfltr, (Uns)Prd18kHZ, 0.02);
 	peref_ApFilter3Init(&p->UTfltr, (Uns)Prd18kHZ, 0.02);
@@ -73,6 +97,39 @@ void Peref_18kHzCalc(TPeref *p) // 18 кГц
 {
 	//-------------------- Фильтруем АЦП-------------------------------
 
+	// забираем сигнал с АЦП на вход фильтра
+	p->UfltrOpen.Input		 = TU_SIG_OPEN;
+	p->UfltrClose.Input		 = TU_SIG_CLOSE;
+	p->UfltrStop.Input		 = TU_SIG_STOP;
+	p->UfltrMu.Input		 = TU_SIG_MU;
+	p->UfltrResetAlarm.Input = TU_SIG_RESETALARM;
+	p->UfltrReadyTU.Input	 = TU_SIG_READYTU;
+	p->UfltrDU.Input		 = TU_SIG_DU;
+	//филльтруем входной сигнал ТУ
+	peref_ApFilter3Calc(&p->UfltrOpen);
+	peref_ApFilter3Calc(&p->UfltrClose);
+	peref_ApFilter3Calc(&p->UfltrStop);
+	peref_ApFilter3Calc(&p->UfltrMu);
+	peref_ApFilter3Calc(&p->UfltrResetAlarm);
+	peref_ApFilter3Calc(&p->UfltrReadyTU);
+	peref_ApFilter3Calc(&p->UfltrDU);
+	//результат фильтрации передаём в структуру для расчёта RMS
+	p->InDigSignal.sigOpen.Input 		= p->UfltrOpen.Output;
+	p->InDigSignal.sigClose.Input 		= p->UfltrClose.Output;
+	p->InDigSignal.sigStop.Input 		= p->UfltrStop.Output;
+	p->InDigSignal.sigMU.Input 			= p->UfltrMu.Output;
+	p->InDigSignal.sigResetAlarm.Input 	= p->UfltrResetAlarm.Output;
+	p->InDigSignal.sigReadyTU.Input 	= p->UfltrReadyTU.Output;
+	p->InDigSignal.sigDU.Input 			= p->UfltrDU.Output;
+	//функция расчёта RMS для сигналов ТУ
+	Peref_SinObserverUpdate(&p->InDigSignal.sigOpen);
+	Peref_SinObserverUpdate(&p->InDigSignal.sigClose);
+	Peref_SinObserverUpdate(&p->InDigSignal.sigStop);
+	Peref_SinObserverUpdate(&p->InDigSignal.sigMU);
+	Peref_SinObserverUpdate(&p->InDigSignal.sigResetAlarm);
+	Peref_SinObserverUpdate(&p->InDigSignal.sigReadyTU);
+	Peref_SinObserverUpdate(&p->InDigSignal.sigDU);
+
 /*	p->URfltr.Input = ADC_UR;
 	p->USfltr.Input = ADC_US;
 	p->UTfltr.Input = ADC_UT;
@@ -97,14 +154,12 @@ void Peref_18kHzCalc(TPeref *p) // 18 кГц
 	p->sensObserver.IVinp = p->IVfltr.Output;
 	p->sensObserver.IWinp = p->IWfltr.Output;*/
 
-		p->sensObserver.URinp = ADC_UR;
-		p->sensObserver.USinp = ADC_US;
-		p->sensObserver.UTinp = ADC_UT;
-		p->sensObserver.IUinp = ADC_IU;
-		p->sensObserver.IVinp = ADC_IV;
-		p->sensObserver.IWinp = ADC_IW;
-
-
+	p->sensObserver.URinp = ADC_UR;
+	p->sensObserver.USinp = ADC_US;
+	p->sensObserver.UTinp = ADC_UT;
+	p->sensObserver.IUinp = ADC_IU;
+	p->sensObserver.IVinp = ADC_IV;
+	p->sensObserver.IWinp = ADC_IW;
 
 	Peref_SensObserverUpdate(&p->sensObserver);
 
@@ -127,6 +182,7 @@ void Peref_18kHzCalc(TPeref *p) // 18 кГц
 	Peref_PhaseOrderUpdate(&p->phaseOrder);
 
 	if (!p->sinObserver.IV.CurAngle)	p->Phifltr.Input = p->sinObserver.US.CurAngle;
+
 }
 
 //---------------------------------------------------

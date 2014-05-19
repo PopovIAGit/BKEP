@@ -116,8 +116,9 @@ void InterfIndication(TRam *p)
 	p->ramGroupA.Faults.Net.all  = p->ramGroupH.FaultsNet.all;
 	p->ramGroupA.Faults.Load.all = p->ramGroupH.FaultsLoad.all;
 	p->ramGroupA.Faults.Dev.all  = p->ramGroupH.FaultsDev.all;
-	p->ramGroupA.Inputs.all      = p->ramGroupH.Inputs.all;
-	p->ramGroupA.Outputs.all     = p->ramGroupH.Outputs.all;
+
+	//p->ramGroupA.StateTu.all     = g_Comm.digitInterface.Inputs.all;
+	p->ramGroupA.StateTs.all	 = g_Comm.digitInterface.Outputs.all;
 }
 //---------------------------------------------------
 void g_Ram_SetTorque(void)
@@ -136,7 +137,7 @@ void RefreshParams(Uns addr)
 
 	}else if (addr == REG_OVERWAY_ZONE) { //Mcu.Valve.BreakDelta = CalcClbAbsRev(&Calib, g_Ram.ramGroupB.OverwayZone);
 
-	}else if (addr == REG_INPUT_MASK){
+	}else if (addr == REG_TU_INVERT){
 
 		// Все входа не реверсивные
 		// хуйню заменить на нормальный код

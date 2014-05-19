@@ -69,6 +69,8 @@ void Core_ValveDriveStop(TCoreVlvDrvCtrl *p)
 
 void Core_ValveDriveUpdate(TCoreVlvDrvCtrl *p)
 {
+
+
 	GetActiveControls(p);	// ѕолучение данных по активированному типу управлени€ (местное/дистанци€)
 	TeleControl(p);			// ѕодача команд дистанционного управлени€
 	MpuControl(p);			// ѕодача команд местного управлени€
@@ -148,6 +150,7 @@ __inline void MpuControl(TCoreVlvDrvCtrl *p)
 				break;
 		}
 }
+
 __inline void TeleControl(TCoreVlvDrvCtrl *p)
 {
 	TValveCmd TuControl = vcwNone;

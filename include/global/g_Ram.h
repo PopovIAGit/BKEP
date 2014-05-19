@@ -14,6 +14,7 @@
 #include "g_Structs.h"			// Структуры
 #include "peref_Clock.h"		// Библиотека для преобразований чисел/строк
 #include "core.h"
+#include "comm.h"
 //#include "core_Protections.h" 	//структура защит
 //#include "comm_LocalControl.h"
 
@@ -129,8 +130,8 @@ typedef struct _TRamGroupA
 {
 	TStatusReg      Status;           	// 0.Статус работы
 	TFltUnion	    Faults;				// 1-4.Аварии
-	TInputReg       Inputs;           	// 5.Состояние дискретных входов
-	TOutputReg      Outputs;          	// 6.Состояние дискретных выходов
+	TInputReg       StateTu;     	    // 5.Состояние дискретных входов
+	TOutputReg      StateTs;		    // 6.Состояние дискретных выходов
 	Uns             Position;        	// 7.Положение
 	Uns             Torque;           	// 8.Момент
 	Int             Speed;				// 9.Скорость
@@ -178,8 +179,9 @@ typedef struct _TRamGroupB
 	Uns             TuLockSeal;         // 19.Блокировка залипани
 	Uns             TuTime;             // 20.Время команды
 	TInputType 		InputType;			// 21.Тип входного сигнала 24/220
-	TInputMask	    InputMask;			// 22.Маска дискретных входов
-	TOutputMask 	OutputMask;			// 23.Маска дискретных выходов
+	TUInvert	    TuInvert;			// 22.Маска дискретных входов
+	TSInvert 		TsInvert;			// 23.Маска дискретных выходов
+	TInputReg		DigitalMode;		// **.режим потенциальный / импульсный
 	TBaudRate       RsBaudRate;         // 24.Скорость связи
 	Uns             RsStation;          // 25.Адрес станции
 	TParityMode		RsMode;				// 26.Режим связи
@@ -387,8 +389,8 @@ typedef struct _TRamGroupH
 	TReverseType	ReverseType;         // 96.Тип реверса
 	Uns				DemoPosition1;       // 97.Демо положение 1
 	Uns				DemoPosition2;       // 98.Демо положение 2
-	TInputReg       Inputs;           	 // 99.Состояние дискретных входов
-	TOutputReg      Outputs;          	 // 100.Состояние дискретных выходов
+	//TInputReg       StateTu;           	 // 99.Состояние дискретных входов
+	//TOutputReg      StateTs;          	 // 100.Состояние дискретных выходов
 	Uns             TuReleMode;          // 101.Релейный режим
 	TNormState	    NormState[3];		 // 102-104.Нормальное состояние входов    - Не используется но если не заработают маски
 	TNormState 	    NormOut[8];			 // 105-112.Нормальное состояние выходов - то пользуем это
@@ -409,6 +411,56 @@ typedef struct _TRamGroupH
 	TBurCmd 		LogControlWord;		 // 127. Команды БУР
 	Uns				LogReset;			 // 128. Сброс журналов
 	Uns 			BkpIndication;		 // 129. Индикация на БКП
+	//------Параметры для ТУ------------------------------------
+	Uns				LevelOnOpen220;
+	Uns				LevelOffOpen220;
+	Uns				LevelOnOpen24;
+	Uns				LevelOffOpen24;
+	Uns				UOpen_Mpy;
+	Uns				p_UOpen_Offset;
+	//-------------------------------
+	Uns				LevelOnClose220;
+	Uns				LevelOffClose220;
+	Uns				LevelOnClose24;
+	Uns				LevelOffClose24;
+	Uns				p_UClose_Mpy;
+	Uns				p_UClose_Offset;
+	//-------------------------------
+	Uns				LevelOnStop220;
+	Uns				LevelOffStop220;
+	Uns				LevelOnStop24;
+	Uns				LevelOffStop24;
+	Uns				p_UStop_Mpy;
+	Uns				p_UStop_Offset;
+	//-------------------------------
+	Uns				LevelOnMU220;
+	Uns				LevelOffMU220;
+	Uns				LevelOnMU24;
+	Uns				LevelOffMU24;
+	Uns				p_UMu_Mpy;
+	Uns				p_UMu_Offset;
+	//-------------------------------
+	Uns				LevelOnResetAlarm220;
+	Uns				LevelOffResetAlarm220;
+	Uns				LevelOnResetAlarm24;
+	Uns				LevelOffResetAlarm24;
+	Uns				p_UResetAlarm_Mpy;
+	Uns				p_UResetAlarm_Offset;
+	//-------------------------------
+	Uns				LevelOnReadyTU220;
+	Uns				LevelOffReadyTU220;
+	Uns				LevelOnReadyTU24;
+	Uns				LevelOffReadyTU24;
+	Uns				p_UReadyTu_Mpy;
+	Uns				p_UReadyTu_Offset;
+	//-------------------------------
+	Uns				LevelOnDU220;
+	Uns				LevelOffDU220;
+	Uns				LevelOnDU24;
+	Uns				LevelOffDU24;
+	Uns				p_UDu_Mpy;
+	Uns				p_UDu_Offset;
+	//-------------------------------
 	Uns 			Rsvd3[10];			 // 130-139.Резерв
 } TRamGroupH;
 
@@ -428,8 +480,8 @@ typedef struct _TRamGroupE
 	Uns            LogIv;               // 11.Ток фазы V
 	Uns            LogIw;               // 12.Ток фазы W
 	Int            LogTemper;           // 13.Температура блока
-	TInputReg      LogInputs;           // 14.Состояние дискретных входов
-	TOutputReg     LogOutputs;          // 15.Состояние дискретных выходов
+	TInputReg      LogStateTu;           // 14.Состояние дискретных входов
+	TOutputReg     LogSataeTs;          // 15.Состояние дискретных выходов
 	Uns 		   Rsvd[14];			// 16-29.Резерв
 } TRamGroupE;
 
@@ -523,7 +575,11 @@ typedef struct _TTEKDriveData
 #define REG_COEF_VOLT_FILTER	GetAdr(ramGroupC.CoefVoltFltr)
 #define REG_CURRENT_FILTER		GetAdr(ramGroupC.CoefCurrFltr)
 
-#define REG_INPUT_MASK			GetAdr(ramGroupB.InputMask.all)
+#define REG_TU_TYPE				GetAdr(ramGroupB.InputType)
+#define REG_TU_INVERT			GetAdr(ramGroupB.TuInvert.all)
+#define REG_TS_INVERT			GetAdr(ramGroupB.TsInvert.all)
+
+
 #define REG_DRIVE_TYPE			GetAdr(ramGroupC.DriveType)
 
 #define REG_TORQUE_CURR 		GetAdr(ramGroupH.TqCurr)
@@ -608,8 +664,8 @@ typedef struct _TTEKDriveData
 #define REG_VER_PO			GetAdr(ramGroupA.VersionPO)
 #define REG_SUBVER_PO		GetAdr(ramGroupC.SubVersionPO)
 
-#define IsImpulseMode()		(!g_Ram.ramGroupA.DIGITAL_CMD_MODE)
-#define IsPotentialMode()	(g_Ram.ramGroupA.DIGITAL_CMD_MODE)
+//#define IsImpulseMode		(!g_Ram.ramGroupA.digitalMode.all)
+//#define IsPotentialMode		(g_Ram.ramGroupA.digitalMode.all)
 
 // Коды блокировки
 #define LOCK_MPU			BIT0	// Блокировка МПУ
