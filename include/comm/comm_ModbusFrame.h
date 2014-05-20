@@ -47,7 +47,7 @@ static void DataUnPack(Byte *Buf, Uns *Data, Byte Count)
 
 __inline void CrcPack(TMbPort *hPort)
 {
-	Uns Crc = CalcFrameCrc(hPort->Frame.Buf, hPort->Frame.TxLength);
+	Uns Crc = CalcFrameCrc((hPort->Frame.Buf), hPort->Frame.TxLength);
 	hPort->Frame.Buf[hPort->Frame.TxLength++] = (Byte)(Crc & 0xFF);
 	hPort->Frame.Buf[hPort->Frame.TxLength++] = (Byte)(Crc >> 8);
 	
@@ -138,6 +138,10 @@ __inline void ReadRegsResponse(TMbPort *hPort)
 	Buf[2] = hPort->Packet.Count << 1;
 	DataPack(&Buf[3], hPort->Packet.Data, hPort->Packet.Count);
 	hPort->Frame.TxLength = Buf[2] + 3;
+	/*Byte *Buf = hPort->Frame.Buf;
+	//Buf[2] = hPort->Packet.Count << 1;
+	DataPack(&Buf[2], hPort->Packet.Data, hPort->Packet.Count);
+	hPort->Frame.TxLength = (hPort->Packet.Count << 1) + 3;*/
 }
 
 __inline void ReadRegsConfirmation(TMbPort *hPort)

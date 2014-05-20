@@ -19,7 +19,7 @@ void Comm_Init(TComm *p)
 
 	SciMasterConnBetweenBlockInit(&g_Comm.mbBkp);
 
-	InitChanelAsuModbus(&g_Comm.mbAsu);
+	//InitChanelAsuModbus(&g_Comm.mbAsu);
 	//InitChanelShnModbus(&g_Comm.mbShn);
 	InitChanelBtModbus(&g_Comm.mbBt);
 
@@ -30,12 +30,13 @@ void Comm_Init(TComm *p)
 	g_Comm.Bluetooth.UartBaud	  = g_Comm.mbBt.Params.UartBaud;		//
 	g_Comm.Bluetooth.Mode	  	  = g_Comm.mbBt.Params.Mode;			//
 	g_Comm.Bluetooth.Parity	   	  = g_Comm.mbBt.Params.Parity;			//
+	SerialCommInit(&g_Comm.mbBt);
 	InitChanelBt(&g_Comm.Bluetooth);
 
-	SerialCommInit(&g_Comm.mbAsu);
+	//SerialCommInit(&g_Comm.mbAsu);
 	//SerialCommInit(&g_Comm.mbShn);
-	SerialCommInit(&g_Comm.mbBt);
 	Comm_LocalControlInit(&g_Comm.localControl);
+
 
 }
 //---------------------------------------------------
@@ -63,7 +64,7 @@ void Comm_Update(TComm *p)
 		break;
 	}
 
-	ModBusUpdate(&g_Comm.mbAsu); // slave канал связи с верхним уровнем АСУ
+	//ModBusUpdate(&g_Comm.mbAsu); // slave канал связи с верхним уровнем АСУ
 	//ModBusUpdate(&g_Comm.mbShn); // master канал связи с устройством плавного пуска
 
 	SciMasterConnBetweenBlockUpdate(&g_Comm.mbBkp, &g_Comm.BkpData);// master канал связи с

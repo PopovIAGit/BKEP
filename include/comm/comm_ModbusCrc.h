@@ -34,8 +34,12 @@ __inline void GenerateCrcTable(void)
 //-------------------------------------------------------------------------------
 static Uns CalcFrameCrc(Byte *Buf, Uns Count)
 {
+	/*Uns Crc = INIT_CRC;
+	do {Crc = (Crc >> 8) ^ CrcTable[(Crc ^ (Uns)*Buf++) & 0x00FF];}
+	while (--Count);
+	return Crc;*/
 	Uns Crc = INIT_CRC;
-	do {Crc = (Crc >> 8) ^ CrcTable[(Crc ^ (Uns)*Buf++) & 0xFF];}
+	do {Crc = (Crc >> 8) ^ CrcTable[(Crc ^ (Uns)*Buf++) & 0x00FF];}
 	while (--Count);
 	return Crc;
 }

@@ -35,7 +35,7 @@
   #define MCBSP_SRG_FREQ       CPU_SPD/4                    // SRG input is LSPCLK (SYSCLKOUT/4) for examples
 #endif
 
-#define CLKGDV_VAL           0x6C // - 115200 бод/сек
+#define CLKGDV_VAL           0x6B // - 115200 бод/сек
 #define MCBSP_INIT_DELAY     2*(CPU_SPD/MCBSP_SRG_FREQ)                  // # of CPU cycles in 2 SRG cycles-init delay
 #define MCBSP_CLKG_DELAY     2*(CPU_SPD/(MCBSP_SRG_FREQ/(1+CLKGDV_VAL))) // # of CPU cycles in 2 CLKG cycles-init delay
 
@@ -103,6 +103,7 @@ void InitMcbspa(void)
 	McbspaRegs.SRGR2.bit.CLKSM = 1;
 	McbspaRegs.SRGR1.bit.CLKGDV = CLKGDV_VAL;
 
+	McbspaRegs.SPCR2.bit.XINTM = 0;
 	McbspaRegs.SPCR1.bit.RINTM = 0;
 
 	McbspaRegs.SPCR2.all = 0;
@@ -190,6 +191,7 @@ void InitMcbspa(void)
 	//************ Disable TX/RX unit
     McbspaRegs.SPCR2.bit.XRST=1;
     McbspaRegs.SPCR1.bit.RRST=1;
+    McbspaRegs.SPCR1.bit.DXENA=1;
     asm(" RPT #249 || NOP");
     // Frame Sync Generator reset
     McbspaRegs.SPCR2.bit.FRST=1;
