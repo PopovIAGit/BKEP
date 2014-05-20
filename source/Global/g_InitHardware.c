@@ -389,10 +389,10 @@ void InitGpio(void)
 	GpioCtrlRegs.GPADIR.bit.GPIO9	= 1;	//TS_10
 	GpioDataRegs.GPADAT.bit.GPIO9	= 0;
 
-	GpioCtrlRegs.GPADIR.bit.GPIO10	= 1;	//TS_11
+	GpioCtrlRegs.GPADIR.bit.GPIO10	= 1;	//TS_11 - управление контактором ЗАКРЫТЬ
 	GpioDataRegs.GPADAT.bit.GPIO10	= 0;
 
-	GpioCtrlRegs.GPADIR.bit.GPIO11	= 1;	//TS_12
+	GpioCtrlRegs.GPADIR.bit.GPIO11	= 1;	//TS_12 - управление контактором ОТКРЫТЬ
 	GpioDataRegs.GPADAT.bit.GPIO11	= 0;
 
 	EDIS;

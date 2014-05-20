@@ -31,13 +31,18 @@ extern "C" {
 //#define CMD_CONTROL_CONFIG
 //0123456789012345678901234567890123456
 //"SET CONTROL CONFIG 0000 0040 0080\r\n\n"
+//#define CMD_CONTROL_CONFIG 		"SET CONTROL CONFIG 0000 0050 0490\r\n"
+//#define CMD_CONTROL_CONFIG 		"SET CONTROL CONFIG 0000 0040 0080\r\n"???
+//#define CMD_CONTROL_ECHO 		"SET CONTROL ECHO 7\r\n"
+
 #define CMD_CONTROL_CONFIG 		"SET CONTROL CONFIG 0000 0040 0080\r\n"
 #define CMD_CONTROL_ECHO 		"SET CONTROL ECHO 0004\r\n"
 
-//#define CMD_CONTROL_ECHO 		"SET CONTROL CONFIG 0000 0040 0080\r\n\n"
-//#define CMD_CONTROL_CONFIG 		"SET CONTROL ECHO 0004\r\n\n"
+#define CMD_CONTROL_PROFILE		"SET PROFILE SPP Bluetooth Serial Port\r\n"
+#define CMD_CONTROL_CLASS		"SET BT CLASS 001f00\r\n"
+#define CMD_CONTROL_SET			"SET\r\n"
 
-#define CMD_CONTROL_NAME 		"SET BT NAME BKD.v1\r\n"
+#define CMD_CONTROL_NAME 		"SET BT NAME BKD.v0002\r\n"
 #define CMD_CONTROL_AUTH		"SET BT AUTH * 5124\r\n"
 #define CMD_CONTROL_BAUD		"SET CONTROL BAUD 115200,8N1\r\n"
 
@@ -70,7 +75,7 @@ typedef struct _TBluetoothPort
 	char *DeviceNameString;
 	char *DeviceAuthCodeString;
 
-	char RxBuffer[BT_RX_BUFFER_SIZE];
+	char RxBuffer[BT_RX_BUFFER_SIZE+50];
 
 	void (*EnableRx)(void);
 	void (*EnableTx)(void);

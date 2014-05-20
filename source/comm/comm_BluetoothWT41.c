@@ -46,7 +46,7 @@ void InitChanelBt(TBluetoothHandle bPort)
 	bPort->State	= 0;
 	bPort->CmdState = 0;
 	bPort->Status	= 0;
-	bPort->Mode 	= BT_COMMAND_MODE;
+	//bPort->Mode 	= BT_COMMAND_MODE;
 	bPort->StrIndex	= 0;
 	bPort->Timer	= 0;
 	bPort->Period	= 15;//(1.00 * PRD3)
@@ -114,6 +114,20 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 					ClearValues(bPort);	bPort->State++;
 				}
 				break;
+		//------------------------------------------------
+		/*case 4: SendCommandOne(bPort, CMD_CONTROL_PROFILE);
+				if (bPort->Status == BT_RECEIVE_COMPLETE)
+				{
+				ClearValues(bPort);	bPort->State++;
+				}
+				break;
+		case 5: SendCommandOne(bPort, CMD_CONTROL_CLASS);
+				if (bPort->Status == BT_RECEIVE_COMPLETE)
+				{
+				ClearValues(bPort);	bPort->State++;
+				}
+				break;*/
+		//------------------------------------------------
 				
 		case 4:	SendCommandOne(bPort, CMD_CONTROL_NAME);//SendCommandTwo(bPort, CMD_CONTROL_NAME, bPort->DeviceNameString);
 				if (bPort->Status == BT_RECEIVE_COMPLETE)
@@ -134,7 +148,14 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 					ClearValues(bPort);	bPort->State++;
 				}
 				break;
-
+		//-------------------------------------------------------------
+		/*case 9: SendCommandOne(bPort, CMD_CONTROL_SET);
+				if (bPort->Status == BT_RECEIVE_COMPLETE)
+				{
+					ClearValues(bPort);	bPort->State++;
+				}
+				break;*/
+		//-------------------------------------------------------------
 		// ћожно после всех настроек послать команду сброса модул€
 		// пока попробую без нее
 
@@ -158,6 +179,7 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 				{										// ожидаем переход в режим команд
 					ClearValues(bPort);
 					bPort->State = 7;						// ѕереход в режим ожидани€ соединени€
+					//bPort->State = 10;						// ѕереход в режим ожидани€ соединени€
 				}										
 				break;				
 	}
@@ -360,7 +382,9 @@ __inline void RxDataMode(TBluetoothHandle bPort, TMbHandle hPort)
 	bPort->RxBytesCount++;
 #endif
 
-	/*RxState+=2;
+	/*
+	здесь часть кода котора€ отвечает за отключение
+	  RxState+=2;
 	switch (RxState)
 	{
 		case 0: if (Data != 'N')	RxState = 0;	break;
@@ -376,7 +400,7 @@ __inline void RxDataMode(TBluetoothHandle bPort, TMbHandle hPort)
 	// ѕрием данных дл€ инф.модул€
 	ImReceiveData(&g_Stat.Im, Data);
 
-	if (RxState >= 7)	
+	if (RxState >= 7) //было 7 а теперь 10
 	{	
 		bPort->Mode = BT_COMMAND_MODE;
 		RxState = 0;
@@ -692,7 +716,7 @@ void SendTwoString(TBluetoothHandle bPort, char *FirstString, char *SecondString
 void EnableBtRx(void)
 {
 	LgUns i=0;
-	for(i=0; i<15000; i++){}
+	for(i=0; i<30000; i++){}
 	McBsp_tx_disable(MCBSPA);
 	McBsp_rx_enable(MCBSPA);
 }

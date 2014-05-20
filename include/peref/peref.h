@@ -45,6 +45,14 @@ typedef struct {
 	APFILTER3  			IUfltr;
 	APFILTER3  			IVfltr;
 	APFILTER3  			IWfltr;
+	//--- Фильтры U для Телеуправления -----------------
+	APFILTER3  			UfltrOpen;
+	APFILTER3  			UfltrClose;
+	APFILTER3  			UfltrStop;
+	APFILTER3  			UfltrMu;
+	APFILTER3  			UfltrResetAlarm;
+	APFILTER3  			UfltrReadyTU;
+	APFILTER3  			UfltrDU;
 	// ------------------------------
 	TSensObserver		sensObserver;		// Масштабирование сигналов с датчиков
 	TSinObserver		sinObserver;		// Вычисление RMS
@@ -62,6 +70,10 @@ typedef struct {
 	Uns 				AngleUI;
 	//---------------------------
 	TLeds				leds;
+	//---------------------------
+	TSensTuObserver		InDigSignalObserver;	// Масштабирование сигналов с датчиков
+	TSinSignalObserver  InDigSignal;			// Вычисление RMS
+
 } TPeref;
 
 //------------------- Протатипы функций ------------------------------------

@@ -28,6 +28,35 @@ void Peref_SensObserverInit(TSensObserver *p)
 	p->pOffsetMode = mAutoOffset;
 }
 
+void Peref_SensTuObserverInit(TSensTuObserver *p)
+{
+	p->parSensors.p_UOpen_Mpy			= &g_Ram.ramGroupH.UOpen_Mpy;
+	p->parSensors.p_UOpen_Offset		= &g_Ram.ramGroupH.p_UOpen_Offset;
+
+	p->parSensors.p_UClose_Mpy			= &g_Ram.ramGroupH.p_UClose_Mpy;
+	p->parSensors.p_UClose_Offset		= &g_Ram.ramGroupH.p_UClose_Offset;
+
+	p->parSensors.p_UStop_Mpy			= &g_Ram.ramGroupH.p_UStop_Mpy;
+	p->parSensors.p_UStop_Offset		= &g_Ram.ramGroupH.p_UStop_Offset;
+
+	p->parSensors.p_UMu_Mpy				= &g_Ram.ramGroupH.p_UMu_Mpy;
+	p->parSensors.p_UStop_Offset		= &g_Ram.ramGroupH.p_UStop_Offset;
+
+	p->parSensors.p_UStop_Mpy			= &g_Ram.ramGroupH.p_UStop_Mpy;
+	p->parSensors.p_UMu_Offset			= &g_Ram.ramGroupH.p_UMu_Offset;
+
+	p->parSensors.p_UResetAlarm_Mpy		= &g_Ram.ramGroupH.p_UResetAlarm_Mpy;
+	p->parSensors.p_UResetAlarm_Offset	= &g_Ram.ramGroupH.p_UResetAlarm_Offset;
+
+	p->parSensors.p_UReadyTu_Mpy		= &g_Ram.ramGroupH.p_UReadyTu_Mpy;
+	p->parSensors.p_UReadyTu_Offset		= &g_Ram.ramGroupH.p_UReadyTu_Offset;
+
+	p->parSensors.p_UDu_Mpy				= &g_Ram.ramGroupH.p_UDu_Mpy;
+	p->parSensors.p_UDu_Offset			= &g_Ram.ramGroupH.p_UDu_Offset;
+
+	p->pOffsetMode = mAutoOffset;
+}
+
 void SetOffsets(TSensObserver *p) //обработка оффсетов
 {
 	switch(p->pOffsetMode)
@@ -58,3 +87,20 @@ void Peref_SensObserverUpdate(TSensObserver *p) // 18000 Гц
 	// Проверили и поправили значения оффсетов
 	SetOffsets(p);
 }
+
+void Peref_SensTuObserverUpdate(TSensTuObserver *p) // 18000 Гц
+{
+	// Преобразование напряжений
+	p->UOpenOut  		= ADC_CONV(p->UOpenInp, 	  *p->parSensors.p_UOpen_Mpy, 		*p->parSensors.p_UOpen_Offset);
+	p->UCloseOut 		= ADC_CONV(p->UCloseInp, 	  *p->parSensors.p_UClose_Mpy, 		*p->parSensors.p_UClose_Offset);
+	p->UStopOut 		= ADC_CONV(p->UStopInp, 	  *p->parSensors.p_UStop_Mpy, 		*p->parSensors.p_UStop_Offset);
+	p->UMuOut 			= ADC_CONV(p->UMuInp, 		  *p->parSensors.p_UMu_Mpy, 		*p->parSensors.p_UMu_Offset);
+	p->UResetAlarmOut 	= ADC_CONV(p->UResetAlarmInp, *p->parSensors.p_UResetAlarm_Mpy, *p->parSensors.p_UResetAlarm_Offset);
+	p->UReadyTuOut 		= ADC_CONV(p->UReadyTuInp,    *p->parSensors.p_UReadyTu_Mpy, 	*p->parSensors.p_UReadyTu_Offset);
+	p->UDuOut		 	= ADC_CONV(p->UDuInp, 		  *p->parSensors.p_UDu_Mpy, 		*p->parSensors.p_UDu_Offset);
+
+	// Проверили и поправили значения оффсетов
+	//SetOffsets(p);
+}
+
+

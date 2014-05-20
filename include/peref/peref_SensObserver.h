@@ -37,6 +37,24 @@ typedef struct {
 	Uns 			*p_IW_Offset;	// Сдвиг для тока W
 } TSensorsParams;
 
+// Параметры сигналов Телесуправления
+typedef struct {
+	Uns				*p_UOpen_Mpy;			// Мультипликатор для напряжения сигнала Open
+	Uns				*p_UOpen_Offset;		// Сдвиг для напряжения сигнала Open
+	Uns				*p_UClose_Mpy;			// Мультипликатор для напряжения сигнала Close
+	Uns				*p_UClose_Offset;		// Сдвиг для напряжения сигнала Close
+	Uns				*p_UStop_Mpy;			// Мультипликатор для напряжения сигнала Stop
+	Uns				*p_UStop_Offset;		// Сдвиг для напряжения сигнала Stop
+	Uns				*p_UMu_Mpy;				// Мультипликатор для напряжения сигнала MU
+	Uns				*p_UMu_Offset;			// Сдвиг для напряжения сигнала MU
+	Uns				*p_UResetAlarm_Mpy;		// Мультипликатор для напряжения сигнала ResetAlarm
+	Uns				*p_UResetAlarm_Offset;	// Сдвиг для напряжения сигнала ResetAlarm
+	Uns				*p_UReadyTu_Mpy;		// Мультипликатор для напряжения сигнала ReadyTU
+	Uns				*p_UReadyTu_Offset;		// Сдвиг для напряжения сигнала ReadyTu
+	Uns				*p_UDu_Mpy;				// Мультипликатор для напряжения сигнала DU
+	Uns				*p_UDu_Offset;			// Сдвиг для напряжения сигнала DU
+} TDigSinalParams;
+
 // Режим подстройки оффсетов
 typedef enum{
 	mManual     = 0,				// Режим ручной настройки
@@ -62,11 +80,36 @@ typedef struct {
 	float32 			IWout;			// Выход: ток W
 } TSensObserver;
 
+// Основная структура настройки датчиков тока и напряжения
+typedef struct {
+	TDigSinalParams		parSensors;		// Параметр: параметры датчиков
+	TOffsetMode		    pOffsetMode;	// Параметр: способ вычисления сдвига (Offset)
+
+	float32				UOpenInp;		// Вход: напряжение
+	float32 			UCloseInp;		// Вход: напряжение
+	float32 			UStopInp;		// Вход: напряжение
+	float32 			UMuInp;			// Вход: напряжение
+	float32 			UResetAlarmInp;	// Вход: напряжение
+	float32 			UReadyTuInp;	// Вход: напряжение
+	float32 			UDuInp;			// Вход: напряжение
+
+	float32				UOpenOut;		// Вход: напряжение
+	float32 			UCloseOut;		// Вход: напряжение
+	float32 			UStopOut;		// Вход: напряжение
+	float32 			UMuOut;			// Вход: напряжение
+	float32 			UResetAlarmOut;	// Вход: напряжение
+	float32 			UReadyTuOut;	// Вход: напряжение
+	float32 			UDuOut;			// Вход: напряжение
+
+} TSensTuObserver;
+
 //------------------- Глобальные переменные -------------------------------------
 //------------------- Протатипы функций -----------------------------------------
 void Peref_SensObserverInit(TSensObserver *p);
 void SetOffsets(TSensObserver *p);
 void Peref_SensObserverUpdate(TSensObserver *p);
+
+void Peref_SensTuObserverInit(TSensTuObserver *p);
 
 
 #endif

@@ -137,7 +137,7 @@ __inline void ReadRegsResponse(TMbPort *hPort)
 	Byte *Buf = hPort->Frame.Buf;
 	Buf[2] = hPort->Packet.Count << 1;
 	DataPack(&Buf[3], hPort->Packet.Data, hPort->Packet.Count);
-	hPort->Frame.TxLength = Buf[2] + 3;
+	hPort->Frame.TxLength = (hPort->Packet.Count << 1) + 3;
 	/*Byte *Buf = hPort->Frame.Buf;
 	//Buf[2] = hPort->Packet.Count << 1;
 	DataPack(&Buf[2], hPort->Packet.Data, hPort->Packet.Count);

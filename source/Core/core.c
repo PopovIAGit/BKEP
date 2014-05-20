@@ -9,7 +9,9 @@
 #include "core.h"
 #include "peref.h"
 #include "g_Structs.h"
+//#include "comm.h"
 #include "stat.h"
+#include "stat_fm25v10.h"
 
 TFM25V10 Eeprom1;
 TFM25V10 Eeprom2;

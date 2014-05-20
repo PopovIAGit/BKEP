@@ -108,8 +108,8 @@ void InitTables(void)
 	ImEvLogMainAddrsTable[13]	= GetAdr(ramGroupA.Iv);
 	ImEvLogMainAddrsTable[14]	= GetAdr(ramGroupA.Iw);
 	ImEvLogMainAddrsTable[15]	= GetAdr(ramGroupA.Temper);
-	ImEvLogMainAddrsTable[16]	= GetAdr(ramGroupA.Inputs);
-	ImEvLogMainAddrsTable[17]	= GetAdr(ramGroupA.Outputs);
+	ImEvLogMainAddrsTable[16]	= GetAdr(ramGroupA.StateTu);
+	ImEvLogMainAddrsTable[17]	= GetAdr(ramGroupA.StateTs);
 	ImEvLogMainAddrsTable[18]	= GetAdr(ramGroupH.Seconds);
 	ImEvLogMainAddrsTable[19]	= FIRST_RECORD_FLAG_ADDR;
 
@@ -123,8 +123,8 @@ void InitTables(void)
 	ImEvLogBufAddrsTable[7]  = GetAdr(ramGroupA.Iv);
 	ImEvLogBufAddrsTable[8]  = GetAdr(ramGroupA.Iw);
 	ImEvLogBufAddrsTable[9]  = GetAdr(ramGroupA.Temper);
-	ImEvLogBufAddrsTable[10] = GetAdr(ramGroupA.Inputs);
-	ImEvLogBufAddrsTable[11] = GetAdr(ramGroupA.Outputs);
+	ImEvLogBufAddrsTable[10] = GetAdr(ramGroupA.StateTu);
+	ImEvLogBufAddrsTable[11] = GetAdr(ramGroupA.StateTs);
 
 	ImCmdLogAddrsTable[0] = GetAdr(ramGroupB.DevTime);
 	ImCmdLogAddrsTable[1] = GetAdr(ramGroupB.DevDate);
@@ -206,8 +206,8 @@ void InitLogEvent(TLogEvent *le)
 	le->Iv			= &g_Ram.ramGroupA.Iu;
 	le->Iw			= &g_Ram.ramGroupA.Iu;
 	le->Temper		= &g_Ram.ramGroupA.Temper;
-	le->Inputs		= &g_Ram.ramGroupA.Inputs.all;
-	le->Outputs		= &g_Ram.ramGroupA.Outputs.all;
+	le->Inputs		= &g_Ram.ramGroupA.StateTu.all;
+	le->Outputs		= &g_Ram.ramGroupA.StateTs.all;
 	le->Seconds		= &g_Ram.ramGroupH.Seconds;
 
 	memset(&le->Data[0],	0, sizeof(LOG_EV_BUF_DATA_COUNT));		// Буфер журнала событий
@@ -346,8 +346,8 @@ void DataBufferPre(TStat *s)
 		s->LogEventBuffer[LogEvBufIndex].LogIv		 	= g_Ram.ramGroupA.Iv;
 		s->LogEventBuffer[LogEvBufIndex].LogIw		 	= g_Ram.ramGroupA.Iw;
 		s->LogEventBuffer[LogEvBufIndex].LogTemper	 	= g_Ram.ramGroupA.Temper;
-		s->LogEventBuffer[LogEvBufIndex].LogInputs	 	= g_Ram.ramGroupA.Inputs.all;
-		s->LogEventBuffer[LogEvBufIndex].LogOutputs 	= g_Ram.ramGroupA.Outputs.all;
+		s->LogEventBuffer[LogEvBufIndex].LogInputs	 	= g_Ram.ramGroupA.StateTu.all;
+		s->LogEventBuffer[LogEvBufIndex].LogOutputs 	= g_Ram.ramGroupA.StateTs.all;
 
 		// Инкрементируем текущий индекс в буфере. Предыдущие накопленные данные не удаляем.
 		if (++LogEvBufIndex >= LOG_EV_BUF_CELL_COUNT)

@@ -61,6 +61,18 @@ typedef struct
 	TSinPhaseObserver IV;
 	TSinPhaseObserver IW;
 }TSinObserver;
+
+typedef struct
+{
+	TSinPhaseObserver	sigOpen;
+	TSinPhaseObserver	sigClose;
+	TSinPhaseObserver	sigStop;
+	TSinPhaseObserver	sigMU;
+	TSinPhaseObserver	sigResetAlarm;
+	TSinPhaseObserver	sigReadyTU;
+	TSinPhaseObserver	sigDU;
+}TSinSignalObserver;
+
 //--------------------  Глобальные переменные ------------------------------
 //--------------------  Протатипы функций ----------------------------------
 
