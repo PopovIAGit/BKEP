@@ -49,8 +49,8 @@ void Peref_LedsInit(pLeds p, Uns freq)
 	p->ledBluetooth.timeOfBlink	= 0;								//bluetooth
 	p->ledConnect.timeOfBlink 	= freq/p->ledConnect.blinkPRD;		//сеть
 
-	//p->pStatus = &g_Core.Status.all;
-	p->pStatus = &g_Core.TestStatus.all;
+	p->pStatus = &g_Core.Status.all;
+	//p->pStatus = &g_Core.TestStatus.all;
 
 }
 //--------------------------------------------------------

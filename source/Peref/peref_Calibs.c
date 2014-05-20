@@ -7,13 +7,17 @@
 
 #include "peref.h"
 
+#define MpyDivK(V1,V2,K,Prec)	(int16)((int32)((float32)(V1) * (V2) / (K))  >> (Prec))
+#define DivKQ1(V1,V2,K,Prec) 	(int16)((int32)((float32)(V1) * (K)  / (V2)) >> (Prec))
+
 LgUns TmpRevolution = 0;
+LgUns DataTmp;
 
 void Peref_CalibInit(TPerefPosition *p)
 {
 	p->ResetFlag 	= false;
 	p->CancelFlag 	= false;
-	p->GearRatio 	= 0;
+	p->GearRatio 	= g_Ram.ramGroupC.GearRatio;
 	p->Zone 		= 0;
 	p->RevMax 		= REV_MAX;
 	p->LinePos		= 0;
@@ -23,7 +27,7 @@ void Peref_CalibInit(TPerefPosition *p)
 	p->MuffTime		= MUFF_CLB_TIME;
 	p->MuffTimer	= 0;
 	p->Reserved		= 0;
-	p->GearInv		= 0;
+	p->GearInv		= CalcClbGearInv(&g_Peref.Position);
 	p->FstepInv		= 0;
 	p->PosSensPow	= &g_Ram.ramGroupC.PosSensPow;
 	p->PositionAcc	= &g_Ram.ramGroupB.PositionAcc;
@@ -38,6 +42,33 @@ void Peref_CalibInit(TPerefPosition *p)
 	p->Indication	= ToPtr(&g_Ram.ramGroupH.CalibState);
 
 }
+
+
+
+Uint32 CalcClbGearInv(TPerefPosition *p)
+{
+	#if defined(__TMS320C28X__)
+	return 0UL;
+	#else
+	return ((16384000UL >> *p->PosSensPow) / (LgUns)p->GearRatio + 1);
+	#endif
+}
+
+Uint32 CalcClbAbsRev(TPerefPosition *p, Uint16 GearRev)
+{
+	return MpyDivK(GearRev, p->GearRatio, 1000, *p->PosSensPow);
+}
+
+int16 CalcClbGearRev(TPerefPosition *p, int32 AbsRev)
+{
+	return DivKQ1(AbsRev, p->GearRatio, 1000, *p->PosSensPow);
+}
+
+Uint32 CalcClbPercentToAbs(TPerefPosition *p, Uint16 Percent)
+{
+	return MpyDivK(p->FullStep, Percent, 1000, 0);
+}
+
 
 void Peref_Calibration(TPerefPosition *p)
 {
@@ -55,7 +86,7 @@ void Peref_Calibration(TPerefPosition *p)
 				break;
 			case 2: // Снимаем
 				if (!CheckStatus(p, 0)) break;
-				p->CycleData = 0;
+				p->Indication->ClosePos = 0;
 				p->Indication->Status &= CLB_OPEN;
 				break;
 		}
@@ -74,7 +105,7 @@ void Peref_Calibration(TPerefPosition *p)
 			break;
 		case 2: // Снимаем
 			if (!CheckStatus(p, 0)) break;
-			p->CycleData = 0;
+			p->Indication->OpenPos = 0;
 		    p->Indication->Status &= CLB_CLOSE;
 			break;
 		}
@@ -87,7 +118,8 @@ void Peref_Calibration(TPerefPosition *p)
 		if (CheckStatus(p, CLB_FLAG))
 		{
 			p->Indication->ClosePos = *p->AbsPosition;
-			Data = (((LgUns)p->GearRatio * (LgUns)p->Command->RevOpen) << *p->PosSensPow)/10;
+			Data = CalcClbAbsRev(p, p->Command->RevOpen);
+		//	Data = (((LgUns)p->GearRatio * (LgUns)p->Command->RevOpen) << *p->PosSensPow)/10;
 			if (*p->RodType) Data = p->Indication->ClosePos - Data;
 			else Data = p->Indication->ClosePos + Data;
 			p->Indication->OpenPos = Data & p->RevMax;
@@ -102,7 +134,8 @@ void Peref_Calibration(TPerefPosition *p)
 		if (CheckStatus(p, CLB_FLAG))
 		{
 			p->Indication->OpenPos = *p->AbsPosition;
-			Data = (((LgUns)p->GearRatio * (LgUns)p->Command->RevClose) << *p->PosSensPow)/10;
+			Data = CalcClbAbsRev(p, p->Command->RevClose);
+			//Data = (((LgUns)p->GearRatio * (LgUns)p->Command->RevClose) << *p->PosSensPow)/10;
 			if (*p->RodType) Data = p->Indication->OpenPos + Data;
 			else Data = p->Indication->OpenPos - Data;
 			p->Indication->ClosePos = Data & p->RevMax;
@@ -137,7 +170,8 @@ void Peref_CalibUpdate(TPerefPosition *p)
 		{
 			// Полный ход в метках энкодера с ограничением на макс. количество меток энкодера
 			p->FullStep = (OpenPos - ClosePos) & p->RevMax;
-			*p->FullWay = (Uns)(((p->FullStep * 10) >> *p->PosSensPow)/ p->GearRatio);
+			*p->FullWay = (Uint16)CalcClbGearRev(p, (int32)p->FullStep);
+			//*p->FullWay = (Uns)(((p->FullStep * 10) >> *p->PosSensPow)/ p->GearRatio);
 			if((*p->FullWay >> 1) <= *p->PositionAcc)
 			{
 				p->FullStep = 0;
@@ -170,11 +204,13 @@ void Peref_CalibUpdate(TPerefPosition *p)
 					p->LinePos = p->LinePos - p->RevMax - 1;
 			}
 
-			*p->CurWay = ((p->LinePos * 10) >> *p->PosSensPow)/ p->GearRatio;
+			*p->CurWay = CalcClbGearRev(p, p->LinePos);
+			//*p->CurWay = ((p->LinePos * 10) >> *p->PosSensPow)/ p->GearRatio;
 			if (*p->CurWay <= (Int)*p->PositionAcc) p->Zone |= CLB_CLOSE;
 			if (*p->CurWay >= ((Int)*p->FullWay - (Int)*p->PositionAcc)) p->Zone |= CLB_OPEN;
 
-			*p->PositionPr = (p->LinePos*1000UL)/p->FullStep;
+			*p->PositionPr = DivKQ1(p->LinePos, p->FullStep, 1000, 0);
+			//*p->PositionPr = (p->LinePos*1000UL)/p->FullStep;
 			if ((p->Zone & CLB_CLOSE) && (*p->PositionPr > 0))    *p->PositionPr = 0;
 			if ((p->Zone & CLB_OPEN)  && (*p->PositionPr < 1000)) *p->PositionPr = 1000;
 		}
@@ -189,7 +225,8 @@ void Peref_CalibUpdate(TPerefPosition *p)
 		else if (Indic->Status & CLB_CLOSE) p->LinePos = (Position - ClosePos) & p->RevMax;
 		else if (Indic->Status & CLB_OPEN)  p->LinePos = (OpenPos - Position)  & p->RevMax;
 
-		*p->CurWay = ((p->LinePos * 10) >> *p->PosSensPow)/ p->GearRatio;
+		*p->CurWay = CalcClbGearRev(p, p->LinePos);
+		//*p->CurWay = ((p->LinePos * 10) >> *p->PosSensPow)/ p->GearRatio;
 		if (*p->CurWay <= (Int)*p->PositionAcc) p->Zone |= Indic->Status;
 	}
 }

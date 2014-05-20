@@ -54,11 +54,12 @@ extern "C" {
 #define CONTACTOR_1_ENABLE  GpioDataRegs.GPADAT.bit.GPIO10
 #define CONTACTOR_2_ENABLE  GpioDataRegs.GPADAT.bit.GPIO11
 
-//--- BUTTON's ---------------------------------------
-#define HALL_OPEN			AdcRegs.ADCRESULT0
-#define HALL_STOP_MU		AdcRegs.ADCRESULT1
-#define HALL_CLOSE			AdcRegs.ADCRESULT2
-#define HALL_STOP_DU		AdcRegs.ADCRESULT3
+//----DISCR IN---------------------------------------
+
+#define TY_24				GpioDataRegs.GPBDAT.bit.GPIO40 // 24 или 220 ТУ
+#define KEY_1				GpioDataRegs.GPBDAT.bit.GPIO41 // кнопка шкафа Вперед (акт. = 1)
+#define KEY_2				GpioDataRegs.GPBDAT.bit.GPIO42 // кнопка шкафа Назад (акт. = 1)
+#define KEY_3				GpioDataRegs.GPBDAT.bit.GPIO43 // кнопка шкафа Стоп (акт. = 1)
 
 //--- SENSORS ---------------------------------------- PIA 03.04.14
 #define ADC_UR				AdcRegs.ADCRESULT2

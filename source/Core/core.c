@@ -9,9 +9,7 @@
 #include "core.h"
 #include "peref.h"
 #include "g_Structs.h"
-//#include "comm.h"
-//#include "stat.h"
-#include "stat_fm25v10.h"
+#include "stat.h"
 
 TFM25V10 Eeprom1;
 TFM25V10 Eeprom2;
@@ -19,8 +17,8 @@ TFM25V10 Eeprom2;
 TCore	g_Core;
 
 //выбор микросхем
-__inline void Eeprom1CsSet(Byte Lev)  {SC_EEPROM1 = Lev;}
-__inline void Eeprom2CsSet(Byte Lev)  {SC_EEPROM2 = Lev;}
+__inline void Eeprom1CsSet(Byte Lev)  {SC_EEPROM1 = !Lev;}
+__inline void Eeprom2CsSet(Byte Lev)  {SC_EEPROM2 = !Lev;}
 
 //---------------------------------------------------
 void Core_Init(TCore *p)
@@ -41,6 +39,7 @@ void Core_Init(TCore *p)
 
 	p->Status.bit.Stop = 1;					// При включение выставляем стоп
 }
+
 
 // Функция задания момента в зависимости от положения и направления движения
 void Core_DefineCtrlParams(TCore *p) // 50 hz
@@ -156,7 +155,7 @@ void Core_CalibControl(TCore *p)
 		else
 		{
 			g_Ram.ramGroupD.TaskClose = trReset;
-			g_Ram.ramGroupD.TaskClose = trReset;
+			g_Ram.ramGroupD.TaskOpen  = trReset;
 
 			p->VlvDrvCtrl.EvLog.Value = CMD_RES_CLB;
 		}
@@ -178,22 +177,20 @@ void Core_CalibControl(TCore *p)
 		}
 	}
 
-	/*Добавить Запись параметров калибровки и числа циклов
-
-	if (IsMemParReady())													// если есть готовность к записи параметров
+	if (IsMemParReady())																	// если есть готовность к записи параметров
 	{
-		if (GrH->CycleCnt != PrevCycle)										// если счетчик циклов обновился
+		if (g_Ram.ramGroupH.CycleCnt != p->PrevCycle)										// если счетчик циклов обновился
 		{
-			WritePar(REG_CYCLE_CNT, &GrH->CycleCnt, 1);						// записали параметр счетчик циклов
-			PrevCycle = GrH->CycleCnt;										// запомнили записанный параметр, для последующей проверки
+			WriteToEeprom(REG_CYCLE_CNT, &g_Ram.ramGroupH.CycleCnt, 1);						// записали параметр счетчик циклов
+			p->PrevCycle = g_Ram.ramGroupH.CycleCnt;										// запомнили записанный параметр, для последующей проверки
+			g_Ram.ramGroupA.CycleCnt = g_Ram.ramGroupH.CycleCnt;
 		}
-		else if (GrH->CalibState != GrA->CalibState)						// если состояние калибровки изменилось
+		else if (g_Ram.ramGroupH.CalibState != g_Ram.ramGroupA.CalibState)					// если состояние калибровки изменилось
 		{
-			WritePar(REG_CALIB_STATE, &GrH->CalibState, sizeof(ClbIndication));// то записали состояние калибровки
-			GrA->CalibState = GrH->CalibState;								// запоминаем записанный параметр, для последующей проверки
+			WriteToEeprom(REG_CALIB_STATE, &g_Ram.ramGroupH.CalibState, sizeof(ClbIndication));	// то записали состояние калибровки
+			g_Ram.ramGroupA.CalibState = g_Ram.ramGroupH.CalibState;						// запоминаем записанный параметр, для последующей проверки
 		}
 	}
-	  */
 }
 
 // Действия выполняемые при стопе

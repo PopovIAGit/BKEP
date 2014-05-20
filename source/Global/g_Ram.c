@@ -32,6 +32,7 @@ void g_Ram_Init(TRam *p)
 	p->ramGroupA.CalibState = p->ramGroupH.CalibState;
 	p->ramGroupA.CycleCnt =  p->ramGroupH.CycleCnt;
 	//PrevCycle = p->ramGroupH.CycleCnt;
+	g_Core.PrevCycle = p->ramGroupH.CycleCnt;
 	p->ramGroupA.VersionPO = VERSION;
 	p->ramGroupC.SubVersionPO = SUBVERSION;
 
@@ -108,7 +109,41 @@ void g_Ram_Init(TRam *p)
 //---------------------------------------------------
 void g_Ram_Update(TRam *p)
 {
-	InterfIndication(p);
+	//------ Core -> RAM ------------------------------------
+	p->ramGroupA.Status = g_Core.Status;
+	//InterfIndication(p);
+
+	//----- Peref -> RAM -----------------------------------
+
+	 p->ramGroupA.Ur 			= g_Peref.sinObserver.UR.Output;
+	 p->ramGroupA.Us 			= g_Peref.sinObserver.US.Output;
+	 p->ramGroupA.Ut 			= g_Peref.sinObserver.UT.Output;
+	 p->ramGroupH.Umid 			= g_Peref.Umid;
+	 p->ramGroupH.VSkValue 		= SkewCalc(p->ramGroupA.Ur, p->ramGroupA.Us, p->ramGroupA.Ut, p->ramGroupH.Umid);
+
+	 if(!g_Core.Status.bit.Stop)
+	 {
+		 p->ramGroupA.Iu 		= g_Peref.sinObserver.IU.Output;
+		 p->ramGroupA.Iv 		= g_Peref.sinObserver.IV.Output;
+		 p->ramGroupA.Iw 		= g_Peref.sinObserver.IW.Output;
+		 p->ramGroupA.AngleUI 	= g_Peref.AngleUI;
+		 p->ramGroupH.Imid 		= g_Peref.Imid;
+		 p->ramGroupH.ISkewValue= SkewCalc(p->ramGroupA.Iu, p->ramGroupA.Iv, p->ramGroupA.Iw, p->ramGroupH.Imid);
+	 }
+	 else
+	 {
+		 p->ramGroupA.Iu 		= 0;
+		 p->ramGroupA.Iv 		= 0;
+		 p->ramGroupA.Iw 		= 0;
+		 p->ramGroupA.AngleUI 	= 0;
+		 p->ramGroupH.Imid 		= 0;
+		 p->ramGroupH.ISkewValue= 0;
+	 }
+
+	 p->ramGroupA.Speed = g_Peref.Position.speedRPM;
+	 // ------------------------------------------
+	 p->ramGroupA.Position = p->ramGroupC.Position;
+
 }
 
 void InterfIndication(TRam *p)
@@ -130,11 +165,14 @@ void RefreshParams(Uns addr)
 {
 	//TCoreProtections *pProtections 	= &g_Core.protections;
 	TPeref *pPeref 					= &g_Peref;
-	//TPerefPosition *pPosition 		= &g_Peref.position;
+	TPerefPosition *pPosition 		= &g_Peref.Position;
 
-	if (addr == REG_GEAR_RATIO)	{//Calib.GearRatio = g_Ram.ramGroupC.GearRatio;
+	if (addr == REG_GEAR_RATIO)	{
 
-	}else if (addr == REG_OVERWAY_ZONE) { //Mcu.Valve.BreakDelta = CalcClbAbsRev(&Calib, g_Ram.ramGroupB.OverwayZone);
+		pPosition->GearRatio = g_Ram.ramGroupC.GearRatio;
+		pPosition->GearInv = CalcClbGearInv(&g_Peref.Position);
+
+	}else if (addr == REG_OVERWAY_ZONE) { g_Core.VlvDrvCtrl.Valve.BreakDelta = (((LgUns)pPosition->GearRatio * (LgUns)g_Ram.ramGroupB.OverwayZone) << *pPosition->PosSensPow)/10; //CalcClbAbsRev(&Calib, g_Ram.ramGroupB.OverwayZone);
 
 	}else if (addr == REG_INPUT_MASK){
 

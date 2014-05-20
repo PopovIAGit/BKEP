@@ -19,13 +19,12 @@ Outputs
 #include "core_Menu.h"
 #include "core_VlvDrvCtrl.h"
 #include "core_TorqueObserver.h"
+#include "comm.h"
 #include "g_Ram.h"
 #include "g_InitHardware.h"
 #include "csl\csl_memory.h"
 #include "stat_fm25v10.h"
-//#include "core_Commands.h"
 //#include "core_MotorControl.h"
-//#include "core_HeatMotor.h"
 
 //--------------------- Константы-------------------------------------------
 #define CMD_DEFAULTS_USER	0x0010	// Пользовательские параметры по умолчанию
@@ -37,6 +36,7 @@ Outputs
 #define CMD_DEFAULTS_FACT 	0x0400	// Заводские параметры по умолчанию
 
 #define START_DELAY_TIME		(2.000 * Prd50HZ)		// Ограничение времени паузы между остановом и след. запуском
+
 //--------------------- Макросы --------------------------------------------
 //-------------------- Структуры -------------------------------------------
 
@@ -75,6 +75,8 @@ typedef struct {
 	TCoreVlvDrvCtrl		VlvDrvCtrl;		// Управление задвижкой
 	// ---
 	TDmControl			MotorControl;	// Управление двигателем
+
+	Uns 				PrevCycle;		// Предидущее значение счетчика циклов
 } TCore;
 
 //------------------- Глобальные переменные --------------------------------

@@ -352,15 +352,16 @@ typedef struct _TRamGroupH
 {
 	TCalibState     CalibState;          // 0.Состояние калибровки
 	Uns             CalibRsvd;           // 1.Резерв для калибровки
-	LgUns             ClosePosition;    // 2-3.Положение закрыто		???
-	LgUns             OpenPosition;     // 4-5.Положение открыто		???
-										 // Дальше адрес +2
+	LgUns           ClosePosition;    	 // 2-3.Положение закрыто		???
+	LgUns           OpenPosition;     	 // 4-5.Положение открыто		???
 	Uns             Password1;           // 6.Основной пароль
 	Uns             Password2;           // 7.Заводской пароль
 	Uns             ScFaults;            // 8.Аварии КЗ
 	Uns				UporOnly;			 // 9.Параметр включающий работу только на упоре
 	Uns             CycleCnt;            // 10.Счетчик циклов
-	Uns				Rsvd1[5];			 // 11-15.Резерв
+	Uns				CmdKey;				 // 11.Команда с кнопок ЩСУ
+	Uns				CmdButton;			 // 12.Команда с ручек управления
+	Uns				Rsvd1[3];			 // 11-15.Резерв
 	Uns				TransCurr;			 // 16.Ток перехода
 	TCubArray		TqCurr;				 // 17-36.Ток поверхности
 	TCubArray		TqAngUI;			 // 37-56.Углы нагрузки
@@ -545,11 +546,14 @@ typedef struct _TTEKDriveData
 #define REG_GR				GetAdr(ramGroup.STATUS)
 #define COUNT_GR			30
 */
+
+#define REG_CALIB_STATE		GetAdr(ramGroupH.CalibState)
 #define REG_CALIB_CLOSE		GetAdr(ramGroupH.ClosePosition)
 #define REG_CALIB_OPEN		REG_CALIB_CLOSE+2
 
 #define REG_FACTORY_NUMBER	GetAdr(ramGroupC.FactoryNumber)
 #define REG_PRODUCT_DATE	GetAdr(ramGroupC.ProductYear)
+#define REG_CYCLE_CNT		GetAdr(ramGroupH.CycleCnt)
 
 /*
 #define REG_TASK_TIME		GetAdr(ramGroupD.TASK_TIME)

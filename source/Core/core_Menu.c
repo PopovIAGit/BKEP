@@ -206,18 +206,28 @@ void SetDefaultValues(TCoreMenu *p, Byte *groupNumber) // в Core_MenuDisplay()
 				&&(DefAddr != REG_TASK_TIME)
 				&&(DefAddr != REG_TASK_DATE))
 			||(DefAddr == REG_CODE)||(DefAddr == REG_FCODE))
-	 		*(ToUnsPtr(&g_Ram) + DefAddr) = Dcr.Def;
-		DefAddr++;
+		{
+			*(ToUnsPtr(&g_Ram) + DefAddr) = Dcr.Def;
+			DefAddr++;
+
+		} else {DefAddr++; return;}
+	} else {
+		*groupNumber =0;
 		return;
 	}
 	
-	if (IsMemParReady())
+	ReadWriteEeprom(&Eeprom1,F_WRITE,DefAddr,ToUnsPtr(&g_Ram) + DefAddr,1);
+	while (!IsMemParReady()) {FM25V10_Update(&Eeprom1); DelayUs(1000);}
+	// Инициализация фильтров, масштабов и т.д.
+	RefreshParams(DefAddr);
+
+	/*if (IsMemParReady())
 	{
-		// Запись всех параметров в Eeprom
-		ReadWriteAllParams(F_WRITE,p);
-		DefAddr = 0;
+		// Запись параметров в Eeprom
+		//ReadWriteAllParams(F_WRITE,p);
+		//DefAddr = 0;
 		*groupNumber = 0;
-	}
+	}*/
 }
 //--------------------------------------------------------
 void ReadWriteAllParams(Byte cmd, TCoreMenu *p)	// в Core_MenuInit()

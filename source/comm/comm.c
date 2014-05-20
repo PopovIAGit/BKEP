@@ -8,6 +8,7 @@
 ======================================================================*/
 
 #include "comm.h"
+#include "g_Ram.h"
 
 TComm	g_Comm;
 //---------------------------------------------------
@@ -34,14 +35,34 @@ void Comm_Init(TComm *p)
 	SerialCommInit(&g_Comm.mbAsu);
 	//SerialCommInit(&g_Comm.mbShn);
 	SerialCommInit(&g_Comm.mbBt);
-
+	Comm_LocalControlInit(&g_Comm.localControl);
 
 }
 //---------------------------------------------------
 void Comm_Update(TComm *p)
 {
 	//	КОМАНДЫ С МПУ !!!
-	//Comm_LocalControlUpdate(&p->localControl); // Ф-я обр-ки сигналов с ПДУ
+	// передаем значения сработавших датчиков холла
+	g_Ram.ramGroupC.HallBlock.all = Comm_LocalButtonUpdate(&p->localControl);
+
+	// передаем команду с кнопок управления
+	g_Ram.ramGroupH.CmdKey =  Comm_LocalKeyUpdate(&p->localControl);
+
+	// передаем команду с ручек БКП
+
+	switch (Comm_LocalButtonUpdate(&p->localControl))
+	{
+	case BIT0:
+		g_Ram.ramGroupH.CmdButton = KEY_OPEN;
+		break;
+	case BIT1:
+		g_Ram.ramGroupH.CmdButton = KEY_CLOSE;
+		break;
+	case BIT2 | BIT3:
+		g_Ram.ramGroupH.CmdButton = KEY_STOP;
+		break;
+	}
+
 	ModBusUpdate(&g_Comm.mbAsu); // slave канал связи с верхним уровнем АСУ
 	//ModBusUpdate(&g_Comm.mbShn); // master канал связи с устройством плавного пуска
 
