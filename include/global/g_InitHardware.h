@@ -66,6 +66,11 @@ extern "C" {
 #define TS_9	GpioDataRegs.GPADAT.bit.GPIO8
 #define TS_10	GpioDataRegs.GPADAT.bit.GPIO9
 
+#define TY_24				GpioDataRegs.GPBDAT.bit.GPIO40 // 24 или 220 ТУ
+#define KEY_1				GpioDataRegs.GPBDAT.bit.GPIO41 // кнопка шкафа Вперед (акт. = 1)
+#define KEY_2				GpioDataRegs.GPBDAT.bit.GPIO42 // кнопка шкафа Назад (акт. = 1)
+#define KEY_3				GpioDataRegs.GPBDAT.bit.GPIO43 // кнопка шкафа Стоп (акт. = 1)
+
 //--- SENSORS ---------------------------------------- PIA 03.04.14
 #define ADC_UR				AdcRegs.ADCRESULT2
 #define ADC_US				AdcRegs.ADCRESULT4

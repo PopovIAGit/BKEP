@@ -13,7 +13,7 @@
 #include "std.h"
 //#include "config.h"
 #include "comm_DigitalInputs.h"
-//#include "comm_LocalControl.h"
+#include "comm_LocalControl.h"
 #include "comm_ModbusRtu.h"
 #include "comm_SerialComm.h"
 #include "comm_BetweenBlock.h"
@@ -30,7 +30,7 @@ extern "C" {
 //--------------------------------------------------------
 
 typedef struct {
-	//TCommMPU			localControl;	// Пульт местного управления
+	TCommMPU			localControl;		// Пульт местного управления
 	//----
 	TDigitalInput 		digitInput;		// Цифровой вход: телеуправлен
 	// ---
@@ -45,7 +45,7 @@ typedef struct {
 	TMbPort  			mbShn;				// ModBus - УПП
 	TMbPort  			mbBt;				// ModBus - Bluetooth
 	TBluetoothPort		Bluetooth;			// Bluetooth
-	TBKPData			BkpData;			//структура обмена данными с БКП
+	TBKPData			BkpData;			// структура обмена данными с БКП
 } TComm;
 //--------------------------------------------------------
 

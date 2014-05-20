@@ -20,9 +20,8 @@ void ContactorInit(TContactorControl *p)
 
 void ContactorControlUpdate(TContactorControl *p)
 {
-
-//	switch (*p->ContactorGroup)
-	switch (ContTest)
+	switch (*p->ContactorGroup)
+	//switch (ContTest)
 	{
 		case cgStop:
 		{

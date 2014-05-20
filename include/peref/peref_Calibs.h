@@ -91,6 +91,12 @@ static Byte CheckStatus(TPerefPosition *, Uns);
 void Peref_SpeedCalc(TPerefPosition *);
 
 
+Uint32 CalcClbGearInv(TPerefPosition *);
+Uint32 CalcClbAbsRev(TPerefPosition *, Uint16 GearRev);
+int16  CalcClbGearRev(TPerefPosition *, int32 AbsRev);
+Uint32 CalcClbPercentToAbs(TPerefPosition *, Uint16 Percent);
+
+
 #ifdef __cplusplus
 }
 #endif // extern "C"

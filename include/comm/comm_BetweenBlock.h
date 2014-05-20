@@ -67,6 +67,14 @@ typedef union {
   } bit;
 } TBkpHallReg;
 
+// Режим связи
+typedef enum {
+	hmOpen 	 = 0,				//
+	hmClose  = 1,				//
+	hmStopMu = 2,				//
+	hmStopDu = 3
+} THallMask;
+
 // Структура обмена данными с БКП
 typedef struct _TBKPData {
 	Uns      	BkpVersion;

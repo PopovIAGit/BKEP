@@ -89,8 +89,8 @@ typedef enum {
 // Структура для работы с местным управлением
 typedef struct {
 	Bool				 Enable;				// Наличие местного управления
-	Byte				 BtnKey;				// Команда с ручек/кнопок
-	Byte				 PduKey;				// Команда с ПДУ
+	Uns				 	*BtnKey;				// Команда с ручек
+	Uns				 	*PduKey;				// Команда с кнопок ЩСУ
 	Bool				 CancelFlag;			// Флаг отмена команды
 } TMpuControl;
 

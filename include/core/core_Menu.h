@@ -22,10 +22,10 @@
 #define IsPassword1()		(g_Ram.ramGroupH.Password1 != 0)
 #define IsPassword2()		(g_Ram.ramGroupH.Password2 != 0)
 
-#define KEY_NONE       0  // Открыть			// Не используется
-#define KEY_OPEN       1  // Открыть			// Не используется
-#define KEY_CLOSE      2  // Закрыть			// Не используется
-#define KEY_STOP       3  // Стоп				// Не используется
+#define KEY_NONE       0  // Открыть
+#define KEY_OPEN       1  // Открыть
+#define KEY_CLOSE      2  // Закрыть
+#define KEY_STOP       3  // Стоп
 #define KEY_UP         4  // Вверх
 #define KEY_LEFT       5  // Влево (при редактировании параметра)
 #define KEY_RIGHT      6  // Вправо (при редактировании параметра)

@@ -19,6 +19,8 @@ __inline void DriveOpen(TCoreVlvDrvCtrl *);			// ... при открыть
 __inline void UpdateComm(TCoreVlvDrvCtrl *);		// Обработка внутренней команды при обработке реверса
 static   void ReverseDrive(TCoreVlvDrvCtrl *);		// Действия при реверсеы
 
+__inline void GetCurrentCommand(TCoreVlvDrvCtrl *);
+
 void Core_ValveDriveInit(TCoreVlvDrvCtrl *p)
 {
 	p->Status 				= ToPtr(&g_Core.Status);
@@ -27,8 +29,8 @@ void Core_ValveDriveInit(TCoreVlvDrvCtrl *p)
 	p->DuSource				= &g_Ram.ramGroupB.DuSource;
 	p->ReverseType			= &g_Ram.ramGroupH.ReverseType;
 	p->Mpu.Enable			= true;
-	p->Mpu.BtnKey			= 0;
-	p->Mpu.PduKey			= 0;
+	p->Mpu.BtnKey			= &g_Ram.ramGroupH.CmdButton;
+	p->Mpu.PduKey			= &g_Ram.ramGroupH.CmdKey;
 	p->Mpu.CancelFlag		= false;
 	p->Tu.Enable			= true;
 	p->Tu.LocalFlag			= false;
@@ -76,6 +78,15 @@ void Core_ValveDriveUpdate(TCoreVlvDrvCtrl *p)
 	MpuControl(p);			// Подача команд местного управления
 	UnitControl(p);			// Дейстаия в зависимости от команды (открыть/закрыть/стоп)
 }
+
+__inline void GetCurrentCommand(TCoreVlvDrvCtrl *p)
+{
+	// Местное
+
+
+	// Дистанция
+}
+
 //
 __inline void GetActiveControls(TCoreVlvDrvCtrl *p)
 {
@@ -114,14 +125,14 @@ __inline void GetActiveControls(TCoreVlvDrvCtrl *p)
 // обработка команд с МПУ
 __inline void MpuControl(TCoreVlvDrvCtrl *p)
 {
-	Byte Key = 0;
+	Uns Key = 0;
 			Uns  Active = 0;
 
 		if(!p->Mpu.Enable) return;				// выключено выходим
 
 		if (p->Mpu.BtnKey)						// Пришла команда с ручек
 		{
-			Key = p->Mpu.BtnKey;				// Запомнили пришедшую команду
+			Key = *p->Mpu.BtnKey;				// Запомнили пришедшую команду
 			Active = (p->ActiveControls & CMD_SRC_MPU); // Запомнили активирован ли режим мпу
 			p->EvLog.Source = CMD_SRC_MPU;				// Источник команды для журнала
 			p->Mpu.BtnKey = 0;					// Сбросили команду
@@ -129,7 +140,7 @@ __inline void MpuControl(TCoreVlvDrvCtrl *p)
 
 		if (p->Mpu.PduKey)						//Аналогично
 		{
-			Key = p->Mpu.PduKey;
+			Key = *p->Mpu.PduKey;
 			Active = (p->ActiveControls & CMD_SRC_PDU);
 			p->EvLog.Source = CMD_SRC_PDU;
 			p->Mpu.PduKey = 0;
