@@ -180,7 +180,8 @@ typedef struct _TRamGroupB
 	Uns             TuTime;             // 20.Время команды
 	TInputType 		InputType;			// 21.Тип входного сигнала 24/220
 	TUInvert	    TuInvert;			// 22.Маска дискретных входов
-	TSInvert 		TsInvert;			// 23.Маска дискретных выходов
+	//TSInvert 		TsInvert;			// 23.Маска дискретных выходов
+	TOutputReg		TsInvert;			// 23.Маска дискретных выходов
 	TInputReg		DigitalMode;		// **.режим потенциальный / импульсный
 	TBaudRate       RsBaudRate;         // 24.Скорость связи
 	Uns             RsStation;          // 25.Адрес станции

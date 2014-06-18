@@ -13,10 +13,10 @@
 #define GOOD_CRC    0x0000
 #define GENER_CRC   0xA001
 
-static Uns CrcTable[256];
+Uns CrcTable[256];
 
 //-------------------------------------------------------------------------------
-__inline void GenerateCrcTable(void)
+void GenerateCrcTable(void)
 {
 	Uns i, j, Crc;
 	for (i=0; i < 256; i++)

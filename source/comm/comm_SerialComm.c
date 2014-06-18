@@ -149,9 +149,11 @@ void ModBusUpdate(TMbHandle hPort)
 
 	if (Packet->Request)
 	{
+
 		Packet->Exception = UpdatePacket(Packet);
 		Packet->Response  = Packet->Request;
 		Packet->Request   = 0;
+		GpioDataRegs.GPATOGGLE.bit.GPIO27=1;
 	}
 	
 	hPort->Serial.RsState = Packet->Exception; //???MbConnect = !Packet->Exception;
@@ -194,11 +196,24 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 					default: return EX_ILLEGAL_FUNCTION;
 				}
 				break;
-			case MB_WRITE_REGS:
+			case MB_WRITE_REG:
 				switch(Res)
 				{
 					case 1:
 						//return WriteRegs(Port, (Uint16 *)&Ram, Addr, Count);
+						/*if (Packet->Addr==0x7) {
+							if (*Packet->Data==1) g_Ram.ramGroupB.TsInvert.bit.Closed = 1;
+							if (*Packet->Data==2) g_Ram.ramGroupB.TsInvert.bit.Closed = 0;
+							if (*Packet->Data==3) g_Ram.ramGroupB.TsInvert.bit.Opened = 1;
+							if (*Packet->Data==4) g_Ram.ramGroupB.TsInvert.bit.Opened = 0;
+							if (*Packet->Data==5) g_Ram.ramGroupB.TsInvert.bit.Mufta = 1;
+							if (*Packet->Data==6) g_Ram.ramGroupB.TsInvert.bit.Mufta = 0;
+							if (*Packet->Data==7) g_Ram.ramGroupB.TsInvert.bit.MUDU = 1;
+							if (*Packet->Data==8) g_Ram.ramGroupB.TsInvert.bit.MUDU = 0;
+							if (*Packet->Data==9) g_Ram.ramGroupB.TsInvert.bit.Opening = 1;
+							if (*Packet->Data==10) g_Ram.ramGroupB.TsInvert.bit.Opening = 0;
+							return 0;
+						} else*/
 						return WriteData(Packet->Addr, Packet->Data, Packet->Count);
 						//if (!Port->Frame.Exception) SerialCommRefresh();
 					case 5:

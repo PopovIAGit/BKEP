@@ -162,7 +162,8 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 		// Режим ожидания соединения
 		case 7:	if (bPort->Status == BT_RECEIVE_COMPLETE)
 				{
-		 			if (CheckString(bPort, "RING"))				// Ожидаем соединение
+					GpioDataRegs.GPADAT.bit.GPIO27=1;
+					if (CheckString(bPort, "RING"))				// Ожидаем соединение
 		 				bPort->State++;							// Должно прийти RING
 					else 
 						ClearValues(bPort);						// Делаем сброс значений, если пришло что-то другое
@@ -170,13 +171,16 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 				break;
 
 
-		case 8: bPort->Mode = BT_DATA_MODE;					// Переход в режим данных
+		case 8: GpioDataRegs.GPADAT.bit.GPIO27 = 0;
+				bPort->Mode = BT_DATA_MODE;					// Переход в режим данных
 				ClearValues(bPort);
 				bPort->State++;
 				break;
 
-		case 9: if (bPort->Mode == BT_COMMAND_MODE)			// Работаем в режиме данных,
+		case 9:
+			    if (bPort->Mode == BT_COMMAND_MODE)			// Работаем в режиме данных,
 				{										// ожидаем переход в режим команд
+
 					ClearValues(bPort);
 					bPort->State = 7;						// Переход в режим ожидания соединения
 					//bPort->State = 10;						// Переход в режим ожидания соединения
@@ -417,6 +421,54 @@ void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 
 	if (bPort->Mode == BT_COMMAND_MODE) return;
 
+	/*if ((Frame->TxLength-2)>0)
+	{
+		if (hPort->Params.HardWareType==UART_TYPE) SCI_transmit(hPort->Params.ChannelID, *Frame->Data++);
+		else if (hPort->Params.HardWareType==MCBSP_TYPE)
+		{
+			//if (((Frame->TxBufLen)&0x01) && ((Frame->Data - Frame->Buf)>=(Frame->TxBufLen-1)))
+			if (((Frame->TxBufLen)&0x01) && ((Frame->TxBufLen - (Frame->TxLength-2))>=(Frame->TxBufLen-1)))
+			{
+				Stop = 1;
+				DataSend = ((*Frame->Data++)&0x00FF)|(((*Frame->Data++)<<8)&0xFF00);
+				Frame->TxLength=Frame->TxLength-2;
+				McBsp_transmit(hPort->Params.ChannelID, DataSend, Stop);
+			} else
+			{
+				DataSend = ((*Frame->Data++)&0x00FF)|(((*Frame->Data++)<<8)&0xFF00);
+				Frame->TxLength = Frame->TxLength -2;
+				McBsp_transmit(hPort->Params.ChannelID, DataSend, 0);
+			}
+
+			Stop=0;
+
+		}
+	} else
+	{
+		StartTimer(&Frame->TimerPost);
+	}*/
+
+	if ((Frame->Data - Frame->Buf) < Frame->TxLength){
+		if (hPort->Params.HardWareType==UART_TYPE) SCI_transmit(hPort->Params.ChannelID, *Frame->Data++);
+		else if (hPort->Params.HardWareType==MCBSP_TYPE)
+		{
+			if (((Frame->TxLength)&0x01) && ((Frame->Data - Frame->Buf)>=(Frame->TxLength-1)))
+			{
+				Stop = 1;
+				DataSend = ((*Frame->Data++)&0x00FF)|(((*Frame->Data++)<<8)&0xFF00);
+				McBsp_transmit(hPort->Params.ChannelID, DataSend, Stop);
+			} else
+			{
+				DataSend = ((*Frame->Data++)&0x00FF)|(((*Frame->Data++)<<8)&0xFF00);
+				McBsp_transmit(hPort->Params.ChannelID, DataSend, 0);
+			}
+			Stop=0;
+		}
+	}
+	else StartTimer(&Frame->TimerPost);
+
+	/*if (bPort->Mode == BT_COMMAND_MODE) return;
+
 	if ((Frame->Data - Frame->Buf) < Frame->TxLength){
 		if (hPort->Params.HardWareType==UART_TYPE) SCI_transmit(hPort->Params.ChannelID, *Frame->Data++);
 		else if (hPort->Params.HardWareType==MCBSP_TYPE)
@@ -436,7 +488,7 @@ void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 
 		}
 	}
-	else StartTimer(&Frame->TimerPost);
+	else StartTimer(&Frame->TimerPost);*/
 
 	/*if ((Frame->Data - Frame->Buf) < Frame->TxLength){
 		if (hPort->Params.HardWareType==UART_TYPE) SCI_transmit(hPort->Params.ChannelID, *Frame->Data++);

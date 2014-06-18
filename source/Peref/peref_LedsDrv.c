@@ -138,84 +138,12 @@ void Peref_LedsUpdate(pLeds p)
 	else 											// Если статус нет "Неисправности"
 		p->leds.all |= LED_DEFECT_MASK;				// Гасим светодиод
 
-	/*
-	// ------Спящий режим----------------------------------------------
-	if (*p->pStatus & STATUS_SLEEP)						// Если "Спящий режим"
-	{
-		LedTurnOnOff(p->ledSleep, p->leds.bit.Mode);
-		if (p->leds.all != LED_MODE_MASK)
-			p->leds.all &= LED_MODE_MASK;				// Гасим все лампочки, кроме зелененькой
-	}
-	else
-	{
-		// ------Открыто/Открывается----------------------------------------
-		if (*p->pStatus & STATUS_BRAKING)
-		{
-			LedTurnOnOff(p->ledOpen, p->leds.bit.Open);
-			LedTurnOnOff(p->ledClose, p->leds.bit.Close);
-		}
-		else
-		{
-			if ((*p->pStatus & STATUS_OPENED)||(*p->pStatus & STATUS_OPENING))	// Если статус - "открыто/открывается"
-			{																	
-				LedTurnOnOff(p->ledOpen, p->leds.bit.Open);	// Зажигаем светодиод
-			}
-			else 											// Если статус не "открыто/открывается"
-				p->leds.all &= ~LED_OPEN_MASK;				// Гасим светодиод
 
-			// ------Закрыто/Закрывается----------------------------------------
-			if ((*p->pStatus & STATUS_CLOSED)||(*p->pStatus & STATUS_CLOSING))	// Если статус - "закрыто/закрывается"
-			{																	
-				LedTurnOnOff(p->ledClose, p->leds.bit.Close);// Зажигаем светодиод
-			}
-			else 											// Если статус не "закрыто/закрывается"
-				p->leds.all &= ~LED_CLOSE_MASK;				// Гасим светодиод
-		}
-
-		// ------Авария-----------------------------------------------------
-		if ((*p->pStatus & STATUS_FAULT)||(*p->pStatus & STATUS_TEST_OPEN_CLOSE))// Если статус - "авария" или "тестовое движение"
-		{																	
-			LedTurnOnOff(p->ledFault, p->leds.bit.Fault);// Зажигаем светодиод
-		}
-		else 											// Если статус не "авария"
-			p->leds.all &= ~LED_FAULT_MASK;
-
-		// ------Режим программирования-------------------------------------
-		if (p->ledMode.blinkTimer)						// Если идет прием сигнала с ПДУ
-		{
-			p->ledMode.blinkTimer--;					// Уменьшаем таймер
-			p->leds.bit.Mode = !p->leds.bit.Mode;		// Моргаем диодом
-		}
-		else if (*p->pStatus & STATUS_PROG_MODE) 		// Если статус - "режим программирования"
-		{																	
-			LedTurnOnOff(p->ledMode, p->leds.bit.Mode); // Зажигаем светодиод
-		}										
-		else 											// Если статус не "режим программирования"
-			p->leds.all &= ~LED_MODE_MASK;				// Гасим светодиод 
-
-		// ------МУ/ДУ----------------------------------------
-		if (*p->pStatus & STATUS_MU_DU)					// Если статус - "дистанционное управление"
-		{																	
-			LedTurnOnOff(p->ledMuDu, p->leds.bit.MuDu);// Зажигаем светодиод
-		}
-		else 											// Если статус не "закрыто/закрывается"
-			p->leds.all &= ~LED_MU_DU_MASK;				// Гасим светодиод
-		
-		// ------Муфта----------------------------------------
-		if (g_Core.protections.outAlarms.loadAlarms.bit.mufta)// Если авария "Муфта"
-		{																	
-			LedTurnOnOff(p->ledMufta, p->leds.bit.Mufta);// Зажигаем светодиод
-		}
-		else 											// Если статус не "закрыто/закрывается"
-			p->leds.all &= ~LED_MUFTA_MASK;				// Гасим светодиод
-	}
-	*/
-
-	LED_OPEN	= p->leds.bit.Open;
-	LED_MUFTA	= g_Core.TestStatus.bit.Mufta;// p->leds.bit.Mufta;
-	LED_DEFECT	= p->leds.bit.Defect;
-	LED_FAULT	= p->leds.bit.Fault;
-	LED_CLOSE = p->leds.bit.Close;
+	//LED_OPEN	= p->leds.bit.Open;
+	//LED_MUFTA	= g_Core.TestStatus.bit.Mufta;// p->leds.bit.Mufta;
+	//LED_DEFECT	= p->leds.bit.Defect;
+	//LED_FAULT	= p->leds.bit.Fault;
+	//LED_CLOSE = p->leds.bit.Close;
 
 	//ENABLE_BLUETOOTH = p->leds.bit.Bluetooth;
 

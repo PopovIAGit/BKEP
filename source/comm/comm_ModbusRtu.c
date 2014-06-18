@@ -97,6 +97,7 @@ __inline void UpdateNewFrame(TMbPort *hPort)
 	TMbFrame *Frame = &hPort->Frame;
 	TMbStat  *Stat  = &hPort->Stat;
 	Byte Status;
+	Uns CRC=0;
 	
 	//Status = SCI_getstatus(hPort->Params.UartID);
 
@@ -128,6 +129,9 @@ __inline void UpdateNewFrame(TMbPort *hPort)
 		Stat->BusFrameLenErrCount++;
 		goto FRAMING_ERROR;
 	}
+
+
+	CRC = CalcFrameCrc(Frame->Buf, Frame->RxLength);
 
 	if (CalcFrameCrc(Frame->Buf, Frame->RxLength) != GOOD_CRC)
 	{

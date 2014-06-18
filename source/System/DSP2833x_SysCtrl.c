@@ -243,7 +243,7 @@ void InitPeripheralClocks(void)
 
 // HISPCP/LOSPCP prescale register settings, normally it will be set to default values
    SysCtrlRegs.HISPCP.all = 0x0000;
-   SysCtrlRegs.LOSPCP.all = 0x0006;
+   SysCtrlRegs.LOSPCP.all = 0x0007;
 
 // XCLKOUT to SYSCLKOUT ratio.  By default XCLKOUT = 1/4 SYSCLKOUT
    // XTIMCLK = SYSCLKOUT/2
