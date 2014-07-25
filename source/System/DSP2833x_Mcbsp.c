@@ -101,7 +101,7 @@ void InitMcbspa(void)
 	McbspaRegs.SRGR2.all = 0;
 	McbspaRegs.SPCR2.bit.FREE = 1;
 	McbspaRegs.SRGR2.bit.CLKSM = 1;
-	McbspaRegs.SRGR1.bit.CLKGDV = CLKGDV_VAL;
+	McbspaRegs.SRGR1.bit.CLKGDV = 92;//CLKGDV_VAL;
 
 	McbspaRegs.SPCR2.bit.XINTM = 0;
 	McbspaRegs.SPCR1.bit.RINTM = 0;

@@ -15,7 +15,7 @@ Uns PassCount=1;
 
 extern void InterruptInit  (void);
 extern void InterruptUpdate(void);
-/*extern*/ Uns CrcTable[256];
+extern Uns CrcTable[256];
 static Uns CalcFrameCrc1(Byte *Buf, Uns Count);
 Uns I2CA_setCommand(void);
 Uns I2CA_ReadTemper(void);
@@ -60,12 +60,13 @@ void main(void) {
 
 /*
 		g_Comm.mbBt.Frame.Buf[0]=1;
-		g_Comm.mbBt.Frame.Buf[1]=3;
-		g_Comm.mbBt.Frame.Buf[2]=2;
-		g_Comm.mbBt.Frame.Buf[3]=0;
-		g_Comm.mbBt.Frame.Buf[4]=40;
+		g_Comm.mbBt.Frame.Buf[1]=0x10;
+		g_Comm.mbBt.Frame.Buf[2]=0;
+		g_Comm.mbBt.Frame.Buf[3]=7;
+		g_Comm.mbBt.Frame.Buf[4]=0;
+		g_Comm.mbBt.Frame.Buf[5]=1;
 
-		g_Comm.mbBt.Frame.TxLength=5;
+		g_Comm.mbBt.Frame.TxLength=6;
 		Crc = CalcFrameCrc1((&g_Comm.mbBt.Frame.Buf[0]), g_Comm.mbBt.Frame.TxLength);
 		g_Comm.mbBt.Frame.Buf[g_Comm.mbBt.Frame.TxLength++] = (Byte)(Crc & 0xFF);
 		g_Comm.mbBt.Frame.Buf[g_Comm.mbBt.Frame.TxLength++] = (Byte)(Crc >> 8);
@@ -158,6 +159,7 @@ interrupt void ScicTxIsrHandler(void)
 //-------------------------------------------------------------
 interrupt void McbspRxAHandler(void) // прерывание приема данных
 {
+
 	BluetoothRxHandler(&g_Comm.Bluetooth, &g_Comm.mbBt);
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP6;
 }
