@@ -20,7 +20,7 @@ void RefreshData(void);
 void WriteAllParams(void);
 void ReadAllParams(void);
 void CubRefresh(TCubStr *v, TCubArray *Array);
-void InterfIndication(TRam *);
+
 
 //---------------------------------------------------
 void g_Ram_Init(TRam *p)

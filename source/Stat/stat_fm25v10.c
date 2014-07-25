@@ -123,7 +123,6 @@ void FM25V10_Update(TFM25V10 *p)
 }
 
 
-
 Byte FM25V10_ReadStatus(TFM25V10 *p)
 {
 	Byte Status;

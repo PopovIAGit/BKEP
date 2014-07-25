@@ -19,7 +19,6 @@ __inline void DriveOpen(TCoreVlvDrvCtrl *);			// ... при открыть
 __inline void UpdateComm(TCoreVlvDrvCtrl *);		// Обработка внутренней команды при обработке реверса
 static   void ReverseDrive(TCoreVlvDrvCtrl *);		// Действия при реверсеы
 
-__inline void GetCurrentCommand(TCoreVlvDrvCtrl *);
 
 void Core_ValveDriveInit(TCoreVlvDrvCtrl *p)
 {
@@ -71,20 +70,10 @@ void Core_ValveDriveStop(TCoreVlvDrvCtrl *p)
 
 void Core_ValveDriveUpdate(TCoreVlvDrvCtrl *p)
 {
-
-
 	GetActiveControls(p);	// Получение данных по активированному типу управления (местное/дистанция)
 	TeleControl(p);			// Подача команд дистанционного управления
 	MpuControl(p);			// Подача команд местного управления
 	UnitControl(p);			// Дейстаия в зависимости от команды (открыть/закрыть/стоп)
-}
-
-__inline void GetCurrentCommand(TCoreVlvDrvCtrl *p)
-{
-	// Местное
-
-
-	// Дистанция
 }
 
 //

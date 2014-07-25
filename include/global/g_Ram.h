@@ -181,15 +181,15 @@ typedef struct _TRamGroupB
 	TInputType 		InputType;			// 21.Тип входного сигнала 24/220
 	TUInvert	    TuInvert;			// 22.Маска дискретных входов
 	TSInvert 		TsInvert;			// 23.Маска дискретных выходов
-	TInputReg		DigitalMode;		// **.режим потенциальный / импульсный
 	TBaudRate       RsBaudRate;         // 24.Скорость связи
 	Uns             RsStation;          // 25.Адрес станции
 	TParityMode		RsMode;				// 26.Режим связи
 	TSettingPlace	SettingPlace;		// 27.Место установки БУР
-	Uns 			Rsvd2[4];			// 28-31.
+	TKeyInvert		KeyInvert;			// 28.Маска кнопок управления
+	Uns 			Rsvd2[3];			// 29-31.
 	Uns				NoMoveTime;		   	// 32.Время отсутствия движения
 	Uns				OverwayZone;		// 33.Макси
-	Uns 			Rsvd3;				// 34.
+	TInputReg		DigitalMode;		// 34.режим потенциальный / импульсный
  	Uns             SleepTime;          // 35.Дежурный режим
 	Uns 			Rsvd[14];
 } TRamGroupB;
@@ -349,7 +349,7 @@ typedef struct _TRamGroupG
 	Uns 		   Rsvd[8];			    // 22-29.Резерв
 } TRamGroupG;
 
-// Группа H (Адрес 260, Количество 140)
+// Группа H (Адрес 260, Количество 200)
 typedef struct _TRamGroupH
 {
 	TCalibState     CalibState;          // 0.Состояние калибровки
@@ -377,7 +377,7 @@ typedef struct _TRamGroupH
 	Uns             VSkValue;          	 // 83.Асиметрия фаз питающей сети
   	Uns     	    PhOrdValue;        	 // 84.Чередование фаз сети
 	TNetReg         DefectsNet;          // 85.Диагностика сети (для неисправностей)
-	Uns             Rsvd7;         	 	 // 86. Резерв
+	Uns				Imidpr;			 	 // 86 Резерв
 	TLoadReg        FaultsLoad;          // 87.Диагностика нагрузки
 	Uns             Iu;                  // 88.Ток фазы U
 	Uns             Iv;                  // 89.Ток фазы V
@@ -385,13 +385,12 @@ typedef struct _TRamGroupH
 	Uns             Imid;				 // 91.Средний ток
   	Uns             ISkewValue;          // 92.Асиметрия токов нагрузки
 	Uns             Position;            // 93.Положение
-	LgUns  			FullStep;        	 // 94.Полный ход
-	Uns				Imidpr;			 	 // 95 Резерв
+	LgUns  			FullStep;        	 // 94-95.Полный ход
 	TReverseType	ReverseType;         // 96.Тип реверса
 	Uns				DemoPosition1;       // 97.Демо положение 1
 	Uns				DemoPosition2;       // 98.Демо положение 2
-	//TInputReg       StateTu;           	 // 99.Состояние дискретных входов
-	//TOutputReg      StateTs;          	 // 100.Состояние дискретных выходов
+	TInputReg       StateTu;           	 // 99.Состояние дискретных входов
+	TOutputReg      StateTs;          	 // 100.Состояние дискретных выходов
 	Uns             TuReleMode;          // 101.Релейный режим
 	TNormState	    NormState[3];		 // 102-104.Нормальное состояние входов    - Не используется но если не заработают маски
 	TNormState 	    NormOut[8];			 // 105-112.Нормальное состояние выходов - то пользуем это
@@ -413,59 +412,59 @@ typedef struct _TRamGroupH
 	Uns				LogReset;			 // 128. Сброс журналов
 	Uns 			BkpIndication;		 // 129. Индикация на БКП
 	//------Параметры для ТУ------------------------------------
-	Uns				LevelOnOpen220;
-	Uns				LevelOffOpen220;
-	Uns				LevelOnOpen24;
-	Uns				LevelOffOpen24;
-	Uns				UOpen_Mpy;
-	Uns				p_UOpen_Offset;
+	Uns				LevelOnOpen220;		 // 130
+	Uns				LevelOffOpen220;	 // 131
+	Uns				LevelOnOpen24;		 // 132
+	Uns				LevelOffOpen24;		 // 133
+	Uns				UOpen_Mpy;   		 // 134
+	Uns				p_UOpen_Offset;		 // 135
 	//-------------------------------
-	Uns				LevelOnClose220;
-	Uns				LevelOffClose220;
-	Uns				LevelOnClose24;
-	Uns				LevelOffClose24;
-	Uns				p_UClose_Mpy;
-	Uns				p_UClose_Offset;
+	Uns				LevelOnClose220;	 // 136
+	Uns				LevelOffClose220;	 // 137
+	Uns				LevelOnClose24;		 // 138
+	Uns				LevelOffClose24;	 // 139
+	Uns				p_UClose_Mpy;		 // 140
+	Uns				p_UClose_Offset;	 // 141
 	//-------------------------------
-	Uns				LevelOnStop220;
-	Uns				LevelOffStop220;
-	Uns				LevelOnStop24;
-	Uns				LevelOffStop24;
-	Uns				p_UStop_Mpy;
-	Uns				p_UStop_Offset;
+	Uns				LevelOnStop220;		 // 142
+	Uns				LevelOffStop220;	 // 143
+	Uns				LevelOnStop24;		 // 144
+	Uns				LevelOffStop24;		 // 145
+	Uns				p_UStop_Mpy;		 // 146
+	Uns				p_UStop_Offset;		 // 147
 	//-------------------------------
-	Uns				LevelOnMU220;
-	Uns				LevelOffMU220;
-	Uns				LevelOnMU24;
-	Uns				LevelOffMU24;
-	Uns				p_UMu_Mpy;
-	Uns				p_UMu_Offset;
+	Uns				LevelOnMU220;		 // 148
+	Uns				LevelOffMU220;		 // 149
+	Uns				LevelOnMU24;		 // 150
+	Uns				LevelOffMU24;		 // 151
+	Uns				p_UMu_Mpy;			 // 152
+	Uns				p_UMu_Offset;		 // 153
 	//-------------------------------
-	Uns				LevelOnResetAlarm220;
-	Uns				LevelOffResetAlarm220;
-	Uns				LevelOnResetAlarm24;
-	Uns				LevelOffResetAlarm24;
-	Uns				p_UResetAlarm_Mpy;
-	Uns				p_UResetAlarm_Offset;
+	Uns				LevelOnResetAlarm220;// 154
+	Uns				LevelOffResetAlarm220;// 155
+	Uns				LevelOnResetAlarm24; // 156
+	Uns				LevelOffResetAlarm24;// 157
+	Uns				p_UResetAlarm_Mpy;	 // 158
+	Uns				p_UResetAlarm_Offset;// 159
 	//-------------------------------
-	Uns				LevelOnReadyTU220;
-	Uns				LevelOffReadyTU220;
-	Uns				LevelOnReadyTU24;
-	Uns				LevelOffReadyTU24;
-	Uns				p_UReadyTu_Mpy;
-	Uns				p_UReadyTu_Offset;
+	Uns				LevelOnReadyTU220;	 // 160
+	Uns				LevelOffReadyTU220;	 // 161
+	Uns				LevelOnReadyTU24;	 // 162
+	Uns				LevelOffReadyTU24;	 // 163
+	Uns				p_UReadyTu_Mpy;		 // 164
+	Uns				p_UReadyTu_Offset;	 // 165
 	//-------------------------------
-	Uns				LevelOnDU220;
-	Uns				LevelOffDU220;
-	Uns				LevelOnDU24;
-	Uns				LevelOffDU24;
-	Uns				p_UDu_Mpy;
-	Uns				p_UDu_Offset;
+	Uns				LevelOnDU220;		 // 166
+	Uns				LevelOffDU220;		 // 167
+	Uns				LevelOnDU24;		 // 168
+	Uns				LevelOffDU24;		 // 169
+	Uns				p_UDu_Mpy;			 // 170
+	Uns				p_UDu_Offset;		 // 171
 	//-------------------------------
-	Uns 			Rsvd3[10];			 // 130-139.Резерв
+	Uns 			Rsvd3[29];			 // 172-200.Резерв
 } TRamGroupH;
 
-// Группа E (Адрес 400, Количество 32)
+// Группа E (Адрес 460, Количество 32)
 typedef struct _TRamGroupE
 {
 	TTimeVar       LogTime;				// T.Время
@@ -692,6 +691,7 @@ void RefreshParams(Uns);
 Int MinMax3IntValue (Int, Int, Int);
 Int Max3Int (Int , Int , Int );
 void g_Ram_SetTorque(void);
+void InterfIndication(TRam *);
 
 extern TRam 			g_Ram;
 extern TTekDriveData	g_RamTek;

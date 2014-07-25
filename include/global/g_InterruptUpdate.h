@@ -85,7 +85,7 @@ TPeriodicalFunction Task18kHz[] =
 {
 	PrdElemInit(Peref_18kHzCalc,						&g_Peref),
 	PrdElemInit(SciMasterConnBetweenBlockCommTimer,		&g_Comm.mbBkp),
-	//PrdElemInit(MonitorUpdate,						NULL),
+	PrdElemInit(MonitorUpdate,						NULL),
 	//PrdElemInit(AvagoEncoderAEAT84ADCalc,				&g_Peref.position),
 	//PrdElemInit(task1,	NULL)
 };
@@ -132,6 +132,9 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(Core_CalibStop, 				&g_Core),
 	PrdElemInit(Core_TorqueCalc, 				&g_Core.TorqObs),
 	PrdElemInit(Core_ValveDriveUpdate, 			&g_Core.VlvDrvCtrl),
+	PrdElemInit(Core_ProtectionsEnable,		    &g_Core.Protections),
+	PrdElemInit(Core_DevProc_FaultIndic,		&g_Core.Protections),
+	PrdElemInit(EngPhOrdPrt,					&g_Core.Protections),
 	/*PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.protections.overHeatBlock),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.protections.underColdBlock),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.protections.overTemper1),
@@ -162,6 +165,7 @@ TPeriodicalFunction Task10Hz[] =        //не более  200-т задач
 	//PrdElemInit(Peref_10HzCalc,				&g_Peref),
 	//PrdElemInit(Peref_Calibration, 						&g_Peref.Position),
 	PrdElemInit(BluetoothTimer,							&g_Comm.Bluetooth),
+	PrdElemInit(InterfIndication,						&g_Ram),
 	//PrdElemInit(task1_10Hz,								NULL)
 };
 //------------Конец файла-----------------------------------------------

@@ -22,6 +22,7 @@
 
 TPeref	g_Peref;
 
+
 //---------------------------------------------------
 void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновление
 {
@@ -36,43 +37,43 @@ void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновлени
 	//----для  Телеуправления---------------------------------------------------------------------------
 	memset(&p->InDigSignal, 0, sizeof(TSinSignalObserver));
 
-	peref_ApFilter3Init(&p->UfltrOpen, 		 (Uns)Prd18kHZ, 0.02);		// Инициализируем фильтры
-	peref_ApFilter3Init(&p->UfltrClose, 	 (Uns)Prd18kHZ, 0.02);
-	peref_ApFilter3Init(&p->UfltrStop, 		 (Uns)Prd18kHZ, 0.02);
-	peref_ApFilter3Init(&p->UfltrMu, 		 (Uns)Prd18kHZ, 0.02);
-	peref_ApFilter3Init(&p->UfltrResetAlarm, (Uns)Prd18kHZ, 0.02);
-	peref_ApFilter3Init(&p->UfltrReadyTU, 	 (Uns)Prd18kHZ, 0.02);
-	peref_ApFilter3Init(&p->UfltrDU, 		 (Uns)Prd18kHZ, 0.02);
+	peref_ApFilter3Init(&p->UfltrOpen, 		 (Uns)Prd18kHZ, 10.0);		// Инициализируем фильтры
+	peref_ApFilter3Init(&p->UfltrClose, 	 (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter3Init(&p->UfltrStop, 		 (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter3Init(&p->UfltrMu, 		 (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter3Init(&p->UfltrResetAlarm, (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter3Init(&p->UfltrReadyTU, 	 (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter3Init(&p->UfltrDU, 		 (Uns)Prd18kHZ, 10.0);
 
 	Peref_SensTuObserverInit(&p->InDigSignalObserver);// Инициализируем обработку синусойды
 
-	Peref_SinObserverInit(&p->InDigSignal.sigOpen,		Prd18kHZ);
-	Peref_SinObserverInit(&p->InDigSignal.sigClose,		Prd18kHZ);
-	Peref_SinObserverInit(&p->InDigSignal.sigStop,		Prd18kHZ);
-	Peref_SinObserverInit(&p->InDigSignal.sigMU,		Prd18kHZ);
-	Peref_SinObserverInit(&p->InDigSignal.sigResetAlarm,Prd18kHZ);
-	Peref_SinObserverInit(&p->InDigSignal.sigReadyTU,	Prd18kHZ);
-	Peref_SinObserverInit(&p->InDigSignal.sigDU,		Prd18kHZ);
+	Peref_SinObserverInitFloat(&p->InDigSignal.sigOpen,		Prd18kHZ);
+	Peref_SinObserverInitFloat(&p->InDigSignal.sigClose,	Prd18kHZ);
+	Peref_SinObserverInitFloat(&p->InDigSignal.sigStop,		Prd18kHZ);
+	Peref_SinObserverInitFloat(&p->InDigSignal.sigMU,		Prd18kHZ);
+	Peref_SinObserverInitFloat(&p->InDigSignal.sigResetAlarm,Prd18kHZ);
+	Peref_SinObserverInitFloat(&p->InDigSignal.sigReadyTU,	Prd18kHZ);
+	Peref_SinObserverInitFloat(&p->InDigSignal.sigDU,		Prd18kHZ);
 
 	//----------------------------------------------------------------------------------------------
 
-	peref_ApFilter3Init(&p->URfltr, (Uns)Prd18kHZ, 0.02);		// Инициализируем фильтры
-	peref_ApFilter3Init(&p->USfltr, (Uns)Prd18kHZ, 0.02);
-	peref_ApFilter3Init(&p->UTfltr, (Uns)Prd18kHZ, 0.02);
-	peref_ApFilter3Init(&p->IUfltr, (Uns)Prd18kHZ, 0.02);
-	peref_ApFilter3Init(&p->IVfltr, (Uns)Prd18kHZ, 0.02);
-	peref_ApFilter3Init(&p->IWfltr, (Uns)Prd18kHZ, 0.02);
+	peref_ApFilter3Init(&p->URfltr, (Uns)Prd18kHZ, 10.0);		// Инициализируем фильтры
+	peref_ApFilter3Init(&p->USfltr, (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter3Init(&p->UTfltr, (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter3Init(&p->IUfltr, (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter3Init(&p->IVfltr, (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter3Init(&p->IWfltr, (Uns)Prd18kHZ, 10.0);
 
 	Peref_SensObserverInit(&p->sensObserver);// Инициализируем обработку синусойды
 
 	memset(&p->sinObserver, 0, sizeof(TSinObserver));
 
-	Peref_SinObserverInit(&p->sinObserver.UR,Prd18kHZ);
-	Peref_SinObserverInit(&p->sinObserver.US,Prd18kHZ);
-	Peref_SinObserverInit(&p->sinObserver.UT,Prd18kHZ);
-	Peref_SinObserverInit(&p->sinObserver.IU,Prd18kHZ);
-	Peref_SinObserverInit(&p->sinObserver.IV,Prd18kHZ);
-	Peref_SinObserverInit(&p->sinObserver.IW,Prd18kHZ);
+	Peref_SinObserverInitFloat(&p->sinObserver.UR,Prd18kHZ);
+	Peref_SinObserverInitFloat(&p->sinObserver.US,Prd18kHZ);
+	Peref_SinObserverInitFloat(&p->sinObserver.UT,Prd18kHZ);
+	Peref_SinObserverInitFloat(&p->sinObserver.IU,Prd18kHZ);
+	Peref_SinObserverInitFloat(&p->sinObserver.IV,Prd18kHZ);
+	Peref_SinObserverInitFloat(&p->sinObserver.IW,Prd18kHZ);
 
 	p->phaseOrder.UR = &p->sinObserver.UR;	 // Привязываем
 	p->phaseOrder.US = &p->sinObserver.US;
@@ -113,24 +114,36 @@ void Peref_18kHzCalc(TPeref *p) // 18 кГц
 	peref_ApFilter3Calc(&p->UfltrResetAlarm);
 	peref_ApFilter3Calc(&p->UfltrReadyTU);
 	peref_ApFilter3Calc(&p->UfltrDU);
-	//результат фильтрации передаём в структуру для расчёта RMS
-	p->InDigSignal.sigOpen.Input 		= p->UfltrOpen.Output;
-	p->InDigSignal.sigClose.Input 		= p->UfltrClose.Output;
-	p->InDigSignal.sigStop.Input 		= p->UfltrStop.Output;
-	p->InDigSignal.sigMU.Input 			= p->UfltrMu.Output;
-	p->InDigSignal.sigResetAlarm.Input 	= p->UfltrResetAlarm.Output;
-	p->InDigSignal.sigReadyTU.Input 	= p->UfltrReadyTU.Output;
-	p->InDigSignal.sigDU.Input 			= p->UfltrDU.Output;
-	//функция расчёта RMS для сигналов ТУ
-	Peref_SinObserverUpdate(&p->InDigSignal.sigOpen);
-	Peref_SinObserverUpdate(&p->InDigSignal.sigClose);
-	Peref_SinObserverUpdate(&p->InDigSignal.sigStop);
-	Peref_SinObserverUpdate(&p->InDigSignal.sigMU);
-	Peref_SinObserverUpdate(&p->InDigSignal.sigResetAlarm);
-	Peref_SinObserverUpdate(&p->InDigSignal.sigReadyTU);
-	Peref_SinObserverUpdate(&p->InDigSignal.sigDU);
 
-/*	p->URfltr.Input = ADC_UR;
+	p->InDigSignalObserver.UOpenInp 		= p->UfltrOpen.Output;
+	p->InDigSignalObserver.UCloseInp 		= p->UfltrClose.Output;
+	p->InDigSignalObserver.UStopInp 		= p->UfltrStop.Output;
+	p->InDigSignalObserver.UMuInp 			= p->UfltrMu.Output;
+	p->InDigSignalObserver.UDuInp 			= p->UfltrDU.Output;
+	p->InDigSignalObserver.UReadyTuInp 	 	= p->UfltrReadyTU.Output;
+	p->InDigSignalObserver.UResetAlarmInp 	= p->UfltrResetAlarm.Output;
+
+		Peref_SensTuObserverUpdate(&p->InDigSignalObserver);
+
+		//результат фильтрации передаём в структуру для расчёта RMS
+		p->InDigSignal.sigOpen.Input 		= p->InDigSignalObserver.UOpenOut;
+		p->InDigSignal.sigClose.Input 		= p->InDigSignalObserver.UCloseOut;
+	    p->InDigSignal.sigStop.Input		= p->InDigSignalObserver.UStopOut;
+		p->InDigSignal.sigMU.Input 			= p->InDigSignalObserver.UMuOut;
+		p->InDigSignal.sigResetAlarm.Input 	= p->InDigSignalObserver.UResetAlarmOut;
+		p->InDigSignal.sigReadyTU.Input 	= p->InDigSignalObserver.UReadyTuOut;
+		p->InDigSignal.sigDU.Input 			= p->InDigSignalObserver.UDuOut;
+		//функция расчёта RMS для сигналов ТУ
+		Peref_SinObserverUpdateFloat(&p->InDigSignal.sigOpen);
+		Peref_SinObserverUpdateFloat(&p->InDigSignal.sigClose);
+		Peref_SinObserverUpdateFloat(&p->InDigSignal.sigStop);
+		Peref_SinObserverUpdateFloat(&p->InDigSignal.sigMU);
+		Peref_SinObserverUpdateFloat(&p->InDigSignal.sigResetAlarm);
+		Peref_SinObserverUpdateFloat(&p->InDigSignal.sigReadyTU);
+		Peref_SinObserverUpdateFloat(&p->InDigSignal.sigDU);
+
+	//------------------ Забираем данные с датчиков-----------------------------------
+	p->URfltr.Input = ADC_UR;
 	p->USfltr.Input = ADC_US;
 	p->UTfltr.Input = ADC_UT;
 	p->IUfltr.Input = ADC_IU;
@@ -143,23 +156,24 @@ void Peref_18kHzCalc(TPeref *p) // 18 кГц
 	peref_ApFilter3Calc(&p->UTfltr);
 	peref_ApFilter3Calc(&p->IUfltr);
 	peref_ApFilter3Calc(&p->IVfltr);
-	peref_ApFilter3Calc(&p->IWfltr);*/
+	peref_ApFilter3Calc(&p->IWfltr);
 
 	//-------------- Обработка синусойды ------------------------------
 
-/*	p->sensObserver.URinp = p->URfltr.Output;
+	p->sensObserver.URinp = p->URfltr.Output;
 	p->sensObserver.USinp = p->USfltr.Output;
 	p->sensObserver.UTinp = p->UTfltr.Output;
 	p->sensObserver.IUinp = p->IUfltr.Output;
 	p->sensObserver.IVinp = p->IVfltr.Output;
-	p->sensObserver.IWinp = p->IWfltr.Output;*/
+	p->sensObserver.IWinp = p->IWfltr.Output;
 
+/*
 	p->sensObserver.URinp = ADC_UR;
 	p->sensObserver.USinp = ADC_US;
 	p->sensObserver.UTinp = ADC_UT;
 	p->sensObserver.IUinp = ADC_IU;
 	p->sensObserver.IVinp = ADC_IV;
-	p->sensObserver.IWinp = ADC_IW;
+	p->sensObserver.IWinp = ADC_IW;*/
 
 	Peref_SensObserverUpdate(&p->sensObserver);
 
@@ -172,12 +186,12 @@ void Peref_18kHzCalc(TPeref *p) // 18 кГц
 	p->sinObserver.IV.Input = p->sensObserver.IVout;
 	p->sinObserver.IW.Input = p->sensObserver.IWout;
 
-	Peref_SinObserverUpdate(&p->sinObserver.UR);
-	Peref_SinObserverUpdate(&p->sinObserver.US);
-	Peref_SinObserverUpdate(&p->sinObserver.UT);
-	Peref_SinObserverUpdate(&p->sinObserver.IU);
-	Peref_SinObserverUpdate(&p->sinObserver.IV);
-	Peref_SinObserverUpdate(&p->sinObserver.IW);
+	Peref_SinObserverUpdateFloat(&p->sinObserver.UR);
+	Peref_SinObserverUpdateFloat(&p->sinObserver.US);
+	Peref_SinObserverUpdateFloat(&p->sinObserver.UT);
+	Peref_SinObserverUpdateFloat(&p->sinObserver.IU);
+	Peref_SinObserverUpdateFloat(&p->sinObserver.IV);
+	Peref_SinObserverUpdateFloat(&p->sinObserver.IW);
 
 	Peref_PhaseOrderUpdate(&p->phaseOrder);
 

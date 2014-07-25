@@ -30,7 +30,7 @@ extern "C" {
 //--------------------------------------------------------
 
 typedef struct {
-	TCommMPU			localControl;		// Пульт местного управления
+	TCommMPU			localControl;	// Пульт местного управления
 	//----
 	TDigitalInput 		digitInput;		// Цифровой вход: телеуправлен
 	// ---
@@ -40,12 +40,12 @@ typedef struct {
 	// ---
 	Uns					outputCmdSrc;	// Выход: источник команд
 	// ---
-	TMbBBPort  			mbBkp;				// ModBus - БКП
-	TMbPort  			mbAsu;				// ModBus - АСУ
-	TMbPort  			mbShn;				// ModBus - УПП
-	TMbPort  			mbBt;				// ModBus - Bluetooth
-	TBluetoothPort		Bluetooth;			// Bluetooth
-	TBKPData			BkpData;			// структура обмена данными с БКП
+	TMbBBPort  			mbBkp;			// ModBus - БКП
+	TMbPort  			mbAsu;			// ModBus - АСУ
+	TMbPort  			mbShn;			// ModBus - УПП
+	TMbPort  			mbBt;			// ModBus - Bluetooth
+	TBluetoothPort		Bluetooth;		// Bluetooth
+	TBKPData			BkpData;		// структура обмена данными с БКП
 } TComm;
 //--------------------------------------------------------
 

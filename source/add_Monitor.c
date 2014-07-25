@@ -60,8 +60,8 @@ void MonitorUpdate(void){
 	switch (Monitor.program)
 	{
 		 case 1:
-			 	 	 Data1 = g_Peref.sensObserver.URinp;
-			 	 	 Data2 = g_Peref.sensObserver.URinp;		break;
+			 	 	 Data1 = AdcRegs.ADCRESULT10;
+			 	 	 Data2 = AdcRegs.ADCRESULT10;		break;
 		 case 2:
 					 Data1 = g_Peref.sensObserver.URout;
 					 Data2 = g_Peref.sensObserver.URout;		break;
@@ -72,11 +72,11 @@ void MonitorUpdate(void){
 		 					 Data1 = g_Peref.sensObserver.IUout;
 		 					 Data2 = g_Peref.sensObserver.IUout;		break;
 		 case 5:
-		 					 Data1 = g_Peref.sinObserver.IU.Output;
-		 					 Data2 = g_Peref.sinObserver.IU.Output;		break;
+		 					 Data1 = g_Peref.sinObserver.UR.Output;
+		 					 Data2 = g_Peref.sinObserver.UR.Input;		break;
 		 case 6:
-		 					 Data1 = g_Peref.sensObserver.URout;
-		 					 Data2 = g_Peref.sensObserver.URout;		break;
+		 					 Data1 = g_Peref.InDigSignalObserver.UStopOut;
+		 					 Data2 = g_Peref.InDigSignalObserver.UStopOut;		break;
 
 	}
 

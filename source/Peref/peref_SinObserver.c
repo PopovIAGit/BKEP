@@ -9,13 +9,54 @@
 ======================================================================*/
 #include "peref.h"
 
+
 void Peref_SinObserverInit(TSinPhaseObserver *p, Uns Freq)
 {
 	p->CurAngle = 0;
 	p->StepAngle = 18000 / Freq; // 50 √ц / 18000 √ц * 360 √рад = 1 √рад
 }
 
-void Peref_SinObserverUpdate(TSinPhaseObserver *p)		// –мс, угол, пол€рность сигнала
+void Peref_SinObserverInitFloat(TSinPhaseObserverFloat *p, Uns Freq)
+{
+	p->CurAngle = 0;
+	p->StepAngle = 18000 / Freq; // 50 √ц / 18000 √ц * 360 √рад = 1 √рад
+}
+
+void Peref_SinObserverUpdateFloat(TSinPhaseObserverFloat *p)		// –мс, угол, пол€рность сигнала Float
+{
+	register Uns Sign;
+
+	if (p->Input > 0)
+		Sign = 0;
+	else
+		Sign = 1;
+
+	p->CurAngle = p->CurAngle + p->StepAngle;
+
+	if (Sign != p->Sign)
+	{
+		if (p->CurAngle < MIN_ANGLE)  p->Polarity = 0;
+		else if (!Sign) p->Polarity = 1;
+		else p->Polarity = -1;
+		p->CurAngle = 0;
+		p->Sign = Sign;
+	}
+	else if (p->CurAngle > MAX_ANGLE)
+	{
+		p->Polarity = 0;
+		p->CurAngle = MAX_ANGLE;
+	}
+
+	p->Sum += pow(fabs(p->Input), 2);
+	if(++p->Counter >= BASE_ANGLE*2)
+	{
+		p->Output = (sqrt(p->Sum / (BASE_ANGLE*2)));
+		p->Sum = 0;
+		p->Counter = 0;
+	}
+}
+
+void Peref_SinObserverUpdate(TSinPhaseObserver *p)		// –мс, угол, пол€рность сигнала Int
 {
 	register Uns Sign;
 

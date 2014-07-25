@@ -90,7 +90,7 @@ void Stat_Init(TStat *s)
 	FM25V10_Init(&Eeprom2);*/
 }
 //---------------------------------------------------
-void InitTables(void)
+/*void InitTables(void)
 {
 	ImEvLogMainAddrsTable[0]	= GetAdr(ramGroupB.DevTime);
 	ImEvLogMainAddrsTable[1]	= GetAdr(ramGroupB.DevDate);
@@ -138,7 +138,7 @@ void InitTables(void)
 	ImParamLogAddrsTable[3] = NEW_PARAM_ADDR;
 	ImParamLogAddrsTable[4] = NEW_PARAM_VALUE_ADDR;
 
-}
+}*/
 //---------------------------------------------------
 
 void InitInfoModule(TInfoModule *im)
@@ -437,21 +437,21 @@ void LogEvControl(TStat *s)
 
 void GetCurrentCmd(TStat *s)
 {
-	/*TBurCmd LogControlWord = bcmNone;
+	TBurCmd LogControlWord = bcmNone;
 	static Uns PrevEvLogValue = 0;
 	static Bool FirstCmd = true;
 
-	if (Mcu.EvLog.Value != 0)
+	if (g_Core.VlvDrvCtrl.EvLog.Value != 0)
 		LogControlWord = bcmNone;
 
 	// Отсекаем повторяющуся команду Стоп
-	if ((Mcu.EvLog.Value == CMD_STOP) && (PrevEvLogValue == CMD_STOP))
+	if ((g_Core.VlvDrvCtrl.EvLog.Value == CMD_STOP) && (PrevEvLogValue == CMD_STOP))
 	{
-		Mcu.EvLog.Value = 0;
+		g_Core.VlvDrvCtrl.EvLog.Value = 0;
 		return;
 	}
 
-	switch(Mcu.EvLog.Value)
+	switch(g_Core.VlvDrvCtrl.EvLog.Value)
 	{
 		case CMD_STOP: 			LogControlWord = bcmStop;				break;
 		case CMD_CLOSE: 		LogControlWord = bcmClose;				break;
@@ -468,23 +468,23 @@ void GetCurrentCmd(TStat *s)
 		default: LogControlWord = bcmNone; break;
 	}
 
-	if (Mcu.EvLog.Value != 0)
+	if (g_Core.VlvDrvCtrl.EvLog.Value != 0)
 	{
-		PrevEvLogValue = Mcu.EvLog.Value;
+		PrevEvLogValue = g_Core.VlvDrvCtrl.EvLog.Value;
 
 		if (FirstCmd)
 		{
 			FirstCmd = false;
 
 			// Если самая первая из команд - Стоп, то убираем ее
-			if (Mcu.EvLog.Value == CMD_STOP)
+			if (g_Core.VlvDrvCtrl.EvLog.Value == CMD_STOP)
 				LogControlWord = bcmNone;
 		}
 	}
 
-	Mcu.EvLog.Value = 0;
+	g_Core.VlvDrvCtrl.EvLog.Value = 0;
 
-	s->LogCmd.CmdReg = LogControlWord;*/
+	s->LogCmd.CmdReg = LogControlWord;
 }
 
 void LogCmdControl(TStat *s)
