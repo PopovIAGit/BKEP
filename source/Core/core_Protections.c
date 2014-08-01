@@ -12,6 +12,21 @@
 
 void Core_ProtectionsInit(TCoreProtections *p)
 {
+	//---------ЗАЩИТЫ ПРОЦЕССА--------------------------------------------------------
+	//---------Муфта--------------------------------------------------------
+
+		// Муфта выставляется в core.c
+
+	//---------Нет Движенния-----------------------------------------------
+
+	p->NoMove.Cfg.all				= PRT_CFG_SET(CAN_BE_MUFTA, INP_LESS_LEVEL,NoMove_bit,HYST_OFF);
+	p->NoMove.Input					= (Int *)&g_Ram.ramGroupC.Position;
+	p->NoMove.Output				= (Uns *)&p->outFaults.Proc.all;
+	p->NoMove.EnableLevel			= (Int *)&g_Ram.ramGroupC.MuffZone;
+	p->NoMove.DisableLevel			= (Int *)&g_Ram.ramGroupC.MuffZone;
+	p->NoMove.Timeout				= &g_Ram.ramGroupB.NoMoveTime;
+	p->NoMove.Scale					= PROTECT_SCALE;
+
 	//---------ЗАЩИТЫ ПО НАПРЯЖЕНИЮ---------------------------------------
 	//---------Пониженное напряжение (авария)---------------------------------------
 
@@ -371,7 +386,6 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 		State = 0;	// вернулись к истокам
 		break;
 	}
-
 }
 
 // Индикация аварий процесса и устройства
@@ -389,11 +403,12 @@ void Core_DevProc_FaultIndic(TCoreProtections *p)
 
 	if(g_Ram.ramGroupC.ErrIndic != pmOff)
 	{
-		p->outDefects.Dev.bit.Memory1 = 0;//g_Eeprom1.Error;
-		p->outDefects.Dev.bit.Memory2 = 0;//g_Eeprom2.Error;
+		//p->outDefects.Dev.bit.Memory1 = g_Eeprom1.Error;
+		//p->outDefects.Dev.bit.Memory2 = g_Eeprom2.Error;
 		p->outDefects.Dev.bit.PosSens = 0;//??? добавить при наличии драйвера
-		p->outDefects.Dev.bit.Rtc 	 = 0;
-		p->outDefects.Dev.bit.TSens 	 = 0;
+		p->outDefects.Dev.bit.Rtc 	  = (Uns)g_Peref.Rtc.Error;
+		p->outDefects.Dev.bit.TSens   = (Uns)g_Peref.TSens.Error;
+		p->outDefects.Dev.bit.Dac     = (Uns)g_Peref.Dac.Error;
 	}
 }
 
@@ -480,5 +495,7 @@ void Core_ProtectionsClear(TCoreProtections *p)
 
 void Core_ProtectionsUpdate(TCoreProtections *p)
 {
-
+	Core_ProtecionSHC_Update(&p->ShC_U);
+	Core_ProtecionSHC_Update(&p->ShC_V);
+	Core_ProtecionSHC_Update(&p->ShC_W);
 }

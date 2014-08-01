@@ -242,8 +242,14 @@ void InitPeripheralClocks(void);
 void InitPieVectTable(void);
 void EnableInterrupts(void);
 void InitSpiGpio(void);
+
+
+extern struct I2CMSG I2cMsg;
+
 void InitI2CGpio(void);
 void InitI2C(void);
+extern void I2C_update(struct I2CMSG *Msg);
+
 
 //???
 void ADC_cal(void);

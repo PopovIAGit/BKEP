@@ -83,6 +83,16 @@
 #define I2C_NO    0
 #define I2C_DUMMY_BYTE 0
 
+// I2C Message Commands
+#define I2C_MSGSTAT_INACTIVE          0x0000
+#define I2C_MSGSTAT_SEND_WITHSTOP     0x0010
+#define I2C_MSGSTAT_WRITE_BUSY        0x0011
+#define I2C_MSGSTAT_SEND_NOSTOP       0x0020
+#define I2C_MSGSTAT_SEND_NOSTOP_BUSY  0x0021
+#define I2C_MSGSTAT_RESTART           0x0022
+#define I2C_MSGSTAT_READ_BUSY         0x0023
+#define I2C_MSGSTAT_NACK			  0x0030
+
 
 //--------------------------------------------
 // Structures
@@ -90,23 +100,12 @@
 
 // I2C Message Structure
 struct I2CMSG {
-  Uint16 MsgStatus;				// Word stating what state msg is in:
-  								//   I2C_MSGCMD_INACTIVE = do not send msg
-  								//   I2C_MSGCMD_BUSY = msg start has been sent,
-  								//                     awaiting stop
-  								//   I2C_MSGCMD_SEND_WITHSTOP = command to send
-  								//       master trans msg complete with a stop bit
-  								//   I2C_MSGCMD_SEND_NOSTOP = command to send
-  								//       master trans msg without the stop bit
-  								//   I2C_MSGCMD_RESTART = command to send a restart
-  								//       as a master receiver with a stop bit
-  Uint16 SlaveAddress;			// I2C address of slave msg is intended for
-  Uint16 NumOfBytes;			// Num of valid bytes in (or to be put in MsgBuffer)
-  Uint16 MemoryHighAddr;		// EEPROM address of data associated with msg (high byte)
-  Uint16 MemoryLowAddr;			// EEPROM address of data associated with msg (low byte)
-  Uint16 MsgBuffer[I2C_MAX_BUFFER_SIZE];	// Array holding msg data - max that
-  										    // MAX_BUFFER_SIZE can be is 16 due to
-  										    // the FIFO's
+	Uint16 Status;			// Message Command
+	Uint16 Busy;			// Busy flag
+	Uint16 Slave;			// Address of slave msg
+	Uint16 RxBytes;			// Num of valid bytes
+	Uint16 TxBytes;			// Num of valid bytes
+	Uint16 Buffer[16];		// Array holding msg data
 };
 
 
