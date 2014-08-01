@@ -22,13 +22,14 @@
 #include "peref_Calibs.h"			// PIA 14.04.14
 #include "peref_ContactorControl.h"	// PIA 17.04.14
 //#include "peref_DisplayDrv.h"
-#include "peref\peref_LedsDrv.h"
+#include "peref_LedsDrv.h"
+#include "peref_Clock.h"
 //#include "peref_TempObserver.h"
-//#include "peref_Clock.h"
 //#include "peref_SDModDrv.h"
 //#include "peref_EncoderDrv.h"
-//#include "peref_TempDrv.h"
-//#include "peref_Dac7513Drv.h"
+#include "peref_ADT75Drv.h"
+#include "peref_DacMCP4276Drv.h"
+#include  "peref_RtcDS3231Drv.h"
 //
 #ifdef __cplusplus
 extern "C" {
@@ -71,6 +72,11 @@ typedef struct {
 	//---------------------------
 	TLeds				leds;
 	//---------------------------
+	MCP4726				Dac;					// Цап
+	ADT75				TSens;					// Датчик температуры
+	DS3231				Rtc;					// Часы
+	RTC_Obj				RtcData;
+	//---------------------------
 	TSensTuObserver		InDigSignalObserver;	// Масштабирование сигналов с датчиков
 	TSinSignalObserver  InDigSignal;			// Вычисление RMS
 
@@ -81,6 +87,8 @@ void Peref_Init(TPeref *);
 void Peref_18kHzCalc(TPeref *);
 void Peref_50HzCalc (TPeref *);
 void Peref_10HzCalc (TPeref *);
+void I2CDevUpdate(TPeref *);
+void RTC_Control(void);
 
 //------------------- Глобальные переменные --------------------------------
 extern	TPeref	g_Peref;

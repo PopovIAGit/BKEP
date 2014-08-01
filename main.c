@@ -43,7 +43,6 @@ void main(void) {
 
 	InterruptInit();
 
-
 	StartCpuTimer0();
 
 	EINT;          						// Enable Global interrupt INTM
@@ -56,32 +55,6 @@ void main(void) {
 
 		Comm_Update(&g_Comm);
 		//ImUpdate(&g_Stat.Im);
-
-
-/*
-		g_Comm.mbBt.Frame.Buf[0]=1;
-		g_Comm.mbBt.Frame.Buf[1]=0x10;
-		g_Comm.mbBt.Frame.Buf[2]=0;
-		g_Comm.mbBt.Frame.Buf[3]=7;
-		g_Comm.mbBt.Frame.Buf[4]=0;
-		g_Comm.mbBt.Frame.Buf[5]=1;
-
-		g_Comm.mbBt.Frame.TxLength=6;
-		Crc = CalcFrameCrc1((&g_Comm.mbBt.Frame.Buf[0]), g_Comm.mbBt.Frame.TxLength);
-		g_Comm.mbBt.Frame.Buf[g_Comm.mbBt.Frame.TxLength++] = (Byte)(Crc & 0xFF);
-		g_Comm.mbBt.Frame.Buf[g_Comm.mbBt.Frame.TxLength++] = (Byte)(Crc >> 8);
-*/
-		if (PassCount==1)
-		{
-		   //DELAY_US(50000);
-		   I2CA_setCommand();
-		   //I2CA_ReadTemper();
-		}
-		if (PassCount==2)
-		{
-		   //DELAY_US(50000);
-		   I2CA_ReadTemper();
-		}
 
 	}
 }

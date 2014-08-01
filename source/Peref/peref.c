@@ -22,6 +22,7 @@
 
 TPeref	g_Peref;
 
+Bool RtcStart    = False;
 
 //---------------------------------------------------
 void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновление
@@ -92,6 +93,11 @@ void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновлени
 	ContactorInit(&p->ContactorControl);
 	// ----—игнализаци€ лампочками-----------------------
 	Peref_LedsInit(&p->leds, Prd10HZ);
+	ADT75_Init(&p->TSens);
+	MCP4276_Init(&p->Dac);
+	DS3231_Init(&p->Rtc);
+	p->Rtc.Data =(char *) &p->RtcData;
+
 }
 //---------------------------------------------------
 void Peref_18kHzCalc(TPeref *p) // 18 к√ц
@@ -197,6 +203,9 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
 
 	if (!p->sinObserver.IV.CurAngle)	p->Phifltr.Input = p->sinObserver.US.CurAngle;
 
+	//-------------------------------------------------------------
+
+	I2CDevUpdate(p);
 }
 
 //---------------------------------------------------
@@ -218,7 +227,73 @@ void Peref_50HzCalc(TPeref *p)	// 50 √ц
 
 void Peref_10HzCalc(TPeref *p)	// 10 √ц
 {
+	int16 PosPr = 0;
+//-------- логика ÷јѕ -------------------------------------------------
+	if (g_Ram.ramGroupG.Mode)	p->Dac.Data = g_Ram.ramGroupG.DacValue;
+	else if(g_Ram.ramGroupH.CalibState != csCalib) p->Dac.Data = 0;
+	else
+	{
+		PosPr = g_Ram.ramGroupA.PositionPr;
+		if(PosPr < 0) PosPr = 0;
+		if(PosPr > 1000) PosPr = 1000;
+		p->Dac.Data = g_Ram.ramGroupC.Dac_Offset + (Uint16)(0.001 * (g_Ram.ramGroupC.Dac_Mpy - g_Ram.ramGroupC.Dac_Offset) * PosPr);
+	}
+	//---------------------------------------------------------------------------
+}
+//-----------------ќбработка данных с микросхем по »2—---------------------------
+void I2CDevUpdate(TPeref *p)
+{
+	static Uint16 Step = 0;
 
+	I2C_update(&I2cMsg);
+
+	switch(Step)
+	{
+		case 0: ADT75_Update(&p->TSens); if (!p->TSens.Busy) Step = 1; break;
+		case 1: MCP4726_Update(&p->Dac); if (!p->Dac.Busy)   Step = 2; break;
+		case 2: DS3231_Update(&p->Rtc);  if (!p->Rtc.Busy)   Step = 0; break;
+	}
 }
 
 //---------------------------------------------------
+
+void RTC_Control(void)
+{
+		static Uns PrevTime;
+		static Uns PrevDate;
+		TTimeVar *DevTime = &g_Ram.ramGroupB.DevTime;
+		TDateVar *DevDate = &g_Ram.ramGroupB.DevDate;
+
+		if(g_Peref.Rtc.Busy) return;
+
+		if (RtcStart)
+		{
+			if (DevTime->all != PrevTime)
+			{
+				RTC_SetTime(&g_Peref.RtcData, DevTime, 0);
+				g_Peref.Rtc.Flag = True;
+			}
+			if (DevDate->all != PrevDate)
+			{
+				RTC_SetDate(&g_Peref.RtcData, DevDate, 1);
+				g_Peref.Rtc.Flag = True;
+			}
+			if (RTC_TimeCorr(&g_Peref.RtcData, g_Ram.ramGroupB.TimeCorrection))
+			{
+				g_Peref.Rtc.Flag = True;
+			}
+		}
+
+		if (!g_Peref.Rtc.Flag)
+		{
+			RTC_GetTime(&g_Peref.RtcData, DevTime);
+			RTC_GetDate(&g_Peref.RtcData, DevDate);
+			g_Ram.ramGroupH.Seconds =(Uns) &g_Peref.RtcData.Sec;
+		}
+
+		PrevTime = DevTime->all;
+		PrevDate = DevDate->all;
+		RtcStart = True;
+}
+
+//----------------------------------------------

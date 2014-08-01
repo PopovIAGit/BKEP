@@ -28,6 +28,7 @@
 #define	NoOpen_bit			3
 #define NoCalib_bit			4
 #define Overway_bit			5
+#define Mufta_bit			6
 #define MuDuDef_bit			7
 
 // Номера битов g_Structs.h -> TNetReg
@@ -74,6 +75,7 @@
 typedef struct {
 	// Входы --------------------------------------------------
 	// -------- Диагностика процесса ------------
+		TAlarmElem			NoMove;				// Нет движения - авария
 	// -------- Диагностика сети ----------------
 		TAlarmElem 			underVoltageR;		// Понижение напряжения R  - авария
 		TAlarmElem 			underVoltageS;		// Понижение напряжения S  - авария

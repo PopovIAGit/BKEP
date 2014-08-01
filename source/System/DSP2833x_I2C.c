@@ -14,6 +14,13 @@
 #include "chip\DSP2833x_Device.h"     // DSP2833x Headerfile Include File
 //#include "DSP2833x_Examples.h"   // DSP2833x Examples Include File
 
+#define I2C_STOP	0x0800
+#define I2C_START	0x2000
+
+struct I2CMSG I2cMsg;
+
+static void ResetFifo(void);
+
 //---------------------------------------------------------------------------
 // InitI2C: 
 //---------------------------------------------------------------------------
@@ -21,11 +28,14 @@
 //
 void InitI2C(void)
 {
+
+	memset(&I2cMsg, 0, sizeof(struct I2CMSG));
+
 // Initialize I2C
-   I2caRegs.I2CSAR = 0x0048;		// Slave address - EEPROM control code
+  // I2caRegs.I2CSAR = 0x0048;		// Slave address - EEPROM control code
 
    //#if (CPU_FRQ_150MHZ)             // Default - For 150MHz SYSCLKOUT
-		I2caRegs.I2CPSC.all = 14;   // Prescaler - need 7-12 Mhz on module clk (150/15 = 10MHz)
+	/*	I2caRegs.I2CPSC.all = 14;   // Prescaler - need 7-12 Mhz on module clk (150/15 = 10MHz)
    //#endif
 
    I2caRegs.I2CCLKL = 10;			// NOTE: must be non zero
@@ -35,7 +45,22 @@ void InitI2C(void)
    I2caRegs.I2CMDR.all = 0x0020;	// Take I2C out of reset
 									// Stop I2C when suspended
    I2caRegs.I2CFFTX.all = 0x6000;	// Enable FIFO mode and TXFIFO
-   I2caRegs.I2CFFRX.all = 0x2040;	// Enable RXFIFO, clear RXFFINT,
+   I2caRegs.I2CFFRX.all = 0x2040;	// Enable RXFIFO, clear RXFFINT,*/
+
+		I2caRegs.I2CMDR.all  = 0x00;
+		#ifdef CPU_FRQ_150MHZ
+		I2caRegs.I2CPSC.all  = 14;
+		#endif
+		#ifdef CPU_FRQ_100MHZ
+		I2caRegs.I2CPSC.all  = 9;
+		#endif
+		I2caRegs.I2CCLKL     = 45;
+		I2caRegs.I2CCLKH     = 50;
+		I2caRegs.I2CIER.all  = 0x00;
+		I2caRegs.I2CFFTX.all = 0x6000;
+		I2caRegs.I2CFFRX.all = 0x2040;
+		I2caRegs.I2CMDR.all  = 0x20;
+
 }	
 
 //---------------------------------------------------------------------------
@@ -81,7 +106,91 @@ void InitI2CGpio(void)
     EDIS;
 }
 
+void I2C_update(struct I2CMSG *Msg)
+{
+	Uint16 i;
 
+	if (I2caRegs.I2CSTR.bit.ARDY)
+	{
+		if (I2caRegs.I2CSTR.bit.NACK)
+		{
+			I2caRegs.I2CMDR.bit.STP  = 1;
+			I2caRegs.I2CSTR.bit.NACK = 1;
+			Msg->Status = I2C_MSGSTAT_NACK;
+		}
+		else if (Msg->Status == I2C_MSGSTAT_SEND_NOSTOP_BUSY)
+		{
+			Msg->Status = I2C_MSGSTAT_RESTART;
+		}
+		I2caRegs.I2CSTR.bit.ARDY = 1;
+	}
+
+	if (I2caRegs.I2CSTR.bit.SCD)
+	{
+		switch(Msg->Status)
+		{
+			case I2C_MSGSTAT_WRITE_BUSY:
+				Msg->Status = I2C_MSGSTAT_INACTIVE;
+				break;
+			case I2C_MSGSTAT_SEND_NOSTOP_BUSY:
+				Msg->Status = I2C_MSGSTAT_SEND_NOSTOP;
+				break;
+			case I2C_MSGSTAT_READ_BUSY:
+   			for (i=0; i < Msg->RxBytes; i++)
+					Msg->Buffer[i] = I2caRegs.I2CDRR;
+				Msg->Status = I2C_MSGSTAT_INACTIVE;
+				break;
+		}
+		I2caRegs.I2CSTR.bit.SCD = 1;
+	}
+
+	switch(Msg->Status)
+	{
+		case I2C_MSGSTAT_SEND_WITHSTOP:
+			if (I2caRegs.I2CMDR.bit.STP) break;
+			if (I2caRegs.I2CSTR.bit.BB)  break;
+			ResetFifo();
+
+			I2caRegs.I2CSAR = Msg->Slave;
+			I2caRegs.I2CCNT = Msg->TxBytes;
+   		for (i=0; i < Msg->TxBytes; i++)
+				I2caRegs.I2CDXR = Msg->Buffer[i];
+			I2caRegs.I2CMDR.all = (0x4620|I2C_STOP|I2C_START);
+			Msg->Status = I2C_MSGSTAT_WRITE_BUSY;
+			break;
+
+		case I2C_MSGSTAT_SEND_NOSTOP:
+			if (I2caRegs.I2CMDR.bit.STP) break;
+			if (I2caRegs.I2CSTR.bit.BB)  break;
+			ResetFifo();
+
+			I2caRegs.I2CSAR = Msg->Slave;
+			I2caRegs.I2CCNT = Msg->TxBytes;
+   		for (i=0; i < Msg->TxBytes; i++)
+				I2caRegs.I2CDXR = Msg->Buffer[i];
+			I2caRegs.I2CMDR.all = (0x4620|I2C_START);
+			Msg->Status = I2C_MSGSTAT_SEND_NOSTOP_BUSY;
+			break;
+
+		case I2C_MSGSTAT_RESTART:
+			if (I2caRegs.I2CMDR.bit.STP) break;
+			ResetFifo();
+
+			I2caRegs.I2CSAR = Msg->Slave;
+			I2caRegs.I2CCNT = Msg->RxBytes;
+			I2caRegs.I2CMDR.all = (0x4420|I2C_STOP|I2C_START);
+			Msg->Status = I2C_MSGSTAT_READ_BUSY;
+			break;
+	}
+}
+
+static void ResetFifo(void)
+{
+	I2caRegs.I2CFFRX.bit.RXFFRST = 0;
+	I2caRegs.I2CFFTX.bit.TXFFRST = 0;
+	I2caRegs.I2CFFRX.bit.RXFFRST = 1;
+	I2caRegs.I2CFFTX.bit.TXFFRST = 1;
+}
 	
 //===========================================================================
 // End of file.
