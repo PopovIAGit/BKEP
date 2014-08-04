@@ -74,12 +74,12 @@ typedef struct RTC_Lite {
 
 void Peref_RTCUpdate(void *);
 void RTC_Tick(void *);
-Byte RTC_DefMaxDay(Byte, Byte);
+char RTC_DefMaxDay(char, char);
 void RTC_GetTime(void *, TTimeVar *);
 void RTC_GetDate(void *, TDateVar *);
-void RTC_SetTime(void *, TTimeVar *, Byte);
-void RTC_SetDate(void *, TDateVar *, Byte);
-Byte RTC_TimeCorr(void *, Int Corr);
+void RTC_SetTime(void *, TTimeVar *, char);
+void RTC_SetDate(void *, TDateVar *, char);
+char RTC_TimeCorr(void *, int Corr);
 
 #ifdef __cplusplus
 }

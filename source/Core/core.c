@@ -260,6 +260,8 @@ void Core_ControlMode(TCore *p)
 		break;
 	case wmMove:
 		g_Ram.ramGroupA.Torque = p->TorqObs.Indication; // отображаем текущий момент
+		if(p->TorqObs.Indication < p->MotorControl.TorqueSet) p->MotorControl.MufTimer = 0;
+		else if (++p->MotorControl.MufTimer >= MOVE_STATE_TIME) p->Protections.outFaults.Proc.bit.Mufta = 1;	// выставл€ем муфту если в течении секунды момент больше заданного
 		break;
 	}
 }

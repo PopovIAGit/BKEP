@@ -385,7 +385,7 @@ typedef struct _TRamGroupH
 	Uns             Imid;				 // 91.Средний ток
   	Uns             ISkewValue;          // 92.Асиметрия токов нагрузки
 	Uns             Position;            // 93.Положение
-	LgUns  			FullStep;        	 // 94.Полный ход
+	LgUns  			FullStep;        	 // 94-95.Полный ход
 	TReverseType	ReverseType;         // 96.Тип реверса
 	Uns				DemoPosition1;       // 97.Демо положение 1
 	Uns				DemoPosition2;       // 98.Демо положение 2

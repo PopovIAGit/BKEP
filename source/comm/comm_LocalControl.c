@@ -11,6 +11,7 @@
 
 #include "comm.h"
 #include "core_Menu.h"
+#include "g_Ram.h"
 
 void Comm_LocalControlInit(TCommMPU *p)
 {
@@ -31,6 +32,9 @@ void Comm_LocalControlInit(TCommMPU *p)
 	p->key1Param.timer = 0;
 	p->key2Param.timer = 0;
 	p->key3Param.timer = 0;
+
+	p->KeyLogicSignal = ToPtr(&g_Ram.ramGroupB.KeyInvert);
+	p->inputBCP_Data  = ToPtr(&g_Ram.ramGroupC.HallBlock);
 }
 
 // Драйвер обработки кнопок ЩСУ
@@ -38,7 +42,7 @@ Uns Comm_LocalKeyUpdate(TCommMPU *p)
 {
 	static Uns result;
 
-	if(!KEY_1 && !KEY_2 && !KEY_3)
+	if(!KEY_1 && KEY_2 && !KEY_3)
 	{
 		p->key1Param.timer = 0;
 		p->key2Param.timer = 0;
@@ -49,7 +53,7 @@ Uns Comm_LocalKeyUpdate(TCommMPU *p)
 	}
 
 	// Close
-	if (!KEY_1)
+	if (!KEY_1 ^ p->KeyLogicSignal->bit.Close)
 		p->key1Param.timer = 0;
 	else if (p->key1Param.timer < p->key1Param.timeout)
 		p->key1Param.timer++;
@@ -57,7 +61,7 @@ Uns Comm_LocalKeyUpdate(TCommMPU *p)
 		result = KEY_CLOSE;
 
 	// Open
-	if (!KEY_2)
+	if (!KEY_3 ^ p->KeyLogicSignal->bit.Open)
 		p->key2Param.timer = 0;
 	else if (p->key2Param.timer < p->key2Param.timeout)
 		p->key2Param.timer++;
@@ -65,7 +69,7 @@ Uns Comm_LocalKeyUpdate(TCommMPU *p)
 		result = KEY_OPEN;
 
 	// Stop
-	if (!KEY_3)
+	if (!KEY_2 ^ p->KeyLogicSignal->bit.Stop)
 		p->key3Param.timer = 0;
 	else if (p->key3Param.timer < p->key3Param.timeout)
 		p->key3Param.timer++;
@@ -80,7 +84,7 @@ Uns Comm_LocalButtonUpdate(TCommMPU *p)
 {
 	static Uns result;
 
-	if (!p->inputBCP_Data.all || ((p->inputBCP_Data.all & hmClose) && (p->inputBCP_Data.all & hmOpen)))
+	if (!p->inputBCP_Data->all || ((p->inputBCP_Data->all & hmClose) && (p->inputBCP_Data->all & hmOpen)))
 	{
 		p->btn1Param.timer = 0;
 		p->btn2Param.timer = 0;
@@ -92,14 +96,14 @@ Uns Comm_LocalButtonUpdate(TCommMPU *p)
 	}
 	else
 	{
-		switch(p->inputBCP_Data.all)
+		switch(p->inputBCP_Data->all)
 		{
 		case (1 << hmOpen):
 
 			if (++p->btn1Param.timer > p->btn1Param.timeout)
 			{
 				p->btn1Param.timer = 0;
-				result |=  BIT0;
+				result |=  BTN_OPEN_BIT;
 			}
 
 			break;
@@ -108,7 +112,7 @@ Uns Comm_LocalButtonUpdate(TCommMPU *p)
 			if (++p->btn2Param.timer > p->btn2Param.timeout)
 			{
 				p->btn2Param.timer = 0;
-				result |= BIT1;
+				result |= BTN_CLOSE_BIT;
 			}
 
 			break;
@@ -117,7 +121,7 @@ Uns Comm_LocalButtonUpdate(TCommMPU *p)
 			if (++p->btn4Param.timer > p->btn4Param.timeout)
 			{
 				p->btn4Param.timer = 0;
-				result |= BIT2;
+				result |= BTN_STOPMU_BIT;
 			}
 			break;
 		case (1 << hmStopDu):
@@ -125,7 +129,7 @@ Uns Comm_LocalButtonUpdate(TCommMPU *p)
 			if (++p->btn3Param.timer > p->btn3Param.timeout)
 			{
 				p->btn3Param.timer = 0;
-				result |= BIT3;
+				result |= BTN_STOPDU_BIT;
 			}
 
 			break;
@@ -134,3 +138,4 @@ Uns Comm_LocalButtonUpdate(TCommMPU *p)
 	}
 	return result;
 }
+

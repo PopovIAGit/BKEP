@@ -24,8 +24,25 @@ void Core_ProtectionsAlarmUpdate(TAlarmElem *p)
 	{
 		if (p->Cfg.bit.CanBeReseted)
 			*p->Output &= ~BitMask;
-		p->Timer = 0;
+			 p->Timer = 0;
+			 p->Signal = ToLong(p->Input);
 		return;
+	}
+
+	if(p->Cfg.bit.CanBeReseted)
+	{
+		if ((int16) labs(ToLong(p->Input) - p->Signal) >= *p->EnableLevel)
+		{
+			p->Timer = 0;
+			p->Signal = ToLong(p->Input);
+		}
+		else
+		{
+			if (p->Timer < (*p->Timeout * p->Scale))
+				p->Timer++;
+			else
+				*p->Output |= BitMask;
+		}
 	}
 
 	if (!(*p->Output & BitMask))	// Если аварии нет (*p->Output & BitMask дает "0")

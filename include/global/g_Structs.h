@@ -131,7 +131,7 @@ typedef union _TProcessReg {
      	Uns NoOpen:1;	   	// 3     Не задано положение открыто
 		Uns NoCalib:1;		// 4     Калибровка не выполнена
      	Uns Overway:1;		// 5     Уплотнение не достигнуто
-		Uns Rsvd1:1;		// 6	 Резерв
+		Uns Mufta:1;		// 6	 Муфта
 		Uns MuDuDef:1;		// 7     Ошибка по дискретным входам Му/Ду
 		Uns Rsvd:8;			// 8-15  Резерв
 	} bit;
@@ -209,7 +209,8 @@ typedef union _TDeviceReg {
 		Uns Tl_BCP:1;		// 6     Переохлождение блока БКП
 		Uns Th_BCD:1;		// 7     Перегрев блока БКД
 		Uns Tl_BCD:1;		// 8     Переохлождение блока БКД
-     	Uns Rsvd:7;       	// 9-15  Резерв
+		Uns Dac:1;			// 8     Переохлождение блока БКД
+     	Uns Rsvd:6;       	// 10-15  Резерв
   } bit;
 } TDeviceReg;
 

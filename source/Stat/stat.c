@@ -92,7 +92,7 @@ void Stat_Init(TStat *s)
 	FM25V10_Init(&Eeprom2);*/
 }
 //---------------------------------------------------
-void InitTables(void)
+/*void InitTables(void)
 {
 	ImEvLogMainAddrsTable[0]	= GetAdr(ramGroupB.DevTime);
 	ImEvLogMainAddrsTable[1]	= GetAdr(ramGroupB.DevDate);
@@ -140,7 +140,7 @@ void InitTables(void)
 	ImParamLogAddrsTable[3] = NEW_PARAM_ADDR;
 	ImParamLogAddrsTable[4] = NEW_PARAM_VALUE_ADDR;
 
-}
+}*/
 //---------------------------------------------------
 
 void InitInfoModule(TInfoModule *im)

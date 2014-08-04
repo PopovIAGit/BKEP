@@ -43,34 +43,47 @@ typedef struct
 
 typedef struct
 {
+  Float Input;			// 	Входное мгновенное значение
+  Float Output;			//	Выходное действующее значение
+  Uns 	Sign;			//	Знак входного сигнала
+  Int 	Polarity;		//	Полярность
+  Uns 	CurAngle;		//	Угол фазы сигнала
+  Uns   StepAngle;		// 	Шаг изменения угла
+  Uns   Counter;		// 	Счетчик для более точного расчета интеграла
+  Float Sum;			//	Интеграл мгновенных значений
+} TSinPhaseObserverFloat;
+
+typedef struct
+{
 	Int Direction;
 	Int TmpDir;
 	Uns Timeout;
 	Uns Timer;
-	TSinPhaseObserver 	*UR;
-	TSinPhaseObserver	*US;
-	TSinPhaseObserver	*UT;
+	TSinPhaseObserverFloat 	*UR;
+	TSinPhaseObserverFloat	*US;
+	TSinPhaseObserverFloat	*UT;
 } TPhaseOrder;
 
 typedef struct
 {
-	TSinPhaseObserver UR;
-	TSinPhaseObserver US;
-	TSinPhaseObserver UT;
-	TSinPhaseObserver IU;
-	TSinPhaseObserver IV;
-	TSinPhaseObserver IW;
+	TSinPhaseObserverFloat UR;
+	TSinPhaseObserverFloat US;
+	TSinPhaseObserverFloat UT;
+	TSinPhaseObserverFloat IU;
+	TSinPhaseObserverFloat IV;
+	TSinPhaseObserverFloat IW;
+
 }TSinObserver;
 
 typedef struct
 {
-	TSinPhaseObserver	sigOpen;
-	TSinPhaseObserver	sigClose;
-	TSinPhaseObserver	sigStop;
-	TSinPhaseObserver	sigMU;
-	TSinPhaseObserver	sigResetAlarm;
-	TSinPhaseObserver	sigReadyTU;
-	TSinPhaseObserver	sigDU;
+	TSinPhaseObserverFloat	sigOpen;
+	TSinPhaseObserverFloat	sigClose;
+	TSinPhaseObserverFloat	sigStop;
+	TSinPhaseObserverFloat	sigMU;
+	TSinPhaseObserverFloat	sigResetAlarm;
+	TSinPhaseObserverFloat	sigReadyTU;
+	TSinPhaseObserverFloat	sigDU;
 }TSinSignalObserver;
 
 //--------------------  Глобальные переменные ------------------------------
@@ -79,6 +92,9 @@ typedef struct
 void Peref_SinObserverInit(TSinPhaseObserver *p, Uns Freq);
 void Peref_SinObserverUpdate(TSinPhaseObserver *p);
 void Peref_PhaseOrderUpdate(TPhaseOrder *p);
+
+void Peref_SinObserverInitFloat(TSinPhaseObserverFloat *p, Uns Freq);
+void Peref_SinObserverUpdateFloat(TSinPhaseObserverFloat *p);
 
 
 

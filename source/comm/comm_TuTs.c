@@ -115,8 +115,10 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//200 Ãö
 	//g_Ram.ramGroupH.ADC_STOP=g_Peref.AdcStop;
 	//g_Ram.ramGroupH.ADC_TEST_BLOCK=g_Peref.AdcTestBlock;
 
-	if (!(*p->TypeLogicSignal&OPEN_BIT)) DIN_Update_On(&p->dinOpen, p->TypeVoltSignal, OPEN_BIT);
-	else DIN_Update_Off(&p->dinOpen, p->TypeVoltSignal, OPEN_BIT);
+	if (!(*p->TypeLogicSignal & OPEN_BIT))
+		DIN_Update_On(&p->dinOpen, p->TypeVoltSignal, OPEN_BIT);
+	else
+		DIN_Update_Off(&p->dinOpen, p->TypeVoltSignal, OPEN_BIT);
 
 	if (!(*p->TypeLogicSignal&CLOSE_BIT)) DIN_Update_On(&p->dinClose, p->TypeVoltSignal, CLOSE_BIT);
 	else DIN_Update_Off(&p->dinClose, p->TypeVoltSignal, CLOSE_BIT);

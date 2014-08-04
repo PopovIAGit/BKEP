@@ -3,10 +3,64 @@
 #include "stat.h"
 //#include "stat_InfoModule.h"
 
-Uns ImEvLogMainAddrsTable[20];
-Uns ImEvLogBufAddrsTable[12];
-Uns ImCmdLogAddrsTable[5];
-Uns ImParamLogAddrsTable[5];
+//Uns ImEvLogMainAddrsTable[20];
+//Uns ImEvLogBufAddrsTable[12];
+//Uns ImCmdLogAddrsTable[5];
+//Uns ImParamLogAddrsTable[5];
+
+Uns ImEvLogMainAddrsTable[]	= {
+								GetAdr(ramGroupB.DevTime),
+								GetAdr(ramGroupB.DevDate),
+								GetAdr(ramGroupA.Status),
+								GetAdr(ramGroupA.Faults.Proc),
+								GetAdr(ramGroupA.Faults.Net),
+								GetAdr(ramGroupA.Faults.Load),
+								GetAdr(ramGroupA.Faults.Dev),
+								GetAdr(ramGroupA.PositionPr),
+								GetAdr(ramGroupA.Torque),
+								GetAdr(ramGroupA.Ur),
+								GetAdr(ramGroupA.Us),
+								GetAdr(ramGroupA.Ut),
+								GetAdr(ramGroupA.Iu),
+								GetAdr(ramGroupA.Iv),
+								GetAdr(ramGroupA.Iw),
+								GetAdr(ramGroupA.Temper),
+								GetAdr(ramGroupA.StateTu.all),
+								GetAdr(ramGroupA.StateTs.all),
+								GetAdr(ramGroupH.Seconds),
+								FIRST_RECORD_FLAG_ADDR
+};
+
+Uns ImEvLogBufAddrsTable[] = {
+								GetAdr(ramGroupA.Status),
+								GetAdr(ramGroupA.PositionPr),
+								GetAdr(ramGroupA.Torque),
+								GetAdr(ramGroupA.Ur),
+								GetAdr(ramGroupA.Us),
+								GetAdr(ramGroupA.Ut),
+								GetAdr(ramGroupA.Iu),
+								GetAdr(ramGroupA.Iv),
+								GetAdr(ramGroupA.Iw),
+								GetAdr(ramGroupA.Temper),
+								GetAdr(ramGroupA.StateTu.all),
+								GetAdr(ramGroupA.StateTs.all)
+};
+
+Uns ImCmdLogAddrsTable[] = {
+								GetAdr(ramGroupB.DevTime),
+								GetAdr(ramGroupB.DevDate),
+								GetAdr(ramGroupH.Seconds),
+								GetAdr(ramGroupH.LogControlWord),
+								GetAdr(ramGroupA.Status)
+};
+
+Uns ImParamLogAddrsTable[] = {
+								GetAdr(ramGroupB.DevTime),
+								GetAdr(ramGroupB.DevDate),
+								GetAdr(ramGroupH.Seconds),
+								NEW_PARAM_ADDR,
+								NEW_PARAM_VALUE_ADDR
+};
 
 Uns CurrentLogRec = 0;
 Uns CurrentLogCnt = 0;

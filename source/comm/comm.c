@@ -21,7 +21,7 @@ void Comm_Init(TComm *p)
 	Comm_TuTsInit(&p->digitInterface);
 
 	// Пульт местного управления:
-	//Comm_LocalControlInit (&p->localControl);
+	Comm_LocalControlInit (&p->localControl);
 
 	SciMasterConnBetweenBlockInit(&g_Comm.mbBkp);
 
@@ -43,35 +43,30 @@ void Comm_Init(TComm *p)
 	//SerialCommInit(&g_Comm.mbShn);
 	Comm_LocalControlInit(&g_Comm.localControl);
 
-
 }
 //---------------------------------------------------
 void Comm_Update(TComm *p)
 {
 	//	КОМАНДЫ С МПУ !!!
-	// передаем значения сработавших датчиков холла
-	g_Ram.ramGroupC.HallBlock.all = Comm_LocalButtonUpdate(&p->localControl);
-
 	// передаем команду с кнопок управления
 	g_Ram.ramGroupH.CmdKey =  Comm_LocalKeyUpdate(&p->localControl);
 
 	// передаем команду с ручек БКП
-
 	switch (Comm_LocalButtonUpdate(&p->localControl))
 	{
-	case BIT0:
-		g_Ram.ramGroupH.CmdButton = KEY_OPEN;
-		break;
-	case BIT1:
-		g_Ram.ramGroupH.CmdButton = KEY_CLOSE;
-		break;
-	case BIT2 | BIT3:
-		g_Ram.ramGroupH.CmdButton = KEY_STOP;
-		break;
+		case BTN_OPEN_BIT:
+			g_Ram.ramGroupH.CmdButton = KEY_OPEN;
+			break;
+		case BTN_CLOSE_BIT:
+			g_Ram.ramGroupH.CmdButton = KEY_CLOSE;
+			break;
+		case BTN_STOPMU_BIT|BTN_STOPDU_BIT:
+			g_Ram.ramGroupH.CmdButton = KEY_STOP;
+			break;
 	}
 
-	ModBusUpdate(&g_Comm.mbAsu); // slave канал связи с верхним уровнем АСУ
-	//ModBusUpdate(&g_Comm.mbShn); // master канал связи с устройством плавного пуска
+	ModBusUpdate(&g_Comm.mbAsu); 	// slave канал связи с верхним уровнем АСУ
+	//ModBusUpdate(&g_Comm.mbShn);  // master канал связи с устройством плавного пуска
 
 	//SciMasterConnBetweenBlockUpdate(&g_Comm.mbBkp, &g_Comm.BkpData);// master канал связи с
 
