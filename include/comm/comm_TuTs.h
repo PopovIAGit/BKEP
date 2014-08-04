@@ -70,7 +70,7 @@ typedef union _TInputReg {
 		Uns ResetAlarm:1;	// 4	Резерв
 		Uns ReadyTu:1;		// 5	Резерв
 		Uns Du:1;			// 6	Резерв
-		Uns NoUse:8;		// 7-15	Не используются
+		Uns NoUse:9;		// 7-15	Не используются
 	} bit;
 } TInputReg;
 

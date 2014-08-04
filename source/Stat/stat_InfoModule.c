@@ -182,6 +182,7 @@ void DownloadFunc(TInfoModule *p)
 				p->FuncState = imIdle;
 
 			p->Timer = p->Period;
+			p->TimerIndex = p->PeriodIndex;
 			p->EnableTransmit();
 		}
 
@@ -198,8 +199,8 @@ void ImReceiveData(TInfoModule *p, Byte Data)
 
 	// На всякий случай заводим таймер сброса
 	p->Timer = p->Period;
+	p->TimerIndex = p->PeriodIndex;
 }
-
 
 
 void SendData(TInfoModule *p)
@@ -228,6 +229,7 @@ void SendData(TInfoModule *p)
 		}
 		else
 		{
+			p->TimerIndex = p->PeriodIndex;				// Заводим таймер сброса
 			p->Timer = p->Period;				// Заводим таймер сброса
 			*p->IsTxBusy = true;				// Выставляем флаг занятости передатчика. Нужно делать это именно в ИМ
 			Data = p->WrBuffer[p->TxIndex++];
@@ -525,6 +527,17 @@ void ImTimer(TInfoModule *p)
 		CurrentLogRec = 0;
 
 		p->IsLogTransmit = false;
+	}
+}
+
+void ImTimerIndex(TInfoModule *p)
+{
+	if (p->TimerIndex > 0)	p->TimerIndex--;
+
+	// Сброс инф. модуля по таймауту
+	if (p->TimerIndex == 1)
+	{
+		p->Index=0;
 	}
 }
 

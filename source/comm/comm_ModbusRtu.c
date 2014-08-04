@@ -97,12 +97,12 @@ __inline void UpdateNewFrame(TMbPort *hPort)
 	TMbFrame *Frame = &hPort->Frame;
 	TMbStat  *Stat  = &hPort->Stat;
 	Byte Status;
-	Uns CRC=0;
+	//Uns CRC=0;
 	
 	//Status = SCI_getstatus(hPort->Params.UartID);
 
 	if (hPort->Params.HardWareType==UART_TYPE) Status = SCI_getstatus(hPort->Params.ChannelID);
-	else if (hPort->Params.HardWareType==MCBSP_TYPE) Status = McBsp_getstatus(hPort->Params.ChannelID);
+	//else if (hPort->Params.HardWareType==MCBSP_TYPE) Status = McBsp_getstatus(hPort->Params.ChannelID);
 
 	//??? определение ошибок для McBsp
 	if (hPort->Params.HardWareType==UART_TYPE){
@@ -115,12 +115,14 @@ __inline void UpdateNewFrame(TMbPort *hPort)
 		}
 	} else
 	if (hPort->Params.HardWareType==MCBSP_TYPE){
-		if (Status & MCBSP_ERROR){
+		/*эксперимент
+
+		 if (Status & MCBSP_ERROR){
 			if (Status & MCBSP_TX_SYNC_ERROR) Stat->SyncTxErrCount++;
 			if (Status & MCBSP_RX_SYNC_ERROR) Stat->SyncRxErrCount++;
 			McBsp_reset(hPort->Params.ChannelID);
 			goto FRAMING_ERROR;
-		}
+		}*/
 	}
 
 	
@@ -130,8 +132,8 @@ __inline void UpdateNewFrame(TMbPort *hPort)
 		goto FRAMING_ERROR;
 	}
 
-
-	CRC = CalcFrameCrc(Frame->Buf, Frame->RxLength);
+	if (Frame->RxLength==12 && hPort->Params.HardWareType==MCBSP_TYPE) Frame->RxLength=11;//приём команды 16 для msbsp
+	//CRC = CalcFrameCrc(Frame->Buf, Frame->RxLength);
 
 	if (CalcFrameCrc(Frame->Buf, Frame->RxLength) != GOOD_CRC)
 	{

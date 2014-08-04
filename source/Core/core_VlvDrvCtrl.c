@@ -71,8 +71,6 @@ void Core_ValveDriveStop(TCoreVlvDrvCtrl *p)
 
 void Core_ValveDriveUpdate(TCoreVlvDrvCtrl *p)
 {
-
-
 	GetActiveControls(p);	// ѕолучение данных по активированному типу управлени€ (местное/дистанци€)
 	TeleControl(p);			// ѕодача команд дистанционного управлени€
 	MpuControl(p);			// ѕодача команд местного управлени€

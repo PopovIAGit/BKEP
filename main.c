@@ -20,8 +20,9 @@ static Uns CalcFrameCrc1(Byte *Buf, Uns Count);
 Uns I2CA_setCommand(void);
 Uns I2CA_ReadTemper(void);
 
-void main(void) {
-	Uns Crc=0;
+void main(void)
+{
+
 	// Сначала инициализируется процессор
 	InitHardware();
 	memset(&g_Core, 	0, sizeof(TCore));
@@ -55,7 +56,7 @@ void main(void) {
 	{
 
 		Comm_Update(&g_Comm);
-		//ImUpdate(&g_Stat.Im);
+		ImUpdate(&g_Stat.Im);
 
 
 /*
@@ -86,17 +87,14 @@ void main(void) {
 	}
 }
 
-static Uns CalcFrameCrc1(Byte *Buf, Uns Count)
+/*static Uns CalcFrameCrc1(Byte *Buf, Uns Count)
 {
-	/*Uns Crc = INIT_CRC;
-	do {Crc = (Crc >> 8) ^ CrcTable[(Crc ^ (Uns)*Buf++) & 0x00FF];}
-	while (--Count);
-	return Crc;*/
+
 	Uns Crc = 0xFFFF;
 	do {Crc = (Crc >> 8) ^ CrcTable[(Crc ^ (Uns)*Buf++) & 0x00FF];}
 	while (--Count);
 	return Crc;
-}
+}*/
 
 interrupt void CpuTimer0IsrHandler(void)	//	18 000
 {

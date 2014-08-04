@@ -201,7 +201,7 @@ void InitMcbspa(void)
 //-------------------------------------------------------------------------------------------
 Uns McBsp_recieve(Byte Id)
 {
-	Uns Data=0;
+	//Uns Data=0;
 	Uns Data1=0;
 	Uns Data2=0;
 	Byte Data11=0;
@@ -209,14 +209,30 @@ Uns McBsp_recieve(Byte Id)
 	LgUns LgData=0;
 	Uns Result=0;
 	Uns i=0;
-
-	if (McBspRegs[Id]->SPCR1.bit.RRDY==1)
-	{
+	Uns Count=0;
+	while(McBspRegs[Id]->SPCR1.bit.RRDY==0) {
+		if(++Count>65000) return 0;
+	}
+	//if (McBspRegs[Id]->SPCR1.bit.RRDY==1)
+	//{
 
 		Data1 = McBspRegs[Id]->DRR1.all;
 		Data2 = McBspRegs[Id]->DRR2.all;
 
 		LgData = (LgUns)Data1 | (((LgUns)(Data2)<<16)&0xFFFF0000);
+		/*
+		((LgData&1)==1)
+		(((LgData>>9)&1)==0)
+		(((LgData>>10)&1)==1)
+		*/
+
+		if ( (((LgData>>1)&1)==1) &&
+		     (((LgData>>10)&1)==0) &&
+
+		     (((LgData>>11)&1)==1)  )
+		{
+			LgData = LgData>>1;
+		}
 
 		Data1 = (Uns)((LgData>>11)&0x00ff);
 		Data2 = (Uns)((LgData>>1)&0x00ff);
@@ -233,12 +249,11 @@ Uns McBsp_recieve(Byte Id)
 		//Data1 = (Uns)((LgData>>1)&0x00FF);
 		//Data2 = (Uns)((LgData>>11)&0x00FF);
 
-
 		Result = (Uns)Data11 | (Uns)((Data22<<8)&0xFF00);
 
 		return Result;
-	}
-	else return 0;
+	//}
+	//else return 0;
 
 }
 
@@ -249,6 +264,11 @@ void McBsp_transmit(Byte Id, Uns Data, Uns Stop)
 	Uns Data1=0;
 	Uns Data2=0;
 	LgUns Data3=0;
+	Uns Count=0;
+	/*while(McBspRegs[Id]->SPCR2.bit.XRDY==0)
+	{
+		if(++Count>65000) return;
+	}*/
 	if (McBspRegs[Id]->SPCR2.bit.XRDY==1)
 	{
 		Data1 = Data&0x00FF;
@@ -276,13 +296,49 @@ void McBsp_transmit(Byte Id, Uns Data, Uns Stop)
 		McBspRegs[Id]->DXR1.all = (Uns)(Data3&0x0000FFFF);
 		McBspRegs[Id]->DXR2.all = (Uns)((Data3>>16)&0x0000FFFF);
 	}
-	/*	for (i=0; i<8;i++)
-		{
-			if ((Data>>7-i)&0x01==1) DataN |=(1<<i);
-		}
-	 McBspRegs[Id]->DXR1.all = ((((Uns)DataN<<2)+0x0803)&0x0FFF);}//((((Uns)DataN<<1)+0x0E01)&0x0CFF);}
-	 */
+}
+
+void McBsp_transmitIM(Byte Id, Uns Data)
+{
+	Byte DataN=0,i=0;
+
+	Uns Data1=0;
+	Uns Data2=0;
+	LgUns Data3=0;
+	Uns Count =0;
+	while(McBspRegs[Id]->SPCR2.bit.XRDY==0)
+	{
+		if(++Count>65000) return;
 	}
+	//if (McBspRegs[Id]->SPCR2.bit.XRDY==1)
+	//{
+		Data1 = Data&0x00FF;
+		Data2 = Data>>8;
+
+		DataN = (Data1<<1) + 0x0200;
+		Data1 = DataN;
+		DataN = 0;
+		for (i=0; i<10;i++)
+		{
+			if ((Data1>>9-i)&0x01==1) DataN |=(1<<i);
+		}Data1 = DataN;
+
+		/*DataN = (Data2<<1) + 0x0200;
+		Data2 = DataN;
+		DataN=0;
+		for (i=0; i<10;i++)
+		{
+			if ((Data2>>9-i)&0x01==1) DataN |=(1<<i);
+		}Data2 = DataN;*/
+		Data2 = 0x03ff;
+		Data3 = (LgUns)(Data2&0x03ff) | ((LgUns)(Data1&0x03ff)<<10);
+
+		//if (Stop==1)
+			Data3 |= 0x03ff;
+		McBspRegs[Id]->DXR1.all = (Uns)(Data3&0x0000FFFF);
+		McBspRegs[Id]->DXR2.all = (Uns)((Data3>>16)&0x0000FFFF);
+	//}
+}
 
 /*
  if (McBspRegs[Id]->SPCR2.bit.XRDY==1)

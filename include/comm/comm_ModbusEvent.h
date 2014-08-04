@@ -12,9 +12,15 @@
 
 #include "comm_ModBusRtu.h"
 Uns testPreamble=0;
+Uns CountMess=0;
 
 static void SendMasterResponse(TMbPort *hPort);
 __inline void CrcPack(TMbPort *);
+
+Uns timerSend=0;
+Uns timer1send=0;
+Uns timer2send=9000;
+
 //-------------------------------------------------------------------------------
 __inline void BreakFrameEvent(TMbPort *hPort)
 {
@@ -25,10 +31,24 @@ __inline void BreakFrameEvent(TMbPort *hPort)
 //-------------------------------------------------------------------------------
 __inline void NewFrameEvent(TMbPort *hPort)
 {
+	//CountMess++;
+	timerSend=0;
 	hPort->Frame.NewMessage = true;
 	hPort->Frame.RxLength   = hPort->Frame.Data - hPort->Frame.Buf;
 	//hPort->Frame.RxLength = hPort->Frame.RxLength-1;//test blue при приёме насчитывает на один байт больше ???
 	hPort->Frame.Data       = hPort->Frame.Buf;
+	/*if (hPort->Frame.Buf[0]==10 && hPort->Frame.Buf[1]==11 && hPort->Frame.Buf[2]==12 && hPort->Frame.Buf[3]==13 &&
+			hPort->Frame.Buf[4]==14 && hPort->Frame.Buf[5]==0){
+		hPort->Frame.Buf[0]=0;
+		hPort->Frame.Buf[1]=0;
+		hPort->Frame.Buf[2]=0;
+		hPort->Frame.Buf[3]=0;
+		hPort->Frame.Buf[4]=0;
+		hPort->Frame.Buf[5]=0;
+		CountMess++;
+	}*/
+
+
 }
 
 //-------------------------------------------------------------------------------
@@ -45,6 +65,9 @@ __inline void PreambleEvent(TMbPort *hPort)
 			DataSend = ((*hPort->Frame.Data++)&0x00FF)|((*hPort->Frame.Data++<<8)&0xFF00);
 			McBsp_transmit(hPort->Params.ChannelID, DataSend, 0);
 		}
+
+	if (timerSend>timer1send) timer1send=timerSend;
+	if (timerSend<timer2send) timer2send=timerSend;
 }
 
 //-------------------------------------------------------------------------------

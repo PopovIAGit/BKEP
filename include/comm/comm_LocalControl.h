@@ -29,6 +29,19 @@ typedef union
 	} bit;
 } TInputData;
 
+typedef union _THallBlock
+{
+	Uns all;
+	struct
+	{
+		Uns Open:1;		// 0 - кнопка 1 (левая ручка)
+		Uns Close:1;		// 1 - кнопка 2 (левая ручка)
+		Uns StopMU:1;		// 2 - кнопка 3 (правая ручка)
+		Uns	StopDU:1;		// 3 - кнопка 4 (правая ручка)
+		Uns rsvd2:12;	// 4-15 - резерв
+	} bit;
+} THallBlock;
+
 typedef struct {
 	Uns					upLevel;		// Уровень срабатывания
 	Uns 				timer;			// Таймер

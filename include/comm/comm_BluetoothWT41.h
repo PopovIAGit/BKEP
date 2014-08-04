@@ -14,12 +14,14 @@
 extern "C" {
 #endif
 
+#include "comm_ModBusTimers.h"
+
 #define BT_DBG					0
 
 #define BT_COMMAND_MODE			0
 #define BT_DATA_MODE			1
 
-#define BT_RX_BUFFER_SIZE		10
+#define BT_RX_BUFFER_SIZE		12//10
 
 #define BT_IDLE					40
 #define BT_TRANSMIT_COMPLETE	41
@@ -42,7 +44,8 @@ extern "C" {
 #define CMD_CONTROL_CLASS		"SET BT CLASS 001f00\r\n"
 #define CMD_CONTROL_SET			"SET\r\n"
 
-#define CMD_CONTROL_NAME 		"SET BT NAME BKD.v0002\r\n"
+#define CMD_CONTROL_NAME 		"SET BT NAME "
+//#define CMD_CONTROL_NAME 		"SET BT NAME BKD.v0002\r\n"
 #define CMD_CONTROL_AUTH		"SET BT AUTH * 5124\r\n"
 #define CMD_CONTROL_BAUD		"SET CONTROL BAUD 115200,8N1\r\n"
 
@@ -57,6 +60,7 @@ typedef struct _TBluetoothPort
 	Uns  UartBaud;             // Расчитанная скорость для UART
 	Byte Parity;               // Режим паритета
 	Byte StopBit;               // Режим паритета
+	Byte RepeatInit;
 
 	Uns  HardWareType;			// тип аппаратного канала передачи данных
 
@@ -72,6 +76,16 @@ typedef struct _TBluetoothPort
 	Bool IsConnected;
 	Bool Error;
 
+	Bool        Enabled;		//состояние канала bluetooth
+	TTimerList  TimerActive;	//
+	TTimerList  TimerBlink;	//
+	Bool		BlinkConnect;
+	Bool Connect;
+
+	Byte ModeProtocol;
+	Uns  ButtActivTimer;
+	Byte Function;
+
 	char *DeviceNameString;
 	char *DeviceAuthCodeString;
 
@@ -81,6 +95,7 @@ typedef struct _TBluetoothPort
 	void (*EnableTx)(void);
 	Uns (*ReceiveByte)(void);
 	void (*TransmitByte)(Uns Data);
+	void (*TransmitByteIM)(Uns Data);
 
 	#if BT_DBG
 		Uns TxBytesCount;
@@ -95,6 +110,7 @@ void BluetoothWTUpdate(TBluetoothHandle);
 void BluetoothRxHandler(TBluetoothHandle, TMbHandle);
 void BluetoothTxHandler(TBluetoothHandle, TMbHandle);
 void BluetoothTimer(TBluetoothHandle);
+void BluetoothActivation(TBluetoothHandle);
 
 
 #ifdef __cplusplus

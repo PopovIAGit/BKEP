@@ -117,6 +117,8 @@ TPeriodicalFunction Task200Hz[] =       	//не более  20-ти задач
 	PrdElemInit(LogCmdControl,							&g_Stat),
 	PrdElemInit(LogParamMbExec,							&g_Stat),
 	PrdElemInit(LogParamControl,						&g_Stat),
+	PrdElemInit(ImTimer,				                &g_Stat.Im),
+
 };
 
 // ================================ 50 Гц ==================================
@@ -162,6 +164,8 @@ TPeriodicalFunction Task10Hz[] =        //не более  200-т задач
 	//PrdElemInit(Peref_10HzCalc,				&g_Peref),
 	//PrdElemInit(Peref_Calibration, 						&g_Peref.Position),
 	PrdElemInit(BluetoothTimer,							&g_Comm.Bluetooth),
+	PrdElemInit(BluetoothActivation,					&g_Comm.Bluetooth),
+	PrdElemInit(ImTimerIndex,				                &g_Stat.Im),
 	//PrdElemInit(task1_10Hz,								NULL)
 };
 //------------Конец файла-----------------------------------------------

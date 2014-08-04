@@ -209,7 +209,7 @@ typedef union _TDeviceReg {
 		Uns Tl_BCP:1;		// 6     Переохлождение блока БКП
 		Uns Th_BCD:1;		// 7     Перегрев блока БКД
 		Uns Tl_BCD:1;		// 8     Переохлождение блока БКД
-     	Uns Rsvd:6;       	// 9-15  Резерв
+     	Uns Rsvd:7;       	// 9-15  Резерв
   } bit;
 } TDeviceReg;
 
@@ -334,18 +334,6 @@ typedef union _TLedsReg {	// МОИ
 		Uns Rsvd:8;      	// 6-15  Резерв
 	} bit;
 } TLedsReg;
-
-// Состояние датчиков холла блока
-typedef union _THallBlock {
-	Uns all;
-	struct {
-		Uns Open:1;       // 0     Открыть
-		Uns Close:1;      // 1     Закрыть
-		Uns StopMU:1;     // 2     Стоп/МУ
-		Uns StopDU:1;     // 3     Стоп/ДУ
-		Uns Rsvd:12;      // 4-15  Резерв
-	} bit;
-} THallBlock;
 
 // Тип задвижки клин/шибер
 typedef enum {

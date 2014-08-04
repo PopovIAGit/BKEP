@@ -55,6 +55,9 @@ void Core_MenuInit(TCoreMenu *p)
 	//g_Ram.ramGroupA.VER_PO = SVN_REVISION/100;
 	//g_Ram.ramGroupA.SUBVER_PO = SVN_REVISION;
 	//while (g_Ram.ramGroupA.SUBVER_PO >= 100) g_Ram.ramGroupA.SUBVER_PO -= 100;
+
+	p->MinMaxGain = &g_Ram.ramGroupC.MaxTorque;
+
 }
 //---------------------------------------------------
 

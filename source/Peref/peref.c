@@ -22,6 +22,8 @@
 
 TPeref	g_Peref;
 
+extern Uns timerSend;
+
 //---------------------------------------------------
 void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновление
 {
@@ -97,6 +99,7 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
 {
 	//-------------------- ‘ильтруем ј÷ѕ-------------------------------
 
+	timerSend++;
 	// забираем сигнал с ј÷ѕ на вход фильтра
 	p->UfltrOpen.Input		 = TU_SIG_OPEN;
 	p->UfltrClose.Input		 = TU_SIG_CLOSE;

@@ -71,6 +71,8 @@ extern "C" {
 #define KEY_2				GpioDataRegs.GPBDAT.bit.GPIO42 // кнопка шкафа Назад (акт. = 1)
 #define KEY_3				GpioDataRegs.GPBDAT.bit.GPIO43 // кнопка шкафа Стоп (акт. = 1)
 
+#define BUTTON_BLUE			GpioDataRegs.GPBDAT.bit.GPIO46 // активация bluetooth канала
+
 //--- SENSORS ---------------------------------------- PIA 03.04.14
 #define ADC_UR				AdcRegs.ADCRESULT2
 #define ADC_US				AdcRegs.ADCRESULT4

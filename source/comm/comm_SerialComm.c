@@ -149,7 +149,9 @@ void ModBusUpdate(TMbHandle hPort)
 
 	if (Packet->Request)
 	{
-
+		if (Packet->Request==16){
+			//GpioDataRegs.GPATOGGLE.bit.GPIO27=1;
+		}
 		Packet->Exception = UpdatePacket(Packet);
 		Packet->Response  = Packet->Request;
 		Packet->Request   = 0;
@@ -196,7 +198,7 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 					default: return EX_ILLEGAL_FUNCTION;
 				}
 				break;
-			case MB_WRITE_REG:
+			case MB_WRITE_REGS:
 				switch(Res)
 				{
 					case 1:

@@ -30,6 +30,7 @@ void InitInfoModule(pTInfoModule);
 void InitLogEvent(pTLogEvent);
 void InitLogCmd(pTLogCmd);
 void InitLogParam(pTLogParam);
+void InitTables(void);
 
 //---------------------------------------------------
 // Инициализация журнала
@@ -71,6 +72,7 @@ void Stat_Init(TStat *s)
 		s->LogEventBuffer[i].LogOutputs	 = 0;
 	}
 
+	InitTables();
 	// Инициализация основной флеш
 	//memset(&g_MainFlash, 0, sizeof(TAT25DF041A));
 	//g_MainFlash.CSAddr = CS_MAIN_FLASH;
@@ -154,6 +156,8 @@ void InitInfoModule(TInfoModule *im)
 	im->IsTxBusy		= &g_Comm.Bluetooth.TxBusy;
 	im->Timer			= 0;
 	im->Period			= IM_TIMEOUT;
+	im->TimerIndex		= 0;
+	im->PeriodIndex		= 30; //300мс
 
 	im->CanReadNextRec	= False;
 	im->IsReadRecBusy	= False;
@@ -175,7 +179,7 @@ void InitInfoModule(TInfoModule *im)
 	// Для информационного модуля
 	im->EnableReceive	 = g_Comm.Bluetooth.EnableRx;
 	im->EnableTransmit	 = g_Comm.Bluetooth.EnableTx;
-	im->TransmitByte	 = g_Comm.Bluetooth.TransmitByte;
+	im->TransmitByte	 = g_Comm.Bluetooth.TransmitByteIM;
 
 }
 //---------------------------------------------------
@@ -437,21 +441,21 @@ void LogEvControl(TStat *s)
 
 void GetCurrentCmd(TStat *s)
 {
-	/*TBurCmd LogControlWord = bcmNone;
+	TBurCmd LogControlWord = bcmNone;
 	static Uns PrevEvLogValue = 0;
 	static Bool FirstCmd = true;
 
-	if (Mcu.EvLog.Value != 0)
+	if (g_Core.VlvDrvCtrl.EvLog.Value != 0)
 		LogControlWord = bcmNone;
 
 	// Отсекаем повторяющуся команду Стоп
-	if ((Mcu.EvLog.Value == CMD_STOP) && (PrevEvLogValue == CMD_STOP))
+	if ((g_Core.VlvDrvCtrl.EvLog.Value == CMD_STOP) && (PrevEvLogValue == CMD_STOP))
 	{
-		Mcu.EvLog.Value = 0;
+		g_Core.VlvDrvCtrl.EvLog.Value = 0;
 		return;
 	}
 
-	switch(Mcu.EvLog.Value)
+	switch(g_Core.VlvDrvCtrl.EvLog.Value)
 	{
 		case CMD_STOP: 			LogControlWord = bcmStop;				break;
 		case CMD_CLOSE: 		LogControlWord = bcmClose;				break;
@@ -468,23 +472,23 @@ void GetCurrentCmd(TStat *s)
 		default: LogControlWord = bcmNone; break;
 	}
 
-	if (Mcu.EvLog.Value != 0)
+	if (g_Core.VlvDrvCtrl.EvLog.Value != 0)
 	{
-		PrevEvLogValue = Mcu.EvLog.Value;
+		PrevEvLogValue = g_Core.VlvDrvCtrl.EvLog.Value;
 
 		if (FirstCmd)
 		{
 			FirstCmd = false;
 
 			// Если самая первая из команд - Стоп, то убираем ее
-			if (Mcu.EvLog.Value == CMD_STOP)
+			if (g_Core.VlvDrvCtrl.EvLog.Value == CMD_STOP)
 				LogControlWord = bcmNone;
 		}
 	}
 
-	Mcu.EvLog.Value = 0;
+	g_Core.VlvDrvCtrl.EvLog.Value = 0;
 
-	s->LogCmd.CmdReg = LogControlWord;*/
+	s->LogCmd.CmdReg = LogControlWord;
 }
 
 void LogCmdControl(TStat *s)
