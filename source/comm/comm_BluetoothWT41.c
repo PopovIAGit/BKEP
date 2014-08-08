@@ -143,6 +143,7 @@ void BluetoothActivation(TBluetoothHandle bPort)
 			bPort->State = 7;
 			bPort->Function = 0;
 			bPort->ButtActivTimer = 0;
+			bPort->Mode = BT_COMMAND_MODE;
 		}
 	}
 
@@ -212,6 +213,8 @@ void BluetoothActivation(TBluetoothHandle bPort)
 			bPort->BlinkConnect = false;
 			bPort->Function = 0;
 			g_Stat.Im.Index=0;
+
+			bPort->Mode = BT_DATA_MODE;
 		}
 	}
 
@@ -240,7 +243,7 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 	{
 		// Иницилизация драйвера
 		case 0:
-			    //InitChanelBt(bPort);
+			    InitChanelBt(bPort);
 				bPort->State=1;
 				break;
 				
@@ -290,7 +293,6 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 		case 7:	bPort->BlinkConnect = false;
 				if (bPort->Status == BT_RECEIVE_COMPLETE)
 				{
-					//GpioDataRegs.GPADAT.bit.GPIO27=1;
 					if (CheckString(bPort, "RI"))
 					{ // Ожидаем соединение
 		 				bPort->State=8;							// Должно прийти RING
@@ -299,25 +301,29 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 						ClearValues(bPort);						// Делаем сброс значений, если пришло что-то другое
 				}											// Обычно приходит OK или PAIR
 				break;
-
-		case 8: //GpioDataRegs.GPADAT.bit.GPIO27 = 0;
-
+		case 8:
 				StartTimer(&bPort->TimerBlink);
 				bPort->Mode = BT_DATA_MODE;					// Переход в режим данных
 				ClearValues(bPort);
 				bPort->State=9;
 				bPort->StrIndex=0;
 				break;
-
 		case 9:
 			    if (bPort->Mode == BT_COMMAND_MODE)			// Работаем в режиме данных,
 				{										// ожидаем переход в режим команд
-
 					ClearValues(bPort);
-					bPort->State = 7;						// Переход в режим ожидания соединения
-					//bPort->State = 10;						// Переход в режим ожидания соединения
+					bPort->State = 10;						// Переход в режим ожидания соединения
+					// После включения Bluetooth запускаем таймер
+					bPort->Timer = bPort->Period;
 				}										
 				break;				
+				// Режим ожидания соединения
+		case 10:	if (!bPort->Timer)
+					{
+						bPort->BlinkConnect = false;
+						ClearValues(bPort);	bPort->State=2;
+					}
+				break;
 	}
 
 	bPort->IsConnected = (bPort->Mode == BT_DATA_MODE);
@@ -507,10 +513,12 @@ __inline void RxDataMode(TBluetoothHandle bPort, TMbHandle hPort)
 		{
 
 			bPort->Mode = BT_COMMAND_MODE;
+			bPort->Status = BT_RECEIVE_COMPLETE;
 			Frame->Buf[0]=0;
 			Frame->Buf[1]=0;
 			Frame->Buf[2]=0;
 			bPort->StrIndex=0;
+			GpioDataRegs.GPADAT.bit.GPIO27=0;
 		}
 	}
 
@@ -545,7 +553,9 @@ __inline void RxDataMode(TBluetoothHandle bPort, TMbHandle hPort)
 		if (RxState >= 2) //было 7 а теперь 10
 		{
 			bPort->Mode = BT_COMMAND_MODE;
+			bPort->Status = BT_RECEIVE_COMPLETE;
 			RxState = 0;
+			GpioDataRegs.GPADAT.bit.GPIO27=0;
 		}
 	}
 

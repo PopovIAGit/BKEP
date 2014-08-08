@@ -17,8 +17,8 @@ extern void InterruptInit  (void);
 extern void InterruptUpdate(void);
 extern Uns CrcTable[256];
 static Uns CalcFrameCrc1(Byte *Buf, Uns Count);
-Uns I2CA_setCommand(void);
-Uns I2CA_ReadTemper(void);
+//Uns I2CA_setCommand(void);
+//Uns I2CA_ReadTemper(void);
 
 void main(void)
 {
@@ -142,7 +142,7 @@ interrupt void McbspTxAHandler(void) // прерывание передачи данных
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP6;
 }
 //-------------------------------------------------------------
-Uns I2CA_setCommand(void)
+/*Uns I2CA_setCommand(void)
 {
    // Wait until the STP bit is cleared from any previous master communication.
    // Clearing of this bit by the module is delayed until after the SCD bit is
@@ -222,16 +222,13 @@ interrupt void i2c_int1a_isr(void)     // I2C-A
    }  // end of register access ready
 
    /*else
-   {
-      // Generate some error due to invalid interrupt source
-      asm("   ESTOP0");
-   }*/
+
 
    if (PassCount>2)PassCount=0;
    // Enable future I2C (PIE Group 8) interrupts
    PieCtrlRegs.PIEACK.all = PIEACK_GROUP8;
 }
-
+*/
 //-----------------------------------------------
 /*interrupt void i2c_int1a_isr(void)     // I2C-B
 {

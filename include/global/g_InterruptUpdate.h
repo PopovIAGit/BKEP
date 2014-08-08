@@ -87,8 +87,6 @@ TPeriodicalFunction Task18kHz[] =
 	PrdElemInit(SciMasterConnBetweenBlockCommTimer,		&g_Comm.mbBkp),
 	PrdElemInit(MonitorUpdate,							NULL),
 	PrdElemInit(Core_ProtectionsUpdate,					&g_Core.Protections),
-	//PrdElemInit(AvagoEncoderAEAT84ADCalc,				&g_Peref.position),
-	//PrdElemInit(task1,	NULL)
 };
 
 //—юда вставл€ем функции дл€ соответствующей группы
@@ -138,7 +136,7 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(Core_ProtectionsEnable,		    &g_Core.Protections),
 	PrdElemInit(Core_DevProc_FaultIndic,		&g_Core.Protections),
 	PrdElemInit(EngPhOrdPrt,					&g_Core.Protections),
-	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.NoMove),
+	/*PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.NoMove),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.overVoltageR),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.overVoltageS),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.overVoltageT),
@@ -166,7 +164,7 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.overHeatBCD),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.overHeatBCP),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.underColdBCD),
-	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.underColdBCP),
+	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.underColdBCP),*/
 	/*PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.protections.overHeatBlock),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.protections.underColdBlock),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.protections.overTemper1),

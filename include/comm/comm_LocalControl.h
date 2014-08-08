@@ -47,6 +47,7 @@ typedef union _THallBlock {
 	} bit;
 } THallBlock;
 
+/*
 typedef union _THallBlock
 {
 	Uns all;
@@ -58,7 +59,7 @@ typedef union _THallBlock
 		Uns	StopDU:1;		// 3 - кнопка 4 (правая ручка)
 		Uns rsvd2:12;	// 4-15 - резерв
 	} bit;
-} THallBlock;
+} THallBlock;*/
 
 typedef struct {
 	Uns					upLevel;		// Уровень срабатывания

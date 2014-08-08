@@ -104,8 +104,9 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
 {
 	//-------------------- ‘ильтруем ј÷ѕ-------------------------------
 
-	timerSend++;
+	//timerSend++;
 	// забираем сигнал с ј÷ѕ на вход фильтра
+	/*
 	p->UfltrOpen.Input		 = TU_SIG_OPEN;
 	p->UfltrClose.Input		 = TU_SIG_CLOSE;
 	p->UfltrStop.Input		 = TU_SIG_STOP;
@@ -174,14 +175,6 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
 	p->sensObserver.IVinp = p->IVfltr.Output;
 	p->sensObserver.IWinp = p->IWfltr.Output;
 
-/*
-	p->sensObserver.URinp = ADC_UR;
-	p->sensObserver.USinp = ADC_US;
-	p->sensObserver.UTinp = ADC_UT;
-	p->sensObserver.IUinp = ADC_IU;
-	p->sensObserver.IVinp = ADC_IV;
-	p->sensObserver.IWinp = ADC_IW;*/
-
 	Peref_SensObserverUpdate(&p->sensObserver);
 
 	//--------------- RMS угол пол€рность -----------------------------
@@ -205,7 +198,7 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
 	if (!p->sinObserver.IV.CurAngle)	p->Phifltr.Input = p->sinObserver.US.CurAngle;
 
 	//-------------------------------------------------------------
-
+	*/
 	I2CDevUpdate(p);
 }
 

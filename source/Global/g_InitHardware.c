@@ -24,7 +24,7 @@ interrupt void McbspTxAHandler(void);			// McBSP A TX
 void ADCCinit(void);
 
 void   I2CA_Init(void);
-extern interrupt void i2c_int1a_isr(void);
+//extern interrupt void i2c_int1a_isr(void);
 
 
 void InitClocks(void);

@@ -146,6 +146,8 @@ typedef struct _TMbStat {
 	Uns TxMsgCount;            // Счетчик переданных сообщений
 	Uns RxBytesCount;          // Принятое количество байт
 	Uns TxBytesCount;          // Отправление количество байт
+	Uns MAMsgIn;
+	Uns MAMsgOut;
 } TMbStat;
 
 typedef struct _TSerialInterface

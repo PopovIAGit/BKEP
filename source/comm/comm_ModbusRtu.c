@@ -66,6 +66,7 @@ void ModBusInvoke(TMbPort *hPort)
 {
 	if (hPort->Frame.NewMessage)
 	{
+		hPort->Stat.MAMsgIn++;
 		UpdateNewFrame(hPort);
 		hPort->Frame.NewMessage = FALSE;
 	}
@@ -156,6 +157,11 @@ FRAMING_ERROR:
 
 	if (hPort->Params.HardWareType==UART_TYPE) SCI_rx_enable(hPort->Params.ChannelID);
 	else if (hPort->Params.HardWareType==MCBSP_TYPE) McBsp_rx_enable(hPort->Params.ChannelID);
+
+	if (hPort->Frame.Buf[0]==0) hPort->Frame.Buf[0]=1;
+	if (hPort->Frame.Buf[1]!=3 || hPort->Frame.Buf[1]!=16) hPort->Frame.Buf[1]=3;
+	hPort->Packet.Exception = hPort->Frame.Buf[1];
+	hPort->Packet.Response = EX_SLAVE_DEVICE_FAILURE;
 }
 
 #if defined(_MASTER_)
@@ -294,6 +300,7 @@ __inline void SlaveResponse(TMbPort *hPort)
 		Frame->Buf[1]   = Packet->Response | 0x80;
 		Frame->Buf[2]   = Packet->Exception;
 		Frame->TxLength = 3;
+		Packet->Exception = 0;
 	}
 	else switch(Packet->Response)
 	{
@@ -304,7 +311,7 @@ __inline void SlaveResponse(TMbPort *hPort)
 		default: Packet->Response = 0; return;
 	}
 	Packet->Response = 0;
-	
+	hPort->Stat.MAMsgOut++;
 	SendFrame(hPort);
 }
 #endif

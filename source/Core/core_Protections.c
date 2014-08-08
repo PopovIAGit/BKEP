@@ -414,7 +414,7 @@ void Core_DevProc_FaultIndic(TCoreProtections *p)
 
 void EngPhOrdPrt(TCoreProtections *p)
 {
-	static Bool  Flag = False;          // флаг для единичной проверки правельности чередования фазы
+	static Bool  Flag = False;          // флаг для единичной проверки прав?е?льности чередования фазы
 	static LgUns StartPos;
 	static Uns   Timer = 0;
 	static Int   EngPhOrdValue = 0;
