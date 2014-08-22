@@ -83,8 +83,10 @@ LgUns  X, X10, X18;
 
 TPeriodicalFunction Task18kHz[] =         
 {
+	PrdElemInit(Peref_SensObserverUpdate,				&g_Peref.sensObserver),
+	PrdElemInit(Peref_SensTuObserverUpdate,				&g_Peref.InDigSignalObserver),
 	PrdElemInit(Peref_18kHzCalc,						&g_Peref),
-	PrdElemInit(SciMasterConnBetweenBlockCommTimer,		&g_Comm.mbBkp),
+	PrdElemInit(SciMasterConnBetweenBlockCommTimer,		&g_Comm.mbBkp),	//на 18к√ц
 	PrdElemInit(MonitorUpdate,							NULL),
 	PrdElemInit(Core_ProtectionsUpdate,					&g_Core.Protections),
 };
@@ -96,14 +98,11 @@ TPeriodicalFunction Task18kHz[] =
 TPeriodicalFunction Task2kHz[] =          //Ќе более 4-х задач
 {
 	//PrdElemInit(Core_ProtectionsRefresh,	&g_Core.protections),
-	//PrdElemInit(SerialCommTimings,						&g_Comm.mbAsu),
+	PrdElemInit(SerialCommTimings,						&g_Comm.mbAsu),	//на 2 к√ц
 	//PrdElemInit(SerialCommTimings,						&g_Comm.mbShn),
-	PrdElemInit(SerialCommTimings,						&g_Comm.mbBt),
-	PrdElemInit(FM25V10_Update,							&Eeprom1),
-	PrdElemInit(FM25V10_Update,							&Eeprom2),
-	//PrdElemInit(SciMasterConnBetweenBlockCommTimer,		&g_Comm.mbBkp),
-	//PrdElemInit(SciMasterConnBetweenBlockUpdate,		&g_Comm.mbBkp),
-
+	PrdElemInit(SerialCommTimings,						&g_Comm.mbBt),	//на 2 к√ц
+	PrdElemInit(FM25V10_Update,							&Eeprom1),		//на 2 к√ц
+	PrdElemInit(FM25V10_Update,							&Eeprom2),		//на 2 к√ц
 };
 // ================================ 200 √ц ==================================
 
@@ -116,8 +115,7 @@ TPeriodicalFunction Task200Hz[] =       	//не более  20-ти задач
 	PrdElemInit(LogCmdControl,							&g_Stat),
 	PrdElemInit(LogParamMbExec,							&g_Stat),
 	PrdElemInit(LogParamControl,						&g_Stat),
-	PrdElemInit(ImTimer,				                &g_Stat.Im),
-
+	PrdElemInit(ImTimer,				                &g_Stat.Im),// на 200√ц
 };
 
 // ================================ 50 √ц ==================================
@@ -169,7 +167,7 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.protections.underColdBlock),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.protections.overTemper1),
 	PrdElemInit(EleSyEncoderCalc,				&g_Peref.position.encoder),*/
-	PrdElemInit(Comm_Update,					&g_Comm),
+	//PrdElemInit(Comm_Update,					&g_Comm),
 	/*PrdElemInit(Core_CommandControl,			&g_Core.commands),
 	PrdElemInit(Core_CommandsUpdate,			&g_Core.commands),
 	PrdElemInit(Core_CmdUpdate,					&g_Core),
@@ -194,14 +192,14 @@ TPeriodicalFunction Task10Hz[] =        //не более  200-т задач
 //	PrdElemInit(Drive_Update,				&g_Drive),
 	PrdElemInit(Peref_LedsUpdate,			&g_Peref.leds),
 	//PrdElemInit(Peref_TenControl,			NULL),
-	//PrdElemInit(BluetoothTimer,							&g_Comm.Bluetooth),
-	PrdElemInit(Peref_10HzCalc,				&g_Peref),
-	PrdElemInit(BluetoothTimer,				&g_Comm.Bluetooth),
-	PrdElemInit(InterfIndication,			&g_Ram),
-	PrdElemInit(RTC_Control,				NULL),
-	PrdElemInit(BluetoothActivation,					&g_Comm.Bluetooth),
-	PrdElemInit(ImTimerIndex,				                &g_Stat.Im),
-	//PrdElemInit(task1_10Hz,								NULL)
+
+	//PrdElemInit(Peref_10HzCalc,				&g_Peref),
+	PrdElemInit(BluetoothTimer,				&g_Comm.Bluetooth),	//на 10 √ц
+	PrdElemInit(InterfIndication,			&g_Ram),			//на 10 √ц
+	PrdElemInit(RTC_Control,				NULL),				//на 10 √ц
+	PrdElemInit(BluetoothActivation,		&g_Comm.Bluetooth),	//на 10 √ц
+	PrdElemInit(ImTimerIndex,				&g_Stat.Im),		//на 10 √ц
+
 };
 //------------ онец файла-----------------------------------------------
 

@@ -148,7 +148,7 @@ void InitSciaGpio(void)
 
 	GpioCtrlRegs.GPBMUX1.bit.GPIO35 = 1;   // Configure GPIO28 for SCIRXDA operation
 	GpioCtrlRegs.GPBMUX1.bit.GPIO36 = 1;   // Configure GPIO29 for SCITXDA operation
-	
+
     EDIS;
 }
 

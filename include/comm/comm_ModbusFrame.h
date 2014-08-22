@@ -50,6 +50,7 @@ __inline void CrcPack(TMbPort *hPort)
 	Uns Crc = CalcFrameCrc((hPort->Frame.Buf), hPort->Frame.TxLength);
 	hPort->Frame.Buf[hPort->Frame.TxLength++] = (Byte)(Crc & 0xFF);
 	hPort->Frame.Buf[hPort->Frame.TxLength++] = (Byte)(Crc >> 8);
+	hPort->Frame.Buf[7]=0;
 	
 }
 

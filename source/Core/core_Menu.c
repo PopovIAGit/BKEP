@@ -200,6 +200,7 @@ void SetDefaultValues(TCoreMenu *p, Byte *groupNumber) // в Core_MenuDisplay()
 	static LgUns DefAddr = 0; 
 	Byte DefCode = 0;
 
+	if (!IsMemParReady()) return;
 	 // Меняем заводские параметры (группа B), защищённые паролем 1
 	if (*groupNumber == GROUP_EDIT_PAR) DefCode = M_EDIT_PAR;
 	 // Меняем заводские параметры (группа C), защищённые паролем 2
@@ -222,18 +223,22 @@ void SetDefaultValues(TCoreMenu *p, Byte *groupNumber) // в Core_MenuDisplay()
 			||(DefAddr == REG_CODE)||(DefAddr == REG_FCODE))
 		{
 			*(ToUnsPtr(&g_Ram) + DefAddr) = Dcr.Def;
+
+			ReadWriteEeprom(&Eeprom1,F_WRITE,DefAddr,ToUnsPtr(&g_Ram) + DefAddr,1);
+			while (!IsMemParReady()) {FM25V10_Update(&Eeprom1); }
+			// Инициализация фильтров, масштабов и т.д.
+			RefreshParams(DefAddr);
+
 			DefAddr++;
 
 		} else {DefAddr++; return;}
 	} else {
 		*groupNumber =0;
+		DefAddr = 0;
 		return;
 	}
 	
-	ReadWriteEeprom(&Eeprom1,F_WRITE,DefAddr,ToUnsPtr(&g_Ram) + DefAddr,1);
-	while (!IsMemParReady()) {FM25V10_Update(&Eeprom1); DelayUs(1000);}
-	// Инициализация фильтров, масштабов и т.д.
-	RefreshParams(DefAddr);
+
 
 	/*if (IsMemParReady())
 	{

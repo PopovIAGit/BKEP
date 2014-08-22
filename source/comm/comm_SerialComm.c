@@ -31,25 +31,27 @@ __inline Byte WriteDataRegsTek(Uns Addr, Uns *Data, Uns Count);
 //---------------------------------------------------
 void InitChanelAsuModbus(TMbHandle hPort)
 {
-	hPort->Params.ChannelID   = ASU_SCI_ID;
-	hPort->Params.Mode     = MB_SLAVE;
-	hPort->Params.Slave    = 1;//g_Ram.ramGroupB.RS_STATION;
-	hPort->Params.BaudRate = BaudRates[3];//BaudRates[g_Ram.ramGroupB.RS_BAUD_RATE];
-	hPort->Params.UartBaud = BrrValues[3];//BrrValues[g_Ram.ramGroupB.RS_BAUD_RATE];
-	hPort->Params.Parity   = 0;//g_Ram.ramGroupB.RS_MODE;
+	hPort->Params.ChannelID = ASU_SCI_ID;//
+	hPort->Params.Mode     	= MB_SLAVE;//
+	hPort->Params.Slave    	= 1;//
+	hPort->Params.BaudRate	= BaudRates[3];//
+	hPort->Params.UartBaud 	= BrrValues[3];//
+	hPort->Params.Parity   	= 0;//
 
 	hPort->Params.RetryCount  = 0;
-	hPort->Params.Scale       = MB_SCALE;
+	hPort->Params.Scale       = 2;//MB_SCALE;
 //	hPort->Params.ConnTimeout = Serial->RsIndicTime * 100;
-	hPort->Params.ConnTimeout = 10;//  ÈÊ
-	hPort->Params.RxDelay     = 10;
+	hPort->Params.ConnTimeout = 2;//10  ÈÊ
+	hPort->Params.RxDelay     = 10;//10
 //	hPort->Params.TxDelay     = Serial->RsWaitTime - 3;
-	hPort->Params.TxDelay     = 10;//  ÈÊ
-	hPort->Params.AckTimeout  = 1000;
+	hPort->Params.TxDelay     = 0;//10  ÈÊ
+	hPort->Params.AckTimeout  = 6;//1000
 	hPort->Params.TrEnable    = &AsuMbSetTr;
-	hPort->Frame.TimerPre.Timeout = 10; //  ÈÊ
+	hPort->Frame.TimerPre.Timeout = 1; //  ÈÊ
 
 	hPort->Params.HardWareType	= UART_TYPE;
+
+	hPort->Params.TrEnable(0);
 
 	//hPort->HardwareSetup = SerialCommInit;
 
@@ -110,18 +112,27 @@ void InitChanelBtModbus(TMbHandle hPort)
 	hPort->Params.UartBaud = 0;//BrrValues[g_Ram.ramGroupB.RS_BAUD_RATE];
 	hPort->Params.Parity   = 0;//g_Ram.ramGroupB.RS_MODE;
 
-	hPort->Params.RetryCount  = 0;
+	/*hPort->Params.RetryCount  = 0;
 	hPort->Params.Scale       = MB_SCALE;
-//	hPort->Params.ConnTimeout = Serial->RsIndicTime * 100;
 	hPort->Params.ConnTimeout = 1;//  ÈÊ
 	hPort->Params.RxDelay     = 1;
-//	hPort->Params.TxDelay     = Serial->RsWaitTime - 3;
 	hPort->Params.TxDelay     = 1;//  ÈÊ
 	hPort->Params.AckTimeout  = 1;//1000;
 	hPort->Params.TrEnable    = &BtMbSetTr;
 	hPort->Frame.TimerPre.Timeout = 1; //  ÈÊ
+	*/
+	hPort->Params.RetryCount  = 0;
+	hPort->Params.Scale       = 2;
+	hPort->Params.ConnTimeout = 2;//  ÈÊ
+	hPort->Params.RxDelay     = 2;
+	hPort->Params.TxDelay     = 2;//  ÈÊ
+	hPort->Params.AckTimeout  = 2;//1000;
+	hPort->Params.TrEnable    = &BtMbSetTr;
+	hPort->Frame.TimerPre.Timeout = 2; //  ÈÊ
 
 	hPort->Params.HardWareType	= MCBSP_TYPE;
+
+	//hPort->Params.TrEnable(0);
 
 }
 
@@ -149,13 +160,13 @@ void ModBusUpdate(TMbHandle hPort)
 
 	if (Packet->Request)
 	{
-		if (Packet->Request==16){
-			//GpioDataRegs.GPATOGGLE.bit.GPIO27=1;
-		}
 		Packet->Exception = UpdatePacket(Packet);
 		Packet->Response  = Packet->Request;
 		Packet->Request   = 0;
-		GpioDataRegs.GPATOGGLE.bit.GPIO27=1;
+		if (hPort->Params.HardWareType==MCBSP_TYPE)
+		{
+			GpioDataRegs.GPATOGGLE.bit.GPIO27=1;
+		}
 	}
 	
 	hPort->Serial.RsState = Packet->Exception; //???MbConnect = !Packet->Exception;
@@ -202,20 +213,6 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 				switch(Res)
 				{
 					case 1:
-						//return WriteRegs(Port, (Uint16 *)&Ram, Addr, Count);
-						/*if (Packet->Addr==0x7) {
-							if (*Packet->Data==1) g_Ram.ramGroupB.TsInvert.bit.Closed = 1;
-							if (*Packet->Data==2) g_Ram.ramGroupB.TsInvert.bit.Closed = 0;
-							if (*Packet->Data==3) g_Ram.ramGroupB.TsInvert.bit.Opened = 1;
-							if (*Packet->Data==4) g_Ram.ramGroupB.TsInvert.bit.Opened = 0;
-							if (*Packet->Data==5) g_Ram.ramGroupB.TsInvert.bit.Mufta = 1;
-							if (*Packet->Data==6) g_Ram.ramGroupB.TsInvert.bit.Mufta = 0;
-							if (*Packet->Data==7) g_Ram.ramGroupB.TsInvert.bit.MUDU = 1;
-							if (*Packet->Data==8) g_Ram.ramGroupB.TsInvert.bit.MUDU = 0;
-							if (*Packet->Data==9) g_Ram.ramGroupB.TsInvert.bit.Opening = 1;
-							if (*Packet->Data==10) g_Ram.ramGroupB.TsInvert.bit.Opening = 0;
-							return 0;
-						} else*/
 						return WriteData(Packet->Addr, Packet->Data, Packet->Count);
 						//if (!Port->Frame.Exception) SerialCommRefresh();
 					case 5:

@@ -10,10 +10,6 @@
 #include "core.h"
 #include "comm.h"
 
-
-TFM25V10		g_Eeprom1;
-TFM25V10		g_Eeprom2;
-
 TStat			g_Stat;
 Uns 			prevCmd = 0, delayStart = 2.0 * Prd50HZ;
 

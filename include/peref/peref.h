@@ -39,21 +39,36 @@ extern "C" {
 // Структура для работы с фильтрами переферии
 typedef struct {
 	//--- Фильтры U -----------------
-	APFILTER3  			URfltr;
-	APFILTER3  			USfltr;
-	APFILTER3  			UTfltr;
+	APFILTER1  			URfltr;
+	APFILTER1  			USfltr;
+	APFILTER1  			UTfltr;
+	APFILTER3  			UR3fltr;
+	APFILTER3  			US3fltr;
+	APFILTER3  			UT3fltr;
 	//--- Фильтры I -----------------
-	APFILTER3  			IUfltr;
-	APFILTER3  			IVfltr;
-	APFILTER3  			IWfltr;
+	APFILTER1  			IUfltr;
+	APFILTER1  			IVfltr;
+	APFILTER1  			IWfltr;
+	APFILTER3  			IU3fltr;
+	APFILTER3  			IV3fltr;
+	APFILTER3  			IW3fltr;
 	//--- Фильтры U для Телеуправления -----------------
-	APFILTER3  			UfltrOpen;
-	APFILTER3  			UfltrClose;
-	APFILTER3  			UfltrStop;
-	APFILTER3  			UfltrMu;
-	APFILTER3  			UfltrResetAlarm;
-	APFILTER3  			UfltrReadyTU;
-	APFILTER3  			UfltrDU;
+	APFILTER1  			UfltrOpen;
+	APFILTER1  			UfltrClose;
+	APFILTER1  			UfltrStop;
+	APFILTER1  			UfltrMu;
+	APFILTER1  			UfltrResetAlarm;
+	APFILTER1  			UfltrReadyTU;
+	APFILTER1  			UfltrDU;
+	//-------------------------------
+	//--- Фильтры U для Телеуправления -----------------
+	APFILTER3  			U3fltrOpen;
+	APFILTER3  			U3fltrClose;
+	APFILTER3  			U3fltrStop;
+	APFILTER3  			U3fltrMu;
+	APFILTER3  			U3fltrResetAlarm;
+	APFILTER3  			U3fltrReadyTU;
+	APFILTER3  			U3fltrDU;
 	// ------------------------------
 	TSensObserver		sensObserver;		// Масштабирование сигналов с датчиков
 	TSinObserver		sinObserver;		// Вычисление RMS
@@ -78,6 +93,7 @@ typedef struct {
 	RTC_Obj				RtcData;
 	//---------------------------
 	TSensTuObserver		InDigSignalObserver;	// Масштабирование сигналов с датчиков
+	Uns					TaktTuSensUpdate;
 	TSinSignalObserver  InDigSignal;			// Вычисление RMS
 
 } TPeref;

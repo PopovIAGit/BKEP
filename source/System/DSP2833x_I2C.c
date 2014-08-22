@@ -54,8 +54,8 @@ void InitI2C(void)
 		#ifdef CPU_FRQ_100MHZ
 		I2caRegs.I2CPSC.all  = 9;
 		#endif
-		I2caRegs.I2CCLKL     = 45;
-		I2caRegs.I2CCLKH     = 50;
+		I2caRegs.I2CCLKL     = 45;		//???
+		I2caRegs.I2CCLKH     = 50;		//???
 		I2caRegs.I2CIER.all  = 0x00;
 		I2caRegs.I2CFFTX.all = 0x6000;
 		I2caRegs.I2CFFRX.all = 0x2040;

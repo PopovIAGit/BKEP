@@ -109,6 +109,8 @@ void g_Ram_Init(TRam *p)
 //---------------------------------------------------
 void g_Ram_Update(TRam *p)
 {
+	g_Ram.ramGroupA.Temper 	  = g_Peref.TSens.Temper;
+
 	//------ Core -> RAM ------------------------------------
 	p->ramGroupA.Status = g_Core.Status;
 	//InterfIndication(p);
@@ -199,9 +201,9 @@ void RefreshParams(Uns addr)
 		pPeref->USfltr.Tf = pPeref->URfltr.Tf; 								  	//peref_ApFilter3Init(&pPeref->USfltr);
 		pPeref->UTfltr.Tf = pPeref->URfltr.Tf; 								  	//peref_ApFilter3Init(&pPeref->UTfltr);
 
-		peref_ApFilter3Init(&pPeref->URfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);
-		peref_ApFilter3Init(&pPeref->USfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);
-		peref_ApFilter3Init(&pPeref->UTfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);
+		peref_ApFilter1Init(&pPeref->URfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);
+		peref_ApFilter1Init(&pPeref->USfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);
+		peref_ApFilter1Init(&pPeref->UTfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);
 
 
 
@@ -211,9 +213,9 @@ void RefreshParams(Uns addr)
 		pPeref->IVfltr.Tf = pPeref->IUfltr.Tf; 									//peref_ApFilter3Init(&pPeref->IVfltr);
 		pPeref->IWfltr.Tf = pPeref->IUfltr.Tf; 									//peref_ApFilter3Init(&pPeref->IWfltr);
 
-		peref_ApFilter3Init(&pPeref->IUfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
-		peref_ApFilter3Init(&pPeref->IVfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
-		peref_ApFilter3Init(&pPeref->IWfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
+		peref_ApFilter1Init(&pPeref->IUfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
+		peref_ApFilter1Init(&pPeref->IVfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
+		peref_ApFilter1Init(&pPeref->IWfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
 
 	} else if (addr >= REG_TORQUE_CURR && addr < REG_TORQUE_CURR+20) {
 		//CubRefresh(&Torq.Cub1, &g_Ram.ramGroupGrH->TqCurr);

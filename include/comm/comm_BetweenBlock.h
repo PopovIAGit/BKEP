@@ -26,8 +26,61 @@ extern "C" {
 #define BKP_SCI_TX_DISABLE()	RS485_DIR_BKD = 0
 
 
-// Структура объекта драйвера
+
+typedef void (*TScTrEnable)(char);
+
+typedef struct _TScParams {
+	unsigned int UartID;
+	unsigned int BrrValue;
+	unsigned int Parity;
+	unsigned int Mode;
+	unsigned int TimeoutPre;
+	unsigned int TimeoutPost;
+	unsigned int TimeoutConn;
+	unsigned int RetryCount;
+	TScTrEnable  TrEnable;
+} TScParams;
+
+typedef struct _TScPacket {
+	unsigned int Flag;
+	unsigned int State;
+	unsigned int Fcs;
+	unsigned int Len;
+	char         Data[10];
+} TScPacket;
+
+typedef struct _TScFrame {
+	unsigned int ConnFlag;
+	unsigned int RetryCounter;
+	unsigned int TimerPre;
+	unsigned int TimerPost;
+	unsigned int TimerConn;
+	unsigned int MsgCount;
+} TScFrame;
+
+typedef struct _TScStat {
+	unsigned int RxMsgCount;
+	unsigned int TxMsgCount;
+	unsigned int RxBytesCount;
+	unsigned int TxBytesCount;
+	unsigned int RxErrCount;
+	unsigned int RxMissedErrCount;
+	unsigned int RxCrcErrCount;
+	unsigned int RxFrameErrLenCount;
+	unsigned int RxOverflowErrCount;
+	unsigned int RxNoRespErrCount;
+} TScStat;
+
 typedef struct _TMbBBPort {
+	TScParams    Params;
+	TScPacket    RxPacket;
+	TScPacket    TxPacket;
+	TScFrame     Frame;
+	TScStat      Stat;
+} TMbBBPort,*TMbBBHandle;
+
+// Структура объекта драйвера
+/*typedef struct _TMbBBPort {
 	Uns IsConnected;
 	Uns RxLength;
 	Uns TxLength;
@@ -42,7 +95,7 @@ typedef struct _TMbBBPort {
 	Uns ConnTimeout;
 	Uns Buffer[BKP_MAX_SCI_BUF_LEN];
 } TMbBBPort,*TMbBBHandle;
-
+*/
 // структуры
 typedef union {
 	Uns all;
@@ -88,8 +141,9 @@ typedef struct _TBKPData {
 
 // Прототипы функций
 
+
 void SciMasterConnBetweenBlockInit(TMbBBHandle);
-void SciMasterConnBetweenBlockUpdate(TMbBBHandle , TBKPDataHandle);
+void SciMasterConnBetweenBlockUpdate(TMbBBHandle);
 void SciMasterConnBetweenBlockRxHandler(TMbBBHandle);
 void SciMasterConnBetweenBlockTxHandler(TMbBBHandle);
 void SciMasterConnBetweenBlockCommTimer(TMbBBHandle);

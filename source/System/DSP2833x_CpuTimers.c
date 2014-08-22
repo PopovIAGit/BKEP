@@ -87,6 +87,7 @@ void ConfigCpuTimer(struct CPUTIMER_VARS *Timer, float Freq, float Period)
     Timer->CPUFreqInMHz = Freq;
     Timer->PeriodInUSec = Period;
     temp = (long) (Freq * Period);
+    //temp = (long) (150000000/18000);
     Timer->RegsAddr->PRD.all = temp;
 
     // Set pre-scale counter to divide by 1 (SYSCLKOUT):

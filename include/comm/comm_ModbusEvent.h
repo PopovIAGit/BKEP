@@ -13,7 +13,7 @@
 #include "comm_ModBusRtu.h"
 Uns testPreamble=0;
 Uns CountMess=0;
-
+extern Uns TestCount;
 static void SendMasterResponse(TMbPort *hPort);
 __inline void CrcPack(TMbPort *);
 
@@ -31,24 +31,10 @@ __inline void BreakFrameEvent(TMbPort *hPort)
 //-------------------------------------------------------------------------------
 __inline void NewFrameEvent(TMbPort *hPort)
 {
-	//CountMess++;
 	timerSend=0;
 	hPort->Frame.NewMessage = true;
 	hPort->Frame.RxLength   = hPort->Frame.Data - hPort->Frame.Buf;
-	//hPort->Frame.RxLength = hPort->Frame.RxLength-1;//test blue при приёме насчитывает на один байт больше ???
 	hPort->Frame.Data       = hPort->Frame.Buf;
-	/*if (hPort->Frame.Buf[0]==10 && hPort->Frame.Buf[1]==11 && hPort->Frame.Buf[2]==12 && hPort->Frame.Buf[3]==13 &&
-			hPort->Frame.Buf[4]==14 && hPort->Frame.Buf[5]==0){
-		hPort->Frame.Buf[0]=0;
-		hPort->Frame.Buf[1]=0;
-		hPort->Frame.Buf[2]=0;
-		hPort->Frame.Buf[3]=0;
-		hPort->Frame.Buf[4]=0;
-		hPort->Frame.Buf[5]=0;
-		CountMess++;
-	}*/
-
-
 }
 
 //-------------------------------------------------------------------------------
@@ -56,8 +42,10 @@ __inline void PreambleEvent(TMbPort *hPort)
 {
 	Uns DataSend=0;
 	hPort->Frame.Data = hPort->Frame.Buf;
+
 	if (testPreamble==1) return;
 	testPreamble=1;
+
 	if (hPort->Params.HardWareType==UART_TYPE) SCI_transmit(hPort->Params.ChannelID, *hPort->Frame.Data++);
 	else if (hPort->Params.HardWareType==MCBSP_TYPE)
 		{
@@ -77,6 +65,7 @@ __inline void PostambleEvent(TMbPort *hPort)
 
 	hPort->Frame.Data = hPort->Frame.Buf;
 	hPort->Params.TrEnable(0);
+	TestCount=0;
 	//GpioDataRegs.GPADAT.bit.GPIO30=1;???
 
 	if (hPort->Params.HardWareType==UART_TYPE){
@@ -87,6 +76,7 @@ __inline void PostambleEvent(TMbPort *hPort)
 	else if (hPort->Params.HardWareType==MCBSP_TYPE) {
 
 		for(i=0; i<15000; i++){}
+		hPort->Frame.AddCount=0;
 		McBsp_tx_disable(hPort->Params.ChannelID);
 		McBsp_rx_enable(hPort->Params.ChannelID);
 	}
@@ -114,7 +104,7 @@ __inline void ConnTimeoutEvent(TMbPort *hPort)
 	#endif*/
 	
 	//#if defined(_SLAVE_)
-	if (IsSlave()) hPort->Packet.Exception = EX_NO_CONNECTION;
+	//if (IsSlave()) hPort->Packet.Exception = EX_NO_CONNECTION;
 	//#endif
 }
 
@@ -133,7 +123,11 @@ static void SendFrame(TMbPort *hPort)
 	hPort->Params.TrEnable(1);
 	//GpioDataRegs.GPADAT.bit.GPIO30=0;???
 
-	if (hPort->Params.HardWareType==UART_TYPE) SCI_tx_enable(hPort->Params.ChannelID);
+	if (hPort->Params.HardWareType==UART_TYPE)
+	{
+		SCI_rx_disable(hPort->Params.ChannelID);
+		SCI_tx_enable(hPort->Params.ChannelID);
+	}
 	else if (hPort->Params.HardWareType==MCBSP_TYPE) {
 			McBsp_rx_disable(hPort->Params.ChannelID);
 			McBsp_tx_enable(hPort->Params.ChannelID);

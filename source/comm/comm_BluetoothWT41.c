@@ -13,7 +13,7 @@
 Byte RxState = 0;
 //הכÿ הנאיגונא Bluetooth
 char StrDev[] = {"SET BT NAME BKD 000000\r\n"};
-
+Uns TestCount=0;
 
 //void InitChanelBt(TBluetoothHandle);
 void SendOneString(TBluetoothHandle, char *String);
@@ -321,7 +321,7 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 		case 10:	if (!bPort->Timer)
 					{
 						bPort->BlinkConnect = false;
-						ClearValues(bPort);	bPort->State=2;
+						ClearValues(bPort);	bPort->State=7;
 					}
 				break;
 	}
@@ -594,7 +594,20 @@ void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 
 	if (bPort->Mode == BT_COMMAND_MODE) return;
 
+	if (TestCount==4) {
+		StartTimer(&Frame->TimerPost);
+		TestCount++;
+		return;
+	}
+	if (TestCount>4) {
+		TestCount++;
+		return;
+	}
+	TestCount++;
+
 	if ((Frame->Data - Frame->Buf) < Frame->TxLength){
+	//if ((Frame->TxLength-hPort->Frame.AddCount)>0){
+
 		//if (hPort->Params.HardWareType==UART_TYPE) SCI_transmit(hPort->Params.ChannelID, *Frame->Data++);
 		//else
 		//if (hPort->Params.HardWareType==MCBSP_TYPE)
@@ -604,18 +617,23 @@ void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 				Stop = 1;
 				DataSend = ((*Frame->Data++)&0x00FF)|(((*Frame->Data++)<<8)&0xFF00);
 				McBsp_transmit(hPort->Params.ChannelID, DataSend, Stop);
+				hPort->Stat.TxBytesCount++;
+				hPort->Frame.AddCount++;
 			} else
 			{
 				DataSend = ((*Frame->Data++)&0x00FF)|(((*Frame->Data++)<<8)&0xFF00);
 				McBsp_transmit(hPort->Params.ChannelID, DataSend, 0);
+				hPort->Stat.TxBytesCount++;
+				hPort->Frame.AddCount++;
+				hPort->Stat.TxBytesCount++;
+				hPort->Frame.AddCount++;
 			}
 			Stop=0;
 		//}
 	}
-	else StartTimer(&Frame->TimerPost);
-
-
-	hPort->Stat.TxBytesCount++;
+	else {
+		StartTimer(&Frame->TimerPost);
+	}
 
 }
 

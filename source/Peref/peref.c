@@ -38,13 +38,21 @@ void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновлени
 	//----для  Телеуправления---------------------------------------------------------------------------
 	memset(&p->InDigSignal, 0, sizeof(TSinSignalObserver));
 
-	peref_ApFilter3Init(&p->UfltrOpen, 		 (Uns)Prd18kHZ, 10.0);		// Инициализируем фильтры
-	peref_ApFilter3Init(&p->UfltrClose, 	 (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter3Init(&p->UfltrStop, 		 (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter3Init(&p->UfltrMu, 		 (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter3Init(&p->UfltrResetAlarm, (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter3Init(&p->UfltrReadyTU, 	 (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter3Init(&p->UfltrDU, 		 (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter3Init(&p->U3fltrOpen, 		 (Uns)Prd50HZ, 10.0);		// Инициализируем фильтры
+	peref_ApFilter3Init(&p->U3fltrClose, 	 (Uns)Prd50HZ, 10.0);
+	peref_ApFilter3Init(&p->U3fltrStop, 		 (Uns)Prd50HZ, 10.0);
+	peref_ApFilter3Init(&p->U3fltrMu, 		 (Uns)Prd50HZ, 10.0);
+	peref_ApFilter3Init(&p->U3fltrResetAlarm, (Uns)Prd50HZ, 10.0);
+	peref_ApFilter3Init(&p->U3fltrReadyTU, 	 (Uns)Prd50HZ, 10.0);
+	peref_ApFilter3Init(&p->U3fltrDU, 		 (Uns)Prd50HZ, 10.0);
+
+	peref_ApFilter1Init(&p->UfltrOpen, 		 (Uns)Prd18kHZ, 10.0);		// Инициализируем фильтры
+	peref_ApFilter1Init(&p->UfltrClose, 	 (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter1Init(&p->UfltrStop, 		 (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter1Init(&p->UfltrMu, 		 (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter1Init(&p->UfltrResetAlarm, (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter1Init(&p->UfltrReadyTU, 	 (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter1Init(&p->UfltrDU, 		 (Uns)Prd18kHZ, 10.0);
 
 	Peref_SensTuObserverInit(&p->InDigSignalObserver);// Инициализируем обработку синусойды
 
@@ -58,12 +66,12 @@ void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновлени
 
 	//----------------------------------------------------------------------------------------------
 
-	peref_ApFilter3Init(&p->URfltr, (Uns)Prd18kHZ, 10.0);		// Инициализируем фильтры
-	peref_ApFilter3Init(&p->USfltr, (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter3Init(&p->UTfltr, (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter3Init(&p->IUfltr, (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter3Init(&p->IVfltr, (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter3Init(&p->IWfltr, (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter1Init(&p->URfltr, (Uns)Prd18kHZ, 10.0);		// Инициализируем фильтры
+	peref_ApFilter1Init(&p->USfltr, (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter1Init(&p->UTfltr, (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter1Init(&p->IUfltr, (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter1Init(&p->IVfltr, (Uns)Prd18kHZ, 10.0);
+	peref_ApFilter1Init(&p->IWfltr, (Uns)Prd18kHZ, 10.0);
 
 	Peref_SensObserverInit(&p->sensObserver);// Инициализируем обработку синусойды
 
@@ -104,87 +112,69 @@ void Peref_18kHzCalc(TPeref *p) // 18 кГц
 {
 	//-------------------- Фильтруем АЦП-------------------------------
 
-	//timerSend++;
-	// забираем сигнал с АЦП на вход фильтра
-	/*
-	p->UfltrOpen.Input		 = TU_SIG_OPEN;
-	p->UfltrClose.Input		 = TU_SIG_CLOSE;
-	p->UfltrStop.Input		 = TU_SIG_STOP;
-	p->UfltrMu.Input		 = TU_SIG_MU;
-	p->UfltrResetAlarm.Input = TU_SIG_RESETALARM;
-	p->UfltrReadyTU.Input	 = TU_SIG_READYTU;
-	p->UfltrDU.Input		 = TU_SIG_DU;
-	//филльтруем входной сигнал ТУ
-	peref_ApFilter3Calc(&p->UfltrOpen);
-	peref_ApFilter3Calc(&p->UfltrClose);
-	peref_ApFilter3Calc(&p->UfltrStop);
-	peref_ApFilter3Calc(&p->UfltrMu);
-	peref_ApFilter3Calc(&p->UfltrResetAlarm);
-	peref_ApFilter3Calc(&p->UfltrReadyTU);
-	peref_ApFilter3Calc(&p->UfltrDU);
+	// TU
+	// забираем отмасштабированный сигнал с АЦП на вход фильтра 1-ого порядка
+	p->UfltrOpen.Input	 	 = p->InDigSignalObserver.UOpenOut;
+	p->UfltrClose.Input		 = p->InDigSignalObserver.UCloseOut;
+	p->UfltrStop.Input		 = p->InDigSignalObserver.UStopOut;
+	p->UfltrMu.Input		 = p->InDigSignalObserver.UMuOut;
+	p->UfltrResetAlarm.Input = p->InDigSignalObserver.UResetAlarmOut;
+	p->UfltrReadyTU.Input	 = p->InDigSignalObserver.UReadyTuOut;
+	p->UfltrDU.Input		 = p->InDigSignalObserver.UDuOut;
 
-	p->InDigSignalObserver.UOpenInp 		= p->UfltrOpen.Output;
-	p->InDigSignalObserver.UCloseInp 		= p->UfltrClose.Output;
-	p->InDigSignalObserver.UStopInp 		= p->UfltrStop.Output;
-	p->InDigSignalObserver.UMuInp 			= p->UfltrMu.Output;
-	p->InDigSignalObserver.UDuInp 			= p->UfltrDU.Output;
-	p->InDigSignalObserver.UReadyTuInp 	 	= p->UfltrReadyTU.Output;
-	p->InDigSignalObserver.UResetAlarmInp 	= p->UfltrResetAlarm.Output;
+	//фильтруем входной сигнал ТУ
+	peref_ApFilter1Calc(&p->UfltrOpen);
+	peref_ApFilter1Calc(&p->UfltrClose);
+	peref_ApFilter1Calc(&p->UfltrStop);
+	peref_ApFilter1Calc(&p->UfltrMu);
+	peref_ApFilter1Calc(&p->UfltrResetAlarm);
+	peref_ApFilter1Calc(&p->UfltrReadyTU);
+	peref_ApFilter1Calc(&p->UfltrDU);
 
-		Peref_SensTuObserverUpdate(&p->InDigSignalObserver);
+	//передаём фильтрованный сигнал на обработку RMS
+	p->InDigSignal.sigOpen.Input 		= p->UfltrOpen.Output;
+	p->InDigSignal.sigClose.Input 		= p->UfltrClose.Output;
+	p->InDigSignal.sigStop.Input 		= p->UfltrStop.Output;
+	p->InDigSignal.sigMU.Input 			= p->UfltrMu.Output;
+	p->InDigSignal.sigResetAlarm.Input 	= p->UfltrDU.Output;
+	p->InDigSignal.sigReadyTU.Input 	= p->UfltrReadyTU.Output;
+	p->InDigSignal.sigDU.Input 			= p->UfltrResetAlarm.Output;
 
-		//результат фильтрации передаём в структуру для расчёта RMS
-		p->InDigSignal.sigOpen.Input 		= p->InDigSignalObserver.UOpenOut;
-		p->InDigSignal.sigClose.Input 		= p->InDigSignalObserver.UCloseOut;
-	    p->InDigSignal.sigStop.Input		= p->InDigSignalObserver.UStopOut;
-		p->InDigSignal.sigMU.Input 			= p->InDigSignalObserver.UMuOut;
-		p->InDigSignal.sigResetAlarm.Input 	= p->InDigSignalObserver.UResetAlarmOut;
-		p->InDigSignal.sigReadyTU.Input 	= p->InDigSignalObserver.UReadyTuOut;
-		p->InDigSignal.sigDU.Input 			= p->InDigSignalObserver.UDuOut;
-		//функция расчёта RMS для сигналов ТУ
-		Peref_SinObserverUpdateFloat(&p->InDigSignal.sigOpen);
-		Peref_SinObserverUpdateFloat(&p->InDigSignal.sigClose);
-		Peref_SinObserverUpdateFloat(&p->InDigSignal.sigStop);
-		Peref_SinObserverUpdateFloat(&p->InDigSignal.sigMU);
-		Peref_SinObserverUpdateFloat(&p->InDigSignal.sigResetAlarm);
-		Peref_SinObserverUpdateFloat(&p->InDigSignal.sigReadyTU);
-		Peref_SinObserverUpdateFloat(&p->InDigSignal.sigDU);
+	//функция расчёта RMS для сигналов ТУ
+	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigOpen);
+	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigClose);
+	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigStop);
+	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigMU);
+	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigResetAlarm);
+	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigReadyTU);
+	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigDU);
+	///////////////////////////////////////////////////////////////////////////////////
 
-	//------------------ Забираем данные с датчиков-----------------------------------
-	p->URfltr.Input = ADC_UR;
-	p->USfltr.Input = ADC_US;
-	p->UTfltr.Input = ADC_UT;
-	p->IUfltr.Input = ADC_IU;
-	p->IVfltr.Input = ADC_IV;
-	p->IWfltr.Input = ADC_IW;
+	//RST UVW
+	//----------------------------------------------------------------------------
+	//---отмасштабированные данные с ацп на вход фильтра 1-ого порядка
+	p->URfltr.Input = p->sensObserver.URout;
+	p->USfltr.Input = p->sensObserver.USout;
+	p->UTfltr.Input = p->sensObserver.UTout;
+	p->IUfltr.Input = p->sensObserver.IUout;
+	p->IVfltr.Input = p->sensObserver.IVout;
+	p->IWfltr.Input = p->sensObserver.IWout;
 
-
-	peref_ApFilter3Calc(&p->URfltr);
-	peref_ApFilter3Calc(&p->USfltr);
-	peref_ApFilter3Calc(&p->UTfltr);
-	peref_ApFilter3Calc(&p->IUfltr);
-	peref_ApFilter3Calc(&p->IVfltr);
-	peref_ApFilter3Calc(&p->IWfltr);
-
-	//-------------- Обработка синусойды ------------------------------
-
-	p->sensObserver.URinp = p->URfltr.Output;
-	p->sensObserver.USinp = p->USfltr.Output;
-	p->sensObserver.UTinp = p->UTfltr.Output;
-	p->sensObserver.IUinp = p->IUfltr.Output;
-	p->sensObserver.IVinp = p->IVfltr.Output;
-	p->sensObserver.IWinp = p->IWfltr.Output;
-
-	Peref_SensObserverUpdate(&p->sensObserver);
+	peref_ApFilter1Calc(&p->URfltr);
+	peref_ApFilter1Calc(&p->USfltr);
+	peref_ApFilter1Calc(&p->UTfltr);
+	peref_ApFilter1Calc(&p->IUfltr);
+	peref_ApFilter1Calc(&p->IVfltr);
+	peref_ApFilter1Calc(&p->IWfltr);
 
 	//--------------- RMS угол полярность -----------------------------
 
-	p->sinObserver.UR.Input = p->sensObserver.URout;
-	p->sinObserver.US.Input = p->sensObserver.USout;
-	p->sinObserver.UT.Input = p->sensObserver.UTout;
-	p->sinObserver.IU.Input = p->sensObserver.IUout;
-	p->sinObserver.IV.Input = p->sensObserver.IVout;
-	p->sinObserver.IW.Input = p->sensObserver.IWout;
+	p->sinObserver.UR.Input = p->URfltr.Output;
+	p->sinObserver.US.Input = p->USfltr.Output;
+	p->sinObserver.UT.Input = p->UTfltr.Output;
+	p->sinObserver.IU.Input = p->IUfltr.Output;
+	p->sinObserver.IV.Input = p->IVfltr.Output;
+	p->sinObserver.IW.Input = p->IWfltr.Output;
 
 	Peref_SinObserverUpdateFloat(&p->sinObserver.UR);
 	Peref_SinObserverUpdateFloat(&p->sinObserver.US);
@@ -198,13 +188,52 @@ void Peref_18kHzCalc(TPeref *p) // 18 кГц
 	if (!p->sinObserver.IV.CurAngle)	p->Phifltr.Input = p->sinObserver.US.CurAngle;
 
 	//-------------------------------------------------------------
-	*/
-	I2CDevUpdate(p);
 }
 
 //---------------------------------------------------
 void Peref_50HzCalc(TPeref *p)	// 50 Гц
 {
+	//фильтруем TU RST UVW фильтром 3-его порядка
+
+	p->UR3fltr.Input = p->sinObserver.UR.Output;
+	p->US3fltr.Input = p->sinObserver.US.Output;
+	p->UT3fltr.Input = p->sinObserver.UT.Output;
+
+	p->IU3fltr.Input = p->sinObserver.IU.Output;
+	p->IV3fltr.Input = p->sinObserver.IV.Output;
+	p->IW3fltr.Input = p->sinObserver.IW.Output;
+
+	peref_ApFilter3Calc(&p->UR3fltr);
+	peref_ApFilter3Calc(&p->US3fltr);
+	peref_ApFilter3Calc(&p->UT3fltr);
+	peref_ApFilter3Calc(&p->IU3fltr);
+	peref_ApFilter3Calc(&p->IV3fltr);
+	peref_ApFilter3Calc(&p->IW3fltr);
+
+	p->U3fltrOpen.Input 		= p->InDigSignal.sigOpen.Output;
+	p->U3fltrClose.Input 		= p->InDigSignal.sigClose.Output;
+	p->U3fltrStop.Input 		= p->InDigSignal.sigStop.Output;
+	p->U3fltrMu.Input 			= p->InDigSignal.sigMU.Output;
+	p->U3fltrDU.Input 			= p->InDigSignal.sigResetAlarm.Output;
+	p->U3fltrReadyTU.Input 		= p->InDigSignal.sigReadyTU.Output;
+	p->U3fltrResetAlarm.Input 	= p->InDigSignal.sigDU.Output;
+
+	peref_ApFilter3Calc(&p->U3fltrOpen);
+	peref_ApFilter3Calc(&p->U3fltrClose);
+	peref_ApFilter3Calc(&p->U3fltrStop);
+	peref_ApFilter3Calc(&p->U3fltrMu);
+	peref_ApFilter3Calc(&p->U3fltrDU);
+	peref_ApFilter3Calc(&p->U3fltrReadyTU);
+	peref_ApFilter3Calc(&p->U3fltrResetAlarm);
+
+	g_Comm.digitInterface.dinOpen.inputDIN 			= p->U3fltrOpen.Output;
+	g_Comm.digitInterface.dinClose.inputDIN 		= p->U3fltrClose.Output;
+	g_Comm.digitInterface.dinStop.inputDIN 			= p->U3fltrStop.Output;
+	g_Comm.digitInterface.dinMu.inputDIN 			= p->U3fltrMu.Output;
+	g_Comm.digitInterface.dinDu.inputDIN 			= p->U3fltrDU.Output;
+	g_Comm.digitInterface.dinPredReady.inputDIN 	= p->U3fltrReadyTU.Output;
+	g_Comm.digitInterface.dinResetAlarm.inputDIN 	= p->U3fltrResetAlarm.Output;
+
 	peref_ApFilter1Calc(&p->Phifltr);
 	if (!g_Core.Status.bit.Stop)
 	p->AngleUI = _IQtoIQ16(p->Phifltr.Output);
@@ -217,6 +246,7 @@ void Peref_50HzCalc(TPeref *p)	// 50 Гц
 	peref_ApFilter3Calc(&p->Imfltr);
 	p->Imid = _IQtoIQ16(p->Imfltr.Output);
 
+	I2CDevUpdate(p);
 }
 
 void Peref_10HzCalc(TPeref *p)	// 10 Гц
@@ -231,6 +261,7 @@ void Peref_10HzCalc(TPeref *p)	// 10 Гц
 		if(PosPr < 0) PosPr = 0;
 		if(PosPr > 1000) PosPr = 1000;
 		p->Dac.Data = g_Ram.ramGroupC.Dac_Offset + (Uint16)(0.001 * (g_Ram.ramGroupC.Dac_Mpy - g_Ram.ramGroupC.Dac_Offset) * PosPr);
+		if (PosPr==9999) p->Dac.Data = g_Ram.ramGroupC.Dac_Offset/4;//???
 	}
 	//---------------------------------------------------------------------------
 }
@@ -247,6 +278,7 @@ void I2CDevUpdate(TPeref *p)
 		case 1: MCP4726_Update(&p->Dac); if (!p->Dac.Busy)   Step = 2; break;
 		case 2: DS3231_Update(&p->Rtc);  if (!p->Rtc.Busy)   Step = 0; break;
 	}
+
 }
 
 //---------------------------------------------------

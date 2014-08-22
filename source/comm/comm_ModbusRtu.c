@@ -83,13 +83,31 @@ void ModBusInvoke(TMbPort *hPort)
 
 void ModBusTimings(TMbPort *hPort)
 {
-	if (!TimerPending(&hPort->Frame.Timer1_5))  BreakFrameEvent(hPort);
-	if (!TimerPending(&hPort->Frame.Timer3_5))  NewFrameEvent(hPort);
-	if (!TimerPending(&hPort->Frame.TimerPre))  PreambleEvent(hPort);
-	if (!TimerPending(&hPort->Frame.TimerPost)) PostambleEvent(hPort);
-	if (!TimerPending(&hPort->Frame.TimerConn)) ConnTimeoutEvent(hPort);
+	if (!TimerPending(&hPort->Frame.Timer1_5))
+	{
+		BreakFrameEvent(hPort);
+	}
+	if (!TimerPending(&hPort->Frame.Timer3_5))
+	{
+		NewFrameEvent(hPort);
+	}
+	if (!TimerPending(&hPort->Frame.TimerPre))
+	{
+		PreambleEvent(hPort);
+	}
+	if (!TimerPending(&hPort->Frame.TimerPost))
+	{
+		PostambleEvent(hPort);
+	}
+	if (!TimerPending(&hPort->Frame.TimerConn))
+	{
+		ConnTimeoutEvent(hPort);
+	}
 	#if defined(_SLAVE_)
-	if (!TimerPending(&hPort->Frame.TimerAck))  AcknoledgeEvent(hPort);
+	if (!TimerPending(&hPort->Frame.TimerAck))
+	{
+		AcknoledgeEvent(hPort);
+	}
 	#endif
 }
 

@@ -15,7 +15,10 @@ void ModBusRxIsr(TMbPort *hPort)
 	TMbFrame *Frame = &hPort->Frame;
 	Byte Data = 0;
 
-	if (hPort->Params.HardWareType==UART_TYPE) Data = SCI_recieve(hPort->Params.ChannelID);
+	if (hPort->Params.HardWareType==UART_TYPE)
+	{
+		Data = SCI_recieve(hPort->Params.ChannelID);
+	}
 	else if (hPort->Params.HardWareType==MCBSP_TYPE) Data = McBsp_recieve(hPort->Params.ChannelID);
 	
 	if ((Frame->Data - Frame->Buf) < 256)
@@ -43,7 +46,11 @@ void ModBusTxIsr(TMbPort *hPort)
 	Uns Stop=0;
 	
 	if ((Frame->Data - Frame->Buf) < Frame->TxLength){
-		if (hPort->Params.HardWareType==UART_TYPE) SCI_transmit(hPort->Params.ChannelID, *Frame->Data++);
+		if (hPort->Params.HardWareType==UART_TYPE)
+		{
+			SCI_transmit(hPort->Params.ChannelID, *Frame->Data++);
+			StartTimer(&Frame->TimerPost);
+		}
 		else if (hPort->Params.HardWareType==MCBSP_TYPE)
 		{
 			if (((Frame->TxLength)&0x01) && ((Frame->Data - Frame->Buf)==1))
@@ -51,6 +58,7 @@ void ModBusTxIsr(TMbPort *hPort)
 				Stop = 1;
 				DataSend = ((*Frame->Data++)&0x00FF)|((*Frame->Data++<<8)&0xFF00);
 				McBsp_transmit(hPort->Params.ChannelID, DataSend, Stop);
+				//StartTimer(&Frame->TimerPost);
 			} else
 			{
 				DataSend = ((*Frame->Data++)&0x00FF)|((*Frame->Data++<<8)&0xFF00);
@@ -58,9 +66,13 @@ void ModBusTxIsr(TMbPort *hPort)
 			}
 
 			Stop=0;
+			//
 		}
 	}
-	else StartTimer(&Frame->TimerPost);
+	else
+	{
+		StartTimer(&Frame->TimerPost);
+	}
 	
 	hPort->Stat.TxBytesCount++;
 }

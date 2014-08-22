@@ -3,305 +3,373 @@
 #include "comm.h"
 #include "g_Ram.h"
 
+Byte testLeds=0;
 
-//#define BKP_SCI_ID			SCIA
-//#define SCI_BAUD			SCI_BRR(1152)
+#define BKP_SCI_ID				SCIA
+//#define BKP_SCI_BAUD			1152
+#define BKP_SCI_PARITY			0
 
-//#define SCI_BREAK			0x20
+#define OUTSIDE_FRAME	0
+#define BEGIN_FRAME		1
+#define LINK_ESCAPE		2
+#define INSIDE_FRAME	3
 
-//#define tx_ext_enable()		RS485_DIR_BKD = 0
-//#define tx_ext_disable()	RS485_DIR_BKD = 1
-//#define is_tx_disable()		(RS485_DIR_BKD == 1)
+#define BOF				0xC0
+#define XBOF				0xFF
+#define EOF				0xC1
+#define CE					0x7D
+#define TRANS				0x20
 
-//struct sci_master_dev dev;
+#define INIT_FCS			0xFFFF
+#define GOOD_FCS			0x0000
+#define GENER_FCS		0xA001
 
-//unsigned long test_counter = 0x12345678;
-/*Uns conn_enable = 1;
-Uns max_time = 0;
-Uns conn_err = 0;*/
-//
-static Uns CalcCRC(Uns *Buffer, Uns Length);
+#define FCS_CALC(crc, c)	((crc >> 8) ^ fcsTable[(crc ^ c) & 0xFF])
+
+#define TIMER_SET(ptimer, interval)	*(ptimer) = interval
+#define TIMER_RESET(ptimer)				*(ptimer) = 0
+
+#define CONN_SCALE				(Uint16)(1.000 * 18000)
+
+static unsigned int fcsGenFlag = 0;
+static unsigned int fcsTable[256];
+unsigned int HZ=0;
+
+static void gen_FcsTable(void);
+
+static void async_unwrap_bof(TMbBBHandle Port, char byte);
+static void async_unwrap_ce(TMbBBHandle Port, char byte);
+static void async_unwrap_eof(TMbBBHandle Port, char byte);
+static void async_unwrap_other(TMbBBHandle Port, char byte);
+static void async_wrap_char(TMbBBHandle Port);
+static char timerExpired(unsigned int *Timer);
+static void BkpConnTrEnable(char Level);
+
+void SciMasterConnBetweenBlockInit(TMbBBHandle Port)
+{
+	memset(&Port->RxPacket, 0, sizeof(TScPacket));
+	memset(&Port->TxPacket, 0, sizeof(TScPacket));
+	memset(&Port->Frame,    0, sizeof(TScFrame));
+	memset(&Port->Stat,     0, sizeof(TScStat));
+
+	Port->Params.UartID      = BKP_SCI_ID;
+	//Port->Params.BrrValue    = SCI_BRR(BKP_SCI_BAUD);
+	Port->Params.BrrValue    = BKP_SCI_BAUD+1;
+	Port->Params.Parity      = BKP_SCI_PARITY;
+	Port->Params.Mode        = 1;
+	Port->Params.TimeoutPre  = 5;
+	Port->Params.TimeoutPost = 5;
+	Port->Params.TimeoutConn = CONN_SCALE/50;
+	Port->Params.RetryCount  = 3;
+	Port->Params.TrEnable    = BkpConnTrEnable;
+
+	Port->TxPacket.Data[0]   = 0x78;
+	Port->TxPacket.Data[1]   = 0x56;
+	Port->TxPacket.Data[2]   = 0x34;
+	Port->TxPacket.Data[3]   = 0x12;
+
+	if(!fcsGenFlag) {gen_FcsTable(); fcsGenFlag = 1;}
+
+	Port->Params.TrEnable(0);
+
+	SCI_init(BKP_SCI_ID, Port->Params.BrrValue, 0, 8);
+
+	//SCI_init(Port->Params.UartID, Port->Params.BrrValue,
+		//	Port->Params.Parity, 8);
+
+	/*SCI_init(Port->Params.UartID, Port->Params.BrrValue,
+		Port->Params.Parity, 8, (Port->Params.Parity & 0x4) ? 2 : 1);*/
+
+	if(Port->Params.Mode)
+	{
+		Port->TxPacket.Flag = 1;
+	}
+	else
+	{
+		TIMER_SET(&Port->Frame.TimerPost, Port->Params.TimeoutPost);
+		TIMER_SET(&Port->Frame.TimerConn, Port->Params.TimeoutConn);
+	}
+}
+
+static void BkpConnTrEnable(char Level)
+{
+	RS485_DIR_BKD = Level;
+}
+
+void SciMasterConnBetweenBlockUpdate(TMbBBHandle Port)
+{
+	char sci_err = (SCI_getstatus(Port->Params.UartID) & SCI_RX_ERROR);
+		if(!Port->Params.Mode && sci_err) SCI_reset(Port->Params.UartID);
+
+		if(timerExpired(&Port->Frame.TimerPre))
+		{
+			Port->Params.TrEnable(1);
+			SCI_tx_enable(Port->Params.UartID);
+			SCI_transmit(Port->Params.UartID, BOF);
+			return;
+		}
+
+		if(timerExpired(&Port->Frame.TimerPost))
+		{
+			SCI_tx_disable(Port->Params.UartID);
+			Port->Params.TrEnable(0);
+			Port->RxPacket.State = OUTSIDE_FRAME;
+			SCI_rx_enable(Port->Params.UartID);
+			if(Port->Params.Mode) TIMER_SET(&Port->Frame.TimerConn, Port->Params.TimeoutConn);
+			return;
+		}
+
+		if(timerExpired(&Port->Frame.TimerConn))
+		{
+			if(Port->Params.Mode)
+			{
+				Port->Stat.RxNoRespErrCount++;
+				Port->Stat.RxErrCount++;
+				if(Port->Frame.RetryCounter < Port->Params.RetryCount)
+					Port->Frame.RetryCounter++;
+				else Port->Frame.ConnFlag = 0;
+				Port->TxPacket.Flag = 1;
+			}
+			else
+			{
+				Port->Frame.ConnFlag = 0;
+			}
+			return;
+		}
+
+		if(!Port->TxPacket.Flag) return;
+		Port->TxPacket.Flag = 0;
+
+		Port->TxPacket.State = BEGIN_FRAME;
+		Port->TxPacket.Len   = 0;
+		Port->TxPacket.Fcs   = INIT_FCS;
+
+		SCI_rx_disable(Port->Params.UartID);
+		if(sci_err) SCI_reset(Port->Params.UartID);
+		TIMER_SET(&Port->Frame.TimerPre, Port->Params.TimeoutPre);
+		Port->Stat.TxMsgCount++;
+
+}
 
 void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 {
-	if(bPort->TxTimer > 0)
-	{
-		bPort->TxTimer--;
-		if(!bPort->TxTimer)
-		{
-			BKP_SCI_TX_DISABLE();
-			memset(bPort->Buffer, 0, BKP_MAX_SCI_BUF_LEN);
-			bPort->RxLength = 0;
-			bPort->RxTimer = BKP_SCI_RX_TIMEOUT;
-			SCI_rx_enable(BKP_SCI_ID);
-		}
-	}
+	Uns i=0;
+	Uint32 BkpEncPostion=0;
 
-	if(bPort->RxTimer > 0)
-	{
-		bPort->RxTimer--;
-		if(!bPort->RxTimer)
-		{
-			SCI_rx_disable(BKP_SCI_ID);
-			bPort->RxFlag = 1;
-		}
-	}
+	//if (HZ==0) {HZ=1; return;}
+	//HZ=0;
 
-	if (bPort->ConnTimer < bPort->ConnTimeout) bPort->ConnTimer++;
-	else bPort->IsConnected = 0;
+	SciMasterConnBetweenBlockUpdate(bPort);
 
-	/*if(bPort->TxTimer > 0)
-	{
-		bPort->TxTimer--;
-		if(!bPort->TxTimer)
-		{
-			BKP_SCI_TX_DISABLE();
-			memset(bPort->Buffer, 0, BKP_MAX_SCI_BUF_LEN);
-			bPort->RxLength = 0;
-			bPort->RxTimer = BKP_SCI_RX_TIMEOUT;
-			SCI_rx_enable(BKP_SCI_ID);
-		}
-	}
+	bPort->TxPacket.Data[4] = g_Ram.ramGroupH.BkpIndication;// GrC->LedsReg.all;
 
-	if(bPort->RxTimer > 0)
-	{
-		bPort->RxTimer--;
-		if(!bPort->RxTimer)
-		{
-			SCI_rx_disable(BKP_SCI_ID);
-			bPort->RxFlag = 1;
-		}
-	}*/
-}
+	if(!bPort->RxPacket.Flag) return;
+	bPort->RxPacket.Flag = 0;
 
-void SciMasterConnBetweenBlockInit(TMbBBHandle bPort)
-{
-	//bPort->timeout = 1000/5;//???
-	memset(&bPort, 0, sizeof(TMbBBHandle));
-	SCI_init(BKP_SCI_ID, BKP_SCI_BAUD, 0, 8);
-	//SCI_init(BKP_SCI_ID, SCI_BRR(BKP_SCI_BAUD), 0, 8, 2);
-	bPort->ConnTimeout = BKP_CONN_TIMEOUT;
+	g_Ram.ramGroupA.VersionPOBkp     = bPort->RxPacket.Data[0];
+	BkpEncPostion       = (Uint32)bPort->RxPacket.Data[4] << 24;
+	BkpEncPostion      |= (Uint32)bPort->RxPacket.Data[3] << 16;
+	BkpEncPostion      |= (Uint32)bPort->RxPacket.Data[2] << 8;
+	BkpEncPostion      |= (Uint32)bPort->RxPacket.Data[1] << 0;
+	g_Ram.ramGroupC.HallBlock.all    = bPort->RxPacket.Data[5];
+	g_Ram.ramGroupA.TemperBKP         = (int16)bPort->RxPacket.Data[6];
+	g_Core.Status.bit.Ten = bPort->RxPacket.Data[7];
 
-	//SCI_init(SCI_ID, SCI_BAUD, 0, 8, 2);
-	//bPort->conn_enable = 1;
-}
+	bPort->TxPacket.Flag = 1;
 
-void SciMasterConnBetweenBlockUpdate(TMbBBHandle bPort, TBKPDataHandle Data)
-{
-	/*Uns Crc;
-
-	if(!bPort->WaitResponse)
-	{
-		memset(bPort->Buffer, 0, BKP_MAX_SCI_BUF_LEN);
-
-		bPort->Buffer[0] = 0x78;
-		bPort->Buffer[1] = 0x56;
-		bPort->Buffer[2] = 0x34;
-		bPort->Buffer[3] = 0x12;
-		bPort->Buffer[4] = g_Ram.ramGroupH.BkpIndication;
-
-		Crc = CalcCRC(bPort->Buffer, BKP_MAX_SCI_BUF_LEN-2);
-		bPort->Buffer[BKP_MAX_SCI_BUF_LEN-1] = Crc >> 8;
-		bPort->Buffer[BKP_MAX_SCI_BUF_LEN-2] = Crc & 0xFF;
-
-		bPort->WaitResponse = 1;
-		bPort->TxLength = 1;
-
-		BKP_SCI_TX_ENABLE();
-		SCI_tx_enable(BKP_SCI_ID);
-		SCI_transmit(BKP_SCI_ID, bPort->Buffer[0]);
-	}
-	else if(bPort->RxFlag)
-	{
-		bPort->RxFlag = 0;
-		if(bPort->RxLength != BKP_MAX_SCI_BUF_LEN)
-		{
-			bPort->ConnErr++;
-			bPort->IsConnected = 0;
-		}
-		else
-		{
-			Crc  = bPort->Buffer[BKP_MAX_SCI_BUF_LEN-1] << 8;
-			Crc |= bPort->Buffer[BKP_MAX_SCI_BUF_LEN-2];
-			if(Crc != CalcCRC(bPort->Buffer, BKP_MAX_SCI_BUF_LEN-2))
-			{
-				bPort->ConnErr++;
-				bPort->IsConnected = 0;
-			}
-			else
-			{
-				bPort->IsConnected = 1;
-				Data->BkpVersion     = bPort->Buffer[0]; //гр А
-				Data->BkpEncPostion  = (LgUns)bPort->Buffer[4] << 24;//
-				Data->BkpEncPostion |= (LgUns)bPort->Buffer[3] << 16;
-				Data->BkpEncPostion |= (LgUns)bPort->Buffer[2] << 8;
-				Data->BkpEncPostion |= (LgUns)bPort->Buffer[1] << 0;
-				Data->BkpHallReg.all = bPort->Buffer[5];//
-				Data->BkpTemper      = (Int)bPort->Buffer[6];
-				Data->BkpOffTen      = bPort->Buffer[7];//???
-
-				g_Ram.ramGroupA.VersionPOBkp = Data->BkpVersion;
-				g_Ram.ramGroupC.Position	 = (Uns)Data->BkpEncPostion;
-				g_Ram.ramGroupA.TemperBKP = Data->BkpTemper;
-			}
-		}
-		bPort->WaitResponse = 0;
-	}*/
-	Uns Crc;
-
-	if(!bPort->WaitResponse)
-	{
-		memset(bPort->Buffer, 0, BKP_MAX_SCI_BUF_LEN);
-
-		bPort->Buffer[0] = 0x78;
-		bPort->Buffer[1] = 0x56;
-		bPort->Buffer[2] = 0x34;
-		bPort->Buffer[3] = 0x12;
-		bPort->Buffer[4] = g_Ram.ramGroupH.BkpIndication;//BkpLedsReg.all;
-
-		Crc = CalcCRC(bPort->Buffer, BKP_MAX_SCI_BUF_LEN-2);
-		bPort->Buffer[BKP_MAX_SCI_BUF_LEN-1] = Crc >> 8;
-		bPort->Buffer[BKP_MAX_SCI_BUF_LEN-2] = Crc & 0xFF;
-
-		bPort->WaitResponse = 1;
-		bPort->TxLength = 1;
-
-		BKP_SCI_TX_ENABLE();
-		SCI_tx_enable(BKP_SCI_ID);
-		SCI_transmit(BKP_SCI_ID, bPort->Buffer[0]);
-	}
-	else if(bPort->RxFlag)
-	{
-		bPort->RxFlag = 0;
-		if(bPort->RxLength != BKP_MAX_SCI_BUF_LEN)
-		{
-			bPort->ConnErr++;
-		}
-		else
-		{
-			Crc  = bPort->Buffer[BKP_MAX_SCI_BUF_LEN-1] << 8;
-			Crc |= bPort->Buffer[BKP_MAX_SCI_BUF_LEN-2];
-			if(Crc != CalcCRC(bPort->Buffer, BKP_MAX_SCI_BUF_LEN-2))
-			{
-				bPort->ConnErr++;
-			}
-			else
-			{
-				bPort->IsConnected = 1;
-				bPort->ConnTimer   = 0;
-				Data->BkpVersion        = bPort->Buffer[0];
-				Data->BkpEncPostion     = (Uint32)bPort->Buffer[4] << 24;
-				Data->BkpEncPostion    |= (Uint32)bPort->Buffer[3] << 16;
-				Data->BkpEncPostion    |= (Uint32)bPort->Buffer[2] << 8;
-				Data->BkpEncPostion    |= (Uint32)bPort->Buffer[1] << 0;
-				Data->BkpHallReg.all    = bPort->Buffer[5];
-				Data->BkpTemper         = (Int)bPort->Buffer[6];
-				Data->BkpOffTen         = bPort->Buffer[7];
-
-				g_Ram.ramGroupA.VersionPOBkp 	= Data->BkpVersion;
-				g_Ram.ramGroupC.Position	 	= (Uns)Data->BkpEncPostion;
-				g_Ram.ramGroupA.TemperBKP 	 	= Data->BkpTemper;
-				g_Ram.ramGroupC.HallBlock.all   = Data->BkpHallReg.all;
-				g_Core.Status.bit.Ten 		 	= Data->BkpOffTen;
-			}
-		}
-		bPort->WaitResponse = 0;
-	}
 }
 
 void SciMasterConnBetweenBlockRxHandler(TMbBBHandle bPort)
 {
-	/*Byte byte = SCI_recieve(SCI_ID);
-	
-	if(SCI_getstatus(SCI_ID) & SCI_BREAK) {
-		SCI_reset(SCI_ID);
-		return;
-	}
-	
-	if(bPort->rx_len < MAX_SCI_BUF_LEN) {
-		bPort->buf[bPort->rx_len++] = byte;
-	}*/
 
-	Uns Data = SCI_recieve(BKP_SCI_ID);
-	bPort->RxByteCount++;
-	if(SCI_getstatus(BKP_SCI_ID) & SCI_BREAK)
-	{
-		SCI_reset(BKP_SCI_ID);
-		return;
-	}
-	if(bPort->RxLength < BKP_MAX_SCI_BUF_LEN)
-	{
-		bPort->Buffer[bPort->RxLength++] = Data;
-		if(bPort->RxLength == BKP_MAX_SCI_BUF_LEN) bPort->RxTimer = 1;
-		else bPort->RxTimer = BKP_SCI_RX_TIMEOUT;
-	}
+	char byte;
 
-	/*Uns Data = SCI_recieve(BKP_SCI_ID);
-	bPort->RxByteCount++;
-	if(SCI_getstatus(BKP_SCI_ID) & SCI_BREAK)
-	{
-		SCI_reset(BKP_SCI_ID);
-		return;
+	//if(!bPort->TxPacket.Flag) return;
+
+	bPort->Stat.RxBytesCount++;
+
+	byte = SCI_getstatus(bPort->Params.UartID);
+	if(byte & SCI_BREAK) SCI_reset(bPort->Params.UartID);
+
+	byte = SCI_recieve(bPort->Params.UartID);
+	switch(byte) {
+		case BOF: async_unwrap_bof(bPort, byte);   break;
+		case EOF: async_unwrap_eof(bPort, byte);   break;
+		case CE:  async_unwrap_ce(bPort, byte);    break;
+		default:  async_unwrap_other(bPort, byte); break;
 	}
-	if(bPort->RxLength < BKP_MAX_SCI_BUF_LEN)
-	{
-		bPort->Buffer[bPort->RxLength++] = Data;
-		if(bPort->RxLength == BKP_MAX_SCI_BUF_LEN) bPort->RxTimer = 1;
-		else bPort->RxTimer = BKP_SCI_RX_TIMEOUT;
-	}*/
 }
 
 void SciMasterConnBetweenBlockTxHandler(TMbBBHandle bPort)
 {
-	/*if(bPort->tx_len < MAX_SCI_BUF_LEN) {
-		SCI_transmit(SCI_ID, bPort->buf[bPort->tx_len++]);
-	}
-	else {
-		SCI_tx_disable(SCI_ID);
-		bPort->postable = 1;
-	}
-
-	Port->TxByteCount++;
-	if(Port->TxLength < BKP_MAX_SCI_BUF_LEN)
-	{
-		SCI_transmit(BKP_SCI_ID, Port->Buffer[Port->TxLength++]);
-	}
-	else
-	{
-		SCI_tx_disable(BKP_SCI_ID);
-		Port->TxTimer = BKP_SCI_TX_TIMEOUT;
-	}*/
-
-	//-----------------------------
-	bPort->TxByteCount++;
-	if(bPort->TxLength < BKP_MAX_SCI_BUF_LEN)
-	{
-		SCI_transmit(BKP_SCI_ID, bPort->Buffer[bPort->TxLength++]);
-	}
-	else
-	{
-		SCI_tx_disable(BKP_SCI_ID);
-		bPort->TxTimer = BKP_SCI_TX_TIMEOUT;
-	}
-
-	/*bPort->TxByteCount++;
-	if(bPort->TxLength < BKP_MAX_SCI_BUF_LEN)
-	{
-		SCI_transmit(BKP_SCI_ID, bPort->Buffer[bPort->TxLength++]);
-	}
-	else
-	{
-		SCI_tx_disable(BKP_SCI_ID);
-		SCI_rx_enable(BKP_SCI_ID);
-		bPort->TxTimer = BKP_SCI_TX_TIMEOUT;
-	}*/
+	bPort->Stat.TxBytesCount++;
+	async_wrap_char(bPort);
 }
 
-static Uns CalcCRC(Uns *Buffer, Uns Length)
+static void async_unwrap_bof(TMbBBHandle Port, char byte)
 {
-  Uns Crc = 0;
-  while(Length--) Crc = Crc + (*Buffer++);
-  return ~Crc;
+	switch(Port->RxPacket.State)
+	{
+		case LINK_ESCAPE:
+		case INSIDE_FRAME:
+			Port->Stat.RxErrCount++;
+			Port->Stat.RxMissedErrCount++;
+			break;
+		case OUTSIDE_FRAME:
+		case BEGIN_FRAME:
+		default:
+			break;
+	}
+
+	Port->RxPacket.State = BEGIN_FRAME;
+	Port->RxPacket.Len   = 0;
+	Port->RxPacket.Fcs   = INIT_FCS;
+}
+
+static void async_unwrap_eof(TMbBBHandle Port, char byte)
+{
+	switch(Port->RxPacket.State)
+	{
+		case OUTSIDE_FRAME:
+			Port->Stat.RxErrCount++;
+			Port->Stat.RxMissedErrCount++;
+			break;
+		case BEGIN_FRAME:
+		case LINK_ESCAPE:
+		case INSIDE_FRAME:
+		default:
+			Port->RxPacket.State = OUTSIDE_FRAME;
+			Port->Stat.RxMsgCount++;
+			if(Port->RxPacket.Len != 10)
+				Port->Stat.RxFrameErrLenCount++;
+			else if(Port->RxPacket.Fcs != GOOD_FCS)
+				Port->Stat.RxCrcErrCount++;
+			else
+			{
+				TIMER_RESET(&Port->Frame.TimerConn);
+				Port->Frame.ConnFlag = 1;
+				Port->Frame.RetryCounter = 0;
+				Port->Frame.MsgCount++;
+				Port->RxPacket.Flag = 1;
+				SCI_rx_disable(Port->Params.UartID);
+				break;
+			}
+			Port->Stat.RxErrCount++;
+			break;
+	}
+}
+
+static void async_unwrap_ce(TMbBBHandle Port, char byte)
+{
+	switch(Port->RxPacket.State)
+	{
+		case OUTSIDE_FRAME:
+			break;
+		case LINK_ESCAPE:
+			break;
+		case BEGIN_FRAME:
+		case INSIDE_FRAME:
+		default:
+			Port->RxPacket.State = LINK_ESCAPE;
+			break;
+	}
+}
+
+static void async_unwrap_other(TMbBBHandle Port, char byte)
+{
+	switch(Port->RxPacket.State)
+	{
+		case LINK_ESCAPE:
+			 byte ^= TRANS;
+		case BEGIN_FRAME:
+			 Port->RxPacket.State = INSIDE_FRAME;
+		case INSIDE_FRAME:
+			if(Port->RxPacket.Len < 10)
+			{
+				Port->RxPacket.Data[Port->RxPacket.Len++] = byte;
+				Port->RxPacket.Fcs = FCS_CALC(Port->RxPacket.Fcs, byte);
+			}
+			else
+			{
+				Port->Stat.RxErrCount++;
+				Port->Stat.RxOverflowErrCount++;
+				Port->RxPacket.State = OUTSIDE_FRAME;
+			}
+			break;
+		case OUTSIDE_FRAME:
+			break;
+	}
+}
+
+static void async_wrap_char(TMbBBHandle Port)
+{
+	char byte;
+
+	switch(Port->TxPacket.Len)
+	{
+		case 10:
+			SCI_transmit(Port->Params.UartID, EOF);
+			Port->TxPacket.Len++;
+			Port->TxPacket.State = OUTSIDE_FRAME;
+			return;
+		case 8:
+			Port->TxPacket.Data[10-2] = (Port->TxPacket.Fcs >> 0) & 0xFF;
+			Port->TxPacket.Data[10-1] = (Port->TxPacket.Fcs >> 8) & 0xFF;
+		default:
+			byte = Port->TxPacket.Data[Port->TxPacket.Len];
+			break;
+	}
+
+	switch(Port->TxPacket.State)
+	{
+		case BEGIN_FRAME:
+			Port->TxPacket.State = INSIDE_FRAME;
+		case INSIDE_FRAME:
+			if((byte == BOF) || (byte == EOF) || (byte == CE))
+			{
+				byte = CE;
+				Port->TxPacket.State = LINK_ESCAPE;
+			}
+			else
+			{
+				Port->TxPacket.Fcs = FCS_CALC(Port->TxPacket.Fcs, byte);
+				Port->TxPacket.Len++;
+			}
+			break;
+		case LINK_ESCAPE:
+			byte = byte ^ TRANS;
+			Port->TxPacket.State = INSIDE_FRAME;
+			Port->TxPacket.Len++;
+			break;
+		case OUTSIDE_FRAME:
+			TIMER_SET(&Port->Frame.TimerPost, Port->Params.TimeoutPost);
+			return;
+	}
+
+	SCI_transmit(Port->Params.UartID, byte);
+}
+
+static void gen_FcsTable(void)
+{
+	unsigned int i, j, v;
+	for (i=0; i < 256; i++) {
+		v = i;
+		for (j=0; j < 8; j++) {
+			if (v & 1) v = (v >> 1) ^ GENER_FCS;
+			else v = (v >> 1);
+		}
+		fcsTable[i] = v;
+	}
+}
+
+static char timerExpired(unsigned int *Timer)
+{
+	if (*Timer > 0)
+	{
+		*Timer = *Timer - 1;
+		if (*Timer == 0) return 1;
+	}
+	return 0;
 }
 
 

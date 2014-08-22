@@ -86,7 +86,7 @@ void InitHardware(void)
 	//PieVectTable.SCIRXINTC = &ScicRxIsrHandler;
 	//PieVectTable.SCITXINTC = &ScicTxIsrHandler;
 	PieVectTable.ADCINT    = &adc_isr;
-	PieVectTable.I2CINT1A  = &i2c_int1a_isr;
+	//PieVectTable.I2CINT1A  = &i2c_int1a_isr;
 	PieVectTable.MRINTA= &McbspRxAHandler;
     PieVectTable.MXINTA= &McbspTxAHandler;
 	EDIS;
@@ -94,9 +94,8 @@ void InitHardware(void)
 	// Initialize all the Device Peripherals
 	InitAdc();
 
-
-
-	I2CA_Init();
+	//I2CA_Init();
+	InitI2C();
 
 	// Configure CPU-Timer 0, 1, and 2 to interrupt every second:
 	// 30MHz CPU Freq, 18к√ц  (55 in uSeconds)
@@ -120,9 +119,9 @@ void InitHardware(void)
 
 	//PieCtrlRegs.PIEIER1.bit.INTx1 = 1; // ADC
 	PieCtrlRegs.PIEIER1.bit.INTx6 = 1;
-	PieCtrlRegs.PIEIER8.bit.INTx1 = 1; // I2C
+	//PieCtrlRegs.PIEIER8.bit.INTx1 = 1; // I2C
 
-    IER |= M_INT8;   // дл€ I2C
+    //IER |= M_INT8;   // дл€ I2C
 	IER |= M_INT1;   // дл€ ј÷ѕ
 	IER |= M_INT6;   // дл€ McBSP
 	IER |= M_INT9;   // дл€ SCI A,B,C
@@ -285,6 +284,7 @@ void InitGpio(void)
 	GpioCtrlRegs.GPBDIR.bit.GPIO45	= 0;	//CONTACTOR_2
 	GpioDataRegs.GPBDAT.bit.GPIO45	= 0;
 
+	//GpioCtrlRegs.GPBPUD.bit.GPIO46	= 1;
 	GpioCtrlRegs.GPBDIR.bit.GPIO46	= 0;	//кнопка акривации bluetooth
 	GpioDataRegs.GPBDAT.bit.GPIO46	= 0;
 
@@ -313,31 +313,43 @@ void InitGpio(void)
 	GpioCtrlRegs.GPADIR.bit.GPIO5	= 1;	// ENC_ADDR2
 	GpioDataRegs.GPADAT.bit.GPIO5	= 0;
 
-	GpioCtrlRegs.GPAPUD.bit.GPIO22	= 1;
+	//GpioCtrlRegs.GPAPUD.bit.GPIO22	= 1;
 	GpioCtrlRegs.GPADIR.bit.GPIO22	= 1;	//LED0
 	GpioDataRegs.GPADAT.bit.GPIO22	= 1;
 
-	GpioCtrlRegs.GPAPUD.bit.GPIO23	= 1;
+	//GpioCtrlRegs.GPAPUD.bit.GPIO23	= 1;
 	GpioCtrlRegs.GPADIR.bit.GPIO23	= 1;	//LED1
 	GpioDataRegs.GPADAT.bit.GPIO23	= 1;
 
-	GpioCtrlRegs.GPAPUD.bit.GPIO24	= 1;
+	//GpioCtrlRegs.GPAPUD.bit.GPIO24	= 1;
 	GpioCtrlRegs.GPADIR.bit.GPIO24	= 1;	//LED2
 	GpioDataRegs.GPADAT.bit.GPIO24	= 1;
 
-	GpioCtrlRegs.GPBPUD.bit.GPIO34	= 1;
+	//GpioCtrlRegs.GPBPUD.bit.GPIO34	= 1;
 	GpioCtrlRegs.GPBDIR.bit.GPIO34	= 1;	//LED3
 	GpioDataRegs.GPBDAT.bit.GPIO34	= 1;
 
-	GpioCtrlRegs.GPAPUD.bit.GPIO25	= 1;
+	//GpioCtrlRegs.GPAPUD.bit.GPIO25	= 1;
 	GpioCtrlRegs.GPADIR.bit.GPIO25	= 1;	//LED4
 	GpioDataRegs.GPADAT.bit.GPIO25	= 1;
 
-	GpioCtrlRegs.GPAPUD.bit.GPIO26	= 1;
+	//GpioCtrlRegs.GPAPUD.bit.GPIO26	= 1;
 	GpioCtrlRegs.GPADIR.bit.GPIO26	= 1;	//LED5
 	GpioDataRegs.GPADAT.bit.GPIO26	= 1;
 
-	GpioCtrlRegs.GPAPUD.bit.GPIO27	= 1;
+	//GpioCtrlRegs.GPCPUD.bit.GPIO66	= 1;
+	GpioCtrlRegs.GPCDIR.bit.GPIO66	= 1;	//LED7
+	GpioDataRegs.GPCDAT.bit.GPIO66	= 1;
+
+	//GpioCtrlRegs.GPCPUD.bit.GPIO65	= 1;
+	GpioCtrlRegs.GPCDIR.bit.GPIO65	= 1;	//LED8
+	GpioDataRegs.GPCDAT.bit.GPIO65	= 1;
+
+	//GpioCtrlRegs.GPCPUD.bit.GPIO64	= 1;
+	GpioCtrlRegs.GPCDIR.bit.GPIO64	= 1;	//LED9
+	GpioDataRegs.GPCDAT.bit.GPIO64	= 1;
+
+	//GpioCtrlRegs.GPAPUD.bit.GPIO27	= 1;
 	GpioCtrlRegs.GPADIR.bit.GPIO27	= 1;	//ENABLE_BLUETOOTH
 	GpioDataRegs.GPADAT.bit.GPIO27	= 1;
 

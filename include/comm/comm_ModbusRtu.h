@@ -121,6 +121,7 @@ typedef struct _TMbFrame {
 	TTimerList TimerAck;       // Таймер для для потверждения
 	Uns        RxLength;       // Длина принятого кадра
 	Uns        TxLength;       // Длина передаваемого кадра
+	Uns 	   AddCount;
 	//Uns		   TxBufLen;
 	Byte      *Data;           // Указатель в буфере данных кадара
 	Byte       Buf[256];       // Буфер данных кадра
