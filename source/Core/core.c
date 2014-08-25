@@ -42,7 +42,6 @@ void Core_Init(TCore *p)
 	p->Status.bit.Stop = 1;					// При включение выставляем стоп
 }
 
-
 // Функция задания момента в зависимости от положения и направления движения
 void Core_DefineCtrlParams(TCore *p) // 50 hz
 {
@@ -212,6 +211,7 @@ void StopPowerControl(void)
 void StartPowerControl(TValveCmd ControlWord)
 {
 	//Если КЗ то return
+	if (g_Core.Protections.ShC_U ||g_Core.Protections.ShC_V  ||g_Core.Protections.ShC_W ) return;
 
 	switch (ControlWord)
 	{
@@ -262,6 +262,9 @@ void Core_ControlMode(TCore *p)
 		g_Ram.ramGroupA.Torque = p->TorqObs.Indication; // отображаем текущий момент
 		if(p->TorqObs.Indication < p->MotorControl.TorqueSet) p->MotorControl.MufTimer = 0;
 		else if (++p->MotorControl.MufTimer >= MOVE_STATE_TIME) p->Protections.outFaults.Proc.bit.Mufta = 1;	// выставляем муфту если в течении секунды момент больше заданного
+		break;
+	case wmPlugBreak:
+
 		break;
 	}
 }

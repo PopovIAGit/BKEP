@@ -471,6 +471,7 @@ void Core_ProtectionsClear(TCoreProtections *p)
 	g_Core.MotorControl.OverWayFlag = 0;		// —бросили отсусвие уплотнени€
 	//Muff = 0;									// сбросили муфту
 
+
 	g_Core.Status.all &= ~STATUS_RESET_MASK;	// отчистили статус от аварии муфты и неисправености
 
 	p->outFaults.Dev.all  = 0;					// сбросили все аварии
