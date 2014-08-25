@@ -108,6 +108,7 @@ typedef struct {
 void Peref_SensObserverInit(TSensObserver *p);
 void SetOffsets(TSensObserver *p);
 void Peref_SensObserverUpdate(TSensObserver *p);
+void Peref_SensTuObserverUpdate(TSensTuObserver *p);
 
 void Peref_SensTuObserverInit(TSensTuObserver *p);
 

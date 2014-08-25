@@ -47,7 +47,7 @@ void Peref_SinObserverUpdateFloat(TSinPhaseObserverFloat *p)		// –мс, угол, пол€
 		p->CurAngle = MAX_ANGLE;
 	}
 
-	p->Sum += pow(fabs(p->Input), 2);
+	p->Sum += p->Input * p->Input;//pow(fabs(p->Input), 2);
 	if(++p->Counter >= BASE_ANGLE*2)
 	{
 		p->Output = (sqrt(p->Sum / (BASE_ANGLE*2)));

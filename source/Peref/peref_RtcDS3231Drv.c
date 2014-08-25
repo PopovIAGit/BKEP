@@ -42,7 +42,7 @@ void DS3231_Update(DS3231 *p)
 		p->Busy     = 1;
 		I2cMsg.Busy = 1;
 	}
-	else if(I2cMsg.Status == I2C_MSGSTAT_NACK)
+	else if(I2cMsg.Status == I2C_MSGSTAT_INACTIVE)//I2C_MSGSTAT_NACK)
 	{
 		if(p->Flag) {p->Flag = 0; p->Error = 1;}
 		else for(i = 0; i < 7; i++)
@@ -57,7 +57,7 @@ void DS3231_Update(DS3231 *p)
 		I2cMsg.Busy   = 0;
 		I2cMsg.Status = I2C_MSGSTAT_INACTIVE;
 	}
-	else if(I2cMsg.Status == I2C_MSGSTAT_INACTIVE)
+	else if(I2cMsg.Status == I2C_MSGSTAT_NACK)//I2C_MSGSTAT_INACTIVE)
 	{
 		p->Flag     = 0;
 		p->Busy     = 0;

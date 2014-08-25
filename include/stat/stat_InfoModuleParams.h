@@ -32,68 +32,14 @@
 #define NEW_PARAM_VALUE_ADDR			60001
 #define FIRST_RECORD_FLAG_ADDR			60002
 
+
+//Uns *DeviceDataPtr 			= ((Uns *)&Ram);
+
+
 extern Uns ImEvLogMainAddrsTable[20];
 extern Uns ImEvLogBufAddrsTable[12];
 extern Uns ImCmdLogAddrsTable[5];
 extern Uns ImParamLogAddrsTable[5];
-
-//Uns *DeviceDataPtr 			= ((Uns *)&Ram);
-/*
-Uns ImEvLogMainAddrsTable[]	= {
-								GetAdr(ramGroupB.DevTime),
-								GetAdr(ramGroupB.DevDate),
-								GetAdr(ramGroupA.Status),
-								GetAdr(ramGroupA.Faults.Proc),
-								GetAdr(ramGroupA.Faults.Net),
-								GetAdr(ramGroupA.Faults.Load),
-								GetAdr(ramGroupA.Faults.Dev),
-								GetAdr(ramGroupA.PositionPr),
-								GetAdr(ramGroupA.Torque),
-								GetAdr(ramGroupA.Ur),
-								GetAdr(ramGroupA.Us),
-								GetAdr(ramGroupA.Ut),
-								GetAdr(ramGroupA.Iu),
-								GetAdr(ramGroupA.Iv),
-								GetAdr(ramGroupA.Iw),
-								GetAdr(ramGroupA.Temper),
-								GetAdr(ramGroupA.Inputs),
-								GetAdr(ramGroupA.Outputs),
-								GetAdr(ramGroupH.Seconds),
-								FIRST_RECORD_FLAG_ADDR
-};
-
-Uns ImEvLogBufAddrsTable[] = {
-								GetAdr(ramGroupA.Status),
-								GetAdr(ramGroupA.PositionPr),
-								GetAdr(ramGroupA.Torque),
-								GetAdr(ramGroupA.Ur),
-								GetAdr(ramGroupA.Us),
-								GetAdr(ramGroupA.Ut),
-								GetAdr(ramGroupA.Iu),
-								GetAdr(ramGroupA.Iv),
-								GetAdr(ramGroupA.Iw),
-								GetAdr(ramGroupA.Temper),
-								GetAdr(ramGroupA.Inputs),
-								GetAdr(ramGroupA.Outputs)
-};
-
-Uns ImCmdLogAddrsTable[] = {
-								GetAdr(ramGroupB.DevTime),
-								GetAdr(ramGroupB.DevDate),
-								GetAdr(ramGroupH.Seconds),
-								GetAdr(ramGroupH.LogControlWord),
-								GetAdr(ramGroupA.Status)
-};
-
-Uns ImParamLogAddrsTable[] = {
-								GetAdr(ramGroupB.DevTime),
-								GetAdr(ramGroupB.DevDate),
-								GetAdr(ramGroupH.Seconds),
-								NEW_PARAM_ADDR,
-								NEW_PARAM_VALUE_ADDR
-};*/
-
-
 
 #endif
 

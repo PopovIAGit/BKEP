@@ -66,6 +66,7 @@ void ModBusInvoke(TMbPort *hPort)
 {
 	if (hPort->Frame.NewMessage)
 	{
+		hPort->Stat.MAMsgIn++;
 		UpdateNewFrame(hPort);
 		hPort->Frame.NewMessage = FALSE;
 	}
@@ -82,13 +83,31 @@ void ModBusInvoke(TMbPort *hPort)
 
 void ModBusTimings(TMbPort *hPort)
 {
-	if (!TimerPending(&hPort->Frame.Timer1_5))  BreakFrameEvent(hPort);
-	if (!TimerPending(&hPort->Frame.Timer3_5))  NewFrameEvent(hPort);
-	if (!TimerPending(&hPort->Frame.TimerPre))  PreambleEvent(hPort);
-	if (!TimerPending(&hPort->Frame.TimerPost)) PostambleEvent(hPort);
-	if (!TimerPending(&hPort->Frame.TimerConn)) ConnTimeoutEvent(hPort);
+	if (!TimerPending(&hPort->Frame.Timer1_5))
+	{
+		BreakFrameEvent(hPort);
+	}
+	if (!TimerPending(&hPort->Frame.Timer3_5))
+	{
+		NewFrameEvent(hPort);
+	}
+	if (!TimerPending(&hPort->Frame.TimerPre))
+	{
+		PreambleEvent(hPort);
+	}
+	if (!TimerPending(&hPort->Frame.TimerPost))
+	{
+		PostambleEvent(hPort);
+	}
+	if (!TimerPending(&hPort->Frame.TimerConn))
+	{
+		ConnTimeoutEvent(hPort);
+	}
 	#if defined(_SLAVE_)
-	if (!TimerPending(&hPort->Frame.TimerAck))  AcknoledgeEvent(hPort);
+	if (!TimerPending(&hPort->Frame.TimerAck))
+	{
+		AcknoledgeEvent(hPort);
+	}
 	#endif
 }
 
@@ -97,12 +116,12 @@ __inline void UpdateNewFrame(TMbPort *hPort)
 	TMbFrame *Frame = &hPort->Frame;
 	TMbStat  *Stat  = &hPort->Stat;
 	Byte Status;
-	Uns CRC=0;
+	//Uns CRC=0;
 	
 	//Status = SCI_getstatus(hPort->Params.UartID);
 
 	if (hPort->Params.HardWareType==UART_TYPE) Status = SCI_getstatus(hPort->Params.ChannelID);
-	else if (hPort->Params.HardWareType==MCBSP_TYPE) Status = McBsp_getstatus(hPort->Params.ChannelID);
+	//else if (hPort->Params.HardWareType==MCBSP_TYPE) Status = McBsp_getstatus(hPort->Params.ChannelID);
 
 	//??? определение ошибок для McBsp
 	if (hPort->Params.HardWareType==UART_TYPE){
@@ -115,12 +134,14 @@ __inline void UpdateNewFrame(TMbPort *hPort)
 		}
 	} else
 	if (hPort->Params.HardWareType==MCBSP_TYPE){
-		if (Status & MCBSP_ERROR){
+		/*эксперимент
+
+		 if (Status & MCBSP_ERROR){
 			if (Status & MCBSP_TX_SYNC_ERROR) Stat->SyncTxErrCount++;
 			if (Status & MCBSP_RX_SYNC_ERROR) Stat->SyncRxErrCount++;
 			McBsp_reset(hPort->Params.ChannelID);
 			goto FRAMING_ERROR;
-		}
+		}*/
 	}
 
 	
@@ -130,8 +151,8 @@ __inline void UpdateNewFrame(TMbPort *hPort)
 		goto FRAMING_ERROR;
 	}
 
-
-	CRC = CalcFrameCrc(Frame->Buf, Frame->RxLength);
+	if (Frame->RxLength==12 && hPort->Params.HardWareType==MCBSP_TYPE) Frame->RxLength=11;//приём команды 16 для msbsp
+	//CRC = CalcFrameCrc(Frame->Buf, Frame->RxLength);
 
 	if (CalcFrameCrc(Frame->Buf, Frame->RxLength) != GOOD_CRC)
 	{
@@ -154,6 +175,11 @@ FRAMING_ERROR:
 
 	if (hPort->Params.HardWareType==UART_TYPE) SCI_rx_enable(hPort->Params.ChannelID);
 	else if (hPort->Params.HardWareType==MCBSP_TYPE) McBsp_rx_enable(hPort->Params.ChannelID);
+
+	if (hPort->Frame.Buf[0]==0) hPort->Frame.Buf[0]=1;
+	if (hPort->Frame.Buf[1]!=3 || hPort->Frame.Buf[1]!=16) hPort->Frame.Buf[1]=3;
+	hPort->Packet.Exception = hPort->Frame.Buf[1];
+	hPort->Packet.Response = EX_SLAVE_DEVICE_FAILURE;
 }
 
 #if defined(_MASTER_)
@@ -292,6 +318,7 @@ __inline void SlaveResponse(TMbPort *hPort)
 		Frame->Buf[1]   = Packet->Response | 0x80;
 		Frame->Buf[2]   = Packet->Exception;
 		Frame->TxLength = 3;
+		Packet->Exception = 0;
 	}
 	else switch(Packet->Response)
 	{
@@ -302,7 +329,7 @@ __inline void SlaveResponse(TMbPort *hPort)
 		default: Packet->Response = 0; return;
 	}
 	Packet->Response = 0;
-	
+	hPort->Stat.MAMsgOut++;
 	SendFrame(hPort);
 }
 #endif

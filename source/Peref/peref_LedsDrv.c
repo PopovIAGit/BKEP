@@ -48,9 +48,10 @@ void Peref_LedsInit(pLeds p, Uns freq)
 	p->ledMufta.timeOfBlink 	= freq/p->ledMufta.blinkPRD;		//муфта
 	p->ledBluetooth.timeOfBlink	= 0;								//bluetooth
 	p->ledConnect.timeOfBlink 	= freq/p->ledConnect.blinkPRD;		//сеть
+	p->ledConnect.timeOfBlink	= 30;
 
-	p->pStatus = &g_Core.Status.all;
-	//p->pStatus = &g_Core.TestStatus.all;
+	//p->pStatus = &g_Core.Status.all;
+	p->pStatus = &g_Core.TestStatus.all;
 
 }
 //--------------------------------------------------------
@@ -58,6 +59,18 @@ void Peref_LedsUpdate(pLeds p)
 {
 
 	Uns tmp=0;
+	Uns i=0;
+	Uns BlinkConnect=0;
+
+	if (g_Comm.mbAsu.Serial.RsState==0) BlinkConnect++;
+	if (g_Comm.mbBkp.Frame.ConnFlag==1) BlinkConnect++;
+	//if (g_Comm.mbShn.Serial.RsState==0) BlinkConnect++;
+
+	p->ledConnect.timeOfBlink = 20;
+	if (BlinkConnect==0) p->ledConnect.timeOfBlink = 20;
+	else if (BlinkConnect==1) p->ledConnect.timeOfBlink = 10;
+	else if (BlinkConnect==2) p->ledConnect.timeOfBlink = 5;
+	else if (BlinkConnect==3) p->ledConnect.timeOfBlink = 1;
 
 	//-------Моргание лампочкой процессора-----------------------------
 	LedTurnOnOff(&p->ledCntr, p->ledCntr.status);
@@ -66,28 +79,9 @@ void Peref_LedsUpdate(pLeds p)
 	//-------Моргание лампочкой процессора-----------------------------
 	LedTurnOnOff(&p->ledConnect, p->ledConnect.status);
 	LED_CONNECT = p->ledConnect.status;
+	p->leds.bit.Connect = p->ledConnect.status;
 
-	// ------Bluettoth режим----------------------------------------------
 	// ------Авария----------------------------------------
-
-	if (*p->pStatus & STATUS_BLUETOOTH)// Если авария
-	{
-		LedTurnOnOff(&p->ledBluetooth, p->leds.bit.Bluetooth);// Зажигаем светодиод
-		p->leds.bit.Bluetooth = p->ledBluetooth.status;
-	}
-	else 											// Если статус не "Авария"
-		p->leds.all |= LED_BLUETOOTH_MASK;				// Гасим светодиод
-
-	/*if (*p->pStatus & STATUS_BLUETOOTH)		// Если "Режим передачи по Bluettoth"
-	{
-		p->ledBluetooth.isBlink		= 0;
-	}
-	else
-	{
-		p->ledBluetooth.isBlink		= 1;
-	}
-	LedTurnOnOff(&p->ledBluetooth, p->ledBluetooth.status);
-	ENABLE_BLUETOOTH = p->ledBluetooth.status;*/
 	//------------------------------------------------------------------
 
 	p->ledOpen.isBlink  = (*p->pStatus & STATUS_OPENING) ? 1: 0;// Статус - "открывается"? Да - Led "моргает". Нет - Led не "моргает"
@@ -138,23 +132,36 @@ void Peref_LedsUpdate(pLeds p)
 	else 											// Если статус нет "Неисправности"
 		p->leds.all |= LED_DEFECT_MASK;				// Гасим светодиод
 
+	LED_OPEN	= p->leds.bit.Open;		DELAY_US(1);
+	LED_MUFTA	= p->leds.bit.Mufta;	DELAY_US(1);
+	LED_DEFECT	= p->leds.bit.Defect;	DELAY_US(1);
+	LED_FAULT	= p->leds.bit.Fault;	DELAY_US(1);
+	LED_CLOSE 	= p->leds.bit.Close;	DELAY_US(1);
 
-	//LED_OPEN	= p->leds.bit.Open;
-	//LED_MUFTA	= g_Core.TestStatus.bit.Mufta;// p->leds.bit.Mufta;
-	//LED_DEFECT	= p->leds.bit.Defect;
-	//LED_FAULT	= p->leds.bit.Fault;
-	//LED_CLOSE = p->leds.bit.Close;
+	if ((!(*p->pStatus & STATUS_OPENING)) && (!(*p->pStatus & STATUS_CLOSING)) && (!(*p->pStatus & STATUS_OPENED)) && (!(*p->pStatus & STATUS_CLOSED)))
+	{
+		LED_NOOPEN = 0;
+		DELAY_US(1);
+		LED_NOCLOSE = 0;
+		DELAY_US(1);
+	} else {
+		LED_NOOPEN = 1;
+		DELAY_US(1);
+		LED_NOCLOSE = 1;
+		DELAY_US(1);
+	}
 
 	//ENABLE_BLUETOOTH = p->leds.bit.Bluetooth;
 
 	g_Ram.ramGroupH.BkpIndication = 0;
 
 	tmp = !p->leds.bit.Fault;		g_Ram.ramGroupH.BkpIndication = tmp;
-	tmp = !p->leds.bit.Defect;		g_Ram.ramGroupH.BkpIndication |=(tmp<<1)&0x2;
-	tmp = !p->leds.bit.Mufta;		g_Ram.ramGroupH.BkpIndication |=(tmp<<2)&0x4;
-	tmp = !p->leds.bit.Open;		g_Ram.ramGroupH.BkpIndication |=(tmp<<3)&0x8;
-	tmp = !p->leds.bit.Close;		g_Ram.ramGroupH.BkpIndication |=(tmp<<4)&0x10;
-	tmp = !p->leds.bit.Connect;		g_Ram.ramGroupH.BkpIndication |=(tmp<<5)&0x20;
+	tmp = !p->leds.bit.Connect;		g_Ram.ramGroupH.BkpIndication |=(tmp<<1)&0x2;
+	tmp = !p->leds.bit.Defect;		g_Ram.ramGroupH.BkpIndication |=(tmp<<2)&0x4;
+	tmp = !p->leds.bit.Mufta;		g_Ram.ramGroupH.BkpIndication |=(tmp<<3)&0x8;
+	tmp = !p->leds.bit.Open;		g_Ram.ramGroupH.BkpIndication |=(tmp<<4)&0x10;
+	tmp = !p->leds.bit.Close;		g_Ram.ramGroupH.BkpIndication |=(tmp<<5)&0x20;
+
 
 }
 //--------------------------------------------------------

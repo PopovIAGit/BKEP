@@ -403,8 +403,8 @@ void Core_DevProc_FaultIndic(TCoreProtections *p)
 
 	if(g_Ram.ramGroupC.ErrIndic != pmOff)
 	{
-		//p->outDefects.Dev.bit.Memory1 = g_Eeprom1.Error;
-		//p->outDefects.Dev.bit.Memory2 = g_Eeprom2.Error;
+		p->outDefects.Dev.bit.Memory1 = Eeprom1.Error;
+		p->outDefects.Dev.bit.Memory2 = Eeprom2.Error;
 		p->outDefects.Dev.bit.PosSens = 0;//??? добавить при наличии драйвера
 		p->outDefects.Dev.bit.Rtc 	  = (Uns)g_Peref.Rtc.Error;
 		p->outDefects.Dev.bit.TSens   = (Uns)g_Peref.TSens.Error;
@@ -414,7 +414,7 @@ void Core_DevProc_FaultIndic(TCoreProtections *p)
 
 void EngPhOrdPrt(TCoreProtections *p)
 {
-	static Bool  Flag = False;          // флаг дл€ единичной проверки правельности чередовани€ фазы
+	static Bool  Flag = False;          // флаг дл€ единичной проверки прав?е?льности чередовани€ фазы
 	static LgUns StartPos;
 	static Uns   Timer = 0;
 	static Int   EngPhOrdValue = 0;

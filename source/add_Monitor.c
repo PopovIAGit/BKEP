@@ -17,11 +17,17 @@ TDataLog Dlog;			//	Dlog монитор
 
 Int DlogCh1 = 0;
 Int DlogCh2 = 0;
+
+float32 DlogCh1F = 0;
+float32 DlogCh2F = 0;
+
 Uns MonSelect = 1;
+Uns MonMode = 0;
+Uns MonScope = 0;
 
 void DLOG_update(TDataLog *p);
 
-void MonitorInit(void)
+/*void MonitorInit(void)
 {
 	memset(&Monitor, 0, sizeof(TMonitor));
 	memset(&Dlog, 0, sizeof(TDataLog));
@@ -43,10 +49,81 @@ void MonitorInit(void)
 	Dlog.Data2Ptr   = &DlogCh2;
 	Dlog.Graph1Ptr  = (Int *)0x3FBC00;
 	Dlog.Graph2Ptr  = (Int *)0x3FBE00;
+}*/
+
+void MonitorInit(void)
+{
+	memset(&Dlog, 0, sizeof(TDataLog));
+
+	Dlog.Mode       = DLOG_STOP;
+	Dlog.DotSpace	= 10;
+	Dlog.CntrMax    = 0x200;
+	Dlog.Level      = 1;
+	Dlog.Delay      = 0;
+	Dlog.OutOfTrig  = 1;
+	Dlog.Data1Ptr   = &DlogCh1;
+	Dlog.Data2Ptr   = &DlogCh2;
+	Dlog.Graph1Ptr  = (Int *)0x3FBC00;
+	Dlog.Graph2Ptr  = (Int *)0x3FBE00;
 }
 
+void MonitorUpdate(void)
+{
+	Dlog.Mode     = MonMode;
+	Dlog.DotSpace = MonScope;
 
-void MonitorUpdate(void){
+	switch (MonSelect)
+	{
+	 	case 0: DlogCh1 = AdcRegs.ADCRESULT10;
+		        DlogCh2 = AdcRegs.ADCRESULT10; break;
+	 	case 1: DlogCh1 = (Uns)(g_Peref.InDigSignalObserver.UStopInp);
+	 			DlogCh2 = (Uns)(g_Peref.InDigSignalObserver.UStopInp); break;
+	 	case 2: DlogCh1 = AdcRegs.ADCRESULT10;
+	 		 	DlogCh2 = (Uns)(g_Peref.U3fltrStop.Output); break;
+
+
+		default: return;
+	}
+
+	DLOG_update(&Dlog);
+}
+
+void DLOG_update(TDataLog *p)
+{
+	if (p->Mode == DLOG_STOP)
+	{
+		p->Counter = 0;
+		p->Prescaller = 0;
+		p->Timer = 0;
+		return;
+	}
+
+	if (p->OutOfTrig || p->Trigger)
+	{
+		p->Timer = 0;
+		if (++p->Prescaller >= p->DotSpace)
+		{
+			p->Prescaller = 0;
+
+			p->Graph1Ptr[p->Counter] = *p->Data1Ptr;
+			p->Graph2Ptr[p->Counter] = *p->Data2Ptr;
+
+			if (++p->Counter >= p->CntrMax)
+			{
+				p->Counter = 0;
+				p->Trigger = 0;
+				if (p->Mode != DLOG_CONT) p->Mode = DLOG_STOP;
+			}
+		}
+	}
+	else if (p->Timer < p->Delay) p->Timer++;
+	else
+	{
+		if ((*p->TriggerPtr >= p->Level) && (p->DataPrev < p->Level)) p->Trigger = 1;
+		p->DataPrev = *p->TriggerPtr;
+	}
+}
+/*void MonitorUpdate(void){
 
 	Float Data1, Data2;
 
@@ -137,4 +214,4 @@ void DLOG_update(TDataLog *p)
 		if ((*p->TriggerPtr >= p->Level) && (p->DataPrev < p->Level)) p->Trigger = 1;
 		p->DataPrev = *p->TriggerPtr;
 	}
-}
+}*/

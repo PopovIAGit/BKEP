@@ -10,10 +10,6 @@
 #include "core.h"
 #include "comm.h"
 
-
-TFM25V10		g_Eeprom1;
-TFM25V10		g_Eeprom2;
-
 TStat			g_Stat;
 Uns 			prevCmd = 0, delayStart = 2.0 * Prd50HZ;
 
@@ -30,6 +26,7 @@ void InitInfoModule(pTInfoModule);
 void InitLogEvent(pTLogEvent);
 void InitLogCmd(pTLogCmd);
 void InitLogParam(pTLogParam);
+void InitTables(void);
 
 //---------------------------------------------------
 // Инициализация журнала
@@ -71,6 +68,7 @@ void Stat_Init(TStat *s)
 		s->LogEventBuffer[i].LogOutputs	 = 0;
 	}
 
+	InitTables();
 	// Инициализация основной флеш
 	//memset(&g_MainFlash, 0, sizeof(TAT25DF041A));
 	//g_MainFlash.CSAddr = CS_MAIN_FLASH;
@@ -90,7 +88,7 @@ void Stat_Init(TStat *s)
 	FM25V10_Init(&Eeprom2);*/
 }
 //---------------------------------------------------
-/*void InitTables(void)
+void InitTables(void)
 {
 	ImEvLogMainAddrsTable[0]	= GetAdr(ramGroupB.DevTime);
 	ImEvLogMainAddrsTable[1]	= GetAdr(ramGroupB.DevDate);
@@ -138,12 +136,12 @@ void Stat_Init(TStat *s)
 	ImParamLogAddrsTable[3] = NEW_PARAM_ADDR;
 	ImParamLogAddrsTable[4] = NEW_PARAM_VALUE_ADDR;
 
-}*/
+}
 //---------------------------------------------------
 
 void InitInfoModule(TInfoModule *im)
 {
-	//memset(&im,	0, sizeof(TInfoModule));
+	memset(&im,	0, sizeof(TInfoModule));
 
 	im->ControlMode=RECEIVE_FUNC_MODE;
 
@@ -154,6 +152,8 @@ void InitInfoModule(TInfoModule *im)
 	im->IsTxBusy		= &g_Comm.Bluetooth.TxBusy;
 	im->Timer			= 0;
 	im->Period			= IM_TIMEOUT;
+	im->TimerIndex		= 0;
+	im->PeriodIndex		= 30; //300мс
 
 	im->CanReadNextRec	= False;
 	im->IsReadRecBusy	= False;
@@ -175,7 +175,7 @@ void InitInfoModule(TInfoModule *im)
 	// Для информационного модуля
 	im->EnableReceive	 = g_Comm.Bluetooth.EnableRx;
 	im->EnableTransmit	 = g_Comm.Bluetooth.EnableTx;
-	im->TransmitByte	 = g_Comm.Bluetooth.TransmitByte;
+	im->TransmitByte	 = g_Comm.Bluetooth.TransmitByteIM;
 
 }
 //---------------------------------------------------

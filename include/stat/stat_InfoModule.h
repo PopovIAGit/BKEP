@@ -49,6 +49,8 @@ typedef struct
 	Bool *IsTxBusy;
 	Uns Timer;
 	Uns Period;
+	Uns TimerIndex;
+	Uns PeriodIndex;
 
 	Bool CanReadNextRec;
 	Bool IsReadRecBusy;
@@ -79,4 +81,5 @@ void ImReset(pTInfoModule);
 void ImBufferReader(pTInfoModule, Byte LogType, Uns RecordNum);
 // Внешняя функция таймера
 void ImTimer(pTInfoModule);
+void ImTimerIndex(pTInfoModule);
 #endif

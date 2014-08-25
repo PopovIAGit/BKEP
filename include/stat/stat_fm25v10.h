@@ -52,6 +52,6 @@ void FM25V10_WriteEnable(pFM25V10);					// Разрешение записи
 void FM25V10_WriteDisable(pFM25V10);					// Запрещение записи
 
 extern TFM25V10 		Eeprom1;		// параметры и часть информационного блока
-extern TFM25V10		Eeprom2;		// часть информационного блока
+extern TFM25V10			Eeprom2;		// часть информационного блока
 
 #endif

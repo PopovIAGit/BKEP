@@ -121,6 +121,7 @@ typedef struct _TMbFrame {
 	TTimerList TimerAck;       // Таймер для для потверждения
 	Uns        RxLength;       // Длина принятого кадра
 	Uns        TxLength;       // Длина передаваемого кадра
+	Uns 	   AddCount;
 	//Uns		   TxBufLen;
 	Byte      *Data;           // Указатель в буфере данных кадара
 	Byte       Buf[256];       // Буфер данных кадра
@@ -146,6 +147,8 @@ typedef struct _TMbStat {
 	Uns TxMsgCount;            // Счетчик переданных сообщений
 	Uns RxBytesCount;          // Принятое количество байт
 	Uns TxBytesCount;          // Отправление количество байт
+	Uns MAMsgIn;
+	Uns MAMsgOut;
 } TMbStat;
 
 typedef struct _TSerialInterface

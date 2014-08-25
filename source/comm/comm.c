@@ -23,9 +23,12 @@ void Comm_Init(TComm *p)
 	// Пульт местного управления:
 	Comm_LocalControlInit (&p->localControl);
 
+	//инициализация канала связи между БКП и БКД
 	SciMasterConnBetweenBlockInit(&g_Comm.mbBkp);
 
+	//канал связи с верхним уровнем контроллеров
 	InitChanelAsuModbus(&g_Comm.mbAsu);
+
 	//InitChanelShnModbus(&g_Comm.mbShn);
 	InitChanelBtModbus(&g_Comm.mbBt);
 
@@ -65,10 +68,10 @@ void Comm_Update(TComm *p)
 			break;
 	}
 
-	ModBusUpdate(&g_Comm.mbAsu); 	// slave канал связи с верхним уровнем АСУ
+	//ModBusUpdate(&g_Comm.mbAsu); 	// slave канал связи с верхним уровнем АСУ
 	//ModBusUpdate(&g_Comm.mbShn);  // master канал связи с устройством плавного пуска
 
-	SciMasterConnBetweenBlockUpdate(&g_Comm.mbBkp, &g_Comm.BkpData);// master канал связи с
+	//SciMasterConnBetweenBlockUpdate(&g_Comm.mbBkp);// master канал связи с
 
 	BluetoothWTUpdate(&g_Comm.Bluetooth); //драйвер Bluetooth
 	ModBusUpdate(&g_Comm.mbBt);  // slave

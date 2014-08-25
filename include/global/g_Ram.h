@@ -185,13 +185,64 @@ typedef struct _TRamGroupB
 	Uns             RsStation;          // 25.Адрес станции
 	TParityMode		RsMode;				// 26.Режим связи
 	TSettingPlace	SettingPlace;		// 27.Место установки БУР
-	TKeyInvert		KeyInvert;			// 28.Маска кнопок управления
+	Uns		KeyInvert;			// 28.Маска кнопок управления
 	Uns 			Rsvd2[3];			// 29-31.
 	Uns				NoMoveTime;		   	// 32.Время отсутствия движения
 	Uns				OverwayZone;		// 33.Макси
 	TInputReg		DigitalMode;		// 34.режим потенциальный / импульсный
  	Uns             SleepTime;          // 35.Дежурный режим
-	Uns 			Rsvd[14];
+ 	Uns 			Rsvd[4];
+ 	//------Параметры для ТУ------------------------------------
+	Uns				LevelOnOpen220;		 // 40
+	Uns				LevelOffOpen220;	 // 41
+	Uns				LevelOnOpen24;		 // 42
+	Uns				LevelOffOpen24;		 // 43
+	Uns				UOpen_Mpy;   		 // 44
+	Uns				p_UOpen_Offset;		 // 45
+	//-------------------------------
+	Uns				LevelOnClose220;	 // 46
+	Uns				LevelOffClose220;	 // 47
+	Uns				LevelOnClose24;		 // 48
+	Uns				LevelOffClose24;	 // 49
+	Uns				p_UClose_Mpy;		 // 50
+	Uns				p_UClose_Offset;	 // 51
+	//-------------------------------
+	Uns				LevelOnStop220;		 // 52
+	Uns				LevelOffStop220;	 // 53
+	Uns				LevelOnStop24;		 // 54
+	Uns				LevelOffStop24;		 // 55
+	Uns				p_UStop_Mpy;		 // 56
+	Uns				p_UStop_Offset;		 // 57
+	//-------------------------------
+	Uns				LevelOnMU220;		 // 58
+	Uns				LevelOffMU220;		 // 59
+	Uns				LevelOnMU24;		 // 60
+	Uns				LevelOffMU24;		 // 61
+	Uns				p_UMu_Mpy;			 // 62
+	Uns				p_UMu_Offset;		 // 63
+	//-------------------------------
+	Uns				LevelOnResetAlarm220;// 64
+	Uns				LevelOffResetAlarm220;// 65
+	Uns				LevelOnResetAlarm24; // 66
+	Uns				LevelOffResetAlarm24;// 67
+	Uns				p_UResetAlarm_Mpy;	 // 68
+	Uns				p_UResetAlarm_Offset;// 69
+	//-------------------------------
+	Uns				LevelOnReadyTU220;	 // 70
+	Uns				LevelOffReadyTU220;	 // 71
+	Uns				LevelOnReadyTU24;	 // 72
+	Uns				LevelOffReadyTU24;	 // 73
+	Uns				p_UReadyTu_Mpy;		 // 74
+	Uns				p_UReadyTu_Offset;	 // 75
+	//-------------------------------
+	Uns				LevelOnDU220;		 // 76
+	Uns				LevelOffDU220;		 // 77
+	Uns				LevelOnDU24;		 // 78
+	Uns				LevelOffDU24;		 // 79
+	Uns				p_UDu_Mpy;			 // 80
+	Uns				p_UDu_Offset;		 // 81
+	//-------------------------------
+	Uns 			Rsvd3[10];
 } TRamGroupB;
 
 // Группа C (Адрес = 90, Количество = 120) - Заводские параметры
@@ -256,7 +307,7 @@ typedef struct _TRamGroupC
 	TPrtMode        PhOrd;          	// 54.Защита от неверного чередования фаз двигателя
 	Uns             OvDTime;     		// 55.Время превышения напряжения
 	Uns             UvDTime;     		// 56.Время превышения напряжения
-	Uns             SubVersionPO;	    // 24.Подверсия ПО
+	Uns             SubVersionPO;	    // 57.Подверсия ПО
 	TPrtMode        IUnLoad;            // 58.Защита от малой нагрузки
 	Uns             IUnLevel;           // 59.Ток малой нагрузки
 	Uns             IUnTime;            // 60.Время малой нагрузки
@@ -411,57 +462,8 @@ typedef struct _TRamGroupH
 	TBurCmd 		LogControlWord;		 // 127. Команды БУР
 	Uns				LogReset;			 // 128. Сброс журналов
 	Uns 			BkpIndication;		 // 129. Индикация на БКП
-	//------Параметры для ТУ------------------------------------
-	Uns				LevelOnOpen220;		 // 130
-	Uns				LevelOffOpen220;	 // 131
-	Uns				LevelOnOpen24;		 // 132
-	Uns				LevelOffOpen24;		 // 133
-	Uns				UOpen_Mpy;   		 // 134
-	Uns				p_UOpen_Offset;		 // 135
 	//-------------------------------
-	Uns				LevelOnClose220;	 // 136
-	Uns				LevelOffClose220;	 // 137
-	Uns				LevelOnClose24;		 // 138
-	Uns				LevelOffClose24;	 // 139
-	Uns				p_UClose_Mpy;		 // 140
-	Uns				p_UClose_Offset;	 // 141
-	//-------------------------------
-	Uns				LevelOnStop220;		 // 142
-	Uns				LevelOffStop220;	 // 143
-	Uns				LevelOnStop24;		 // 144
-	Uns				LevelOffStop24;		 // 145
-	Uns				p_UStop_Mpy;		 // 146
-	Uns				p_UStop_Offset;		 // 147
-	//-------------------------------
-	Uns				LevelOnMU220;		 // 148
-	Uns				LevelOffMU220;		 // 149
-	Uns				LevelOnMU24;		 // 150
-	Uns				LevelOffMU24;		 // 151
-	Uns				p_UMu_Mpy;			 // 152
-	Uns				p_UMu_Offset;		 // 153
-	//-------------------------------
-	Uns				LevelOnResetAlarm220;// 154
-	Uns				LevelOffResetAlarm220;// 155
-	Uns				LevelOnResetAlarm24; // 156
-	Uns				LevelOffResetAlarm24;// 157
-	Uns				p_UResetAlarm_Mpy;	 // 158
-	Uns				p_UResetAlarm_Offset;// 159
-	//-------------------------------
-	Uns				LevelOnReadyTU220;	 // 160
-	Uns				LevelOffReadyTU220;	 // 161
-	Uns				LevelOnReadyTU24;	 // 162
-	Uns				LevelOffReadyTU24;	 // 163
-	Uns				p_UReadyTu_Mpy;		 // 164
-	Uns				p_UReadyTu_Offset;	 // 165
-	//-------------------------------
-	Uns				LevelOnDU220;		 // 166
-	Uns				LevelOffDU220;		 // 167
-	Uns				LevelOnDU24;		 // 168
-	Uns				LevelOffDU24;		 // 169
-	Uns				p_UDu_Mpy;			 // 170
-	Uns				p_UDu_Offset;		 // 171
-	//-------------------------------
-	Uns 			Rsvd3[29];			 // 172-200.Резерв
+	Uns 			Rsvd3[30];			 // 172-200.Резерв
 } TRamGroupH;
 
 // Группа E (Адрес 460, Количество 32)

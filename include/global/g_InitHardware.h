@@ -32,6 +32,10 @@ extern "C" {
 #define LED_FAULT			GpioDataRegs.GPBDAT.bit.GPIO34
 #define LED_CLOSE		    GpioDataRegs.GPADAT.bit.GPIO25
 
+#define LED_NOCLOSE		    GpioDataRegs.GPCDAT.bit.GPIO66
+#define LED_NOOPEN		    GpioDataRegs.GPCDAT.bit.GPIO65
+
+//#define LED_????		    GpioDataRegs.GPADAT.bit.GPIO25
 #define LED_CONNECT			GpioDataRegs.GPADAT.bit.GPIO26
 
 #define WORK_DSP_LED		GpioDataRegs.GPADAT.bit.GPIO29 // GpioDataRegs.GPBDAT.bit.GPIO43
@@ -70,6 +74,8 @@ extern "C" {
 #define KEY_1				GpioDataRegs.GPBDAT.bit.GPIO41 // кнопка шкафа Вперед (акт. = 1)
 #define KEY_2				GpioDataRegs.GPBDAT.bit.GPIO42 // кнопка шкафа Назад (акт. = 1)
 #define KEY_3				GpioDataRegs.GPBDAT.bit.GPIO43 // кнопка шкафа Стоп (акт. = 1)
+
+#define BUTTON_BLUE			GpioDataRegs.GPBDAT.bit.GPIO46 // активация bluetooth канала
 
 //--- SENSORS ---------------------------------------- PIA 03.04.14
 #define ADC_UR				AdcRegs.ADCRESULT2
