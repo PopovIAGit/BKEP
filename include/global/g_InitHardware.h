@@ -32,8 +32,8 @@ extern "C" {
 #define LED_FAULT			GpioDataRegs.GPBDAT.bit.GPIO34
 #define LED_CLOSE		    GpioDataRegs.GPADAT.bit.GPIO25
 
-#define LED_NOCLOSE		    GpioDataRegs.GPCDAT.bit.GPIO66
-#define LED_NOOPEN		    GpioDataRegs.GPCDAT.bit.GPIO65
+#define LED_OPENING		    GpioDataRegs.GPCDAT.bit.GPIO66
+#define LED_CLOSING		    GpioDataRegs.GPCDAT.bit.GPIO65
 
 //#define LED_????		    GpioDataRegs.GPADAT.bit.GPIO25
 #define LED_CONNECT			GpioDataRegs.GPADAT.bit.GPIO26
