@@ -36,6 +36,7 @@ void Peref_LedsInit(pLeds p, Uns freq)
 	p->ledFault.blinkPRD 		= Prd10HZ;
 	p->ledDefect.blinkPRD 		= Prd10HZ;
 	p->ledMufta.blinkPRD 		= Prd10HZ;
+	p->ledMuDu.blinkPRD 		= Prd10HZ;
 	p->ledConnect.blinkPRD 		= 1;
 
 	p->ledCntr.isBlink 			= 1;
@@ -44,6 +45,8 @@ void Peref_LedsInit(pLeds p, Uns freq)
 
 	p->ledOpening.timeOfBlink 		= freq/p->ledOpening.blinkPRD;			//состояние открыто
 	p->ledClosing.timeOfBlink 		= freq/p->ledClosing.blinkPRD;			//состояние открыто
+
+	p->ledMuDu.timeOfBlink 		= freq/p->ledMuDu.blinkPRD;			//состояние открыто
 
 	p->ledCntr.timeOfBlink 		= freq/p->ledCntr.blinkPRD;			//работа процессора
 	p->ledOpen.timeOfBlink 		= freq/p->ledOpen.blinkPRD;			//состояние открыто
@@ -157,6 +160,15 @@ void Peref_LedsUpdate(pLeds p)
 	else 											// Если статус нет "Неисправности"
 		p->leds.all |= LED_DEFECT_MASK;				// Гасим светодиод
 
+	// ------Му/Ду----------------------------------------
+	if (*p->pStatus & STATUS_MU_DU)// Если неисправность
+	{
+		LedTurnOnOff(&p->ledMuDu, p->leds.bit.MuDu);// Зажигаем светодиод
+		p->leds.bit.MuDu = p->ledMuDu.status;
+	}
+	else 											// Если статус нет "Неисправности"
+		p->leds.all |= LED_MUDU_MASK;				// Гасим светодиод
+
 	LED_OPEN	= p->leds.bit.Open;		DELAY_US(1);
 	LED_MUFTA	= p->leds.bit.Mufta;	DELAY_US(1);
 	LED_DEFECT	= p->leds.bit.Defect;	DELAY_US(1);
@@ -164,6 +176,7 @@ void Peref_LedsUpdate(pLeds p)
 	LED_CLOSE 	= p->leds.bit.Close;	DELAY_US(1);
 	LED_CLOSING = p->leds.bit.Closing;	DELAY_US(1);
 	LED_OPENING = p->leds.bit.Opening;	DELAY_US(1);
+	LED_MUDU	= p->leds.bit.MuDu;		DELAY_US(1);
 
 	if ((!(*p->pStatus & STATUS_OPENING)) && (!(*p->pStatus & STATUS_CLOSING)) && (!(*p->pStatus & STATUS_CLOSED)) && (!(*p->pStatus & STATUS_OPENED)))
 	{
@@ -173,29 +186,9 @@ void Peref_LedsUpdate(pLeds p)
 		DELAY_US(1);
 		p->leds.bit.Close = 0;
 		p->leds.bit.Open = 0;
-	} /*else {
-		LED_OPEN = 0;
-		DELAY_US(1);
-		LED_CLOSE = 0;
-		DELAY_US(1);
-		p->leds.bit.Close = 0;
-		p->leds.bit.Open = 0;
-	}*/
+	}
 
-	//ENABLE_BLUETOOTH = p->leds.bit.Bluetooth;
-
-	//g_Ram.ramGroupH.BkpIndication = 0;
-
-
-	tmp = !p->leds.bit.Closing;		g_Ram.ramGroupH.BkpIndication |=(tmp<<0)&0x1;
-	tmp = !p->leds.bit.Connect;		g_Ram.ramGroupH.BkpIndication |=(tmp<<1)&0x2;
-	tmp = !p->leds.bit.Close;		g_Ram.ramGroupH.BkpIndication |=(tmp<<2)&0x4;
-	tmp = !p->leds.bit.Fault;		g_Ram.ramGroupH.BkpIndication |=(tmp<<3)&0x8;
-	tmp = !p->leds.bit.Defect;		g_Ram.ramGroupH.BkpIndication |=(tmp<<4)&0x10;
-	tmp = !p->leds.bit.Mufta;		g_Ram.ramGroupH.BkpIndication |=(tmp<<5)&0x20;
-	tmp = !p->leds.bit.Open;		g_Ram.ramGroupH.BkpIndication |=(tmp<<6)&0x40;
-	tmp = !p->leds.bit.Opening;		g_Ram.ramGroupH.BkpIndication |=(tmp<<7)&0x80;
-
+	g_Ram.ramGroupH.BkpIndication = (~p->leds.all) & 0x00FF;
 
 
 }

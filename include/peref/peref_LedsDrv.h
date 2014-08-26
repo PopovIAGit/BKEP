@@ -26,7 +26,8 @@
 #define LED_MUFTA_MASK		BIT5
 #define LED_OPEN_MASK		BIT6	// Индикатор "ОТКРЫТО/ОТКРЫВАЕТСЯ". 1 - "ОТКРЫТО", 1,0,1,0 - "ОТКРЫВАЕТСЯ"
 #define LED_OPENING_MASK	BIT7
-#define LED_BLUETOOTH_MASK	BIT8	// Индикатор "ОТКРЫТО/ОТКРЫВАЕТСЯ". 1 - "ОТКРЫТО", 1,0,1,0 - "ОТКРЫВАЕТСЯ"
+#define LED_MUDU_MASK		BIT8
+#define LED_BLUETOOTH_MASK	BIT9	// Индикатор "ОТКРЫТО/ОТКРЫВАЕТСЯ". 1 - "ОТКРЫТО", 1,0,1,0 - "ОТКРЫВАЕТСЯ"
 			   
 #define LEDS_WITHOUT_CNTR	0x1F	// Индикатор работы процессора
 
@@ -53,8 +54,9 @@ typedef union {
 		Uns Mufta:1;		// 5	Светодиод "Муфта"
 		Uns Open:1;			// 6	Светодиод "Открыто"
 		Uns Opening:1;		// 7	Светодиод "Открывается"
-		Uns Bluetooth:1;	// 8	Светодиод "Работа Bluetooth"
-     	Uns rsvd:7; 		// 9-15  Резерв
+		Uns MuDu:1;		// 8	Светодиод "Му/Ду"
+		Uns Bluetooth:1;	// 9	Светодиод "Работа Bluetooth"
+     	Uns rsvd:6; 		// 10-15  Резерв
   } bit;
 } TLedReg;
 
@@ -70,6 +72,7 @@ typedef struct
 	TLedParams	ledMufta;
 	TLedParams	ledOpening;
 	TLedParams	ledClosing;
+	TLedParams	ledMuDu;
 	TLedReg		leds;
 	Uns 		*pStatus;		// Указатель на статус ядра
 	Uns			leds_displayReg;
