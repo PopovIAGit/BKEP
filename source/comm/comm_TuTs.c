@@ -98,16 +98,16 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//200 Гц
 	ts_all = p->Outputs.all ^g_Ram.ramGroupB.TsInvert.all;
 
 	// ----------------------ВЫВОД ТЕЛЕСИГНАЛИЗАЦИИ----------------------------------
-	TS_1 = (ts_all>>0) & 0x01;
-	TS_2 = (ts_all>>1) & 0x01;
-	TS_3 = (ts_all>>2) & 0x01;
-	TS_4 = (ts_all>>3) & 0x01;
-	TS_5 = (ts_all>>4) & 0x01;
-	TS_6 = (ts_all>>5) & 0x01;
-	TS_7 = (ts_all>>6) & 0x01;
-	TS_8 = (ts_all>>7) & 0x01;
-	TS_9 = (ts_all>>8) & 0x01;
-	TS_10= (ts_all>>9) & 0x01;
+	TS_1 = !((ts_all>>0) & 0x01);
+	TS_2 = !((ts_all>>1) & 0x01);
+	TS_3 = !((ts_all>>2) & 0x01);
+	TS_4 = !((ts_all>>3) & 0x01);
+	TS_5 = !((ts_all>>4) & 0x01);
+	TS_6 = !((ts_all>>5) & 0x01);
+	TS_7 = !((ts_all>>6) & 0x01);
+	TS_8 = !((ts_all>>7) & 0x01);
+	TS_9 = !((ts_all>>8) & 0x01);
+	TS_10= !((ts_all>>9) & 0x01);
 
 	//в группу H добавить
 	//g_Ram.ramGroupH.ADC_OPEN=g_Peref.AdcOpen;

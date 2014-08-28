@@ -74,7 +74,7 @@ void Comm_Update(TComm *p)
 	//SciMasterConnBetweenBlockUpdate(&g_Comm.mbBkp);// master канал связи с
 
 	BluetoothWTUpdate(&g_Comm.Bluetooth); //драйвер Bluetooth
-	ModBusUpdate(&g_Comm.mbBt);  // slave
+	if (g_Comm.Bluetooth.ModeProtocol==1) ModBusUpdate(&g_Comm.mbBt);  // slave
 
 	//SerialCommUpdate(&Mb);
 

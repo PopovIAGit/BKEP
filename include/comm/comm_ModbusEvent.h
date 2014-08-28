@@ -43,7 +43,7 @@ __inline void PreambleEvent(TMbPort *hPort)
 	Uns DataSend=0;
 	hPort->Frame.Data = hPort->Frame.Buf;
 
-	if (testPreamble==1) return;
+	if (testPreamble==1) return;//??? что это ???
 	testPreamble=1;
 
 	if (hPort->Params.HardWareType==UART_TYPE) SCI_transmit(hPort->Params.ChannelID, *hPort->Frame.Data++);

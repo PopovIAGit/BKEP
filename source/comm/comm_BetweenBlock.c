@@ -153,7 +153,7 @@ void SciMasterConnBetweenBlockUpdate(TMbBBHandle Port)
 
 void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 {
-	Uns i=0;
+	//Uns i=0;
 	Uint32 BkpEncPostion=0;
 
 	//if (HZ==0) {HZ=1; return;}

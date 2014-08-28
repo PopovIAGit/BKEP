@@ -202,7 +202,7 @@ void BluetoothActivation(TBluetoothHandle bPort)
 					GpioDataRegs.GPADAT.bit.GPIO27=1;
 				}
 			}
-			else GpioDataRegs.GPADAT.bit.GPIO27=0;
+			else if (bPort->ModeProtocol==1) GpioDataRegs.GPADAT.bit.GPIO27=0;
 		}
 	} else if (bPort->Enabled==true && bPort->BlinkConnect==true)
 	{
@@ -214,7 +214,7 @@ void BluetoothActivation(TBluetoothHandle bPort)
 			bPort->Function = 0;
 			g_Stat.Im.Index=0;
 
-			bPort->Mode = BT_DATA_MODE;
+			if (bPort->ModeProtocol == 1) bPort->Mode = BT_DATA_MODE;
 		}
 	}
 
@@ -479,6 +479,8 @@ __inline void RxCommandMode(TBluetoothHandle bPort)
 __inline void RxDataMode(TBluetoothHandle bPort, TMbHandle hPort)
 {
 	Uns Data;
+	Uns Data1;
+	Uns Data2;
 	TMbFrame *Frame = &hPort->Frame;
 
 	//bPort->Error = CheckCommError(bPort);
@@ -530,25 +532,52 @@ __inline void RxDataMode(TBluetoothHandle bPort, TMbHandle hPort)
 	// Прием данных для инф.модуля
 	if (bPort->ModeProtocol == 2)
 	{
+		GpioDataRegs.GPATOGGLE.bit.GPIO27=1;
 		Frame->Buf[0]=0;
 		Frame->Buf[1]=0;
 		Frame->Buf[2]=0;
 
-		RxState++;
-		switch (RxState)
-		{
-			case 0: if ((char)(Data&0x00FF) != 'N')	RxState = 0;	break;
-			case 1: if ((char)(Data&0x00FF) != 'O')	RxState = 0;	break;
-			case 2: if ((char)(Data&0x00FF) != ' ')	RxState = 0;	break;
-			/*case 3: if (Data != 'C')	RxState = 0;	break;
-			case 4: if (Data != 'A')	RxState = 0;	break;
-			case 5: if (Data != 'R')	RxState = 0;	break;
-			case 6: if (Data != 'R')	RxState = 0;	break;
-			case 7: if (Data != 'I')	RxState = 0;	break;*/
-		}
 
-		// Прием данных для инф.модуля
-		ImReceiveData(&g_Stat.Im, (char)(Data&0x00FF));
+		if (hPort->Params.HardWareType==MCBSP_TYPE)
+		{
+			Data1 = (char)(Data&0x00FF);
+			Data2 = (char)(Data>>8)&0x00ff;
+
+			switch (RxState)
+			{
+				case 0: if ((char)(Data1&0x00FF) != 'N')	{RxState=0;} else {RxState++;}
+						if ((char)(Data2&0x00FF) != 'O')	{RxState=0;} else {RxState++;}  break;
+				case 2: if ((char)(Data1&0x00FF) != ' ')	{RxState=0;} else {RxState++;}	break;
+				/*case 3: if (Data != 'C')	RxState = 0;	break;
+				case 4: if (Data != 'A')	RxState = 0;	break;
+				case 5: if (Data != 'R')	RxState = 0;	break;
+				case 6: if (Data != 'R')	RxState = 0;	break;
+				case 7: if (Data != 'I')	RxState = 0;	break;*/
+			}
+
+			// Прием данных для инф.модуля
+			ImReceiveData(&g_Stat.Im, (char)(Data1&0x00FF));
+			//ImReceiveData(&g_Stat.Im, (char)(Data2&0x00FF));
+
+		}else
+		{
+			Data1 = Data;
+
+			switch (RxState)
+			{
+				case 0: if ((char)(Data&0x00FF) != 'N')	RxState=0; else RxState++;	break;
+				case 1: if ((char)(Data&0x00FF) != 'O')	RxState=0; else RxState++;	break;
+				case 2: if ((char)(Data&0x00FF) != ' ')	RxState=0; else RxState++;	break;
+				/*case 3: if (Data != 'C')	RxState = 0;	break;
+				case 4: if (Data != 'A')	RxState = 0;	break;
+				case 5: if (Data != 'R')	RxState = 0;	break;
+				case 6: if (Data != 'R')	RxState = 0;	break;
+				case 7: if (Data != 'I')	RxState = 0;	break;*/
+			}
+			// Прием данных для инф.модуля
+			ImReceiveData(&g_Stat.Im, (char)(Data1&0x00FF));
+
+		}
 
 		if (RxState >= 2) //было 7 а теперь 10
 		{
@@ -557,6 +586,7 @@ __inline void RxDataMode(TBluetoothHandle bPort, TMbHandle hPort)
 			RxState = 0;
 			GpioDataRegs.GPADAT.bit.GPIO27=0;
 		}
+
 	}
 
 	/*
@@ -594,47 +624,50 @@ void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 
 	if (bPort->Mode == BT_COMMAND_MODE) return;
 
-	if (TestCount==4) {
-		StartTimer(&Frame->TimerPost);
+
+	if (bPort->ModeProtocol==1)
+	{
+		if (TestCount==4) {
+			StartTimer(&Frame->TimerPost);
+			TestCount++;
+			return;
+		}
+		if (TestCount>4) {
+			TestCount++;
+			return;
+		}
 		TestCount++;
-		return;
-	}
-	if (TestCount>4) {
-		TestCount++;
-		return;
-	}
-	TestCount++;
 
-	if ((Frame->Data - Frame->Buf) < Frame->TxLength){
-	//if ((Frame->TxLength-hPort->Frame.AddCount)>0){
+		if ((Frame->Data - Frame->Buf) < Frame->TxLength){
+		//if ((Frame->TxLength-hPort->Frame.AddCount)>0){
 
-		//if (hPort->Params.HardWareType==UART_TYPE) SCI_transmit(hPort->Params.ChannelID, *Frame->Data++);
-		//else
-		//if (hPort->Params.HardWareType==MCBSP_TYPE)
-		//{
-			if (((Frame->TxLength)&0x01) && ((Frame->Data - Frame->Buf)>=(Frame->TxLength-1)))
-			{
-				Stop = 1;
-				DataSend = ((*Frame->Data++)&0x00FF)|(((*Frame->Data++)<<8)&0xFF00);
-				McBsp_transmit(hPort->Params.ChannelID, DataSend, Stop);
-				hPort->Stat.TxBytesCount++;
-				hPort->Frame.AddCount++;
-			} else
-			{
-				DataSend = ((*Frame->Data++)&0x00FF)|(((*Frame->Data++)<<8)&0xFF00);
-				McBsp_transmit(hPort->Params.ChannelID, DataSend, 0);
-				hPort->Stat.TxBytesCount++;
-				hPort->Frame.AddCount++;
-				hPort->Stat.TxBytesCount++;
-				hPort->Frame.AddCount++;
-			}
-			Stop=0;
-		//}
+			//if (hPort->Params.HardWareType==UART_TYPE) SCI_transmit(hPort->Params.ChannelID, *Frame->Data++);
+			//else
+			//if (hPort->Params.HardWareType==MCBSP_TYPE)
+			//{
+				if (((Frame->TxLength)&0x01) && ((Frame->Data - Frame->Buf)>=(Frame->TxLength-1)))
+				{
+					Stop = 1;
+					DataSend = ((*Frame->Data++)&0x00FF)|(((*Frame->Data++)<<8)&0xFF00);
+					McBsp_transmit(hPort->Params.ChannelID, DataSend, Stop);
+					hPort->Stat.TxBytesCount++;
+					hPort->Frame.AddCount++;
+				} else
+				{
+					DataSend = ((*Frame->Data++)&0x00FF)|(((*Frame->Data++)<<8)&0xFF00);
+					McBsp_transmit(hPort->Params.ChannelID, DataSend, 0);
+					hPort->Stat.TxBytesCount++;
+					hPort->Frame.AddCount++;
+					hPort->Stat.TxBytesCount++;
+					hPort->Frame.AddCount++;
+				}
+				Stop=0;
+			//}
+		}
+		else {
+			StartTimer(&Frame->TimerPost);
+		}
 	}
-	else {
-		StartTimer(&Frame->TimerPost);
-	}
-
 }
 
 void BluetoothTimer(TBluetoothHandle bPort)
@@ -948,7 +981,8 @@ void TransmitBtByte(Uns Data)
 //передача 1 байта по каналу McBSP
 void TransmitBtByteIM(Uns Data)
 {
-	McBsp_transmitIM(MCBSPA, Data);
+	McBsp_transmit(MCBSPA, Data, 2);
+	//McBsp_transmitIM(MCBSPA, Data);
 }
 /*void TransmitBtByte(TBluetoothHandle bPort, Byte Data)
 {

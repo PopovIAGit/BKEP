@@ -41,7 +41,7 @@ typedef enum
 typedef struct
 {
 	Byte ControlMode;
-
+	Byte CorrectCount;
 	Byte FuncState;
 	Byte Index;
 	Uns  TxIndex;

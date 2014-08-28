@@ -22,7 +22,7 @@ Bool ReadLogFlag = False;
 Uns  PrevLogAddr[3] = {0,0,0};
 Uns  PrevLogCount[3] = {0,0,0};
 
-void InitInfoModule(pTInfoModule);
+void InitInfoModule(TInfoModule *);
 void InitLogEvent(pTLogEvent);
 void InitLogCmd(pTLogCmd);
 void InitLogParam(pTLogParam);
@@ -141,7 +141,7 @@ void InitTables(void)
 
 void InitInfoModule(TInfoModule *im)
 {
-	memset(&im,	0, sizeof(TInfoModule));
+	memset(im,	0, sizeof(TInfoModule));
 
 	im->ControlMode=RECEIVE_FUNC_MODE;
 
@@ -162,11 +162,11 @@ void InitInfoModule(TInfoModule *im)
 
 	im->DeviceDataPtr   = (Uns *)&g_Ram;
 	//im->DownloadBuffer  = &ImReadBuf[0];
-	memset(&im->ImReadBuf[0],	0, sizeof(IM_READ_BUF_SIZE*2)); // Буфер информационного модуля
+	//memset(im->ImReadBuf[0],	0, sizeof(IM_READ_BUF_SIZE*2)); // Буфер информационного модуля
 
 
-	memset(&im->RdBuffer[0],	0, sizeof(IM_RD_BUFFER_SIZE));
-	memset(&im->WrBuffer[0],	0, sizeof(IM_WR_BUFFER_SIZE));
+	//memset(im->RdBuffer[0],	0, sizeof(IM_RD_BUFFER_SIZE));
+	//memset(im->WrBuffer[0],	0, sizeof(IM_WR_BUFFER_SIZE));
 
 	//??? EnableBtRx
 	//??? void (*EnableReceive)(void);
