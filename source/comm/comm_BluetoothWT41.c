@@ -56,7 +56,7 @@ void InitChanelBt(TBluetoothHandle bPort)
 	//bPort->Mode 	= BT_COMMAND_MODE;
 	bPort->StrIndex	= 0;
 	bPort->Timer	= 0;
-	bPort->Period	= 30;//(1.00 * PRD3)
+	bPort->Period	= 10;//(1.00 * PRD3)
 
 	bPort->IsConnected 	= false;
 	bPort->Error		= false;
@@ -141,6 +141,8 @@ void BluetoothActivation(TBluetoothHandle bPort)
 			GpioDataRegs.GPADAT.bit.GPIO27=1;
 			bPort->ModeProtocol = 0;
 			bPort->State = 7;
+			//McBsp_tx_disable(MCBSPA);
+			//McBsp_rx_enable(MCBSPA);
 			bPort->Function = 0;
 			bPort->ButtActivTimer = 0;
 			bPort->Mode = BT_COMMAND_MODE;
@@ -322,6 +324,8 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 					{
 						bPort->BlinkConnect = false;
 						ClearValues(bPort);	bPort->State=7;
+						McBsp_tx_disable(MCBSPA);
+						McBsp_rx_enable(MCBSPA);
 					}
 				break;
 	}
@@ -503,15 +507,17 @@ __inline void RxDataMode(TBluetoothHandle bPort, TMbHandle hPort)
 			{
 				*Frame->Data++ = Data;
 			}
-			StartTimer(&Frame->Timer1_5);
-			StartTimer(&Frame->Timer3_5);
+		
+		StartTimer(&Frame->Timer1_5);
+		StartTimer(&Frame->Timer3_5);
 		}
+		
 
 		hPort->Stat.RxBytesCount++;
 
 		if (Frame->Buf[0]=='N' &&
 			Frame->Buf[1]=='O' &&
-			Frame->Buf[2]==' ')
+			(Frame->Buf[2]==' ' || Frame->Buf[2]=='!'))
 		{
 
 			bPort->Mode = BT_COMMAND_MODE;
@@ -547,7 +553,7 @@ __inline void RxDataMode(TBluetoothHandle bPort, TMbHandle hPort)
 			{
 				case 0: if ((char)(Data1&0x00FF) != 'N')	{RxState=0;} else {RxState++;}
 						if ((char)(Data2&0x00FF) != 'O')	{RxState=0;} else {RxState++;}  break;
-				case 2: if ((char)(Data1&0x00FF) != ' ')	{RxState=0;} else {RxState++;}	break;
+				case 2: if ((char)(Data1&0x00FF) != ' ' || (char)(Data1&0x00FF) != '!')	{RxState=0;} else {RxState++;}	break;
 				/*case 3: if (Data != 'C')	RxState = 0;	break;
 				case 4: if (Data != 'A')	RxState = 0;	break;
 				case 5: if (Data != 'R')	RxState = 0;	break;
@@ -567,7 +573,7 @@ __inline void RxDataMode(TBluetoothHandle bPort, TMbHandle hPort)
 			{
 				case 0: if ((char)(Data&0x00FF) != 'N')	RxState=0; else RxState++;	break;
 				case 1: if ((char)(Data&0x00FF) != 'O')	RxState=0; else RxState++;	break;
-				case 2: if ((char)(Data&0x00FF) != ' ')	RxState=0; else RxState++;	break;
+				case 2: if ((char)(Data&0x00FF) != ' ' || (char)(Data&0x00FF) != '!')	RxState=0; else RxState++;	break;
 				/*case 3: if (Data != 'C')	RxState = 0;	break;
 				case 4: if (Data != 'A')	RxState = 0;	break;
 				case 5: if (Data != 'R')	RxState = 0;	break;

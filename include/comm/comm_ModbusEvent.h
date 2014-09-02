@@ -43,8 +43,11 @@ __inline void PreambleEvent(TMbPort *hPort)
 	Uns DataSend=0;
 	hPort->Frame.Data = hPort->Frame.Buf;
 
-	if (testPreamble==1) return;//??? что это ???
-	testPreamble=1;
+	if (hPort->Params.HardWareType==MCBSP_TYPE)
+	{
+		if (testPreamble==1) return;
+		testPreamble=1;
+	}
 
 	if (hPort->Params.HardWareType==UART_TYPE) SCI_transmit(hPort->Params.ChannelID, *hPort->Frame.Data++);
 	else if (hPort->Params.HardWareType==MCBSP_TYPE)
@@ -80,11 +83,15 @@ __inline void PostambleEvent(TMbPort *hPort)
 		McBsp_tx_disable(hPort->Params.ChannelID);
 		McBsp_rx_enable(hPort->Params.ChannelID);
 	}
+
+	hPort->Params.TrEnable(0);
+	testPreamble=0;
 }
 
 //-------------------------------------------------------------------------------
 __inline void ConnTimeoutEvent(TMbPort *hPort)
 {
+	//hPort->Frame.Data = hPort->Frame.Buf;
 	/*#if defined(_MASTER_)
 	if (IsMaster())
 	{

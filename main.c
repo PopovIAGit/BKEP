@@ -53,10 +53,8 @@ void main(void)
 
 	while(1)
 	{
-
 		Comm_Update(&g_Comm);
 		ImUpdate(&g_Stat.Im);
-
 	}
 }
 

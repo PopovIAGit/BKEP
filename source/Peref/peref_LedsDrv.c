@@ -68,6 +68,8 @@ void Peref_LedsUpdate(pLeds p)
 
 	Uns BlinkConnect=0;
 
+	if (g_Comm.Bluetooth.State<7) return;
+
 	g_Ram.ramGroupH.BkpIndication = 0;
 
 	if (g_Comm.mbAsu.Serial.RsState==0) BlinkConnect++;
