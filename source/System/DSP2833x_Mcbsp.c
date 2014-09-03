@@ -215,7 +215,7 @@ Uns McBsp_recieve(Byte Id)
 	}
 	//if (McBspRegs[Id]->SPCR1.bit.RRDY==1)
 	//{
-		//McBsp_getstatus(Id);
+		McBsp_getstatus(Id);
 		Data1 = McBspRegs[Id]->DRR1.all;
 		Data2 = McBspRegs[Id]->DRR2.all;
 
