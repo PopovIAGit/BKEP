@@ -63,6 +63,7 @@ void ModBusTxIsr(TMbPort *hPort)
 			{
 				DataSend = ((*Frame->Data++)&0x00FF)|((*Frame->Data++<<8)&0xFF00);
 				McBsp_transmit(hPort->Params.ChannelID, DataSend, 0);
+				//StartTimer(&Frame->TimerPost);
 			}
 
 			Stop=0;
@@ -73,6 +74,7 @@ void ModBusTxIsr(TMbPort *hPort)
 	{
 		StartTimer(&Frame->TimerPost);
 	}
+	//StartTimer(&Frame->TimerPost);
 	
 	hPort->Stat.TxBytesCount++;
 }

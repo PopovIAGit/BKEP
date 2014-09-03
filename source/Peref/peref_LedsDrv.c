@@ -66,9 +66,9 @@ void Peref_LedsInit(pLeds p, Uns freq)
 void Peref_LedsUpdate(pLeds p)
 {
 
-	Uns tmp=0;
-	Uns i=0;
 	Uns BlinkConnect=0;
+
+	if (g_Comm.Bluetooth.State<7) return;
 
 	g_Ram.ramGroupH.BkpIndication = 0;
 

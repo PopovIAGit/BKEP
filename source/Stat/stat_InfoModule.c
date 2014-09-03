@@ -3,12 +3,12 @@
 #include "stat.h"
 //#include "stat_InfoModule.h"
 
-//Uns ImEvLogMainAddrsTable[20];
-//Uns ImEvLogBufAddrsTable[12];
-//Uns ImCmdLogAddrsTable[5];
-//Uns ImParamLogAddrsTable[5];
+Uns ImEvLogMainAddrsTable[20];
+Uns ImEvLogBufAddrsTable[12];
+Uns ImCmdLogAddrsTable[5];
+Uns ImParamLogAddrsTable[5];
 
-Uns ImEvLogMainAddrsTable[]	= {
+/*Uns ImEvLogMainAddrsTable[]	= {
 								GetAdr(ramGroupB.DevTime),
 								GetAdr(ramGroupB.DevDate),
 								GetAdr(ramGroupA.Status),
@@ -60,7 +60,7 @@ Uns ImParamLogAddrsTable[] = {
 								GetAdr(ramGroupH.Seconds),
 								NEW_PARAM_ADDR,
 								NEW_PARAM_VALUE_ADDR
-};
+};*/
 
 Uns CurrentLogRec = 0;
 Uns CurrentLogCnt = 0;
@@ -105,18 +105,23 @@ void ReceiveFunc(TInfoModule *p)
 	switch (p->RdBuffer[0])
 	{
 		// Device Info
-		case 0x01: 	if (p->Index == 1)
+		case 0x01: 	if (p->Index>=2) p->Index = 1;
+
+					if (p->Index == 1)
 					{
 						 IsFuncReceived = true;
 						 p->FuncState = imDeviceInfo;
+						 p->CorrectCount=1;
 					}
 					break;
 					
 		// Summary Logs Info
-		case 0x02:	if (p->Index == 1)
+		case 0x02:	if (p->CorrectCount==1 && p->Index>=2) p->Index = 1;
+					if (p->Index == 1)
 					{
 						 IsFuncReceived = true;
 						 p->FuncState = imSumLogsInfo;
+						 p->CorrectCount = 0;
 					}
 					break;
 					
@@ -127,11 +132,13 @@ void ReceiveFunc(TInfoModule *p)
 						
 						// В зависимости от типа журнала
 						 p->FuncState = imEvLogInfo + (p->RdBuffer[1] - 1);
+						 p->CorrectCount=1;
 					}
 					break;
 		
 		// Logs Parameters Addresses
-		case 0x04:	if (p->Index == 3)
+		case 0x04:	if (p->CorrectCount==1 && p->Index>=4) p->Index = 3;
+					if (p->Index == 3)
 					{
 						 IsFuncReceived = true;
 						 						 	
@@ -144,6 +151,7 @@ void ReceiveFunc(TInfoModule *p)
 							p->FuncState = imCmdLogAddr;
 						else if (p->RdBuffer[1] == IM_LOGPARAMS_TYPE)
 							p->FuncState = imParLogAddr;
+						p->CorrectCount=0;
 					}
 					break;
 					
@@ -156,15 +164,18 @@ void ReceiveFunc(TInfoModule *p)
 						CurrentLogCnt = (p->RdBuffer[2] << 8) | (p->RdBuffer[3]);
 						CurrentLogRec = 0;
 						p->CanReadNextRec = true;
+						p->CorrectCount=1;
 					}
 
 					break;
 
 		// Parameters
-		case 0x06:	if (p->Index == 3)
+		case 0x06:	if (p->CorrectCount==1 && p->Index>=4) p->Index = 3;
+					if (p->Index == 3)
 					{
 						 IsFuncReceived = true;
 						 p->FuncState = imParamDownload;
+						 p->CorrectCount=1;
 					}
 
 					break;
@@ -246,7 +257,15 @@ void DownloadFunc(TInfoModule *p)
 
 void ImReceiveData(TInfoModule *p, Byte Data)
 {
+	Uns i=0;
+
 	p->RdBuffer[p->Index] = Data;
+
+	if (p->Index>0)
+	{
+		i=p->Index;
+		i=i+1;
+	}
 
 	if (p->Index < IM_RD_BUFFER_SIZE)
 		p->Index++;

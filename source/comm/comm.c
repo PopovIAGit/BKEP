@@ -68,13 +68,13 @@ void Comm_Update(TComm *p)
 			break;
 	}
 
-	//ModBusUpdate(&g_Comm.mbAsu); 	// slave канал связи с верхним уровнем АСУ
+	if (g_Comm.Bluetooth.ModeProtocol==0) ModBusUpdate(&g_Comm.mbAsu); 	// slave канал связи с верхним уровнем АСУ
 	//ModBusUpdate(&g_Comm.mbShn);  // master канал связи с устройством плавного пуска
 
 	//SciMasterConnBetweenBlockUpdate(&g_Comm.mbBkp);// master канал связи с
 
 	BluetoothWTUpdate(&g_Comm.Bluetooth); //драйвер Bluetooth
-	ModBusUpdate(&g_Comm.mbBt);  // slave
+	if (g_Comm.Bluetooth.ModeProtocol>0) ModBusUpdate(&g_Comm.mbBt);  // slave
 
 	//SerialCommUpdate(&Mb);
 
