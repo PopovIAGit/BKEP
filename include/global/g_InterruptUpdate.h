@@ -86,7 +86,7 @@ TPeriodicalFunction Task18kHz[] =
 	PrdElemInit(Peref_SensObserverUpdate,				&g_Peref.sensObserver),
 	PrdElemInit(Peref_SensTuObserverUpdate,				&g_Peref.InDigSignalObserver),
 	PrdElemInit(Peref_18kHzCalc,						&g_Peref),
-	PrdElemInit(SciMasterConnBetweenBlockCommTimer,		&g_Comm.mbBkp),	//на 18к√ц
+	//PrdElemInit(SciMasterConnBetweenBlockCommTimer,		&g_Comm.mbBkp),	//на 18к√ц
 	PrdElemInit(MonitorUpdate,							NULL),
 	PrdElemInit(Core_ProtectionsUpdate,					&g_Core.Protections),
 };
