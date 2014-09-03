@@ -209,8 +209,9 @@ typedef union _TDeviceReg {
 		Uns Tl_BCP:1;		// 6     Переохлождение блока БКП
 		Uns Th_BCD:1;		// 7     Перегрев блока БКД
 		Uns Tl_BCD:1;		// 8     Переохлождение блока БКД
-		Uns Dac:1;			// 8     Переохлождение блока БКД
-     	Uns Rsvd:6;       	// 10-15  Резерв
+		Uns Dac:1;			// 8     Сбой ЦАП
+		Uns LowPower:1;		// 9     Выключение БКД
+     	Uns Rsvd:5;       	// 11-15 Резерв
   } bit;
 } TDeviceReg;
 
@@ -278,13 +279,11 @@ typedef enum {
 	dt4000_G9   = 7,
 	dt4000_G18  = 8,
 	dt10000_D6  = 9,
-	dt10000_D12 = 10
+	dt10000_D12 = 10,
+	dt10000_D10 = 11,
+	dt15000_D10 = 12,
+	dt20000_F40 = 13
 }TDriveType;
-
-
-
-
-
 
 // Управление работой защит
 typedef enum {

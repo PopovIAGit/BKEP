@@ -27,22 +27,14 @@ Bool RtcStart    = False;
 //---------------------------------------------------
 void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновление
 {
-  /*peref_ApFilter3Init(&p->URfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);		// Инициализируем фильтры
-	peref_ApFilter3Init(&p->USfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);
-	peref_ApFilter3Init(&p->UTfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);
-	peref_ApFilter3Init(&p->IUfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
-	peref_ApFilter3Init(&p->IVfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
-	peref_ApFilter3Init(&p->IWfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);*/
-
-
 	//----для  Телеуправления---------------------------------------------------------------------------
 	memset(&p->InDigSignal, 0, sizeof(TSinSignalObserver));
 
-	peref_ApFilter3Init(&p->U3fltrOpen, 		 (Uns)Prd50HZ, 10.0);		// Инициализируем фильтры
+	peref_ApFilter3Init(&p->U3fltrOpen, 	 (Uns)Prd50HZ, 10.0);		// Инициализируем фильтры
 	peref_ApFilter3Init(&p->U3fltrClose, 	 (Uns)Prd50HZ, 10.0);
-	peref_ApFilter3Init(&p->U3fltrStop, 		 (Uns)Prd50HZ, 10.0);
+	peref_ApFilter3Init(&p->U3fltrStop, 	 (Uns)Prd50HZ, 10.0);
 	peref_ApFilter3Init(&p->U3fltrMu, 		 (Uns)Prd50HZ, 10.0);
-	peref_ApFilter3Init(&p->U3fltrResetAlarm, (Uns)Prd50HZ, 10.0);
+	peref_ApFilter3Init(&p->U3fltrResetAlarm,(Uns)Prd50HZ, 10.0);
 	peref_ApFilter3Init(&p->U3fltrReadyTU, 	 (Uns)Prd50HZ, 10.0);
 	peref_ApFilter3Init(&p->U3fltrDU, 		 (Uns)Prd50HZ, 10.0);
 
@@ -65,13 +57,6 @@ void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновлени
 	Peref_SinObserverInitFloat(&p->InDigSignal.sigDU,		Prd18kHZ);
 
 	//----------------------------------------------------------------------------------------------
-
-	peref_ApFilter1Init(&p->URfltr, (Uns)Prd18kHZ, 10.0);		// Инициализируем фильтры
-	peref_ApFilter1Init(&p->USfltr, (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter1Init(&p->UTfltr, (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter1Init(&p->IUfltr, (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter1Init(&p->IVfltr, (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter1Init(&p->IWfltr, (Uns)Prd18kHZ, 10.0);
 
 	Peref_SensObserverInit(&p->sensObserver);// Инициализируем обработку синусойды
 

@@ -276,7 +276,7 @@ typedef struct _TRamGroupC
 	Uns			    RevErrLevel;		// 24.Уровень сбоя датчика положения
 	//-индикация конец--
 	Uns             VoltAcc;            // 25.Интенсивность разгона
-	Uns             BrakeAngle;         // 26.Угол торможения
+	Uns             BrakePause;         // 26.Пауза перед торможением
 	Uns             BrakeTime;          // 27.Время торможения
 	Uns				KickCount;			// 28.Колличество ударов
 	Uns             OvLevel;    		// 29.Уровень превышения напряжения
@@ -339,8 +339,8 @@ typedef struct _TRamGroupC
 	Uns             UR_Offset;          // 88.Смещение напряжения фазы R
 	Uns             US_Offset;          // 89.Смещение напряжения фазы S
 	Uns             UT_Offset;          // 90.Смещение напряжения фазы T
-	Uns			    CoefVoltFltr;		// 91.Коэффициент фильтрации входного напряжения
-	Uns			    CoefCurrFltr;		// 92.Коэффициент фильтрации тока нагрузки
+	Uns			    SinTf;				// 91.ПОСТ.ВРЕМЕНИ ФИЛЬТРОВ СИНУСОВ
+	Uns			    RmsTf;				// 92.ПОСТ.ВРЕМЕНИ ФИЛЬТРОВ RMS
 	Uns			    Dac_Mpy;			// 93.Корректировка ЦАП
 	Int			    Dac_Offset;			// 94.Смещение ЦАП
 	Uns             ClosePosition;      // 95.Положение закрыто
@@ -420,16 +420,16 @@ typedef struct _TRamGroupH
 	TCubArray		TqAngUI;			 // 37-56.Углы нагрузки
 	TCubArray		TqAngSf;			 // 57-76.Углы СИФУ
 	Uns				ZazorTime;			 // 77.Время выборки зазора
-	TNetReg         FaultsNet;           // 78.Диагностика сети
+//	TNetReg         FaultsNet;           // 78.Диагностика сети
   	Uns             Ur;                  // 79.Напряжение фазы R
   	Uns             Us;                  // 80.Напряжение фазы S
   	Uns             Ut;                  // 81.Напряжение фазы T
 	Uns             Umid;             	 // 82.Среднее напряжение
 	Uns             VSkValue;          	 // 83.Асиметрия фаз питающей сети
   	Uns     	    PhOrdValue;        	 // 84.Чередование фаз сети
-	TNetReg         DefectsNet;          // 85.Диагностика сети (для неисправностей)
+//	TNetReg         DefectsNet;          // 85.Диагностика сети (для неисправностей)
 	Uns				Imidpr;			 	 // 86 Резерв
-	TLoadReg        FaultsLoad;          // 87.Диагностика нагрузки
+//	TLoadReg        FaultsLoad;          // 87.Диагностика нагрузки
 	Uns             Iu;                  // 88.Ток фазы U
 	Uns             Iv;                  // 89.Ток фазы V
 	Uns             Iw;                  // 90.Ток фазы W
@@ -443,9 +443,8 @@ typedef struct _TRamGroupH
 	TInputReg       StateTu;           	 // 99.Состояние дискретных входов
 	TOutputReg      StateTs;          	 // 100.Состояние дискретных выходов
 	Uns             TuReleMode;          // 101.Релейный режим
-	TNormState	    NormState[3];		 // 102-104.Нормальное состояние входов    - Не используется но если не заработают маски
-	TNormState 	    NormOut[8];			 // 105-112.Нормальное состояние выходов - то пользуем это
-	TDeviceReg      FaultsDev;           // 113.Диагностика устройства
+	Uns      	    Rsvd2[11];		 // 102-112.Нормальное состояние входов
+//	TDeviceReg      FaultsDev;           // 113.Диагностика устройства
 	Uns             StartIndic;			 // 114.Индикация в старте
  	Uns             SleepTime;           // 115.Дежурный режим  mb to C
 	Uns             BusyValue;       	 // 116.Процент исполнения
@@ -574,8 +573,8 @@ typedef struct _TTEKDriveData
 
 #define REG_GEAR_RATIO			GetAdr(ramGroupC.GearRatio)
 
-#define REG_COEF_VOLT_FILTER	GetAdr(ramGroupC.CoefVoltFltr)
-#define REG_CURRENT_FILTER		GetAdr(ramGroupC.CoefCurrFltr)
+#define REG_SIN_FILTER_TF		GetAdr(ramGroupC.SinTf)
+#define REG_RMS_FILTER_TF		GetAdr(ramGroupC.RmsTf)
 
 #define REG_TU_TYPE				GetAdr(ramGroupB.InputType)
 #define REG_TU_INVERT			GetAdr(ramGroupB.TuInvert.all)
@@ -612,6 +611,7 @@ typedef struct _TTEKDriveData
 #define REG_PRODUCT_DATE	GetAdr(ramGroupC.ProductYear)
 #define REG_CYCLE_CNT		GetAdr(ramGroupH.CycleCnt)
 
+#define REG_SHC_FAULT		GetAdr(ramGroupH.ScFaults)
 /*
 #define REG_TASK_TIME		GetAdr(ramGroupD.TASK_TIME)
 #define REG_TASK_DATE		GetAdr(ramGroupD.TASK_DATE)
@@ -692,8 +692,7 @@ void g_Ram_Update(TRam *);
 void RefreshParams(Uns);
 Int MinMax3IntValue (Int, Int, Int);
 Int Max3Int (Int , Int , Int );
-void g_Ram_SetTorque(void);
-void InterfIndication(TRam *);
+
 
 extern TRam 			g_Ram;
 extern TTekDriveData	g_RamTek;

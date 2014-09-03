@@ -19,6 +19,7 @@ Outputs
 #include "core_Menu.h"
 #include "core_VlvDrvCtrl.h"
 #include "core_TorqueObserver.h"
+#include "core_Drive.h"
 #include "comm.h"
 #include "g_Ram.h"
 #include "g_InitHardware.h"
@@ -35,9 +36,9 @@ Outputs
 #define CMD_PAR_CHANGE		0x0200	// Изменение параметров
 #define CMD_DEFAULTS_FACT 	0x0400	// Заводские параметры по умолчанию
 
-#define START_DELAY_TIME		(2.000 * Prd50HZ)		// Ограничение времени паузы между остановом и след. запуском
-#define MOVE_STATE_TIME			(1.000 * Prd50HZ)		// Ограничение времени перехода в муфту
-
+#define START_DELAY_TIME		(Uint16)(2.000 * Prd50HZ)		// Ограничение времени паузы между остановом и след. запуском
+#define MOVE_STATE_TIME			(Uint16)(1.000 * Prd50HZ)		// Ограничение времени перехода в муфту
+#define BREAK_SCALE				(Uint16)(0.010 * Prd50HZ)		//
 //--------------------- Макросы --------------------------------------------
 //-------------------- Структуры -------------------------------------------
 
@@ -47,7 +48,7 @@ Outputs
 typedef enum {
 	wmStop       = 1,					// Режим стоп
 	wmMove     	 = 2,					// Режим движения
-	wmPlugBreak		 = 3					// Режим торможения
+	wmPlugBreak	 = 3					// Режим торможения
 } TWorkMode;
 
 // Структура для цифрового управления приводом
@@ -60,6 +61,9 @@ typedef struct _TDmControl {
 	Uns 		BreakFlag;				// Флаг определяющий возможность уплотнения
 	Uns 		OverWayFlag;			// Флаг показывающий что уплотнение не достигнуто
 	Uns 		MufTimer;				// Таймер срабатывания муфты в движении
+	Uns 		CalibStop;				// Остановка по калибровке
+	Uns 		PlugBreakTimer;			// Таймер используемый для торможения противовключением (пауза перед и само противовключение)
+	Uns 		PlugBreakStep;			// Шаги противовключения (Пауза, торможение, выключение)
 } TDmControl;
 
 typedef struct {
@@ -79,6 +83,8 @@ typedef struct {
 	// ---
 	TDmControl			MotorControl;	// Управление двигателем
 
+	TCoreDrive			Drive;			// Выбор типа приводаф
+
 	Uns 				PrevCycle;		// Предидущее значение счетчика циклов
 } TCore;
 
@@ -96,6 +102,7 @@ void Core_CalibControl(TCore *);			// Управление калибровкой
 void Core_CalibStop(TCore *);				// стоп по калибровке
 void Core_DefineCtrlParams(TCore *);		// Задача контролируемых параметров (Моменты - Движения, трогания, уплотнения. Определение текущей зоны и т.д)
 void Core_ControlMode(TCore *);				// Стэйт машина
+void Core_LowPowerControl(TCore *);			// Действия при отключении питания
 
 extern TCore g_Core;
 extern volatile Uns setTorque;

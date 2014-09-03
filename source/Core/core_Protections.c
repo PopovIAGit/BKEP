@@ -489,9 +489,9 @@ void Core_ProtectionsClear(TCoreProtections *p)
 	Eeprom1.Error  = False;
 	Eeprom2.Error  = False;
 	TempSens.Error = False;
+	 */
+	p->ShcReset = true;
 
-	IsShcReset = true; Выставили флаг сброса КЗ
-	  */
 }
 
 void Core_ProtectionsUpdate(TCoreProtections *p)

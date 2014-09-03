@@ -37,7 +37,6 @@ void Peref_CalibInit(TPerefPosition *p)
 	p->FullWay		= &g_Ram.ramGroupA.FullWay;
 	p->CurWay		= &g_Ram.ramGroupA.CurWay;
 	p->CycleCnt		= &g_Ram.ramGroupH.CycleCnt;
-	p->MuffFlag		= 0;								// ??? Заменить на нормальную муфту
 	p->Command		= ToPtr(&g_Ram.ramGroupD.TaskClose);
 	p->Indication	= ToPtr(&g_Ram.ramGroupH.CalibState);
 

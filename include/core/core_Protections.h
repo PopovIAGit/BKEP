@@ -114,6 +114,8 @@ typedef struct {
 		TFltUnion			outFaults;			// Аварии
 		TFltUnion			outDefects;			// Неисправности
 
+		Bool				ShcReset;			// Флаг по которому сбрасывается КЗ
+
 }TCoreProtections;
 
 //------------------- Глобальные переменные --------------------------------

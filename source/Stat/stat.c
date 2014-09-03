@@ -141,7 +141,7 @@ void InitTables(void)
 
 void InitInfoModule(TInfoModule *im)
 {
-	memset(&im,	0, sizeof(TInfoModule));
+	memset(im,	0, sizeof(TInfoModule));
 
 	im->ControlMode=RECEIVE_FUNC_MODE;
 

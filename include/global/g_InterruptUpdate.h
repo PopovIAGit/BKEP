@@ -110,6 +110,7 @@ TPeriodicalFunction Task200Hz[] =       	//не более  20-ти задач
 {
 //	PrdElemInit(Peref_DisplayUpdate, 					&g_Peref.display),
 	PrdElemInit(Peref_CalibUpdate, 						&g_Peref.Position),
+	PrdElemInit(Core_LowPowerControl, 					&g_Core),
 	PrdElemInit(DataBufferPre,							&g_Stat),
 	PrdElemInit(LogEvControl,							&g_Stat),
 	PrdElemInit(LogCmdControl,							&g_Stat),
@@ -195,7 +196,6 @@ TPeriodicalFunction Task10Hz[] =        //не более  200-т задач
 
 	//PrdElemInit(Peref_10HzCalc,				&g_Peref),
 	PrdElemInit(BluetoothTimer,				&g_Comm.Bluetooth),	//на 10 √ц
-	PrdElemInit(InterfIndication,			&g_Ram),			//на 10 √ц
 	PrdElemInit(RTC_Control,				NULL),				//на 10 √ц
 	PrdElemInit(BluetoothActivation,		&g_Comm.Bluetooth),	//на 10 √ц
 	PrdElemInit(ImTimerIndex,				&g_Stat.Im),		//на 10 √ц
