@@ -51,7 +51,7 @@ void ModBusTxIsr(TMbPort *hPort)
 			SCI_transmit(hPort->Params.ChannelID, *Frame->Data++);
 			StartTimer(&Frame->TimerPost);
 		}
-		else if (hPort->Params.HardWareType==MCBSP_TYPE)
+		/*else if (hPort->Params.HardWareType==MCBSP_TYPE)
 		{
 			if (((Frame->TxLength)&0x01) && ((Frame->Data - Frame->Buf)==1))
 			{
@@ -68,7 +68,7 @@ void ModBusTxIsr(TMbPort *hPort)
 
 			Stop=0;
 			//
-		}
+		}*/
 	}
 	else
 	{
