@@ -50,23 +50,6 @@ void Comm_Init(TComm *p)
 //---------------------------------------------------
 void Comm_Update(TComm *p)
 {
-	//	КОМАНДЫ С МПУ !!!
-	// передаем команду с кнопок управления
-	g_Ram.ramGroupH.CmdKey =  Comm_LocalKeyUpdate(&p->localControl);
-
-	// передаем команду с ручек БКП
-	switch (Comm_LocalButtonUpdate(&p->localControl))
-	{
-		case BTN_OPEN_BIT:
-			g_Ram.ramGroupH.CmdButton = KEY_OPEN;
-			break;
-		case BTN_CLOSE_BIT:
-			g_Ram.ramGroupH.CmdButton = KEY_CLOSE;
-			break;
-		case BTN_STOPMU_BIT|BTN_STOPDU_BIT:
-			g_Ram.ramGroupH.CmdButton = KEY_STOP;
-			break;
-	}
 
 	if (g_Comm.Bluetooth.ModeProtocol==0) ModBusUpdate(&g_Comm.mbAsu); 	// slave канал связи с верхним уровнем АСУ
 	//ModBusUpdate(&g_Comm.mbShn);  // master канал связи с устройством плавного пуска
@@ -74,9 +57,32 @@ void Comm_Update(TComm *p)
 	//SciMasterConnBetweenBlockUpdate(&g_Comm.mbBkp);// master канал связи с
 
 	BluetoothWTUpdate(&g_Comm.Bluetooth); //драйвер Bluetooth
-	if (g_Comm.Bluetooth.ModeProtocol==1) ModBusUpdate(&g_Comm.mbBt);  // slave
+	if (g_Comm.Bluetooth.ModeProtocol>0) ModBusUpdate(&g_Comm.mbBt);  // slave
 
 	//SerialCommUpdate(&Mb);
+
+
+}
+
+void Comm_50HzCalc(TComm *p)
+{
+	//	КОМАНДЫ С МПУ !!!
+		// передаем команду с кнопок управления
+		g_Ram.ramGroupH.CmdKey =  Comm_LocalKeyUpdate(&p->localControl);
+
+		// передаем команду с ручек БКП
+		switch (Comm_LocalButtonUpdate(&p->localControl))
+		{
+			case BTN_OPEN_BIT:
+				g_Ram.ramGroupH.CmdButton = KEY_OPEN;
+				break;
+			case BTN_CLOSE_BIT:
+				g_Ram.ramGroupH.CmdButton = KEY_CLOSE;
+				break;
+			case BTN_STOPMU_BIT|BTN_STOPDU_BIT:
+				g_Ram.ramGroupH.CmdButton = KEY_STOP;
+				break;
+		}
 
 	CommandUpdate(&g_Comm);
 }

@@ -150,8 +150,10 @@ void g_Ram_Update(TRam *p)
 	 // ------------------------------------------
 	 p->ramGroupA.Position = p->ramGroupC.Position;
 	 p->ramGroupA.CycleCnt = p->ramGroupH.CycleCnt;
-	 p->ramGroupA.CalibState = p->ramGroupH.CalibState;
 
+	 p->ramGroupC.Position = p->ramGroupH.Position >> p->ramGroupC.PosPrecision;
+	 p->ramGroupC.ClosePosition = p->ramGroupH.ClosePosition >> p->ramGroupC.PosPrecision;
+	 p->ramGroupC.OpenPosition  = p->ramGroupH.OpenPosition >> p->ramGroupC.PosPrecision;
 	//p->ramGroupA.StateTu.all     = g_Comm.digitInterface.Inputs.all;
 	p->ramGroupA.StateTs.all	 = g_Comm.digitInterface.Outputs.all;
 
@@ -198,15 +200,36 @@ void RefreshParams(Uns addr)
 			peref_ApFilter1Init(&g_Peref.IWfltr, (Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);
 
 
+			peref_ApFilter1Init(&g_Peref.UfltrOpen, 	 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);		// Инициализируем фильтры
+			peref_ApFilter1Init(&g_Peref.UfltrClose, 	 (Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.UfltrStop, 	 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.UfltrMu, 		 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.UfltrResetAlarm,(Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.UfltrReadyTU, 	 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.UfltrDU, 		 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
+
+
 
 	} else if (addr == REG_RMS_FILTER_TF) {
 
-			peref_ApFilter3Init(&g_Peref.UR3fltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.RmsTf);		// Инициализируем фильтры
-			peref_ApFilter3Init(&g_Peref.US3fltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.RmsTf);
-			peref_ApFilter3Init(&g_Peref.UT3fltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.RmsTf);
-			peref_ApFilter3Init(&g_Peref.IU3fltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.RmsTf);
-			peref_ApFilter3Init(&g_Peref.IV3fltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.RmsTf);
-			peref_ApFilter3Init(&g_Peref.IW3fltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.UR3fltr, (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);		// Инициализируем фильтры
+			peref_ApFilter3Init(&g_Peref.US3fltr, (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.UT3fltr, (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.IU3fltr, (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.IV3fltr, (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.IW3fltr, (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
+
+			peref_ApFilter1Init(&g_Peref.Phifltr, (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter1Init(&g_Peref.Umfltr,  (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.Imfltr,  (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
+
+			peref_ApFilter3Init(&g_Peref.U3fltrOpen, 	  (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);		// Инициализируем фильтры
+			peref_ApFilter3Init(&g_Peref.U3fltrClose, 	  (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.U3fltrStop, 	  (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.U3fltrMu, 		  (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.U3fltrResetAlarm,(Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.U3fltrReadyTU,   (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.U3fltrDU, 		  (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
 
 	} else if (addr >= REG_TORQUE_CURR && addr < REG_TORQUE_CURR+20) {
 		//CubRefresh(&Torq.Cub1, &g_Ram.ramGroupGrH->TqCurr);

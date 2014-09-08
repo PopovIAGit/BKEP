@@ -15,6 +15,7 @@
 #include "peref_Clock.h"		// Библиотека для преобразований чисел/строк
 #include "core.h"
 #include "comm.h"
+#include "add_ValueConv.h"
 //#include "core_Protections.h" 	//структура защит
 //#include "comm_LocalControl.h"
 
@@ -435,11 +436,10 @@ typedef struct _TRamGroupH
 	Uns             Iw;                  // 90.Ток фазы W
 	Uns             Imid;				 // 91.Средний ток
   	Uns             ISkewValue;          // 92.Асиметрия токов нагрузки
-	Uns             Position;            // 93.Положение
-	LgUns  			FullStep;        	 // 94-95.Полный ход
-	TReverseType	ReverseType;         // 96.Тип реверса
-	Uns				DemoPosition1;       // 97.Демо положение 1
-	Uns				DemoPosition2;       // 98.Демо положение 2
+  	LgUns           Position;            // 93-94.Положение
+	LgUns  			FullStep;        	 // 95-96.Полный ход
+	TReverseType	ReverseType;         // 97.Тип реверса
+	Uns				Rsvd4;				 // 98.
 	TInputReg       StateTu;           	 // 99.Состояние дискретных входов
 	TOutputReg      StateTs;          	 // 100.Состояние дискретных выходов
 	Uns             TuReleMode;          // 101.Релейный режим

@@ -190,6 +190,7 @@ void Core_CalibControl(TCore *p)
 		else if (g_Ram.ramGroupH.CalibState != g_Ram.ramGroupA.CalibState)					// если состояние калибровки изменилось
 		{
 			WriteToEeprom(REG_CALIB_STATE, &g_Ram.ramGroupH.CalibState, sizeof(ClbIndication));	// то записали состояние калибровки
+			g_Ram.ramGroupA.CalibState = g_Ram.ramGroupH.CalibState;
 		}
 	}
 }
@@ -330,4 +331,46 @@ void Core_LowPowerControl(TCore *p)
 		WriteToEeprom(REG_SHC_FAULT, &g_Ram.ramGroupH.ScFaults, 1);
 	}
 
+}
+
+void Core_MuDuControl(TCore *p)
+{
+	switch (g_Ram.ramGroupB.MuDuSetup)
+	{
+		case mdOff:
+			p->Protections.outDefects.Proc.bit.MuDuDef = 0;
+			break;
+		case mdMuOnly:
+			p->Protections.outDefects.Proc.bit.MuDuDef = 0;
+			break;
+		case mdDuOnly:
+			p->Protections.outDefects.Proc.bit.MuDuDef = 0;
+			break;
+		case mdSelect:
+			if (p->Status.bit.Stop)
+			{
+				if(!g_Ram.ramGroupA.StateTu.bit.Mu && !g_Ram.ramGroupA.StateTu.bit.Du)
+				{
+					p->VlvDrvCtrl.MuDuInput = 0;
+					p->Protections.outDefects.Proc.bit.MuDuDef = 1;
+				}
+				if(g_Ram.ramGroupA.StateTu.bit.Mu && !g_Ram.ramGroupA.StateTu.bit.Du)
+				{
+					p->VlvDrvCtrl.MuDuInput = 1;
+					p->Protections.outDefects.Proc.bit.MuDuDef = 0;
+				}
+				if(!g_Ram.ramGroupA.StateTu.bit.Mu && g_Ram.ramGroupA.StateTu.bit.Du)
+				{
+					p->VlvDrvCtrl.MuDuInput = 0;
+					p->Protections.outDefects.Proc.bit.MuDuDef = 0;
+				}
+				if(g_Ram.ramGroupA.StateTu.bit.Mu && g_Ram.ramGroupA.StateTu.bit.Du)
+				{
+					p->VlvDrvCtrl.MuDuInput = 0;
+					p->Protections.outDefects.Proc.bit.MuDuDef = 1;
+				}
+			}
+			break;
+
+	}
 }

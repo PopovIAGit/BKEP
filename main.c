@@ -53,8 +53,10 @@ void main(void)
 
 	while(1)
 	{
+
 		Comm_Update(&g_Comm);
 		ImUpdate(&g_Stat.Im);
+
 	}
 }
 
@@ -219,7 +221,7 @@ interrupt void i2c_int1a_isr(void)     // I2C-A
       //Temper = I2caRegs.I2CDRR;
    }  // end of register access ready
 
-   else
+   /*else
 
 
    if (PassCount>2)PassCount=0;

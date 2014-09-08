@@ -79,13 +79,13 @@ extern "C" {
 #define BUTTON_BLUE			GpioDataRegs.GPBDAT.bit.GPIO46 // активация bluetooth канала
 
 //--- SENSORS ---------------------------------------- PIA 03.04.14
-#define ADC_UR				AdcRegs.ADCRESULT3
+#define ADC_UR				AdcRegs.ADCRESULT2
 #define ADC_US				AdcRegs.ADCRESULT4
 #define ADC_UT				AdcRegs.ADCRESULT5
 
 #define ADC_IU				AdcRegs.ADCRESULT0
 #define ADC_IV				AdcRegs.ADCRESULT1
-#define ADC_IW				AdcRegs.ADCRESULT2
+#define ADC_IW				AdcRegs.ADCRESULT3
 
 #define TU_SIG_OPEN			AdcRegs.ADCRESULT8
 #define TU_SIG_CLOSE		AdcRegs.ADCRESULT9

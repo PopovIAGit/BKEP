@@ -58,8 +58,8 @@ void Peref_LedsInit(pLeds p, Uns freq)
 	p->ledConnect.timeOfBlink 	= freq/p->ledConnect.blinkPRD;		//сеть
 	p->ledConnect.timeOfBlink	= 30;
 
-	//p->pStatus = &g_Core.Status.all;
-	p->pStatus = &g_Core.TestStatus.all;
+	p->pStatus = &g_Core.Status.all;
+	//p->pStatus = &g_Core.TestStatus.all;
 
 }
 //--------------------------------------------------------

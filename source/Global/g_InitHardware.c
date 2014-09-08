@@ -371,44 +371,44 @@ void InitGpio(void)
 	GpioCtrlRegs.GPCDIR.bit.GPIO78	= 1;	//SC_EEPROM2
 	GpioDataRegs.GPCDAT.bit.GPIO78	= 0;
 
-	GpioCtrlRegs.GPCDIR.bit.GPIO78	= 1;	//ON_TY - ???
-	GpioDataRegs.GPCDAT.bit.GPIO78	= 0;
+	GpioCtrlRegs.GPADIR.bit.GPIO12	= 1;	//ON_TY - ???
+	GpioDataRegs.GPADAT.bit.GPIO12	= 1;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO0	= 1;	//TS_1
-	GpioDataRegs.GPADAT.bit.GPIO0	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO0	= 1;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO1	= 1;	//TS_2
-	GpioDataRegs.GPADAT.bit.GPIO1	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO1	= 1;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO2	= 1;	//TS_3
-	GpioDataRegs.GPADAT.bit.GPIO2	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO2	= 1;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO3	= 1;	//TS_4
-	GpioDataRegs.GPADAT.bit.GPIO3	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO3	= 1;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO4	= 1;	//TS_5
-	GpioDataRegs.GPADAT.bit.GPIO4	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO4	= 1;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO5	= 1;	//TS_6
-	GpioDataRegs.GPADAT.bit.GPIO5	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO5	= 1;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO6	= 1;	//TS_7
-	GpioDataRegs.GPADAT.bit.GPIO6	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO6	= 1;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO7	= 1;	//TS_8
-	GpioDataRegs.GPADAT.bit.GPIO7	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO7	= 1;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO8	= 1;	//TS_9
-	GpioDataRegs.GPADAT.bit.GPIO8	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO8	= 1;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO9	= 1;	//TS_10
-	GpioDataRegs.GPADAT.bit.GPIO9	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO9	= 1;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO10	= 1;	//TS_11 - управление контактором ЗАКРЫТЬ
-	GpioDataRegs.GPADAT.bit.GPIO10	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO10	= 1;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO11	= 1;	//TS_12 - управление контактором ОТКРЫТЬ
-	GpioDataRegs.GPADAT.bit.GPIO11	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO11	= 1;
 
 	EDIS;
 }

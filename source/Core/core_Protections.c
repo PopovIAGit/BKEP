@@ -10,6 +10,8 @@
 #include "core.h"
 #include "peref.h"
 
+__inline void DefDriveFaults(void);
+
 void Core_ProtectionsInit(TCoreProtections *p)
 {
 	//---------ЗАЩИТЫ ПРОЦЕССА--------------------------------------------------------
@@ -494,9 +496,25 @@ void Core_ProtectionsClear(TCoreProtections *p)
 
 }
 
+__inline void DefDriveFaults(void)		// реакция на ошибки, системой
+{
+
+}
+
+Bool IsDefectExist(TPrtMode Mode) // неисправность
+{
+
+}
+
+Bool IsFaultExist(TPrtMode Mode) // неисправность
+{
+
+}
 void Core_ProtectionsUpdate(TCoreProtections *p)
 {
 	Core_ProtecionSHC_Update(&p->ShC_U);
 	Core_ProtecionSHC_Update(&p->ShC_V);
 	Core_ProtecionSHC_Update(&p->ShC_W);
+
+	DefDriveFaults();
 }
