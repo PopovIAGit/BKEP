@@ -119,20 +119,20 @@ __inline void MpuControl(TCoreVlvDrvCtrl *p)
 
 		if(!p->Mpu.Enable) return;				// выключено выходим
 
-		if (p->Mpu.BtnKey)						// Пришла команда с ручек
+		if (*p->Mpu.BtnKey)						// Пришла команда с ручек
 		{
 			Key = *p->Mpu.BtnKey;				// Запомнили пришедшую команду
 			Active = (p->ActiveControls & CMD_SRC_MPU); // Запомнили активирован ли режим мпу
 			p->EvLog.Source = CMD_SRC_MPU;				// Источник команды для журнала
-			p->Mpu.BtnKey = 0;					// Сбросили команду
+			*p->Mpu.BtnKey = 0;					// Сбросили команду
 		}
 
-		if (p->Mpu.PduKey)						//Аналогично
+		if (*p->Mpu.PduKey)						//Аналогично
 		{
 			Key = *p->Mpu.PduKey;
 			Active = (p->ActiveControls & CMD_SRC_PDU);
 			p->EvLog.Source = CMD_SRC_PDU;
-			p->Mpu.PduKey = 0;
+			*p->Mpu.PduKey = 0;
 		}
 
 		switch (Key)							// Обработка пришедшей команды

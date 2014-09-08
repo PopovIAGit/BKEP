@@ -45,7 +45,6 @@ __inline void PreambleEvent(TMbPort *hPort)
 
 	if (hPort->Params.HardWareType==MCBSP_TYPE)
 	{
-		return;
 		if (testPreamble==1) return;
 		testPreamble=1;
 	}
@@ -86,10 +85,7 @@ __inline void PostambleEvent(TMbPort *hPort)
 	}
 
 	hPort->Params.TrEnable(0);
-	if (hPort->Params.HardWareType==MCBSP_TYPE)
-	{
-		testPreamble=0;
-	}
+	testPreamble=0;
 }
 
 //-------------------------------------------------------------------------------

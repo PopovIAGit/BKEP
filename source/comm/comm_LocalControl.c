@@ -42,7 +42,7 @@ Uns Comm_LocalKeyUpdate(TCommMPU *p)
 {
 	static Uns result;
 
-	if(!KEY_1 && KEY_2 && !KEY_3)
+	if(!KEY_1 && !KEY_2 && KEY_3)
 	{
 		p->key1Param.timer = 0;
 		p->key2Param.timer = 0;
@@ -61,7 +61,7 @@ Uns Comm_LocalKeyUpdate(TCommMPU *p)
 		result = KEY_CLOSE;
 
 	// Open
-	if (!KEY_3 ^ p->KeyLogicSignal->bit.Open)
+	if (!KEY_2 ^ p->KeyLogicSignal->bit.Open)
 		p->key2Param.timer = 0;
 	else if (p->key2Param.timer < p->key2Param.timeout)
 		p->key2Param.timer++;
@@ -69,7 +69,7 @@ Uns Comm_LocalKeyUpdate(TCommMPU *p)
 		result = KEY_OPEN;
 
 	// Stop
-	if (!KEY_2 ^ p->KeyLogicSignal->bit.Stop)
+	if (!KEY_3 ^ p->KeyLogicSignal->bit.Stop)
 		p->key3Param.timer = 0;
 	else if (p->key3Param.timer < p->key3Param.timeout)
 		p->key3Param.timer++;
@@ -82,9 +82,11 @@ Uns Comm_LocalKeyUpdate(TCommMPU *p)
 // Драйвер обработки ручек БКП
 Uns Comm_LocalButtonUpdate(TCommMPU *p)
 {
-	static Uns result;
+	 Uns result;
 
-	if (!p->inputBCP_Data->all || ((p->inputBCP_Data->all & hmClose) && (p->inputBCP_Data->all & hmOpen)))
+	if (!p->inputBCP_Data->all
+			|| ((p->inputBCP_Data->all & hmClose)
+					&& (p->inputBCP_Data->all & hmOpen)))
 	{
 		p->btn1Param.timer = 0;
 		p->btn2Param.timer = 0;
@@ -98,7 +100,7 @@ Uns Comm_LocalButtonUpdate(TCommMPU *p)
 	{
 		switch(p->inputBCP_Data->all)
 		{
-		case (1 << hmOpen):
+		case (BTN_OPEN_BIT):
 
 			if (++p->btn1Param.timer > p->btn1Param.timeout)
 			{
@@ -107,7 +109,7 @@ Uns Comm_LocalButtonUpdate(TCommMPU *p)
 			}
 
 			break;
-		case (1 << hmClose):
+		case (BTN_CLOSE_BIT):
 
 			if (++p->btn2Param.timer > p->btn2Param.timeout)
 			{
@@ -116,22 +118,13 @@ Uns Comm_LocalButtonUpdate(TCommMPU *p)
 			}
 
 			break;
-		case (1 << hmStopMu):
+		case (BTN_STOPMU_BIT|BTN_STOPDU_BIT):
 
 			if (++p->btn4Param.timer > p->btn4Param.timeout)
 			{
 				p->btn4Param.timer = 0;
-				result |= BTN_STOPMU_BIT;
+				result |= (BTN_STOPMU_BIT|BTN_STOPDU_BIT);
 			}
-			break;
-		case (1 << hmStopDu):
-
-			if (++p->btn3Param.timer > p->btn3Param.timeout)
-			{
-				p->btn3Param.timer = 0;
-				result |= BTN_STOPDU_BIT;
-			}
-
 			break;
 
 		}

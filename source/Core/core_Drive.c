@@ -17,6 +17,7 @@
 
 	void Core_Drive_Update(TCoreDrive *p)
 	{
+		WAIT_FOR_EEPROM_READY();
 		switch(*p->DriveType)
 		{
 			case dt100_A25:

@@ -103,6 +103,7 @@ void Core_CalibStop(TCore *);				// стоп по калибровке
 void Core_DefineCtrlParams(TCore *);		// Задача контролируемых параметров (Моменты - Движения, трогания, уплотнения. Определение текущей зоны и т.д)
 void Core_ControlMode(TCore *);				// Стэйт машина
 void Core_LowPowerControl(TCore *);			// Действия при отключении питания
+void Core_MuDuControl(TCore *);				// управление режимами мустное дистанция
 
 extern TCore g_Core;
 extern volatile Uns setTorque;
