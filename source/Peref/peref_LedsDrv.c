@@ -176,7 +176,7 @@ void Peref_LedsUpdate(pLeds p)
 	LED_CLOSE 	= p->leds.bit.Close;	DELAY_US(1);
 	LED_CLOSING = p->leds.bit.Closing;	DELAY_US(1);
 	LED_OPENING = p->leds.bit.Opening;	DELAY_US(1);
-	LED_MUDU	= p->leds.bit.MuDu;		DELAY_US(1);
+	LED_MUDU	= !p->leds.bit.MuDu;		DELAY_US(1);
 
 	if ((!(*p->pStatus & STATUS_OPENING)) && (!(*p->pStatus & STATUS_CLOSING)) && (!(*p->pStatus & STATUS_CLOSED)) && (!(*p->pStatus & STATUS_OPENED)))
 	{

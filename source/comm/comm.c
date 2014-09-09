@@ -20,6 +20,8 @@ void Comm_Init(TComm *p)
 	// Теле-сигнализация
 	Comm_TuTsInit(&p->digitInterface);
 
+	DigitalInputInit(&p->digitInput, (g_Ram.ramGroupB.TuTime * Prd50HZ), ICREMENT_DIV, DECREMENT_DIV);
+
 	// Пульт местного управления:
 	Comm_LocalControlInit (&p->localControl);
 
@@ -99,11 +101,27 @@ void CommandUpdate(TComm *p)
 	p->digitInput.input = p->digitInterface.Inputs.all;
 	DigitalInpUpdate(&p->digitInput);					// Вызов функции обработки цифрового сигнала, защита от помех
 	g_Ram.ramGroupA.StateTu.all     = p->digitInput.output;
-	p->outputCmdReg |= DigitCmdModeUpdate(&p->digitInput.output);
-	if (p->outputCmdReg)
+
+	if (!(p->digitInput.output & 0x20))
 	{
-		p->outputCmdSrc = CMD_SRC_DIGITAL;
+		p->outputCmdReg = (p->digitInput.output & 0x4);
 	}
+	else
+	{
+		p->outputCmdReg = (p->digitInput.output & 0x7);
+	}
+
+	g_Ram.ramGroupH.TuState = p->outputCmdReg;
+
+	if (p->digitInput.output & 0x10)
+	{
+		g_Ram.ramGroupD.PrtReset = 1;
+	}
+//	p->outputCmdReg |= DigitCmdModeUpdate(&p->digitInput.output);
+///	if (p->outputCmdReg)
+//	{
+//		p->outputCmdSrc = CMD_SRC_DIGITAL;
+//	}
 }
 //---------------------------------------------------
 // Функция обработки режима работы команд дискретного интерфейса (режим - импульсный, потенциальный)

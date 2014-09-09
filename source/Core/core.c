@@ -203,12 +203,11 @@ void StopPowerControl(void)
 	g_Core.Status.bit.Closing 	= 0;
 	g_Core.Status.bit.Test 		= 0;
 
-	if (g_Core.Protections.outFaults.Proc.bit.Mufta || g_Core.Status.bit.Fault
-			|| g_Core.Status.bit.Defect)
+	if (g_Core.Status.bit.Fault)
 	{
 		g_Core.MotorControl.WorkMode = wmStop;  // Переходим в стейт машину стоп
 	}
-	if (g_Core.MotorControl.CalibStop) g_Core.MotorControl.WorkMode = wmPlugBreak;
+	else if (g_Core.MotorControl.CalibStop) g_Core.MotorControl.WorkMode = wmPlugBreak;
 	else g_Core.MotorControl.WorkMode = wmStop;
 
 	g_Core.MotorControl.CalibStop = 0;
@@ -252,8 +251,8 @@ void StartPowerControl(TValveCmd ControlWord)
 	g_Core.MotorControl.PlugBreakStep = 0;
 	g_Core.Status.bit.Stop 			= 0;
 	g_Core.MotorControl.TorqueSet 	= 0xFFFF;
-	if(g_Core.MotorControl.RequestDir < 0) g_Core.Status.bit.Closing = 1;
-	if(g_Core.MotorControl.RequestDir > 0) g_Core.Status.bit.Opening = 1;
+//	if(g_Core.MotorControl.RequestDir < 0) g_Core.Status.bit.Closing = 1;
+//	if(g_Core.MotorControl.RequestDir > 0) g_Core.Status.bit.Opening = 1;
 
 }
 
@@ -269,10 +268,14 @@ void Core_ControlMode(TCore *p)
 		break;
 	case wmMove:
 		g_Ram.ramGroupA.Torque = p->TorqObs.Indication; // отображаем текущий момент
+
+		if (CONTACTOR_1_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
+		if (CONTACTOR_2_STATUS && g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
+
 		if(p->TorqObs.Indication < p->MotorControl.TorqueSet)
 			p->MotorControl.MufTimer = 0;
 		else if (++p->MotorControl.MufTimer >= MOVE_STATE_TIME)
-			p->Protections.outFaults.Proc.bit.Mufta = 1;	// выставляем муфту если в течении секунды момент больше заданного
+			p->Protections.MuffFlag = 1;	// выставляем муфту если в течении секунды момент больше заданного
 		break;
 	case wmPlugBreak:
 		g_Ram.ramGroupA.Torque = 0;				// отображаем момент
@@ -305,11 +308,12 @@ void Core_LowPowerControl(TCore *p)
 	ShCState = p->Protections.outFaults.Load.all & LOAD_SHC_MASK;
 
 	// Событие выключения блока
-	if ((g_Ram.ramGroupA.Ur < 100) && (g_Ram.ramGroupA.Ur < 100)
-			&& (g_Ram.ramGroupA.Ur < 100))
+	if ((g_Ram.ramGroupA.Ur < 100) && (g_Ram.ramGroupA.Us < 100)
+			&& (g_Ram.ramGroupA.Ut < 100))
 	{
 		p->Protections.outFaults.Dev.bit.LowPower = 1;
 	}
+	else p->Protections.outFaults.Dev.bit.LowPower = 0;
 
 	// Запись КЗ
 	if (ShCState && !g_Ram.ramGroupH.ScFaults)

@@ -154,8 +154,8 @@ void g_Ram_Update(TRam *p)
 	 p->ramGroupC.Position = p->ramGroupH.Position >> p->ramGroupC.PosPrecision;
 	 p->ramGroupC.ClosePosition = p->ramGroupH.ClosePosition >> p->ramGroupC.PosPrecision;
 	 p->ramGroupC.OpenPosition  = p->ramGroupH.OpenPosition >> p->ramGroupC.PosPrecision;
-	//p->ramGroupA.StateTu.all     = g_Comm.digitInterface.Inputs.all;
-	p->ramGroupA.StateTs.all	 = g_Comm.digitInterface.Outputs.all;
+	 p->ramGroupA.StateTu.all   = g_Comm.digitInterface.Inputs.all;
+	 p->ramGroupA.StateTs.all	= g_Comm.digitInterface.Outputs.all;
 
 }
 //---------------------------------------------------

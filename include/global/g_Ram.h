@@ -185,8 +185,8 @@ typedef struct _TRamGroupB
 	TBaudRate       RsBaudRate;         // 24.Скорость связи
 	Uns             RsStation;          // 25.Адрес станции
 	TParityMode		RsMode;				// 26.Режим связи
-	TSettingPlace	SettingPlace;		// 27.Место установки БУР
-	Uns		KeyInvert;			// 28.Маска кнопок управления
+	Uns				Rsvd4;				// 27.
+	Uns				KeyInvert;			// 28.Маска кнопок управления
 	Uns 			Rsvd2[3];			// 29-31.
 	Uns				NoMoveTime;		   	// 32.Время отсутствия движения
 	Uns				OverwayZone;		// 33.Макси
@@ -421,16 +421,16 @@ typedef struct _TRamGroupH
 	TCubArray		TqAngUI;			 // 37-56.Углы нагрузки
 	TCubArray		TqAngSf;			 // 57-76.Углы СИФУ
 	Uns				ZazorTime;			 // 77.Время выборки зазора
-	Uns				Rsvd2;		         // 78.Резерв
+	Uns             TuState;             // 78.Команды ТУ (открыть закрыть стоп)
   	Uns             Ur;                  // 79.Напряжение фазы R
   	Uns             Us;                  // 80.Напряжение фазы S
   	Uns             Ut;                  // 81.Напряжение фазы T
 	Uns             Umid;             	 // 82.Среднее напряжение
 	Uns             VSkValue;          	 // 83.Асиметрия фаз питающей сети
   	Uns     	    PhOrdValue;        	 // 84.Чередование фаз сети
-  	Uns				Rsvd3;         		 // 85.Резерв
+	Uns             Rsvd5;          	 // 85.Диагностика сети (для неисправностей)
 	Uns				Imidpr;			 	 // 86 Резерв
-	Uns				Rsvd4;	          	 // 87.Резерв
+	Uns             Rsvd6;          	 // 87.Диагностика нагрузки
 	Uns             Iu;                  // 88.Ток фазы U
 	Uns             Iv;                  // 89.Ток фазы V
 	Uns             Iw;                  // 90.Ток фазы W
@@ -443,8 +443,7 @@ typedef struct _TRamGroupH
 	TInputReg       StateTu;           	 // 99.Состояние дискретных входов
 	TOutputReg      StateTs;          	 // 100.Состояние дискретных выходов
 	Uns             TuReleMode;          // 101.Релейный режим
-	Uns      	    Rsvd6[11];		 	 // 102-112.Нормальное состояние входов
-	Uns				Rsvd7;           	 // 113.Диагностика устройства
+	Uns      	    Rsvd2[12];		 	 // 102-113.Нормальное состояние входов
 	Uns             StartIndic;			 // 114.Индикация в старте
  	Uns             SleepTime;           // 115.Дежурный режим  mb to C
 	Uns             BusyValue;       	 // 116.Процент исполнения

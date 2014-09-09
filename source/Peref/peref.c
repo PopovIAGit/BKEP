@@ -102,9 +102,9 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
 	p->InDigSignal.sigClose.Input 		= p->UfltrClose.Output;
 	p->InDigSignal.sigStop.Input 		= p->UfltrStop.Output;
 	p->InDigSignal.sigMU.Input 			= p->UfltrMu.Output;
-	p->InDigSignal.sigResetAlarm.Input 	= p->UfltrDU.Output;
+	p->InDigSignal.sigResetAlarm.Input 	= p->UfltrResetAlarm.Output;
 	p->InDigSignal.sigReadyTU.Input 	= p->UfltrReadyTU.Output;
-	p->InDigSignal.sigDU.Input 			= p->UfltrResetAlarm.Output;
+	p->InDigSignal.sigDU.Input 			= p->UfltrDU.Output;
 
 	//функци€ расчЄта RMS дл€ сигналов “”
 	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigOpen);
@@ -180,9 +180,9 @@ void Peref_50HzCalc(TPeref *p)	// 50 √ц
 	p->U3fltrClose.Input 		= p->InDigSignal.sigClose.Output;
 	p->U3fltrStop.Input 		= p->InDigSignal.sigStop.Output;
 	p->U3fltrMu.Input 			= p->InDigSignal.sigMU.Output;
-	p->U3fltrDU.Input 			= p->InDigSignal.sigResetAlarm.Output;
+	p->U3fltrResetAlarm.Input 	= p->InDigSignal.sigResetAlarm.Output;;
 	p->U3fltrReadyTU.Input 		= p->InDigSignal.sigReadyTU.Output;
-	p->U3fltrResetAlarm.Input 	= p->InDigSignal.sigDU.Output;
+	p->U3fltrDU.Input 			= p->InDigSignal.sigDU.Output;
 
 	peref_ApFilter3Calc(&p->U3fltrOpen);
 	peref_ApFilter3Calc(&p->U3fltrClose);
