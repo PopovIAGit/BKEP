@@ -163,7 +163,7 @@ void g_Ram_Update(TRam *p)
 void RefreshParams(Uns addr)
 {
 	//TCoreProtections *pProtections 	= &g_Core.protections;
-	TPeref *pPeref 					= &g_Peref;
+	//TPeref *pPeref 					= &g_Peref;
 	TPerefPosition *pPosition 		= &g_Peref.Position;
 
 	if (addr == REG_GEAR_RATIO)	{

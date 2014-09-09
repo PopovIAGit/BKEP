@@ -11,12 +11,8 @@
 TRam			g_Ram;
 TTekDriveData	g_RamTek;
 
-Uns PassCount=1;
-
 extern void InterruptInit  (void);
 extern void InterruptUpdate(void);
-extern Uns CrcTable[256];
-static Uns CalcFrameCrc1(Byte *Buf, Uns Count);
 //Uns I2CA_setCommand(void);
 //Uns I2CA_ReadTemper(void);
 
@@ -59,15 +55,6 @@ void main(void)
 
 	}
 }
-
-/*static Uns CalcFrameCrc1(Byte *Buf, Uns Count)
-{
-
-	Uns Crc = 0xFFFF;
-	do {Crc = (Crc >> 8) ^ CrcTable[(Crc ^ (Uns)*Buf++) & 0x00FF];}
-	while (--Count);
-	return Crc;
-}*/
 
 interrupt void CpuTimer0IsrHandler(void)	//	18 000
 {
@@ -221,7 +208,7 @@ interrupt void i2c_int1a_isr(void)     // I2C-A
       //Temper = I2caRegs.I2CDRR;
    }  // end of register access ready
 
-   /*else
+   else
 
 
    if (PassCount>2)PassCount=0;

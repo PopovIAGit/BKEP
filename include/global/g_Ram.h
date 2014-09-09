@@ -421,16 +421,16 @@ typedef struct _TRamGroupH
 	TCubArray		TqAngUI;			 // 37-56.Углы нагрузки
 	TCubArray		TqAngSf;			 // 57-76.Углы СИФУ
 	Uns				ZazorTime;			 // 77.Время выборки зазора
-//	TNetReg         FaultsNet;           // 78.Диагностика сети
+	Uns				Rsvd2;		         // 78.Резерв
   	Uns             Ur;                  // 79.Напряжение фазы R
   	Uns             Us;                  // 80.Напряжение фазы S
   	Uns             Ut;                  // 81.Напряжение фазы T
 	Uns             Umid;             	 // 82.Среднее напряжение
 	Uns             VSkValue;          	 // 83.Асиметрия фаз питающей сети
   	Uns     	    PhOrdValue;        	 // 84.Чередование фаз сети
-//	TNetReg         DefectsNet;          // 85.Диагностика сети (для неисправностей)
+  	Uns				Rsvd3;         		 // 85.Резерв
 	Uns				Imidpr;			 	 // 86 Резерв
-//	TLoadReg        FaultsLoad;          // 87.Диагностика нагрузки
+	Uns				Rsvd4;	          	 // 87.Резерв
 	Uns             Iu;                  // 88.Ток фазы U
 	Uns             Iv;                  // 89.Ток фазы V
 	Uns             Iw;                  // 90.Ток фазы W
@@ -439,12 +439,12 @@ typedef struct _TRamGroupH
   	LgUns           Position;            // 93-94.Положение
 	LgUns  			FullStep;        	 // 95-96.Полный ход
 	TReverseType	ReverseType;         // 97.Тип реверса
-	Uns				Rsvd4;				 // 98.
+	Uns				Rsvd5;				 // 98.
 	TInputReg       StateTu;           	 // 99.Состояние дискретных входов
 	TOutputReg      StateTs;          	 // 100.Состояние дискретных выходов
 	Uns             TuReleMode;          // 101.Релейный режим
-	Uns      	    Rsvd2[11];		 // 102-112.Нормальное состояние входов
-//	TDeviceReg      FaultsDev;           // 113.Диагностика устройства
+	Uns      	    Rsvd6[11];		 	 // 102-112.Нормальное состояние входов
+	Uns				Rsvd7;           	 // 113.Диагностика устройства
 	Uns             StartIndic;			 // 114.Индикация в старте
  	Uns             SleepTime;           // 115.Дежурный режим  mb to C
 	Uns             BusyValue;       	 // 116.Процент исполнения
@@ -462,7 +462,7 @@ typedef struct _TRamGroupH
 	Uns				LogReset;			 // 128. Сброс журналов
 	Uns 			BkpIndication;		 // 129. Индикация на БКП
 	//-------------------------------
-	Uns 			Rsvd3[30];			 // 172-200.Резерв
+	Uns 			Rsvd8[30];			 // 172-200.Резерв
 } TRamGroupH;
 
 // Группа E (Адрес 460, Количество 32)

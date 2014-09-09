@@ -501,15 +501,15 @@ __inline void DefDriveFaults(void)		// реакция на ошибки, системой
 
 }
 
-Bool IsDefectExist(TPrtMode Mode) // неисправность
+/*Bool IsDefectExist(TPrtMode Mode) // неисправность
 {
 
-}
+}*/
 
-Bool IsFaultExist(TPrtMode Mode) // неисправность
+/*Bool IsFaultExist(TPrtMode Mode) // неисправность
 {
 
-}
+}*/
 void Core_ProtectionsUpdate(TCoreProtections *p)
 {
 	Core_ProtecionSHC_Update(&p->ShC_U);
