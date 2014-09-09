@@ -284,7 +284,7 @@ void InitGpio(void)
 	GpioCtrlRegs.GPBDIR.bit.GPIO45	= 0;	//CONTACTOR_2
 	GpioDataRegs.GPBDAT.bit.GPIO45	= 0;
 
-	//GpioCtrlRegs.GPBPUD.bit.GPIO46	= 1;
+	GpioCtrlRegs.GPBPUD.bit.GPIO46	= 1;
 	GpioCtrlRegs.GPBDIR.bit.GPIO46	= 0;	//кнопка акривации bluetooth
 	GpioDataRegs.GPBDAT.bit.GPIO46	= 0;
 
