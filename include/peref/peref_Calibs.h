@@ -73,7 +73,6 @@ typedef struct TPerefPosition {
 	Uns   *FullWay;         	// ”казатель на полный ход выходного звена
 	Int   *CurWay;          	// ”казатель на текущий ход выходного звена
 	Uns   *CycleCnt;        	// ”казатель на количество расчитанных циклов
-	Uns   *MuffFlag;        	// —игнал муфты
 	ClbCommand    *Command;    	// ”казатель на структуру управлени€ калибровками
 	ClbIndication *Indication; 	// ”казатель на структуру индикации
 } TPerefPosition;

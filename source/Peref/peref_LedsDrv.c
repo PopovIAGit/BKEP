@@ -58,17 +58,17 @@ void Peref_LedsInit(pLeds p, Uns freq)
 	p->ledConnect.timeOfBlink 	= freq/p->ledConnect.blinkPRD;		//сеть
 	p->ledConnect.timeOfBlink	= 30;
 
-	//p->pStatus = &g_Core.Status.all;
-	p->pStatus = &g_Core.TestStatus.all;
+	p->pStatus = &g_Core.Status.all;
+	//p->pStatus = &g_Core.TestStatus.all;
 
 }
 //--------------------------------------------------------
 void Peref_LedsUpdate(pLeds p)
 {
 
-	Uns tmp=0;
-	Uns i=0;
 	Uns BlinkConnect=0;
+
+	if (g_Comm.Bluetooth.State<7) return;
 
 	g_Ram.ramGroupH.BkpIndication = 0;
 
@@ -176,7 +176,7 @@ void Peref_LedsUpdate(pLeds p)
 	LED_CLOSE 	= p->leds.bit.Close;	DELAY_US(1);
 	LED_CLOSING = p->leds.bit.Closing;	DELAY_US(1);
 	LED_OPENING = p->leds.bit.Opening;	DELAY_US(1);
-	LED_MUDU	= p->leds.bit.MuDu;		DELAY_US(1);
+	LED_MUDU	= !p->leds.bit.MuDu;		DELAY_US(1);
 
 	if ((!(*p->pStatus & STATUS_OPENING)) && (!(*p->pStatus & STATUS_CLOSING)) && (!(*p->pStatus & STATUS_CLOSED)) && (!(*p->pStatus & STATUS_OPENED)))
 	{

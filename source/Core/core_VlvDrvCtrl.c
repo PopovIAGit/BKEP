@@ -33,7 +33,7 @@ void Core_ValveDriveInit(TCoreVlvDrvCtrl *p)
 	p->Mpu.CancelFlag		= false;
 	p->Tu.Enable			= true;
 	p->Tu.LocalFlag			= false;
-	p->Tu.State				= 0;
+	p->Tu.State				= &g_Ram.ramGroupH.TuState;
 	p->Tu.Ready				= true;
 	p->Tu.LockSeal			= &g_Ram.ramGroupB.TuLockSeal;
 	p->Valve.PosRegEnable 	= true;
@@ -119,20 +119,20 @@ __inline void MpuControl(TCoreVlvDrvCtrl *p)
 
 		if(!p->Mpu.Enable) return;				// выключено выходим
 
-		if (p->Mpu.BtnKey)						// Пришла команда с ручек
+		if (*p->Mpu.BtnKey)						// Пришла команда с ручек
 		{
 			Key = *p->Mpu.BtnKey;				// Запомнили пришедшую команду
 			Active = (p->ActiveControls & CMD_SRC_MPU); // Запомнили активирован ли режим мпу
 			p->EvLog.Source = CMD_SRC_MPU;				// Источник команды для журнала
-			p->Mpu.BtnKey = 0;					// Сбросили команду
+			*p->Mpu.BtnKey = 0;					// Сбросили команду
 		}
 
-		if (p->Mpu.PduKey)						//Аналогично
+		if (*p->Mpu.PduKey)						//Аналогично
 		{
 			Key = *p->Mpu.PduKey;
 			Active = (p->ActiveControls & CMD_SRC_PDU);
 			p->EvLog.Source = CMD_SRC_PDU;
-			p->Mpu.PduKey = 0;
+			*p->Mpu.PduKey = 0;
 		}
 
 		switch (Key)							// Обработка пришедшей команды
@@ -160,28 +160,28 @@ __inline void TeleControl(TCoreVlvDrvCtrl *p)
 
 	if (!(p->ActiveControls & CMD_SRC_DIGITAL))
 	{
-		p->Tu.State &= ~(TU_STOP|TU_CLOSE|TU_OPEN);
+		*p->Tu.State &= ~(TU_STOP|TU_CLOSE|TU_OPEN);
 		p->Tu.Ready = True;
 		return;
 	}
 
 	Ready = p->Status->bit.Stop && p->Tu.Ready;
 
-	switch(p->Tu.State & (TU_CLOSE|TU_OPEN))
+	switch(*p->Tu.State & (TU_CLOSE|TU_OPEN))
 	{
 		case TU_CLOSE: if (Ready) TuControl = vcwClose; break;
 		case TU_OPEN:	if (Ready) TuControl = vcwOpen;  break;
 		case (TU_CLOSE|TU_OPEN):  TuControl = vcwStop;  break;
 	}
 
-	if (p->Tu.State & TU_STOP) TuControl = vcwStop;
+	if (*p->Tu.State & TU_STOP) TuControl = vcwStop;
 
 	if (TuControl != vcwNone)
 	{
 		*p->ControlWord = TuControl;
 		p->EvLog.Source = CMD_SRC_DIGITAL;
 	}
-	p->Tu.State &= ~(TU_STOP|TU_CLOSE|TU_OPEN);
+	*p->Tu.State &= ~(TU_STOP|TU_CLOSE|TU_OPEN);
 }
 
 __inline void UnitControl(TCoreVlvDrvCtrl *p)

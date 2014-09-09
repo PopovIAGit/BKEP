@@ -97,7 +97,6 @@ TPeriodicalFunction Task18kHz[] =
 
 TPeriodicalFunction Task2kHz[] =          //Ќе более 4-х задач
 {
-	//PrdElemInit(Core_ProtectionsRefresh,	&g_Core.protections),
 	PrdElemInit(SerialCommTimings,						&g_Comm.mbAsu),	//на 2 к√ц
 	//PrdElemInit(SerialCommTimings,						&g_Comm.mbShn),
 	PrdElemInit(SerialCommTimings,						&g_Comm.mbBt),	//на 2 к√ц
@@ -108,8 +107,8 @@ TPeriodicalFunction Task2kHz[] =          //Ќе более 4-х задач
 
 TPeriodicalFunction Task200Hz[] =       	//не более  20-ти задач
 {
-//	PrdElemInit(Peref_DisplayUpdate, 					&g_Peref.display),
 	PrdElemInit(Peref_CalibUpdate, 						&g_Peref.Position),
+	PrdElemInit(Core_LowPowerControl, 					&g_Core),
 	PrdElemInit(DataBufferPre,							&g_Stat),
 	PrdElemInit(LogEvControl,							&g_Stat),
 	PrdElemInit(LogCmdControl,							&g_Stat),
@@ -158,21 +157,12 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.currSkew),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakCurrU),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakCurrV),
-	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakCurrW),
+	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakCurrW),*/
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.overHeatBCD),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.overHeatBCP),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.underColdBCD),
-	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.underColdBCP),*/
-	/*PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.protections.overHeatBlock),
-	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.protections.underColdBlock),
-	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.protections.overTemper1),
-	PrdElemInit(EleSyEncoderCalc,				&g_Peref.position.encoder),*/
-	//PrdElemInit(Comm_Update,					&g_Comm),
-	/*PrdElemInit(Core_CommandControl,			&g_Core.commands),
-	PrdElemInit(Core_CommandsUpdate,			&g_Core.commands),
-	PrdElemInit(Core_CmdUpdate,					&g_Core),
-	PrdElemInit(Peref_ClockControl,				&g_Peref.clock),
-	PrdElemInit(Core_StatusUpdate,				&g_Core)*/
+	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.underColdBCP),
+	PrdElemInit(Comm_50HzCalc,					&g_Comm),
 	PrdElemInit(GetCurrentCmd,					&g_Stat),
 	PrdElemInit(Core_MenuDisplay,				&g_Core.menu),
 };
@@ -181,24 +171,17 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 
 TPeriodicalFunction Task10Hz[] =        //не более  200-т задач
 {
-	//PrdElemInit(Peref_Calibration, 		&g_Peref.Position),
-	//PrdElemInit(CalcClbCycle, 			&g_Peref.Position),
 	PrdElemInit(Peref_Calibration, 			&g_Peref.Position),
 	PrdElemInit(CalcClbCycle, 				&g_Peref.Position),
-	//PrdElemInit(Core_ProtectionsUpdate,		&g_Core.protections),
 	PrdElemInit(g_Ram_Update,				&g_Ram),
 	PrdElemInit(Peref_SpeedCalc,			&g_Peref.Position),
-	//PrdElemInit(ADT75_Update,				NULL),
-//	PrdElemInit(Drive_Update,				&g_Drive),
 	PrdElemInit(Peref_LedsUpdate,			&g_Peref.leds),
-	//PrdElemInit(Peref_TenControl,			NULL),
-
-	//PrdElemInit(Peref_10HzCalc,				&g_Peref),
+	PrdElemInit(Peref_10HzCalc,				&g_Peref),
 	PrdElemInit(BluetoothTimer,				&g_Comm.Bluetooth),	//на 10 √ц
-	PrdElemInit(InterfIndication,			&g_Ram),			//на 10 √ц
 	PrdElemInit(RTC_Control,				NULL),				//на 10 √ц
 	PrdElemInit(BluetoothActivation,		&g_Comm.Bluetooth),	//на 10 √ц
 	PrdElemInit(ImTimerIndex,				&g_Stat.Im),		//на 10 √ц
+	PrdElemInit(Core_MuDuControl,				&g_Core),		//на 10 √ц
 
 };
 //------------ онец файла-----------------------------------------------

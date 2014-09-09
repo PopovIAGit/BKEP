@@ -220,7 +220,7 @@ void SetDefaultValues(TCoreMenu *p, Byte *groupNumber) // в Core_MenuDisplay()
 				&&(DefAddr != REG_PRODUCT_DATE) // Не дата изготовления
 				&&(DefAddr != REG_TASK_TIME)
 				&&(DefAddr != REG_TASK_DATE))
-			||(DefAddr == REG_CODE)||(DefAddr == REG_FCODE))
+			||(DefAddr == REG_CODE)||(DefAddr == REG_FCODE))//??? а надо ли перезаписывать пароли
 		{
 			*(ToUnsPtr(&g_Ram) + DefAddr) = Dcr.Def;
 

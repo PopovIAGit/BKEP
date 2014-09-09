@@ -114,6 +114,9 @@ typedef struct {
 		TFltUnion			outFaults;			// Аварии
 		TFltUnion			outDefects;			// Неисправности
 
+		Uns 				MuffFlag;			// Флаг муфты
+		Bool				ShcReset;			// Флаг по которому сбрасывается КЗ
+
 }TCoreProtections;
 
 //------------------- Глобальные переменные --------------------------------
@@ -124,8 +127,6 @@ void Core_ProtectionsUpdate(TCoreProtections *);	// Реакция системы на срабатыва
 void Core_ProtectionsReset(TCoreProtections *);		// Сброс защит при повторном пуске
 void Core_ProtectionsClear(TCoreProtections *);		// Сброс всех защит
 void Core_ProtectionsEnable(TCoreProtections *);	// Включение/Выключение защит
-Bool IsFaultExist(TCoreProtections *, TPrtMode);	// Проверка срабатывания аварийных защит
-Bool IsDefectExist(TPrtMode);					// Проверка срабатывания защит по неисправности
 void Core_DevProc_FaultIndic(TCoreProtections *);	// Индикация ошибок устройства и технологического процесса
 void EngPhOrdPrt(TCoreProtections *);				// неверное чередование фаз двигателя
 
