@@ -37,13 +37,13 @@ void DigitalInpUpdate(TDigitalInput *p)	// На вход функции приходит сигнал с ТУ
 	DigitalInputCalc (&p->inpDu, 	 		p->deltOn, p->deltOff, p->timeDelay); 	// Результат записывается в Output
 
 	// Формируем выход
-	p->output  = (p->inpOpen.outputBit  	<<(DIN_OPEN_BIT))&DIN_OPEN_BIT;
-	p->output |= (p->inpClose.outputBit 	<<(DIN_CLOSE_BIT))&DIN_CLOSE_BIT;
-	p->output |= (p->inpStop.outputBit		<<(DIN_STOP_BIT))&DIN_STOP_BIT;
-	p->output |= (p->inpMu.outputBit		<<(DIN_MU_BIT))&DIN_MU_BIT;
-	p->output |= (p->inpResetAlarm.outputBit<<(DIN_RESETALARM_BIT))&DIN_RESETALARM_BIT;
-	p->output |= (p->inpReadyTu.outputBit	<<(DIN_READYTU_BIT))&DIN_READYTU_BIT;
-	p->output |= (p->inpDu.outputBit		<<(DIN_DU_BIT))&DIN_DU_BIT;
+	p->output  = (p->inpOpen.outputBit  	<<(DIN_OPEN_BIT))&(1<<DIN_OPEN_BIT);
+	p->output |= (p->inpClose.outputBit 	<<(DIN_CLOSE_BIT))&(1<<DIN_CLOSE_BIT);
+	p->output |= (p->inpStop.outputBit		<<(DIN_STOP_BIT))&(1<<DIN_STOP_BIT);
+	p->output |= (p->inpMu.outputBit		<<(DIN_MU_BIT))&(1<<DIN_MU_BIT);
+	p->output |= (p->inpResetAlarm.outputBit<<(DIN_RESETALARM_BIT))&(1<<DIN_RESETALARM_BIT);
+	p->output |= (p->inpReadyTu.outputBit	<<(DIN_READYTU_BIT))&(1<<DIN_READYTU_BIT);
+	p->output |= (p->inpDu.outputBit		<<(DIN_DU_BIT))&(1<<DIN_DU_BIT);
 
 }
 

@@ -49,6 +49,9 @@ extern "C" {
 #define Mid3Value(Type) \
   return ((((LgInt)((Type)(Val1)) + (LgInt)((Type)(Val2)) + (LgInt)((Type)(Val3))) * 341L) >> 10)
 
+#define Mid3ValueUns(Val1, Val2, Val3) \
+	(Uint16)(0.33333333 * (Val1 + Val2 + Val3))
+
 #define Max3Value(Type) \
   Type Max = 0; \
   Max = MAX_VAL(Max, Val1); \

@@ -10,6 +10,7 @@
 #include "core.h"
 #include "peref.h"
 
+
 void Core_ProtectionsInit(TCoreProtections *p)
 {
 	//---------ЗАЩИТЫ ПРОЦЕССА--------------------------------------------------------
@@ -453,8 +454,8 @@ void EngPhOrdPrt(TCoreProtections *p)
 void Core_ProtectionsReset(TCoreProtections *p)
 {
 	g_Core.MotorControl.OverWayFlag = 0;		// Сбросили отсусвие уплотнения
-	//Muff = 0;
-	g_Core.Status.all &= ~STATUS_RESET_MASK;	// отчистили статус от аварии муфты и неисправености
+	p->MuffFlag = 0;	// отчистили статус от аварии муфты и неисправености
+	g_Core.Status.bit.Defect = 0;
 
 	p->outDefects.Load.bit.ISkew = 0;
 	p->outDefects.Load.bit.PhlU = 0;
@@ -469,10 +470,10 @@ void Core_ProtectionsReset(TCoreProtections *p)
 void Core_ProtectionsClear(TCoreProtections *p)
 {
 	g_Core.MotorControl.OverWayFlag = 0;		// Сбросили отсусвие уплотнения
-	//Muff = 0;									// сбросили муфту
+	p->MuffFlag = 0;								// сбросили муфту
 
-
-	g_Core.Status.all &= ~STATUS_RESET_MASK;	// отчистили статус от аварии муфты и неисправености
+	g_Core.Status.bit.Fault = 0;
+	g_Core.Status.bit.Defect = 0;
 
 	p->outFaults.Dev.all  = 0;					// сбросили все аварии
 	p->outFaults.Net.all  = 0;
@@ -489,14 +490,48 @@ void Core_ProtectionsClear(TCoreProtections *p)
 	Eeprom1.Error  = False;
 	Eeprom2.Error  = False;
 	TempSens.Error = False;
+	 */
+	p->ShcReset = true;
 
-	IsShcReset = true; Выставили флаг сброса КЗ
-	  */
 }
 
 void Core_ProtectionsUpdate(TCoreProtections *p)
 {
+
+	Uns MuffEnable;
+
 	Core_ProtecionSHC_Update(&p->ShC_U);
 	Core_ProtecionSHC_Update(&p->ShC_V);
 	Core_ProtecionSHC_Update(&p->ShC_W);
+
+	if(p->outDefects.Dev.all || p->outDefects.Load.all || p->outDefects.Net.all || p->outDefects.Proc.all)
+	{
+		g_Core.Status.bit.Defect = 1;
+	}
+	else g_Core.Status.bit.Defect = 0;
+	if(p->outFaults.Dev.all || p->outFaults.Load.all || p->outFaults.Net.all || p->outFaults.Proc.all)
+	{
+		g_Core.Status.bit.Fault = 1;
+	}
+	else g_Core.Status.bit.Fault = 0;
+
+	if (!g_Core.Status.bit.Stop)
+	{
+		if (p->MuffFlag)
+		{
+			if (!g_Core.MotorControl.RequestDir) MuffEnable = 1;
+			else if (g_Core.MotorControl.RequestDir > 0) MuffEnable = !g_Core.Status.bit.Opened;
+			else if (g_Core.MotorControl.RequestDir < 0) MuffEnable = !g_Core.Status.bit.Closed;
+
+			p->outFaults.Proc.bit.Mufta = MuffEnable;
+
+			Core_ValveDriveStop(&g_Core.VlvDrvCtrl);
+		}
+
+		if (g_Core.Status.bit.Fault)
+		{
+			Core_ValveDriveStop(&g_Core.VlvDrvCtrl);
+		}
+	}
+
 }

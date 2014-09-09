@@ -129,7 +129,7 @@ void Core_TorqueInit(TTorqObs *p)
 	CubInit(&p->Cub2, &p->TqAngUI);
 
 	// Инициализируем фильтр момента
-	peref_ApFilter3Init(&p->Trqfltr, (LgUns)Prd18kHZ, 0.02);
+	peref_ApFilter3Init(&p->Trqfltr, (LgUns)Prd18kHZ, 1);
 }
 
 // Расчет момента
@@ -140,8 +140,6 @@ void Core_TorqueCalc(TTorqObs *p)
 		register Int Add;		// ручной контроль индикации момента
 
 		if (!p->ObsEnable) {p->Indication = 0; return;} //если выключен расчет момента то индикация 0 и закрываем тиристоры и выходим
-
-		p->TorqueMax = g_Ram.ramGroupC.MaxTorque * 10; //??? убрать в обновление параметров
 
 		Cub = (p->Imidpr >= p->TransCurr) ? &p->Cub1 : &p->Cub2;  // выбераем по какому кубу работаем для маленьких или больших токов
 

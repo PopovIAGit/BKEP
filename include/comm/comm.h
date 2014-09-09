@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+#define ICREMENT_DIV 25		// Относительная велечина прироста таймера
+#define DECREMENT_DIV 10	// Относительная велечина уменьшения таймера
 //--------------------------------------------------------
 //================== КОММУНИКАЦИИ ========================
 //--------------------------------------------------------
@@ -51,6 +53,7 @@ typedef struct {
 
 void Comm_Init(TComm *);
 void Comm_Update(TComm *);
+void Comm_50HzCalc(TComm *);
 void UpdateTUTS_Test(TComm *p);
 Uns DigitCmdModeUpdate (Uns *);
 

@@ -39,7 +39,6 @@ extern "C" {
 
 //-------------------Статус работы----------------------------
 // Статус работы
-#define STATUS_RESET_MASK	0x2082
 #define STATUS_MOVE_MASK	0xC
 
 typedef union _TStatusReg {
@@ -57,27 +56,11 @@ typedef union _TStatusReg {
 		Uns MuDu:1;				// 8     Местное управление
      	Uns Ten:1;        		// 9     Включен ТЕН
      	Uns EnableBluetooth:1;  // 10    Резервное питание
-		Uns BlkIndic:1;			// 11	 Авария на блоке
-		Uns TsIndic:1;			// 12	 Авария на ТС
+		Uns Rsvd:2;			    // 11-12	 Резерв
 		Uns Defect:1;			// 13	 Неисправность
-		Uns BlkDefect:1;		// 14 	 Неисправность на блоке
-		Uns TsDefect:1;			// 15 	 Неисправность на ТС
+		Uns Rsvd2:2;		    // 14 -15 	Резерв
 	} bit;
 } TStatusReg;
-
-// Управление работой защит
-typedef union _TAlarmMode {
-	Uns all;
-	struct {
-		Uns off:1;					// 0 Защита выключена
-		Uns led:1;					// 1 Только сигнализация и только на блоке
-		Uns ledTs:1;				// 2 Сигнализация на блоке и ТС (пускает, не останавливает)
-		Uns ledTsStartStop:1;		// 3 Сигнализация на блоке и ТС, пускает, останавливает
-		Uns ledTsNotStartStop:1;	// 4 Сигнализация на блоке и ТС, не пускает, останавливает
-		Uns ledTsNotStartNotStop:1;	// 5 Сигнализация на блоке и ТС, не пускает, не останавливает
-		Uns rsvd:10;				// 6-15  Резерв
-	} bit;
-} TAlarmMode;
 
 // Статус калибровки
 typedef enum {
@@ -209,8 +192,9 @@ typedef union _TDeviceReg {
 		Uns Tl_BCP:1;		// 6     Переохлождение блока БКП
 		Uns Th_BCD:1;		// 7     Перегрев блока БКД
 		Uns Tl_BCD:1;		// 8     Переохлождение блока БКД
-		Uns Dac:1;			// 8     Переохлождение блока БКД
-     	Uns Rsvd:6;       	// 10-15  Резерв
+		Uns Dac:1;			// 8     Сбой ЦАП
+		Uns LowPower:1;		// 9     Выключение БКД
+     	Uns Rsvd:5;       	// 11-15 Резерв
   } bit;
 } TDeviceReg;
 
@@ -278,14 +262,12 @@ typedef enum {
 	dt4000_G9   = 7,
 	dt4000_G18  = 8,
 	dt10000_D6  = 9,
-	dt10000_D12 = 10
+	dt10000_D12 = 10,
+	dt10000_D10 = 11,
+	dt15000_D10 = 12,
+	dt20000_F40 = 13
 }TDriveType;
-
-
-
-
-
-
+/*
 // Управление работой защит
 typedef enum {
   pmOff       = 0,		// Защита выключена
@@ -293,6 +275,13 @@ typedef enum {
   pmBlkTsSign = 2,		// Сигнализация на блоке и ТС
   pmSignStop  = 3,		// Сигнализация и останов
   pmCount     = 4		// Количество режимов
+} TPrtMode;*/
+
+// Управление работой защит
+typedef enum {
+  pmOff       = 0,		// Защита выключена
+  pmSignStop  = 1,		// Сигнализация и останов
+  pmCount     = 2		// Количество режимов
 } TPrtMode;
 
 // Тип штока

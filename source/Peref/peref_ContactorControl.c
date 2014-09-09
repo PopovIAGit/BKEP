@@ -25,8 +25,8 @@ void ContactorControlUpdate(TContactorControl *p)
 	{
 		case cgStop:
 		{
-				SET_CONT_CLOSE(0);
-				SET_CONT_OPEN(0);
+				SET_CONT_CLOSE(1);
+				SET_CONT_OPEN(1);
 
 		/*	if (CONTACTOR_1_STATUS || CONTACTOR_2_STATUS)		// ≈сли сигнал с контактора не уходит за 0,2 секунды после подачи команды стоп
 			{
@@ -44,8 +44,8 @@ void ContactorControlUpdate(TContactorControl *p)
 			break;
 		case cgOpen:
 		{
-			SET_CONT_CLOSE(0);
-			SET_CONT_OPEN(1);
+			SET_CONT_CLOSE(1);
+			SET_CONT_OPEN(0);
 		/*
 			if (CONTACTOR_2_STATUS || p->ContactorError) 		//≈сли уже активирован встречный контактор или авари€ контактора то уходим в стоп
 			{
@@ -73,8 +73,8 @@ void ContactorControlUpdate(TContactorControl *p)
 			break;
 		case cgClose:
 		{
-			SET_CONT_CLOSE(1);
-			SET_CONT_OPEN(0);						// ≈сли все хорошо, включаем контактор
+			SET_CONT_CLOSE(0);
+			SET_CONT_OPEN(1);						// ≈сли все хорошо, включаем контактор
 
 			/*if (CONTACTOR_1_STATUS || p->ContactorError) 		//≈сли уже активирован встречный контактор или авари€ контакторов то уходим в стоп
 			{

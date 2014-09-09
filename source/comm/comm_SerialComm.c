@@ -33,21 +33,31 @@ void InitChanelAsuModbus(TMbHandle hPort)
 {
 	hPort->Params.ChannelID = ASU_SCI_ID;//
 	hPort->Params.Mode     	= MB_SLAVE;//
-	hPort->Params.Slave    	= 1;//
-	hPort->Params.BaudRate	= BaudRates[3];//
-	hPort->Params.UartBaud 	= BrrValues[3];//
-	hPort->Params.Parity   	= 0;//
+	hPort->Params.Slave    	= g_Ram.ramGroupB.RsStation;//
+	hPort->Params.BaudRate	= BaudRates[g_Ram.ramGroupB.RsBaudRate];//
+	hPort->Params.UartBaud 	= BrrValues[g_Ram.ramGroupB.RsBaudRate];//
+	hPort->Params.Parity   	= g_Ram.ramGroupB.RsMode;//
 
-	hPort->Params.RetryCount  = 0;
+/*	hPort->Params.RetryCount  = 0;
 	hPort->Params.Scale       = 2;//MB_SCALE;
 //	hPort->Params.ConnTimeout = Serial->RsIndicTime * 100;
-	hPort->Params.ConnTimeout = 2;//10  ÈÊ
-	hPort->Params.RxDelay     = 10;//10
+	hPort->Params.ConnTimeout = 2;//10
+	hPort->Params.RxDelay     = 10;//
 //	hPort->Params.TxDelay     = Serial->RsWaitTime - 3;
-	hPort->Params.TxDelay     = 0;//10  ÈÊ
+	hPort->Params.TxDelay     = 0;//10
 	hPort->Params.AckTimeout  = 6;//1000
 	hPort->Params.TrEnable    = &AsuMbSetTr;
-	hPort->Frame.TimerPre.Timeout = 1; //  ÈÊ
+	hPort->Frame.TimerPre.Timeout = 1; //
+	*/
+	hPort->Params.RetryCount  = 0;
+	hPort->Params.Scale       = MB_SCALE;
+	hPort->Params.ConnTimeout = 10;
+	hPort->Params.RxDelay     = 10;
+	hPort->Params.TxDelay     = 10;
+	hPort->Params.AckTimeout  = 1;//1000;
+	hPort->Params.TrEnable    = &AsuMbSetTr;
+	hPort->Frame.TimerPre.Timeout = 1;
+
 
 	hPort->Params.HardWareType	= UART_TYPE;
 
@@ -112,23 +122,14 @@ void InitChanelBtModbus(TMbHandle hPort)
 	hPort->Params.UartBaud = 0;//BrrValues[g_Ram.ramGroupB.RS_BAUD_RATE];
 	hPort->Params.Parity   = 0;//g_Ram.ramGroupB.RS_MODE;
 
-	/*hPort->Params.RetryCount  = 0;
-	hPort->Params.Scale       = MB_SCALE;
-	hPort->Params.ConnTimeout = 1;//  ÈÊ
-	hPort->Params.RxDelay     = 1;
-	hPort->Params.TxDelay     = 1;//  ÈÊ
-	hPort->Params.AckTimeout  = 1;//1000;
-	hPort->Params.TrEnable    = &BtMbSetTr;
-	hPort->Frame.TimerPre.Timeout = 1; //  ÈÊ
-	*/
 	hPort->Params.RetryCount  = 0;
 	hPort->Params.Scale       = 2;
-	hPort->Params.ConnTimeout = 2;//  ÈÊ
+	hPort->Params.ConnTimeout = 2;
 	hPort->Params.RxDelay     = 2;
-	hPort->Params.TxDelay     = 2;//  ÈÊ
+	hPort->Params.TxDelay     = 2;
 	hPort->Params.AckTimeout  = 2;//1000;
 	hPort->Params.TrEnable    = &BtMbSetTr;
-	hPort->Frame.TimerPre.Timeout = 2; //  ÈÊ
+	hPort->Frame.TimerPre.Timeout = 2;
 
 	hPort->Params.HardWareType	= MCBSP_TYPE;
 

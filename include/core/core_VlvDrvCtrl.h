@@ -98,7 +98,7 @@ typedef struct {
 typedef struct {
 	Bool				 Enable;			// Наличие телеуправления
 	Bool				 LocalFlag;			// Флаг TRUE, если управление местное
-	Uns				 	 State;				// Состояние входов телеуправления
+	Uns				 	*State;				// Состояние входов телеуправления
 	Bool				 Ready;				// Готовность обработки команд ТУ на движение
 	Uns					*LockSeal;			// Блокировка залипания
 } TTeleControl;

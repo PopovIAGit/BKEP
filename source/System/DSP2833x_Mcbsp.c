@@ -215,7 +215,7 @@ Uns McBsp_recieve(Byte Id)
 	}
 	//if (McBspRegs[Id]->SPCR1.bit.RRDY==1)
 	//{
-
+		//McBsp_getstatus(Id);
 		Data1 = McBspRegs[Id]->DRR1.all;
 		Data2 = McBspRegs[Id]->DRR2.all;
 
@@ -264,7 +264,7 @@ void McBsp_transmit(Byte Id, Uns Data, Uns Stop)
 	Uns Data1=0;
 	Uns Data2=0;
 	LgUns Data3=0;
-	Uns Count=0;
+
 	/*while(McBspRegs[Id]->SPCR2.bit.XRDY==0)
 	{
 		if(++Count>65000) return;
@@ -293,6 +293,7 @@ void McBsp_transmit(Byte Id, Uns Data, Uns Stop)
 		Data3 = (LgUns)(Data2&0x03ff) | ((LgUns)(Data1&0x03ff)<<10);
 
 		if (Stop==1) Data3 |= 0x03ff;
+		if (Stop==2) {Data3 = Data3 >> 10; Data3 |= 0x0FFC00;}
 		McBspRegs[Id]->DXR1.all = (Uns)(Data3&0x0000FFFF);
 		McBspRegs[Id]->DXR2.all = (Uns)((Data3>>16)&0x0000FFFF);
 	}
