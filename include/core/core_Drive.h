@@ -1,0 +1,31 @@
+#ifndef DRIVE_
+#define DRIVE_
+
+//----------- Подключение заголовочных файлов ------------------------------
+#include "config.h"
+//--------------------- Константы-------------------------------------------
+#define LENGTH_TRQ		60	// Размер буфера коэффициентов расчета момента
+//--------------------- Макросы --------------------------------------------
+//-------------------- Структуры -------------------------------------------
+
+typedef struct {
+
+	Uns *Inom;
+	Uns *MaxTorqe;
+	Uns *GearRatio;
+	TDriveType *DriveType;
+
+} TCoreDrive;
+//------------------- Глобальные переменные --------------------------------
+extern Int
+	drive1,  drive2,  drive3,	drive4,	drive5,
+	drive6,  drive7,  drive8,  drive9,	drive10,
+	drive11, drive12, drive13, drive14,	drive15,
+	drive16, drive17, drive18, drive19, drive20;
+//------------------- Протатипы функций ------------------------------------
+
+void Core_Drive_Init(TCoreDrive *);
+void Core_Drive_Update(TCoreDrive *);
+void Core_Drive_ParamSet(TCoreDrive *);
+
+#endif

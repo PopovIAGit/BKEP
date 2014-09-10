@@ -153,11 +153,7 @@ void SciMasterConnBetweenBlockUpdate(TMbBBHandle Port)
 
 void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 {
-	Uns i=0;
 	Uint32 BkpEncPostion=0;
-
-	//if (HZ==0) {HZ=1; return;}
-	//HZ=0;
 
 	SciMasterConnBetweenBlockUpdate(bPort);
 
@@ -171,9 +167,10 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 	BkpEncPostion      |= (Uint32)bPort->RxPacket.Data[3] << 16;
 	BkpEncPostion      |= (Uint32)bPort->RxPacket.Data[2] << 8;
 	BkpEncPostion      |= (Uint32)bPort->RxPacket.Data[1] << 0;
-	g_Ram.ramGroupC.HallBlock.all    = bPort->RxPacket.Data[5];
-	g_Ram.ramGroupA.TemperBKP         = (int16)bPort->RxPacket.Data[6];
-	g_Core.Status.bit.Ten = bPort->RxPacket.Data[7];
+	g_Ram.ramGroupH.Position 		= BkpEncPostion;
+	g_Ram.ramGroupC.HallBlock.all   = bPort->RxPacket.Data[5];
+	g_Ram.ramGroupA.TemperBKP       = (int16)bPort->RxPacket.Data[6];
+	g_Core.Status.bit.Ten 			= bPort->RxPacket.Data[7];
 
 	bPort->TxPacket.Flag = 1;
 

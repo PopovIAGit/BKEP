@@ -38,6 +38,7 @@ void Core_Init(TCore *p)
 	Core_TorqueInit(&p->TorqObs);			// Расчет моментов
 	//Core_CommandsInit(&p->commands);		// Получение команд, настройка калибровки
 	Core_ProtectionsInit(&p->Protections);	// Защиты
+	Core_Drive_Init(&p->Drive);				// Выбор типа привода
 
 	p->Status.bit.Stop = 1;					// При включение выставляем стоп
 }
@@ -127,6 +128,7 @@ void Core_CalibStop (TCore *p)
 		if(p->VlvDrvCtrl.Valve.BreakFlag) p->MotorControl.OverWayFlag = 1;	//
 		else	// Если
 			{
+				p->MotorControl.CalibStop = 1;
 				Core_ValveDriveStop(&p->VlvDrvCtrl);
 				p->VlvDrvCtrl.EvLog.Value = CMD_STOP;
 			}
@@ -184,12 +186,11 @@ void Core_CalibControl(TCore *p)
 		{
 			WriteToEeprom(REG_CYCLE_CNT, &g_Ram.ramGroupH.CycleCnt, 1);						// записали параметр счетчик циклов
 			p->PrevCycle = g_Ram.ramGroupH.CycleCnt;										// запомнили записанный параметр, для последующей проверки
-			g_Ram.ramGroupA.CycleCnt = g_Ram.ramGroupH.CycleCnt;
 		}
 		else if (g_Ram.ramGroupH.CalibState != g_Ram.ramGroupA.CalibState)					// если состояние калибровки изменилось
 		{
 			WriteToEeprom(REG_CALIB_STATE, &g_Ram.ramGroupH.CalibState, sizeof(ClbIndication));	// то записали состояние калибровки
-			g_Ram.ramGroupA.CalibState = g_Ram.ramGroupH.CalibState;						// запоминаем записанный параметр, для последующей проверки
+			g_Ram.ramGroupA.CalibState = g_Ram.ramGroupH.CalibState;
 		}
 	}
 }
@@ -202,16 +203,22 @@ void StopPowerControl(void)
 	g_Core.Status.bit.Closing 	= 0;
 	g_Core.Status.bit.Test 		= 0;
 
-	g_Ram.ramGroupH.ContGroup 	 = cgStop;	// Подали команду на стоп контакторам
-	g_Core.MotorControl.WorkMode = wmStop;  // Переходим в стейт машину стоп
-	g_Core.VlvDrvCtrl.StartDelay = (Uns) START_DELAY_TIME; // Выставляем задержку перед следующим пуском
+	if (g_Core.Status.bit.Fault)
+	{
+		g_Core.MotorControl.WorkMode = wmStop;  // Переходим в стейт машину стоп
+	}
+	else if (g_Core.MotorControl.CalibStop) g_Core.MotorControl.WorkMode = wmPlugBreak;
+	else g_Core.MotorControl.WorkMode = wmStop;
+
+	g_Core.MotorControl.CalibStop = 0;
+	g_Core.VlvDrvCtrl.StartDelay = (Uns)START_DELAY_TIME; // Выставляем задержку перед следующим пуском
 }
 
 // Действия при пуске
 void StartPowerControl(TValveCmd ControlWord)
 {
 	//Если КЗ то return
-	if (g_Core.Protections.ShC_U ||g_Core.Protections.ShC_V  ||g_Core.Protections.ShC_W ) return;
+	if (g_Ram.ramGroupA.Faults.Load.all & LOAD_SHC_MASK) return;
 
 	switch (ControlWord)
 	{
@@ -241,30 +248,143 @@ void StartPowerControl(TValveCmd ControlWord)
 
 	// сброс аварий необходимый для пуска
 		Core_ProtectionsReset(&g_Core.Protections);
-
+	g_Core.MotorControl.PlugBreakStep = 0;
 	g_Core.Status.bit.Stop 			= 0;
 	g_Core.MotorControl.TorqueSet 	= 0xFFFF;
-	if(g_Core.MotorControl.RequestDir < 0) g_Core.Status.bit.Closing = 1;
-	if(g_Core.MotorControl.RequestDir > 0) g_Core.Status.bit.Opening = 1;
+//	if(g_Core.MotorControl.RequestDir < 0) g_Core.Status.bit.Closing = 1;
+//	if(g_Core.MotorControl.RequestDir > 0) g_Core.Status.bit.Opening = 1;
 
 }
 
-// Стэйт машина, Добавить логику работы с СофтСтартером
+// Стэйт машина
 void Core_ControlMode(TCore *p)
 {
 	switch(p->MotorControl.WorkMode)
 	{
 	case wmStop:
-		p->MotorControl.RequestDir = 0;		// сбрасываем необходимое направение движения
-		g_Ram.ramGroupA.Torque = 0;			// отображаем момент
+		p->MotorControl.RequestDir = 0;			// сбрасываем необходимое направение движения
+		g_Ram.ramGroupA.Torque = 0;				// отображаем момент
+		g_Ram.ramGroupH.ContGroup 	 = cgStop; 	// Подали команду на стоп контакторам
 		break;
 	case wmMove:
 		g_Ram.ramGroupA.Torque = p->TorqObs.Indication; // отображаем текущий момент
-		if(p->TorqObs.Indication < p->MotorControl.TorqueSet) p->MotorControl.MufTimer = 0;
-		else if (++p->MotorControl.MufTimer >= MOVE_STATE_TIME) p->Protections.outFaults.Proc.bit.Mufta = 1;	// выставляем муфту если в течении секунды момент больше заданного
+
+		if (CONTACTOR_1_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
+		if (CONTACTOR_2_STATUS && g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
+
+		if(p->TorqObs.Indication < p->MotorControl.TorqueSet)
+			p->MotorControl.MufTimer = 0;
+		else if (++p->MotorControl.MufTimer >= MOVE_STATE_TIME)
+			p->Protections.MuffFlag = 1;	// выставляем муфту если в течении секунды момент больше заданного
 		break;
 	case wmPlugBreak:
-
+		g_Ram.ramGroupA.Torque = 0;				// отображаем момент
+		if (p->MotorControl.PlugBreakTimer > 0) p->MotorControl.PlugBreakTimer--;
+		switch(p->MotorControl.PlugBreakStep)
+		{
+			case 0:
+					g_Ram.ramGroupH.ContGroup = cgStop;
+					p->MotorControl.PlugBreakTimer = BREAK_SCALE * g_Ram.ramGroupC.BrakePause;
+					p->MotorControl.PlugBreakStep = 1;
+				break;
+			case 1:
+					if (p->MotorControl.PlugBreakTimer > 0 )break;
+					g_Ram.ramGroupH.ContGroup = (p->MotorControl.RequestDir > 0) ? cgClose : cgOpen;
+					p->MotorControl.PlugBreakTimer = BREAK_SCALE * g_Ram.ramGroupC.BrakeTime;
+					p->MotorControl.PlugBreakStep = 2;
+				break;
+			case 2:
+					if (p->MotorControl.PlugBreakTimer > 0 )break;
+					p->MotorControl.WorkMode = wmStop;
+				break;
+		}
 		break;
+	}
+}
+
+void Core_LowPowerControl(TCore *p)
+{
+	Uns ShCState = 0;
+	ShCState = p->Protections.outFaults.Load.all & LOAD_SHC_MASK;
+
+	// Событие выключения блока
+	if ((g_Ram.ramGroupA.Ur < 100) && (g_Ram.ramGroupA.Us < 100)
+			&& (g_Ram.ramGroupA.Ut < 100))
+	{
+		p->Protections.outFaults.Dev.bit.LowPower = 1;
+	}
+	else p->Protections.outFaults.Dev.bit.LowPower = 0;
+
+	// Запись КЗ
+	if (ShCState && !g_Ram.ramGroupH.ScFaults)
+	{
+		if (IsMemParReady())
+		{
+			g_Ram.ramGroupH.ScFaults = ShCState;
+			WriteToEeprom(REG_SHC_FAULT, &g_Ram.ramGroupH.ScFaults, 1);			// то записали состояние КЗ
+		}
+	}
+	if (g_Ram.ramGroupH.ScFaults)
+	{
+		g_Ram.ramGroupA.Faults.Load.all |= g_Ram.ramGroupH.ScFaults;
+	}
+	if (p->Protections.ShcReset && IsMemParReady())
+	{
+		p->Protections.ShcReset = false;
+		g_Ram.ramGroupH.ScFaults = 0;
+		WriteToEeprom(REG_SHC_FAULT, &g_Ram.ramGroupH.ScFaults, 1);
+	}
+
+}
+
+void Core_MuDuControl(TCore *p)
+{
+	switch (g_Ram.ramGroupB.MuDuSetup)
+	{
+		case mdOff:
+			p->Protections.outDefects.Proc.bit.MuDuDef = 0;
+			break;
+		case mdMuOnly:
+			p->Protections.outDefects.Proc.bit.MuDuDef = 0;
+			break;
+		case mdDuOnly:
+			p->Protections.outDefects.Proc.bit.MuDuDef = 0;
+			break;
+		case mdSelect:
+			if (p->Status.bit.Stop)
+			{
+				if(!g_Ram.ramGroupA.StateTu.bit.Mu && !g_Ram.ramGroupA.StateTu.bit.Du)
+				{
+					p->VlvDrvCtrl.MuDuInput = 0;
+					p->Protections.outDefects.Proc.bit.MuDuDef = 1;
+				}
+				if(g_Ram.ramGroupA.StateTu.bit.Mu && !g_Ram.ramGroupA.StateTu.bit.Du)
+				{
+					p->VlvDrvCtrl.MuDuInput = 1;
+					p->Protections.outDefects.Proc.bit.MuDuDef = 0;
+				}
+				if(!g_Ram.ramGroupA.StateTu.bit.Mu && g_Ram.ramGroupA.StateTu.bit.Du)
+				{
+					p->VlvDrvCtrl.MuDuInput = 0;
+					p->Protections.outDefects.Proc.bit.MuDuDef = 0;
+				}
+				if(g_Ram.ramGroupA.StateTu.bit.Mu && g_Ram.ramGroupA.StateTu.bit.Du)
+				{
+					p->VlvDrvCtrl.MuDuInput = 0;
+					p->Protections.outDefects.Proc.bit.MuDuDef = 1;
+				}
+			}
+			break;
+
+	}
+
+	if (g_Ram.ramGroupD.PrtReset)
+	{
+		if(!p->Status.bit.Stop) p->VlvDrvCtrl.Mpu.CancelFlag = true;
+		else {
+			Core_ProtectionsClear(&p->Protections);
+			p->VlvDrvCtrl.EvLog.Value = CMD_RES_FAULT;
+		}
+		g_Ram.ramGroupD.PrtReset = 0;
 	}
 }

@@ -27,32 +27,9 @@ Bool RtcStart    = False;
 //---------------------------------------------------
 void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновление
 {
-  /*peref_ApFilter3Init(&p->URfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);		// Инициализируем фильтры
-	peref_ApFilter3Init(&p->USfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);
-	peref_ApFilter3Init(&p->UTfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);
-	peref_ApFilter3Init(&p->IUfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
-	peref_ApFilter3Init(&p->IVfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
-	peref_ApFilter3Init(&p->IWfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);*/
-
-
 	//----для  Телеуправления---------------------------------------------------------------------------
 	memset(&p->InDigSignal, 0, sizeof(TSinSignalObserver));
 
-	peref_ApFilter3Init(&p->U3fltrOpen, 		 (Uns)Prd50HZ, 10.0);		// Инициализируем фильтры
-	peref_ApFilter3Init(&p->U3fltrClose, 	 (Uns)Prd50HZ, 10.0);
-	peref_ApFilter3Init(&p->U3fltrStop, 		 (Uns)Prd50HZ, 10.0);
-	peref_ApFilter3Init(&p->U3fltrMu, 		 (Uns)Prd50HZ, 10.0);
-	peref_ApFilter3Init(&p->U3fltrResetAlarm, (Uns)Prd50HZ, 10.0);
-	peref_ApFilter3Init(&p->U3fltrReadyTU, 	 (Uns)Prd50HZ, 10.0);
-	peref_ApFilter3Init(&p->U3fltrDU, 		 (Uns)Prd50HZ, 10.0);
-
-	peref_ApFilter1Init(&p->UfltrOpen, 		 (Uns)Prd18kHZ, 10.0);		// Инициализируем фильтры
-	peref_ApFilter1Init(&p->UfltrClose, 	 (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter1Init(&p->UfltrStop, 		 (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter1Init(&p->UfltrMu, 		 (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter1Init(&p->UfltrResetAlarm, (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter1Init(&p->UfltrReadyTU, 	 (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter1Init(&p->UfltrDU, 		 (Uns)Prd18kHZ, 10.0);
 
 	Peref_SensTuObserverInit(&p->InDigSignalObserver);// Инициализируем обработку синусойды
 
@@ -64,14 +41,7 @@ void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновлени
 	Peref_SinObserverInitFloat(&p->InDigSignal.sigReadyTU,	Prd18kHZ);
 	Peref_SinObserverInitFloat(&p->InDigSignal.sigDU,		Prd18kHZ);
 
-	//----------------------------------------------------------------------------------------------
-
-	peref_ApFilter1Init(&p->URfltr, (Uns)Prd18kHZ, 10.0);		// Инициализируем фильтры
-	peref_ApFilter1Init(&p->USfltr, (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter1Init(&p->UTfltr, (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter1Init(&p->IUfltr, (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter1Init(&p->IVfltr, (Uns)Prd18kHZ, 10.0);
-	peref_ApFilter1Init(&p->IWfltr, (Uns)Prd18kHZ, 10.0);
+	//--------токи и напряжения------------------------------------------------------------------------
 
 	Peref_SensObserverInit(&p->sensObserver);// Инициализируем обработку синусойды
 
@@ -92,10 +62,6 @@ void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновлени
 	p->Umid = 0;
 	p->Imid = 0;
 	p->AngleUI = 0;
-
-	peref_ApFilter1Init(&p->Phifltr, Prd200HZ, 0.05);
-	peref_ApFilter1Init(&p->Umfltr, Prd200HZ, 0.05);
-	peref_ApFilter3Init(&p->Imfltr, Prd200HZ, 0.05);
 
 	Peref_CalibInit(&p->Position);
 	ContactorInit(&p->ContactorControl);
@@ -136,9 +102,9 @@ void Peref_18kHzCalc(TPeref *p) // 18 кГц
 	p->InDigSignal.sigClose.Input 		= p->UfltrClose.Output;
 	p->InDigSignal.sigStop.Input 		= p->UfltrStop.Output;
 	p->InDigSignal.sigMU.Input 			= p->UfltrMu.Output;
-	p->InDigSignal.sigResetAlarm.Input 	= p->UfltrDU.Output;
+	p->InDigSignal.sigResetAlarm.Input 	= p->UfltrResetAlarm.Output;
 	p->InDigSignal.sigReadyTU.Input 	= p->UfltrReadyTU.Output;
-	p->InDigSignal.sigDU.Input 			= p->UfltrResetAlarm.Output;
+	p->InDigSignal.sigDU.Input 			= p->UfltrDU.Output;
 
 	//функция расчёта RMS для сигналов ТУ
 	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigOpen);
@@ -214,9 +180,9 @@ void Peref_50HzCalc(TPeref *p)	// 50 Гц
 	p->U3fltrClose.Input 		= p->InDigSignal.sigClose.Output;
 	p->U3fltrStop.Input 		= p->InDigSignal.sigStop.Output;
 	p->U3fltrMu.Input 			= p->InDigSignal.sigMU.Output;
-	p->U3fltrDU.Input 			= p->InDigSignal.sigResetAlarm.Output;
+	p->U3fltrResetAlarm.Input 	= p->InDigSignal.sigResetAlarm.Output;;
 	p->U3fltrReadyTU.Input 		= p->InDigSignal.sigReadyTU.Output;
-	p->U3fltrResetAlarm.Input 	= p->InDigSignal.sigDU.Output;
+	p->U3fltrDU.Input 			= p->InDigSignal.sigDU.Output;
 
 	peref_ApFilter3Calc(&p->U3fltrOpen);
 	peref_ApFilter3Calc(&p->U3fltrClose);
@@ -238,11 +204,11 @@ void Peref_50HzCalc(TPeref *p)	// 50 Гц
 	if (!g_Core.Status.bit.Stop)
 	p->AngleUI = _IQtoIQ16(p->Phifltr.Output);
 
-	p->Umfltr.Input = _IQ16toIQ(Mid3UnsValue(p->sinObserver.UR.Output, p->sinObserver.US.Output, p->sinObserver.UT.Output));
+	p->Umfltr.Input = Mid3ValueUns(p->sinObserver.UR.Output, p->sinObserver.US.Output, p->sinObserver.UT.Output);
 	peref_ApFilter1Calc(&p->Umfltr);
 	p->Umid = _IQtoIQ16(p->Umfltr.Output);
 
-	p->Imfltr.Input = _IQ16toIQ(Mid3UnsValue(p->sinObserver.IU.Output, p->sinObserver.IV.Output, p->sinObserver.IW.Output));
+	p->Imfltr.Input = Mid3ValueUns(p->sinObserver.IU.Output, p->sinObserver.IV.Output, p->sinObserver.IW.Output);
 	peref_ApFilter3Calc(&p->Imfltr);
 	p->Imid = _IQtoIQ16(p->Imfltr.Output);
 

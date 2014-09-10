@@ -32,12 +32,11 @@ void Peref_CalibInit(TPerefPosition *p)
 	p->PosSensPow	= &g_Ram.ramGroupC.PosSensPow;
 	p->PositionAcc	= &g_Ram.ramGroupB.PositionAcc;
 	p->RodType		= ToPtr(&g_Ram.ramGroupB.RodType);
-	p->AbsPosition	= ToPtr(&g_Ram.ramGroupC.Position);	// ??? Заменить на данные с энкодера
+	p->AbsPosition	= ToPtr(&g_Ram.ramGroupH.Position);	// ??? Заменить на данные с энкодера
 	p->PositionPr	= &g_Ram.ramGroupA.PositionPr;
 	p->FullWay		= &g_Ram.ramGroupA.FullWay;
 	p->CurWay		= &g_Ram.ramGroupA.CurWay;
 	p->CycleCnt		= &g_Ram.ramGroupH.CycleCnt;
-	p->MuffFlag		= 0;								// ??? Заменить на нормальную муфту
 	p->Command		= ToPtr(&g_Ram.ramGroupD.TaskClose);
 	p->Indication	= ToPtr(&g_Ram.ramGroupH.CalibState);
 

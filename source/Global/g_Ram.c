@@ -113,7 +113,10 @@ void g_Ram_Update(TRam *p)
 
 	//------ Core -> RAM ------------------------------------
 	p->ramGroupA.Status = g_Core.Status;
-	//InterfIndication(p);
+	p->ramGroupA.Faults.Net.all  = (g_Core.Protections.outFaults.Net.all  | g_Core.Protections.outDefects.Net.all);
+	p->ramGroupA.Faults.Load.all = (g_Core.Protections.outFaults.Load.all | g_Core.Protections.outDefects.Load.all);
+	p->ramGroupA.Faults.Proc.all = (g_Core.Protections.outFaults.Proc.all | g_Core.Protections.outDefects.Proc.all);
+	p->ramGroupA.Faults.Dev.all  = (g_Core.Protections.outFaults.Dev.all  | g_Core.Protections.outDefects.Dev.all);
 
 	//----- Peref -> RAM -----------------------------------
 
@@ -143,23 +146,18 @@ void g_Ram_Update(TRam *p)
 	 }
 
 	 p->ramGroupA.Speed = g_Peref.Position.speedRPM;
-	 // ------------------------------------------
+
+	 p->ramGroupA.CycleCnt = p->ramGroupH.CycleCnt;
+
+	 p->ramGroupC.Position = p->ramGroupH.Position >> p->ramGroupC.PosPrecision;
 	 p->ramGroupA.Position = p->ramGroupC.Position;
+	 p->ramGroupC.ClosePosition = p->ramGroupH.ClosePosition >> p->ramGroupC.PosPrecision;
+	 p->ramGroupC.OpenPosition  = p->ramGroupH.OpenPosition >> p->ramGroupC.PosPrecision;
+	 p->ramGroupA.StateTu.all   = g_Comm.digitInterface.Inputs.all;
+	 p->ramGroupA.StateTs.all	= g_Comm.digitInterface.Outputs.all;
 
-}
-
-void InterfIndication(TRam *p)
-{
-	p->ramGroupA.Faults.Net.all  = p->ramGroupH.FaultsNet.all;
-	p->ramGroupA.Faults.Load.all = p->ramGroupH.FaultsLoad.all;
-	p->ramGroupA.Faults.Dev.all  = p->ramGroupH.FaultsDev.all;
-
-	//p->ramGroupA.StateTu.all     = g_Comm.digitInterface.Inputs.all;
-	p->ramGroupA.StateTs.all	 = g_Comm.digitInterface.Outputs.all;
-}
-//---------------------------------------------------
-void g_Ram_SetTorque(void)
-{
+	 p->ramGroupB.MOD_FAULT = GpioDataRegs.GPBDAT.bit.GPIO39;
+	 GpioDataRegs.GPBDAT.bit.GPIO48 = p->ramGroupB.RES_ERR;
 
 }
 //---------------------------------------------------
@@ -189,33 +187,51 @@ void RefreshParams(Uns addr)
 
 	} else if (addr == REG_DRIVE_TYPE) {
 
-		//TorqueObsInit();
-		//TorqueMax = g_Ram.ramGroupC.MaxTorque * 10; // Перевод максимального момента в *10
-		//CubRefresh(&Torq.Cub1, &g_Ram.ramGroupGrH->TqCurr);
-		//CubRefresh(&Torq.Cub2, &g_Ram.ramGroupGrH->TqAngUI);
-		//CubRefresh(&Torq.Cub3, &g_Ram.ramGroupGrH->TqAngSf);
+		Core_Drive_Update(&g_Core.Drive);
+		 g_Core.TorqObs.TorqueMax = g_Ram.ramGroupC.MaxTorque * 10; //??? убрать в обновление параметров
+		CubRefresh(&g_Core.TorqObs.Cub1, &g_Ram.ramGroupH.TqCurr);
+		CubRefresh(&g_Core.TorqObs.Cub2, &g_Ram.ramGroupH.TqAngUI);
 
-	} else if (addr == REG_COEF_VOLT_FILTER){
+	} else if (addr == REG_SIN_FILTER_TF){
 
-		pPeref->URfltr.Tf = _IQdiv(g_Ram.ramGroupC.CoefVoltFltr, 1E08); 		//peref_ApFilter3Init(&pPeref->URfltr);
-		pPeref->USfltr.Tf = pPeref->URfltr.Tf; 								  	//peref_ApFilter3Init(&pPeref->USfltr);
-		pPeref->UTfltr.Tf = pPeref->URfltr.Tf; 								  	//peref_ApFilter3Init(&pPeref->UTfltr);
-
-		peref_ApFilter1Init(&pPeref->URfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);
-		peref_ApFilter1Init(&pPeref->USfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);
-		peref_ApFilter1Init(&pPeref->UTfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefVoltFltr);
+			peref_ApFilter1Init(&g_Peref.URfltr, (Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);		// Инициализируем фильтры
+			peref_ApFilter1Init(&g_Peref.USfltr, (Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.UTfltr, (Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.IUfltr, (Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.IVfltr, (Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.IWfltr, (Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);
 
 
+			peref_ApFilter1Init(&g_Peref.UfltrOpen, 	 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);		// Инициализируем фильтры
+			peref_ApFilter1Init(&g_Peref.UfltrClose, 	 (Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.UfltrStop, 	 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.UfltrMu, 		 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.UfltrResetAlarm,(Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.UfltrReadyTU, 	 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.UfltrDU, 		 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
 
-	} else if (addr == REG_CURRENT_FILTER) {
 
-		pPeref->IUfltr.Tf = _IQdiv(g_Ram.ramGroupC.CoefCurrFltr, 1E08); 		//peref_ApFilter3Init(&pPeref->IUfltr);
-		pPeref->IVfltr.Tf = pPeref->IUfltr.Tf; 									//peref_ApFilter3Init(&pPeref->IVfltr);
-		pPeref->IWfltr.Tf = pPeref->IUfltr.Tf; 									//peref_ApFilter3Init(&pPeref->IWfltr);
 
-		peref_ApFilter1Init(&pPeref->IUfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
-		peref_ApFilter1Init(&pPeref->IVfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
-		peref_ApFilter1Init(&pPeref->IWfltr, (LgUns)Prd18kHZ, g_Ram.ramGroupC.CoefCurrFltr);
+	} else if (addr == REG_RMS_FILTER_TF) {
+
+			peref_ApFilter3Init(&g_Peref.UR3fltr, (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);		// Инициализируем фильтры
+			peref_ApFilter3Init(&g_Peref.US3fltr, (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.UT3fltr, (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.IU3fltr, (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.IV3fltr, (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.IW3fltr, (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
+
+			peref_ApFilter1Init(&g_Peref.Phifltr, (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter1Init(&g_Peref.Umfltr,  (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.Imfltr,  (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
+
+			peref_ApFilter3Init(&g_Peref.U3fltrOpen, 	  (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);		// Инициализируем фильтры
+			peref_ApFilter3Init(&g_Peref.U3fltrClose, 	  (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.U3fltrStop, 	  (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.U3fltrMu, 		  (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.U3fltrResetAlarm,(Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.U3fltrReadyTU,   (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.U3fltrDU, 		  (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
 
 	} else if (addr >= REG_TORQUE_CURR && addr < REG_TORQUE_CURR+20) {
 		//CubRefresh(&Torq.Cub1, &g_Ram.ramGroupGrH->TqCurr);
@@ -228,21 +244,6 @@ void RefreshParams(Uns addr)
 	}
 
 }
-//---------------------------------------------------
-/*void CubRefresh(TCubStr *v, TCubArray *Array)	//
-{
-	register TCubPoint *Pt;
-	register Uns i, j;
-
-	for (i=0; i < CUB_COUNT1; i++)
-	{
-		for (j=0; j < CUB_COUNT2; j++)
-		{
-			Pt = &v->Points[i][j];
-			Pt->Z = Array->Data[i][j];
-		}
-	}
-}*/
 //---------------------------------------------------
 Int MinMax3IntValue (Int val1, Int val2, Int val3)
 {
