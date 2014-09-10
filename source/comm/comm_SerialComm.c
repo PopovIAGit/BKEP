@@ -12,6 +12,7 @@
 #include "comm.h"
 #include "comm_SerialComm.h"
 #include "g_Ram.h"
+#include "stat.h"
 
 Bool MbBkpConnect=False;
 Bool MbAsuConnect=False;
@@ -255,7 +256,13 @@ __inline Byte WriteData(Uns Addr, Uns *Data, Uns Count)
 		if (Val->ReadOnly) {return EX_ILLEGAL_FUNCTION;}
 		if (!CheckRange(Data[i], Dcr.Min, Dcr.Max)) 
 			{return EX_ILLEGAL_DATA_VALUE;}
-		if (Val->Memory) Nvm = true;
+		if (Val->Memory)
+		{
+			Nvm = true;
+			g_Stat.LogParam.MbBuffer[g_Stat.LogParam.MbIndex] = i + Addr;			// Запомнили адрес параметра, инкрементировали индекс
+			g_Stat.LogParam.MbIndex++;
+		}
+		//MbTmpData[i] = Tmp;
 	}
 	// ИК
 	//обновление пароля

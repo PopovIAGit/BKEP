@@ -114,9 +114,9 @@ void g_Ram_Update(TRam *p)
 	//------ Core -> RAM ------------------------------------
 	p->ramGroupA.Status = g_Core.Status;
 	p->ramGroupA.Faults.Net.all = (g_Core.Protections.outFaults.Net.all | g_Core.Protections.outDefects.Net.all);
-	p->ramGroupA.Faults.Load.all = (g_Core.Protections.outDefects.Load.all | g_Core.Protections.outDefects.Load.all);
-	p->ramGroupA.Faults.Proc.all = (g_Core.Protections.outDefects.Proc.all | g_Core.Protections.outDefects.Proc.all);
-	p->ramGroupA.Faults.Dev.all = (g_Core.Protections.outDefects.Dev.all | g_Core.Protections.outDefects.Dev.all);
+	p->ramGroupA.Faults.Load.all = (g_Core.Protections.outFaults.Load.all | g_Core.Protections.outDefects.Load.all);
+	p->ramGroupA.Faults.Proc.all = (g_Core.Protections.outFaults.Proc.all | g_Core.Protections.outDefects.Proc.all);
+	p->ramGroupA.Faults.Dev.all = (g_Core.Protections.outFaults.Dev.all | g_Core.Protections.outDefects.Dev.all);
 	//InterfIndication(p);
 
 	//----- Peref -> RAM -----------------------------------

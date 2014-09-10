@@ -280,7 +280,7 @@ void RTC_Control(void)
 		{
 			RTC_GetTime(&g_Peref.RtcData, DevTime);
 			RTC_GetDate(&g_Peref.RtcData, DevDate);
-			g_Ram.ramGroupH.Seconds =(Uns) &g_Peref.RtcData.Sec;
+			g_Ram.ramGroupH.Seconds =(Uns) g_Peref.RtcData.Sec;
 		}
 
 		PrevTime = DevTime->all;

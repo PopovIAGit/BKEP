@@ -29,15 +29,16 @@ void MCP4726_Update(MCP4726 *p)
 		p->Busy     = 1;
 		I2cMsg.Busy = 1;
 	}
-	else if(I2cMsg.Status == I2C_MSGSTAT_NACK)
+	else if(I2cMsg.Status == I2C_MSGSTAT_INACTIVE) //I2C_MSGSTAT_NACK)
 	{
-		p->Error      = 1;
+		p->Error      = 0;
 		p->Busy       = 0;
 		I2cMsg.Busy   = 0;
 		I2cMsg.Status = I2C_MSGSTAT_INACTIVE;
 	}
-	else if(I2cMsg.Status == I2C_MSGSTAT_INACTIVE)
+	else if(I2cMsg.Status == I2C_MSGSTAT_NACK) //I2C_MSGSTAT_INACTIVE)
 	{
+		p->Error      = 0;
 		p->Busy     = 0;
 		I2cMsg.Busy = 0;
 	}

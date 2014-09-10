@@ -56,6 +56,9 @@ void LogEventUpdate(TLogEvent *p)
 		if (p->FirstEvent)
 		{
 			p->FirstEvent = false;
+			p->ExecFlag   = false;
+			p->WriteFlag  = false;
+			return;
 			*pBuf = 250;
 		}
 		else

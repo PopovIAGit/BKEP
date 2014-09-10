@@ -158,7 +158,7 @@ typedef struct _TRamGroupA
 // Группа B (Адрес = 40, Количество = 50) - Параметры пользователя
 typedef struct _TRamGroupB
 {
-	Uns				MoveCloseTorque;	// 0.Момент закрытия
+	Uns				MoveCloseTorque;	// 40.Момент закрытия
 	Uns				MoveOpenTorque;		// 1.Момент открытия
 	Uns				BreakCloseTorque;	// 2.Момент уплотнения на закрытие
 	Uns				StartCloseTorque; 	// 3.Момент трогания на закрытие
@@ -168,7 +168,7 @@ typedef struct _TRamGroupB
 	TBreakMode      BreakMode;		   	// 7.Тип уплотнения
 	TRodType        RodType;            // 8.Тип штока
 	Uns				CloseZone;		 	// 9.Зона закрыто
-	Uns				OpenZone;		 	// 10.Зона открыто
+	Uns				OpenZone;		 	// 50.Зона открыто
 	Uns             PositionAcc;        // 11.Зона смещения
 	Uns             MainCode;        	// 12.Код доступа
 	TTimeVar 		DevTime;			// 13.Время
@@ -178,7 +178,7 @@ typedef struct _TRamGroupB
 	TMuDuSetup      MuDuSetup;          // 17.Настройка режима МУ/ДУ
 	TDuSource		DuSource;			// 18.Источник команд ДУ
 	Uns             TuLockSeal;         // 19.Блокировка залипани
-	Uns             TuTime;             // 20.Время команды
+	Uns             TuTime;             // 60.Время команды
 	TInputType 		InputType;			// 21.Тип входного сигнала 24/220
 	TUInvert	    TuInvert;			// 22.Маска дискретных входов
 	TSInvert 		TsInvert;			// 23.Маска дискретных выходов
@@ -194,7 +194,7 @@ typedef struct _TRamGroupB
  	Uns             SleepTime;          // 35.Дежурный режим
  	Uns 			Rsvd[4];
  	//------Параметры для ТУ------------------------------------
-	Uns				LevelOnOpen220;		 // 40
+	Uns				LevelOnOpen220;		 // 80
 	Uns				LevelOffOpen220;	 // 41
 	Uns				LevelOnOpen24;		 // 42
 	Uns				LevelOffOpen24;		 // 43
@@ -205,7 +205,7 @@ typedef struct _TRamGroupB
 	Uns				LevelOffClose220;	 // 47
 	Uns				LevelOnClose24;		 // 48
 	Uns				LevelOffClose24;	 // 49
-	Uns				p_UClose_Mpy;		 // 50
+	Uns				p_UClose_Mpy;		 // 90
 	Uns				p_UClose_Offset;	 // 51
 	//-------------------------------
 	Uns				LevelOnStop220;		 // 52
@@ -217,7 +217,7 @@ typedef struct _TRamGroupB
 	//-------------------------------
 	Uns				LevelOnMU220;		 // 58
 	Uns				LevelOffMU220;		 // 59
-	Uns				LevelOnMU24;		 // 60
+	Uns				LevelOnMU24;		 // 100
 	Uns				LevelOffMU24;		 // 61
 	Uns				p_UMu_Mpy;			 // 62
 	Uns				p_UMu_Offset;		 // 63
@@ -229,7 +229,7 @@ typedef struct _TRamGroupB
 	Uns				p_UResetAlarm_Mpy;	 // 68
 	Uns				p_UResetAlarm_Offset;// 69
 	//-------------------------------
-	Uns				LevelOnReadyTU220;	 // 70
+	Uns				LevelOnReadyTU220;	 // 110
 	Uns				LevelOffReadyTU220;	 // 71
 	Uns				LevelOnReadyTU24;	 // 72
 	Uns				LevelOffReadyTU24;	 // 73
@@ -421,13 +421,13 @@ typedef struct _TRamGroupH
 	TCubArray		TqAngUI;			 // 37-56.Углы нагрузки
 	TCubArray		TqAngSf;			 // 57-76.Углы СИФУ
 	Uns				ZazorTime;			 // 77.Время выборки зазора
-	Uns             TuState;             // 78.Команды ТУ (открыть закрыть стоп)
+	Uns             TuState;             // +78.Команды ТУ (открыть закрыть стоп)
   	Uns             Ur;                  // 79.Напряжение фазы R
   	Uns             Us;                  // 80.Напряжение фазы S
   	Uns             Ut;                  // 81.Напряжение фазы T
 	Uns             Umid;             	 // 82.Среднее напряжение
 	Uns             VSkValue;          	 // 83.Асиметрия фаз питающей сети
-  	Uns     	    PhOrdValue;        	 // 84.Чередование фаз сети
+  	Uns     	    PhOrdValue;        	 // +84.Чередование фаз сети
 	Uns             Rsvd5;          	 // 85.Диагностика сети (для неисправностей)
 	Uns				Imidpr;			 	 // 86 Резерв
 	Uns             Rsvd6;          	 // 87.Диагностика нагрузки
@@ -435,11 +435,11 @@ typedef struct _TRamGroupH
 	Uns             Iv;                  // 89.Ток фазы V
 	Uns             Iw;                  // 90.Ток фазы W
 	Uns             Imid;				 // 91.Средний ток
-  	Uns             ISkewValue;          // 92.Асиметрия токов нагрузки
+  	Uns             ISkewValue;          // +92.Асиметрия токов нагрузки
   	LgUns           Position;            // 93-94.Положение
 	LgUns  			FullStep;        	 // 95-96.Полный ход
 	TReverseType	ReverseType;         // 97.Тип реверса
-	Uns				Rsvd5;				 // 98.
+	Uns				Rsvd4;				 // 98.
 	TInputReg       StateTu;           	 // 99.Состояние дискретных входов
 	TOutputReg      StateTs;          	 // 100.Состояние дискретных выходов
 	Uns             TuReleMode;          // 101.Релейный режим

@@ -99,7 +99,11 @@ static void BkpConnTrEnable(char Level)
 void SciMasterConnBetweenBlockUpdate(TMbBBHandle Port)
 {
 	char sci_err = (SCI_getstatus(Port->Params.UartID) & SCI_RX_ERROR);
-		if(!Port->Params.Mode && sci_err) SCI_reset(Port->Params.UartID);
+		if(!Port->Params.Mode && sci_err)
+		{
+			SCI_reset(Port->Params.UartID);
+			SCI_init(BKP_SCI_ID, Port->Params.BrrValue, 0, 8);
+		}
 
 		if(timerExpired(&Port->Frame.TimerPre))
 		{
@@ -145,7 +149,11 @@ void SciMasterConnBetweenBlockUpdate(TMbBBHandle Port)
 		Port->TxPacket.Fcs   = INIT_FCS;
 
 		SCI_rx_disable(Port->Params.UartID);
-		if(sci_err) SCI_reset(Port->Params.UartID);
+		if(sci_err)
+		{
+			SCI_reset(Port->Params.UartID);
+			SCI_init(BKP_SCI_ID, Port->Params.BrrValue, 0, 8);
+		}
 		TIMER_SET(&Port->Frame.TimerPre, Port->Params.TimeoutPre);
 		Port->Stat.TxMsgCount++;
 
