@@ -323,6 +323,8 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underColdBCP.Timeout			= 0;
 	p->underColdBCP.Scale			= PROTECT_SCALE;
 
+	p->FaultDelay = (Uns)(Prd10HZ * 2);
+
 }
 
 // Функция включения/выключения защит
@@ -330,6 +332,8 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 {
 	static Byte State = 0;
 	Bool Enable;
+
+	if (p->FaultDelay > 0) return;
 
 	switch (++State)
 	{
@@ -392,6 +396,13 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 // Индикация аварий процесса и устройства
 void Core_DevProc_FaultIndic(TCoreProtections *p)
 {
+
+	if (p->FaultDelay > 0)
+	{
+		p->FaultDelay--;
+		return;
+	}
+
 	p->outFaults.Proc.bit.Overway = g_Core.MotorControl.OverWayFlag;
 
 	p->outDefects.Proc.all &= ~PROC_CALIB_MASK;
@@ -497,6 +508,8 @@ void Core_ProtectionsClear(TCoreProtections *p)
 
 void Core_ProtectionsUpdate(TCoreProtections *p)
 {
+
+	if (p->FaultDelay > 0) return;
 
 	Uns MuffEnable;
 

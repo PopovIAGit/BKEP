@@ -131,7 +131,6 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(Core_TorqueCalc, 				&g_Core.TorqObs),
 	PrdElemInit(Core_ValveDriveUpdate, 			&g_Core.VlvDrvCtrl),
 	PrdElemInit(Core_ProtectionsEnable,		    &g_Core.Protections),
-	PrdElemInit(Core_DevProc_FaultIndic,		&g_Core.Protections),
 	PrdElemInit(EngPhOrdPrt,					&g_Core.Protections),
 	/*PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.NoMove),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.overVoltageR),
@@ -181,7 +180,8 @@ TPeriodicalFunction Task10Hz[] =        //не более  200-т задач
 	PrdElemInit(RTC_Control,				NULL),				//на 10 √ц
 	PrdElemInit(BluetoothActivation,		&g_Comm.Bluetooth),	//на 10 √ц
 	PrdElemInit(ImTimerIndex,				&g_Stat.Im),		//на 10 √ц
-	PrdElemInit(Core_MuDuControl,				&g_Core),		//на 10 √ц
+	PrdElemInit(Core_MuDuControl,			&g_Core),		//на 10 √ц
+	PrdElemInit(Core_DevProc_FaultIndic,	&g_Core.Protections),
 
 };
 //------------ онец файла-----------------------------------------------

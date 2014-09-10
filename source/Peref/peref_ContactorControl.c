@@ -45,7 +45,9 @@ void ContactorControlUpdate(TContactorControl *p)
 		case cgOpen:
 		{
 			SET_CONT_CLOSE(1);
+			DELAY_US(1);
 			SET_CONT_OPEN(0);
+			DELAY_US(1);
 		/*
 			if (CONTACTOR_2_STATUS || p->ContactorError) 		//Если уже активирован встречный контактор или авария контактора то уходим в стоп
 			{

@@ -187,7 +187,9 @@ typedef struct _TRamGroupB
 	TParityMode		RsMode;				// 26.Режим связи
 	Uns				Rsvd4;				// 27.
 	Uns				KeyInvert;			// 28.Маска кнопок управления
-	Uns 			Rsvd2[3];			// 29-31.
+	Uns				MOD_FAULT;
+	Uns				RES_ERR;
+	Uns 			Rsvd2[1];			// 29-31.
 	Uns				NoMoveTime;		   	// 32.Время отсутствия движения
 	Uns				OverwayZone;		// 33.Макси
 	TInputReg		DigitalMode;		// 34.режим потенциальный / импульсный

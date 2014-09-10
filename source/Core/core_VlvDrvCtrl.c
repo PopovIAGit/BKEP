@@ -117,6 +117,8 @@ __inline void MpuControl(TCoreVlvDrvCtrl *p)
 	Uns Key = 0;
 			Uns  Active = 0;
 
+		p->Mpu.Enable = p->Status->bit.MuDu;
+
 		if(!p->Mpu.Enable) return;				// выключено выходим
 
 		if (*p->Mpu.BtnKey)						// Пришла команда с ручек
@@ -156,6 +158,8 @@ __inline void TeleControl(TCoreVlvDrvCtrl *p)
 	TValveCmd TuControl = vcwNone;
 	Bool Ready;
 
+	p->Tu.Enable = !p->Status->bit.MuDu;
+
 	if (!p->Tu.Enable) return;
 
 	if (!(p->ActiveControls & CMD_SRC_DIGITAL))
@@ -172,6 +176,10 @@ __inline void TeleControl(TCoreVlvDrvCtrl *p)
 		case TU_CLOSE: if (Ready) TuControl = vcwClose; break;
 		case TU_OPEN:	if (Ready) TuControl = vcwOpen;  break;
 		case (TU_CLOSE|TU_OPEN):  TuControl = vcwStop;  break;
+		default:
+			p->Tu.Ready = True;
+			if (p->Status->bit.Stop) break;
+			TuControl = vcwStop;
 	}
 
 	if (*p->Tu.State & TU_STOP) TuControl = vcwStop;

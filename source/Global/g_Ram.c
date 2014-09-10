@@ -113,11 +113,10 @@ void g_Ram_Update(TRam *p)
 
 	//------ Core -> RAM ------------------------------------
 	p->ramGroupA.Status = g_Core.Status;
-	p->ramGroupA.Faults.Net.all = (g_Core.Protections.outFaults.Net.all | g_Core.Protections.outDefects.Net.all);
+	p->ramGroupA.Faults.Net.all  = (g_Core.Protections.outFaults.Net.all  | g_Core.Protections.outDefects.Net.all);
 	p->ramGroupA.Faults.Load.all = (g_Core.Protections.outFaults.Load.all | g_Core.Protections.outDefects.Load.all);
 	p->ramGroupA.Faults.Proc.all = (g_Core.Protections.outFaults.Proc.all | g_Core.Protections.outDefects.Proc.all);
-	p->ramGroupA.Faults.Dev.all = (g_Core.Protections.outFaults.Dev.all | g_Core.Protections.outDefects.Dev.all);
-	//InterfIndication(p);
+	p->ramGroupA.Faults.Dev.all  = (g_Core.Protections.outFaults.Dev.all  | g_Core.Protections.outDefects.Dev.all);
 
 	//----- Peref -> RAM -----------------------------------
 
@@ -147,15 +146,18 @@ void g_Ram_Update(TRam *p)
 	 }
 
 	 p->ramGroupA.Speed = g_Peref.Position.speedRPM;
-	 // ------------------------------------------
-	 p->ramGroupA.Position = p->ramGroupC.Position;
+
 	 p->ramGroupA.CycleCnt = p->ramGroupH.CycleCnt;
 
 	 p->ramGroupC.Position = p->ramGroupH.Position >> p->ramGroupC.PosPrecision;
+	 p->ramGroupA.Position = p->ramGroupC.Position;
 	 p->ramGroupC.ClosePosition = p->ramGroupH.ClosePosition >> p->ramGroupC.PosPrecision;
 	 p->ramGroupC.OpenPosition  = p->ramGroupH.OpenPosition >> p->ramGroupC.PosPrecision;
 	 p->ramGroupA.StateTu.all   = g_Comm.digitInterface.Inputs.all;
 	 p->ramGroupA.StateTs.all	= g_Comm.digitInterface.Outputs.all;
+
+	 p->ramGroupB.MOD_FAULT = GpioDataRegs.GPBDAT.bit.GPIO39;
+	 GpioDataRegs.GPBDAT.bit.GPIO48 = p->ramGroupB.RES_ERR;
 
 }
 //---------------------------------------------------

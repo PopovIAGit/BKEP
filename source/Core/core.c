@@ -377,4 +377,14 @@ void Core_MuDuControl(TCore *p)
 			break;
 
 	}
+
+	if (g_Ram.ramGroupD.PrtReset)
+	{
+		if(!p->Status.bit.Stop) p->VlvDrvCtrl.Mpu.CancelFlag = true;
+		else {
+			Core_ProtectionsClear(&p->Protections);
+			p->VlvDrvCtrl.EvLog.Value = CMD_RES_FAULT;
+		}
+		g_Ram.ramGroupD.PrtReset = 0;
+	}
 }

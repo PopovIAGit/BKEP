@@ -291,7 +291,7 @@ void InitGpio(void)
 	GpioCtrlRegs.GPBDIR.bit.GPIO39	= 0;	//MOD_FAULT - ???
 	GpioDataRegs.GPBDAT.bit.GPIO39	= 0;
 
-	GpioCtrlRegs.GPBDIR.bit.GPIO48	= 0;	//RESET_FAULT
+	GpioCtrlRegs.GPBDIR.bit.GPIO48	= 1;	//RESET_FAULT
 	GpioDataRegs.GPBDAT.bit.GPIO48	= 0;
 
 	//выходы

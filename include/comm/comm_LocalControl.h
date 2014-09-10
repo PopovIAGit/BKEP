@@ -17,6 +17,7 @@
 #define BTN_CLOSE_BIT   BIT1
 #define BTN_STOPMU_BIT  BIT2
 #define BTN_STOPDU_BIT  BIT3
+#define BTN_STOP		(BTN_STOPDU_BIT|BTN_STOPMU_BIT)
 
 
 //--------------------- Макросы --------------------------------------------

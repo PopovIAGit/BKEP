@@ -42,8 +42,9 @@ Uns Comm_LocalKeyUpdate(TCommMPU *p)
 {
 	static Uns result;
 
-	if(!KEY_1 && !KEY_2 && KEY_3)
-	{
+	if (!(KEY_1 ^ p->KeyLogicSignal->bit.Close)
+			&& !(KEY_2 ^ p->KeyLogicSignal->bit.Open)
+			&& !(KEY_3 ^ p->KeyLogicSignal->bit.Stop)) {
 		p->key1Param.timer = 0;
 		p->key2Param.timer = 0;
 		p->key3Param.timer = 0;
@@ -98,7 +99,7 @@ Uns Comm_LocalButtonUpdate(TCommMPU *p)
 	}
 	else
 	{
-		switch(p->inputBCP_Data->all)
+		switch(p->inputBCP_Data->all & (~BTN_STOP))
 		{
 		case (BTN_OPEN_BIT):
 
@@ -118,12 +119,15 @@ Uns Comm_LocalButtonUpdate(TCommMPU *p)
 			}
 
 			break;
-		case (BTN_STOPMU_BIT|BTN_STOPDU_BIT):
+		}
+		switch(p->inputBCP_Data->all & BTN_STOP)
+		{
+		case (BTN_STOP):
 
 			if (++p->btn4Param.timer > p->btn4Param.timeout)
 			{
 				p->btn4Param.timer = 0;
-				result |= (BTN_STOPMU_BIT|BTN_STOPDU_BIT);
+				result |= BTN_STOP;
 			}
 			break;
 
