@@ -155,6 +155,7 @@ void g_Ram_Update(TRam *p)
 	 p->ramGroupC.OpenPosition  = p->ramGroupH.OpenPosition >> p->ramGroupC.PosPrecision;
 	 p->ramGroupA.StateTu.all   = g_Comm.digitInterface.Inputs.all;
 	 p->ramGroupA.StateTs.all	= g_Comm.digitInterface.Outputs.all;
+	 p->ramGroupH.ReverseType = rvtNone;
 
 	 p->ramGroupB.MOD_FAULT = GpioDataRegs.GPBDAT.bit.GPIO39;
 	 GpioDataRegs.GPBDAT.bit.GPIO48 = p->ramGroupB.RES_ERR;

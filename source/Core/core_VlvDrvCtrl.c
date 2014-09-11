@@ -178,8 +178,6 @@ __inline void TeleControl(TCoreVlvDrvCtrl *p)
 		case (TU_CLOSE|TU_OPEN):  TuControl = vcwStop;  break;
 		default:
 			p->Tu.Ready = True;
-			if (p->Status->bit.Stop) break;
-			TuControl = vcwStop;
 	}
 
 	if (*p->Tu.State & TU_STOP) TuControl = vcwStop;

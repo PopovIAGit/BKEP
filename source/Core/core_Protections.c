@@ -35,9 +35,9 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underVoltageS.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,UvS_bit,20);
 	p->underVoltageT.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,UvT_bit,20);
 
-	p->underVoltageR.Input 			= (Int *)&g_Ram.ramGroupH.Ur;
-	p->underVoltageS.Input 			= (Int *)&g_Ram.ramGroupH.Us;
-	p->underVoltageT.Input 			= (Int *)&g_Ram.ramGroupH.Ut;
+	p->underVoltageR.Input 			= (Int *)&g_Ram.ramGroupA.Ur;
+	p->underVoltageS.Input 			= (Int *)&g_Ram.ramGroupA.Us;
+	p->underVoltageT.Input 			= (Int *)&g_Ram.ramGroupA.Ut;
 
 	p->underVoltageR.Output 		= (Uns *)&p->outFaults.Net.all;
 	p->underVoltageS.Output 		= (Uns *)&p->outFaults.Net.all;
@@ -65,9 +65,9 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underDefVoltageS.Cfg.all 	= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,UvS_bit,20);
 	p->underDefVoltageT.Cfg.all 	= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,UvT_bit,20);
 
-	p->underDefVoltageR.Input 		= (Int *)&g_Ram.ramGroupH.Ur;
-	p->underDefVoltageS.Input 		= (Int *)&g_Ram.ramGroupH.Us;
-	p->underDefVoltageT.Input 		= (Int *)&g_Ram.ramGroupH.Ut;
+	p->underDefVoltageR.Input 		= (Int *)&g_Ram.ramGroupA.Ur;
+	p->underDefVoltageS.Input 		= (Int *)&g_Ram.ramGroupA.Us;
+	p->underDefVoltageT.Input 		= (Int *)&g_Ram.ramGroupA.Ut;
 
 	p->underDefVoltageR.Output 		= (Uns *)&p->outDefects.Net.all;
 	p->underDefVoltageS.Output 		= (Uns *)&p->outDefects.Net.all;
@@ -94,9 +94,9 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overVoltageS.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,OvS_bit,20);
 	p->overVoltageT.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,OvT_bit,20);
 
-	p->overVoltageR.Input 			= (Int *)&g_Ram.ramGroupH.Ur;
-	p->overVoltageS.Input 			= (Int *)&g_Ram.ramGroupH.Us;
-	p->overVoltageT.Input 			= (Int *)&g_Ram.ramGroupH.Ut;
+	p->overVoltageR.Input 			= (Int *)&g_Ram.ramGroupA.Ur;
+	p->overVoltageS.Input 			= (Int *)&g_Ram.ramGroupA.Us;
+	p->overVoltageT.Input 			= (Int *)&g_Ram.ramGroupA.Ut;
 
 	p->overVoltageR.Output 			= (Uns *)&p->outFaults.Net.all;
 	p->overVoltageS.Output 			= (Uns *)&p->outFaults.Net.all;
@@ -123,9 +123,9 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overDefVoltageS.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,OvS_bit,20);
 	p->overDefVoltageT.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,OvT_bit,20);
 
-	p->overDefVoltageR.Input 		= (Int *)&g_Ram.ramGroupH.Ur;
-	p->overDefVoltageS.Input 		= (Int *)&g_Ram.ramGroupH.Us;
-	p->overDefVoltageT.Input 		= (Int *)&g_Ram.ramGroupH.Ut;
+	p->overDefVoltageR.Input 		= (Int *)&g_Ram.ramGroupA.Ur;
+	p->overDefVoltageS.Input 		= (Int *)&g_Ram.ramGroupA.Us;
+	p->overDefVoltageT.Input 		= (Int *)&g_Ram.ramGroupA.Ut;
 
 	p->overDefVoltageR.Output 		= (Uns *)&p->outDefects.Net.all;
 	p->overDefVoltageS.Output 		= (Uns *)&p->outDefects.Net.all;
@@ -152,8 +152,8 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overMax_VoltageS.Cfg.all 	= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,OvS_max_bit,20);
 	p->overMax_VoltageT.Cfg.all 	= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,OvT_max_bit,20);
 
-	p->overMax_VoltageR.Input 		= (Int *)&g_Ram.ramGroupH.Ur;
-	p->overMax_VoltageS.Input 		= (Int *)&g_Ram.ramGroupH.Us;
+	p->overMax_VoltageR.Input 		= (Int *)&g_Ram.ramGroupA.Ur;
+	p->overMax_VoltageS.Input 		= (Int *)&g_Ram.ramGroupA.Us;
 	p->overMax_VoltageT.Input 		= (Int *)&g_Ram.ramGroupH.Ut;
 
 	p->overMax_VoltageR.Output 		= (Uns *)&p->outFaults.Net.all;
@@ -181,9 +181,9 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->breakVoltS.Cfg.all 			= PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_LESS_LEVEL,BvS_bit,20);
 	p->breakVoltT.Cfg.all 			= PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_LESS_LEVEL,BvT_bit,20);
 
-	p->breakVoltR.Input 			= (Int *)&g_Ram.ramGroupH.Ur;
-	p->breakVoltS.Input 			= (Int *)&g_Ram.ramGroupH.Us;
-	p->breakVoltT.Input 			= (Int *)&g_Ram.ramGroupH.Ut;
+	p->breakVoltR.Input 			= (Int *)&g_Ram.ramGroupA.Ur;
+	p->breakVoltS.Input 			= (Int *)&g_Ram.ramGroupA.Us;
+	p->breakVoltT.Input 			= (Int *)&g_Ram.ramGroupA.Ut;
 
 	p->breakVoltR.Output 			= (Uns *)&p->outFaults.Net.all;
 	p->breakVoltS.Output 			= (Uns *)&p->outFaults.Net.all;
@@ -220,9 +220,9 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->breakCurrV.Cfg.all 			= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,BvS_bit,HYST_OFF);
 	p->breakCurrW.Cfg.all 			= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,BvT_bit,HYST_OFF);
 
-	p->breakCurrU.Input 			= (Int *)&g_Ram.ramGroupH.Iu;
-	p->breakCurrV.Input 			= (Int *)&g_Ram.ramGroupH.Iv;
-	p->breakCurrW.Input 			= (Int *)&g_Ram.ramGroupH.Iw;
+	p->breakCurrU.Input 			= (Int *)&g_Ram.ramGroupA.Iu;
+	p->breakCurrV.Input 			= (Int *)&g_Ram.ramGroupA.Iv;
+	p->breakCurrW.Input 			= (Int *)&g_Ram.ramGroupA.Iw;
 
 	p->breakCurrU.Output 			= (Uns *)&p->outDefects.Load.all;
 	p->breakCurrV.Output 			= (Uns *)&p->outDefects.Load.all;
