@@ -237,10 +237,28 @@ void BluetoothActivation(TBluetoothHandle bPort)
 		bPort->State = 7;
 	}
 
+	if (!TimerPending(&bPort->PredStateTimer))
+	{
+		if (bPort->PredState==bPort->State)
+		{
+			bPort->State=2;
+			bPort->CmdState=0;
+		}
+	}
 }
+
+void PredStateTimerEnabled(TBluetoothHandle bPort)
+{
+	bPort->PredStateTimer.Counter=0;
+	bPort->PredStateTimer.Timeout=20;
+	InitTimer(&bPort->PredStateTimer, bPort->PredStateTimer.Timeout);
+	StartTimer(&bPort->PredStateTimer);
+}
+
 
 void BluetoothWTUpdate(TBluetoothHandle bPort)
 {
+
 	switch (bPort->State)
 	{
 		// Иницилизация драйвера
@@ -253,6 +271,10 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 		case 1: if (!bPort->Timer)
 				{ 
 					ClearValues(bPort);	bPort->State=2;
+
+					bPort->PredState=bPort->State;
+					//bPort->PredStateTimer=
+					PredStateTimerEnabled(bPort);
 				}
 				break;
 
@@ -262,6 +284,8 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 				if (bPort->Status == BT_RECEIVE_COMPLETE)
 				{ 
 					ClearValues(bPort);	bPort->State=3;
+					bPort->PredState=bPort->State;
+					PredStateTimerEnabled(bPort);
 				}
 				break;
 
@@ -269,6 +293,8 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 				if (bPort->Status == BT_RECEIVE_COMPLETE)
 				{ 
 					ClearValues(bPort);	bPort->State=4;
+					bPort->PredState=bPort->State;
+					PredStateTimerEnabled(bPort);
 				}
 				break;
 				
@@ -276,6 +302,8 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 				if (bPort->Status == BT_RECEIVE_COMPLETE)
 				{ 
 					ClearValues(bPort);	bPort->State=5;
+					bPort->PredState=bPort->State;
+					PredStateTimerEnabled(bPort);
 				}
 				break;
 
@@ -283,16 +311,21 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 				if (bPort->Status == BT_RECEIVE_COMPLETE)
 				{ 
 					ClearValues(bPort);	bPort->State=6;
+					bPort->PredState=bPort->State;
+					PredStateTimerEnabled(bPort);
 				}
 				break;
 		case 6: SendCommandOne(bPort, CMD_CONTROL_BAUD);
 				if (bPort->Status == BT_RECEIVE_COMPLETE)
 				{ 
 					ClearValues(bPort);	bPort->State=7;
+					bPort->PredState=bPort->State;
+					PredStateTimerEnabled(bPort);
 				}
 				break;
 		// Режим ожидания соединения
 		case 7:	bPort->BlinkConnect = false;
+				bPort->PredState=0;
 				if (bPort->Status == BT_RECEIVE_COMPLETE)
 				{
 					if (CheckString(bPort, "RI"))

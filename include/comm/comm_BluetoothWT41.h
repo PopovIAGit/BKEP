@@ -67,6 +67,7 @@ typedef struct _TBluetoothPort
 	Bool TxBusy;
 	Byte State;
 	Byte CmdState;
+	Byte PredState;
 	Byte Status;
 	Byte Mode;
 	Uns StrIndex;
@@ -79,6 +80,7 @@ typedef struct _TBluetoothPort
 	Bool        Enabled;		//состояние канала bluetooth
 	TTimerList  TimerActive;	//
 	TTimerList  TimerBlink;	//
+	TTimerList  PredStateTimer;
 	Bool		BlinkConnect;
 	Bool Connect;
 

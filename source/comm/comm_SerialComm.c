@@ -52,7 +52,7 @@ void InitChanelAsuModbus(TMbHandle hPort)
 	*/
 	hPort->Params.RetryCount  = 0;
 	hPort->Params.Scale       = MB_SCALE;
-	hPort->Params.ConnTimeout = 10;
+	hPort->Params.ConnTimeout = 40;
 	hPort->Params.RxDelay     = 10;
 	hPort->Params.TxDelay     = 10;
 	hPort->Params.AckTimeout  = 1;//1000;

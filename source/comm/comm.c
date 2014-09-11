@@ -92,6 +92,8 @@ void Comm_50HzCalc(TComm *p)
 //-----------обработка источников команд -----------------------------
 void CommandUpdate(TComm *p)
 {
+	static Byte clrReset=0;
+
 	p->outputCmdReg = 0;//CMD_NO;
 
 	//здесь не только обработка ТС но и вывод ТС
@@ -113,9 +115,13 @@ void CommandUpdate(TComm *p)
 
 	g_Ram.ramGroupH.TuState = p->outputCmdReg;
 
-	if (p->digitInput.output & 0x10)
+	if ((p->digitInput.output>>4)&0x01==1)
 	{
-		g_Ram.ramGroupD.PrtReset = 1;
+		if (clrReset==0) g_Ram.ramGroupD.PrtReset = 1;
+		clrReset=1;
+	} else if ((p->digitInput.output>>4)&0x01==0)
+	{
+		clrReset=0;
 	}
 //	p->outputCmdReg |= DigitCmdModeUpdate(&p->digitInput.output);
 ///	if (p->outputCmdReg)

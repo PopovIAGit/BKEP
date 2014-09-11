@@ -35,6 +35,11 @@ __inline void NewFrameEvent(TMbPort *hPort)
 	hPort->Frame.NewMessage = true;
 	hPort->Frame.RxLength   = hPort->Frame.Data - hPort->Frame.Buf;
 	hPort->Frame.Data       = hPort->Frame.Buf;
+	if (hPort->Params.ChannelID==SCIB)
+	{
+		//hPort->Serial.RsState=1;
+		hPort->Packet.Exception = FR_SUCCESS;
+	}
 }
 
 //-------------------------------------------------------------------------------
@@ -110,9 +115,14 @@ __inline void ConnTimeoutEvent(TMbPort *hPort)
 	}
 	#endif*/
 	
-	//#if defined(_SLAVE_)
+	#if defined(_SLAVE_)
 	//if (IsSlave()) hPort->Packet.Exception = EX_NO_CONNECTION;
-	//#endif
+		if (hPort->Params.ChannelID==SCIB)
+		{
+			//hPort->Serial.RsState=EX_NO_CONNECTION;
+			hPort->Packet.Exception = EX_NO_CONNECTION;
+		}
+	#endif
 }
 
 //-------------------------------------------------------------------------------

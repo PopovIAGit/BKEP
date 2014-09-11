@@ -169,23 +169,27 @@ void Peref_LedsUpdate(pLeds p)
 	else 											// Если статус нет "Неисправности"
 		p->leds.all |= LED_MUDU_MASK;				// Гасим светодиод
 
-	LED_OPEN	= p->leds.bit.Open;		DELAY_US(1);
-	LED_MUFTA	= p->leds.bit.Mufta;	DELAY_US(1);
-	LED_DEFECT	= p->leds.bit.Defect;	DELAY_US(1);
-	LED_FAULT	= p->leds.bit.Fault;	DELAY_US(1);
-	LED_CLOSE 	= p->leds.bit.Close;	DELAY_US(1);
-	LED_CLOSING = p->leds.bit.Closing;	DELAY_US(1);
-	LED_OPENING = p->leds.bit.Opening;	DELAY_US(1);
-	LED_MUDU	= !p->leds.bit.MuDu;		DELAY_US(1);
+
+	LED_MUFTA	= p->leds.bit.Mufta;	//DELAY_US(1);
+	LED_DEFECT	= p->leds.bit.Defect;	//DELAY_US(1);
+	LED_FAULT	= p->leds.bit.Fault;	//DELAY_US(1);
+
+	LED_CLOSING = p->leds.bit.Closing;	//DELAY_US(1);
+	LED_OPENING = p->leds.bit.Opening;	//DELAY_US(1);
+	LED_MUDU	= !p->leds.bit.MuDu;		//DELAY_US(1);
 
 	if ((!(*p->pStatus & STATUS_OPENING)) && (!(*p->pStatus & STATUS_CLOSING)) && (!(*p->pStatus & STATUS_CLOSED)) && (!(*p->pStatus & STATUS_OPENED)))
 	{
-		LED_OPEN = 0;
-		DELAY_US(1);
-		LED_CLOSE = 0;
-		DELAY_US(1);
+		GpioDataRegs.GPADAT.all &=~ 0x2400000;
+		//LED_OPEN = 0;
+		//DELAY_US(1);
+		//LED_CLOSE = 0;
+		//DELAY_US(1);
 		p->leds.bit.Close = 0;
 		p->leds.bit.Open = 0;
+	} else {
+		LED_OPEN	= p->leds.bit.Open;		DELAY_US(1);
+		LED_CLOSE 	= p->leds.bit.Close;	DELAY_US(1);
 	}
 
 	g_Ram.ramGroupH.BkpIndication = (~p->leds.all) & 0x00FF;
