@@ -69,22 +69,27 @@ void Comm_Update(TComm *p)
 void Comm_50HzCalc(TComm *p)
 {
 	//	КОМАНДЫ С МПУ !!!
-		// передаем команду с кнопок управления
-		g_Ram.ramGroupH.CmdKey =  Comm_LocalKeyUpdate(&p->localControl);
+	// передаем команду с кнопок управления
+	if (g_Ram.ramGroupH.CmdButton != KEY_STOP)
+	g_Ram.ramGroupH.CmdKey = Comm_LocalKeyUpdate(&p->localControl);
 
-		// передаем команду с ручек БКП
-		switch (Comm_LocalButtonUpdate(&p->localControl))
-		{
-			case BTN_OPEN_BIT:
-				g_Ram.ramGroupH.CmdButton = KEY_OPEN;
-				break;
-			case BTN_CLOSE_BIT:
-				g_Ram.ramGroupH.CmdButton = KEY_CLOSE;
-				break;
-			case BTN_STOPMU_BIT|BTN_STOPDU_BIT:
-				g_Ram.ramGroupH.CmdButton = KEY_STOP;
-				break;
-		}
+	// передаем команду с ручек БКП
+	switch (Comm_LocalButtonUpdate(&p->localControl))
+	{
+	case (BTN_STOPMU_BIT | BTN_STOPDU_BIT):
+		g_Ram.ramGroupH.CmdButton = KEY_STOP;
+		break;
+	case BTN_OPEN_BIT:
+		if (g_Ram.ramGroupH.CmdKey == KEY_STOP) break;
+		g_Ram.ramGroupH.CmdButton = KEY_OPEN;
+		break;
+	case BTN_CLOSE_BIT:
+		if (g_Ram.ramGroupH.CmdKey == KEY_STOP) break;
+		g_Ram.ramGroupH.CmdButton = KEY_CLOSE;
+		break;
+	default:
+		g_Ram.ramGroupH.CmdButton = KEY_NONE;
+	}
 
 	CommandUpdate(&g_Comm);
 }
@@ -92,15 +97,15 @@ void Comm_50HzCalc(TComm *p)
 //-----------обработка источников команд -----------------------------
 void CommandUpdate(TComm *p)
 {
-	p->outputCmdReg = 0;//CMD_NO;
+	p->outputCmdReg = 0; //CMD_NO;
 
 	//здесь не только обработка ТС но и вывод ТС
-	Comm_TuTsUpdate(&p->digitInterface);				// Телеуправление, телесигнализация
+	Comm_TuTsUpdate(&p->digitInterface); // Телеуправление, телесигнализация
 
 	//если телеуправление разрешено
 	p->digitInput.input = p->digitInterface.Inputs.all;
-	DigitalInpUpdate(&p->digitInput);					// Вызов функции обработки цифрового сигнала, защита от помех
-	g_Ram.ramGroupA.StateTu.all     = p->digitInput.output;
+	DigitalInpUpdate(&p->digitInput); // Вызов функции обработки цифрового сигнала, защита от помех
+	g_Ram.ramGroupA.StateTu.all = p->digitInput.output;
 
 	if (!(p->digitInput.output & 0x20))
 	{
