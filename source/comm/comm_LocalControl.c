@@ -60,7 +60,7 @@ Uns Comm_LocalKeyUpdate(TCommMPU *p)
 	else if (p->key1Param.timer < p->key1Param.timeout)
 		p->key1Param.timer++;
 	else
-		result = KEY_CLOSE;
+		result = KEY_OPEN;
 
 	// Open
 	if (!KEY_2 ^ p->KeyLogicSignal->bit.Open)
@@ -68,7 +68,7 @@ Uns Comm_LocalKeyUpdate(TCommMPU *p)
 	else if (p->key2Param.timer < p->key2Param.timeout)
 		p->key2Param.timer++;
 	else
-		result = KEY_OPEN;
+		result = KEY_CLOSE;
 
 	// Stop
 	if (!KEY_3 ^ p->KeyLogicSignal->bit.Stop)

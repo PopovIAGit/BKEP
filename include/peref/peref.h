@@ -19,7 +19,7 @@
 #include "peref_ApFilter3.h"  		// PIA 04.04.14
 #include "peref_SensObserver.h" 	// PIA 07.04.14
 #include "peref_SinObserver.h"		// PIA 08.04.14
-#include "peref_Calibs.h"			// PIA 14.04.14
+#include "peref_Calibs.h"		// PIA 14.04.14
 #include "peref_ContactorControl.h"	// PIA 17.04.14
 //#include "peref_DisplayDrv.h"
 #include "peref_LedsDrv.h"
@@ -95,6 +95,9 @@ typedef struct {
 	TSensTuObserver		InDigSignalObserver;	// Масштабирование сигналов с датчиков
 	Uns					TaktTuSensUpdate;
 	TSinSignalObserver  InDigSignal;			// Вычисление RMS
+	//-----------------------------
+	Uns Peref_StertDelayTimeout;
+
 
 } TPeref;
 

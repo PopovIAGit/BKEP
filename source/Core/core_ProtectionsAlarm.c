@@ -22,19 +22,19 @@ void Core_ProtectionsAlarmUpdate(TAlarmElem *p)
 
 	if(!p->Cfg.bit.Enable)	// ≈сли защита выключена
 	{
-		if (p->Cfg.bit.CanBeReseted)
-			*p->Output &= ~BitMask;
+		if (p->Cfg.bit.CanBeReseted)	*p->Output &= ~BitMask;
+
 			 p->Timer = 0;
-			 p->Signal = ToLong(p->Input);
+			 p->Signal = *p->Input;
 		return;
 	}
 
-	if(p->Cfg.bit.CanBeReseted)
+	if(p->Cfg.bit.CanBeReseted == CAN_BE_MUFTA)
 	{
 		if ((int16) labs(ToLong(p->Input) - p->Signal) >= *p->EnableLevel)
 		{
 			p->Timer = 0;
-			p->Signal = ToLong(p->Input);
+			p->Signal = *p->Input; //ToLong(p->Input);
 		}
 		else
 		{
@@ -43,6 +43,7 @@ void Core_ProtectionsAlarmUpdate(TAlarmElem *p)
 			else
 				*p->Output |= BitMask;
 		}
+	   return;
 	}
 
 	if (!(*p->Output & BitMask))	// ≈сли аварии нет (*p->Output & BitMask дает "0")
@@ -68,7 +69,7 @@ void Core_ProtectionsAlarmUpdate(TAlarmElem *p)
 			}
 		}
 	else // если авари€ уже есть (*p->Output & BitMask дает "1")
-		if (p->Cfg.bit.CanBeReseted) // ≈сли "режим работы"=1, то есть аварию можно "сн€ть",
+		if (p->Cfg.bit.CanBeReseted == CAN_BE_RESETED) // ≈сли "режим работы"=1, то есть аварию можно "сн€ть",
 		{
 			// —мотрим на Level("активный уровень").
 			// ќн показывает, каким €вл€етс€ предельное допустимое значение сигнала, максимальным или минимальным

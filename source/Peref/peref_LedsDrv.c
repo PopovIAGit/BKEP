@@ -178,7 +178,7 @@ void Peref_LedsUpdate(pLeds p)
 	LED_OPENING = p->leds.bit.Opening;	//DELAY_US(1);
 	LED_MUDU	= !p->leds.bit.MuDu;		//DELAY_US(1);
 
-	if ((!(*p->pStatus & STATUS_OPENING)) && (!(*p->pStatus & STATUS_CLOSING)) && (!(*p->pStatus & STATUS_CLOSED)) && (!(*p->pStatus & STATUS_OPENED)))
+	if (/*(!(*p->pStatus & STATUS_OPENING)) && (!(*p->pStatus & STATUS_CLOSING)) && */(!(*p->pStatus & STATUS_CLOSED)) && (!(*p->pStatus & STATUS_OPENED)))
 	{
 		GpioDataRegs.GPADAT.all &=~ 0x2400000;
 		//LED_OPEN = 0;

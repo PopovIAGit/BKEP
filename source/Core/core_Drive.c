@@ -9,7 +9,6 @@
 
 	void Core_Drive_Init(TCoreDrive *p)
 	{
-		p->DriveType 	= &g_Ram.ramGroupC.DriveType;
 		p->Inom 		= &g_Ram.ramGroupC.Inom;
 		p->GearRatio 	= &g_Ram.ramGroupC.GearRatio;
 		p->MaxTorqe 	= &g_Ram.ramGroupC.MaxTorque;
@@ -18,13 +17,12 @@
 	void Core_Drive_Update(TCoreDrive *p)
 	{
 		WAIT_FOR_EEPROM_READY();
-		switch(*p->DriveType)
+		switch(g_Ram.ramGroupC.DriveType)
 		{
 			case dt100_A25:
 				PFUNC_blkRead(&drive1,  	 (Int *)(&g_Ram.ramGroupH.TqCurr),   LENGTH_TRQ);
 			 	PFUNC_blkRead(&TransCurrDef[0], (Int *)(&g_Ram.ramGroupH.TransCurr),		  1);
 				break;
-
 			case dt100_A50:
 				PFUNC_blkRead(&drive2,  	 (Int *)(&g_Ram.ramGroupH.TqCurr),   LENGTH_TRQ);
 				PFUNC_blkRead(&TransCurrDef[1], (Int *)(&g_Ram.ramGroupH.TransCurr),		  1);
@@ -75,17 +73,17 @@
 				break;
 		}
 
-		if (*p->DriveType < 14)
+		if (g_Ram.ramGroupC.DriveType < 14)
 		{
-			if ((*p->GearRatio != GearRatioDef[*p->DriveType - 1])
-					|| (*p->Inom != InomDef[*p->DriveType - 1])
-					|| (*p->MaxTorqe != MomMaxDef[*p->DriveType - 1]))
+			if ((*p->GearRatio != GearRatioDef[g_Ram.ramGroupC.DriveType - 1])
+					|| (*p->Inom != InomDef[g_Ram.ramGroupC.DriveType - 1])
+					|| (*p->MaxTorqe != MomMaxDef[g_Ram.ramGroupC.DriveType - 1]))
 			{
 				if (IsMemParReady())
 				{
-					*p->GearRatio = GearRatioDef[*p->DriveType - 1];
-					*p->Inom = InomDef[*p->DriveType - 1];
-					*p->MaxTorqe = MomMaxDef[*p->DriveType - 1];
+					*p->GearRatio = GearRatioDef[g_Ram.ramGroupC.DriveType - 1];
+					*p->Inom = InomDef[g_Ram.ramGroupC.DriveType - 1];
+					*p->MaxTorqe = MomMaxDef[g_Ram.ramGroupC.DriveType - 1];
 					WriteToEeprom(GetAdr(ramGroupC.MaxTorque), &g_Ram.ramGroupC.MaxTorque, 3);
 
 				}

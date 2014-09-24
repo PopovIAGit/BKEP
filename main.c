@@ -18,7 +18,6 @@ extern void InterruptUpdate(void);
 
 void main(void)
 {
-
 	// Сначала инициализируется процессор
 	InitHardware();
 	memset(&g_Core, 	0, sizeof(TCore));
