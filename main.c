@@ -9,7 +9,7 @@
 
 
 TRam			g_Ram;
-TTekDriveData	g_RamTek;
+//TTekDriveData	g_RamTek;
 
 extern void InterruptInit  (void);
 extern void InterruptUpdate(void);
@@ -22,15 +22,16 @@ void main(void)
 	InitHardware();
 	memset(&g_Core, 	0, sizeof(TCore));
 	memset(&g_Ram, 	    0, sizeof(TRam));
-	memset(&g_RamTek, 	0, sizeof(TTekDriveData));
+	//memset(&g_RamTek, 	0, sizeof(TTekDriveData));
 	memset(&g_Comm, 	0, sizeof(TComm));
 	memset(&g_Peref,	0, sizeof(TPeref));
 	memset(&g_Stat,		0, sizeof(TStat));
 	//
 
-	g_Ram_Init(&g_Ram);
+
 	//g_RamTek_Init(&g_Ram);
 	Core_Init(&g_Core);
+	g_Ram_Init(&g_Ram);
 	Comm_Init(&g_Comm);
 	Peref_Init(&g_Peref);
 	Stat_Init(&g_Stat);
