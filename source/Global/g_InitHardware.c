@@ -291,18 +291,16 @@ void InitGpio(void)
 	GpioCtrlRegs.GPBDIR.bit.GPIO39	= 0;	//MOD_FAULT - ???
 	GpioDataRegs.GPBDAT.bit.GPIO39	= 0;
 
+	//выходы
+
 	GpioCtrlRegs.GPBDIR.bit.GPIO48	= 1;	//RESET_FAULT
 	GpioDataRegs.GPBDAT.bit.GPIO48	= 0;
 
-	//выходы
-
 	GpioCtrlRegs.GPAMUX2.bit.GPIO29 = 0;
 	GpioCtrlRegs.GPAPUD.bit.GPIO29	= 1;
+
 	GpioCtrlRegs.GPADIR.bit.GPIO29	= 1;	// WORK_DSP_LED
 	GpioDataRegs.GPADAT.bit.GPIO29	= 1;
-
-	GpioCtrlRegs.GPADIR.bit.GPIO6	= 1;	// OFF_TEN
-	GpioDataRegs.GPADAT.bit.GPIO6	= 0;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO3	= 1;	// ENC_ADDR0
 	GpioDataRegs.GPADAT.bit.GPIO3	= 0;

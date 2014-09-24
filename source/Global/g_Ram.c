@@ -109,56 +109,77 @@ void g_Ram_Init(TRam *p)
 //---------------------------------------------------
 void g_Ram_Update(TRam *p)
 {
-	g_Ram.ramGroupA.Temper 	  = g_Peref.TSens.Temper;
+    p->ramGroupA.Temper = g_Peref.TSens.Temper;
 
-	//------ Core -> RAM ------------------------------------
-	p->ramGroupA.Status = g_Core.Status;
-	p->ramGroupA.Faults.Net.all  = (g_Core.Protections.outFaults.Net.all  | g_Core.Protections.outDefects.Net.all);
-	p->ramGroupA.Faults.Load.all = (g_Core.Protections.outFaults.Load.all | g_Core.Protections.outDefects.Load.all);
-	p->ramGroupA.Faults.Proc.all = (g_Core.Protections.outFaults.Proc.all | g_Core.Protections.outDefects.Proc.all);
-	p->ramGroupA.Faults.Dev.all  = (g_Core.Protections.outFaults.Dev.all  | g_Core.Protections.outDefects.Dev.all);
+    //------ Core -> RAM ------------------------------------
+    p->ramGroupA.Status = g_Core.Status;
+    p->ramGroupA.Faults.Net.all  = (g_Core.Protections.outFaults.Net.all  | g_Core.Protections.outDefects.Net.all);
+    p->ramGroupA.Faults.Load.all = (g_Core.Protections.outFaults.Load.all | g_Core.Protections.outDefects.Load.all);
+    p->ramGroupA.Faults.Proc.all = (g_Core.Protections.outFaults.Proc.all | g_Core.Protections.outDefects.Proc.all);
+    p->ramGroupA.Faults.Dev.all  = (g_Core.Protections.outFaults.Dev.all  | g_Core.Protections.outDefects.Dev.all);
 
-	//----- Peref -> RAM -----------------------------------
+    //----- Peref -> RAM -----------------------------------
 
-	 p->ramGroupA.Ur 			= g_Peref.sinObserver.UR.Output;
-	 p->ramGroupA.Us 			= g_Peref.sinObserver.US.Output;
-	 p->ramGroupA.Ut 			= g_Peref.sinObserver.UT.Output;
-	 p->ramGroupH.Umid 			= g_Peref.Umid;
-	 p->ramGroupH.VSkValue 		= SkewCalc(p->ramGroupA.Ur, p->ramGroupA.Us, p->ramGroupA.Ut, p->ramGroupH.Umid);
+    p->ramGroupA.Ur = g_Peref.sinObserver.UR.Output;
+    p->ramGroupA.Us = g_Peref.sinObserver.US.Output;
+    p->ramGroupA.Ut = g_Peref.sinObserver.UT.Output;
+    p->ramGroupH.Umid = g_Peref.Umid;
+    p->ramGroupH.VSkValue = SkewCalc(p->ramGroupA.Ur, p->ramGroupA.Us, p->ramGroupA.Ut, p->ramGroupH.Umid);
 
-	 if(!g_Core.Status.bit.Stop)
-	 {
-		 p->ramGroupA.Iu 		= g_Peref.sinObserver.IU.Output;
-		 p->ramGroupA.Iv 		= g_Peref.sinObserver.IV.Output;
-		 p->ramGroupA.Iw 		= g_Peref.sinObserver.IW.Output;
-		 p->ramGroupA.AngleUI 	= g_Peref.AngleUI;
-		 p->ramGroupH.Imid 		= g_Peref.Imid;
-		 p->ramGroupH.ISkewValue= SkewCalc(p->ramGroupA.Iu, p->ramGroupA.Iv, p->ramGroupA.Iw, p->ramGroupH.Imid);
-	 }
-	 else
-	 {
-		 p->ramGroupA.Iu 		= 0;
-		 p->ramGroupA.Iv 		= 0;
-		 p->ramGroupA.Iw 		= 0;
-		 p->ramGroupA.AngleUI 	= 0;
-		 p->ramGroupH.Imid 		= 0;
-		 p->ramGroupH.ISkewValue= 0;
-	 }
+    if (!g_Core.Status.bit.Stop)
+	{
+	    p->ramGroupH.IuPr = (g_Peref.sinObserver.IU.Output * 100) / p->ramGroupC.Inom;
+	    p->ramGroupH.IvPr = (g_Peref.sinObserver.IV.Output * 100) / p->ramGroupC.Inom;
+	    p->ramGroupH.IwPr = (g_Peref.sinObserver.IW.Output * 100) / p->ramGroupC.Inom;
+	    p->ramGroupH.Imidpr = (g_Peref.Imid * 100) / p->ramGroupC.Inom;
+	  //  p->ramGroupA.AngleUI = g_Peref.AngleUI;
+	    p->ramGroupH.ISkewValue = SkewCalc(g_Peref.sinObserver.IU.Output, g_Peref.sinObserver.IV.Output, g_Peref.sinObserver.IW.Output,
+		    g_Peref.Imid);
+	    if (p->ramGroupB.IIndicMode == imRms)
+		{
+		    p->ramGroupA.Iu = g_Peref.sinObserver.IU.Output;
+		    p->ramGroupA.Iv = g_Peref.sinObserver.IV.Output;
+		    p->ramGroupA.Iw = g_Peref.sinObserver.IW.Output;
+		    p->ramGroupH.Imid = g_Peref.Imid;
+		}
+	    if (p->ramGroupB.IIndicMode == imPercent)
+		{
+		    p->ramGroupA.Iu = p->ramGroupH.IuPr;
+		    p->ramGroupA.Iv = p->ramGroupH.IvPr;
+		    p->ramGroupA.Iw = p->ramGroupH.IwPr;
+		    p->ramGroupH.Imid = p->ramGroupH.Imidpr;
+		}
+	}
+    else
+	{
+	    p->ramGroupA.Iu = 0;
+	    p->ramGroupA.Iv = 0;
+	    p->ramGroupA.Iw = 0;
+	    p->ramGroupA.AngleUI = 0;
+	    p->ramGroupH.Imid = 0;
+	    p->ramGroupH.ISkewValue = 0;
+	}
 
-	 p->ramGroupA.Speed = g_Peref.Position.speedRPM;
+    p->ramGroupA.Speed = g_Peref.Position.speedRPM;
 
-	 p->ramGroupA.CycleCnt = p->ramGroupH.CycleCnt;
+    p->ramGroupA.CycleCnt = p->ramGroupH.CycleCnt;
 
-	 p->ramGroupC.Position = p->ramGroupH.Position >> p->ramGroupC.PosPrecision;
-	 p->ramGroupA.Position = p->ramGroupC.Position;
-	 p->ramGroupC.ClosePosition = p->ramGroupH.ClosePosition >> p->ramGroupC.PosPrecision;
-	 p->ramGroupC.OpenPosition  = p->ramGroupH.OpenPosition >> p->ramGroupC.PosPrecision;
-	 p->ramGroupA.StateTu.all   = g_Comm.digitInterface.Inputs.all;
-	 p->ramGroupA.StateTs.all	= g_Comm.digitInterface.Outputs.all;
-	 p->ramGroupH.ReverseType = rvtNone;
+    p->ramGroupC.Position 	= p->ramGroupH.Position >> p->ramGroupC.PosPrecision;
+    p->ramGroupA.Position 	= p->ramGroupC.Position;
+    p->ramGroupH.FullStep 	= g_Peref.Position.FullStep;
+    p->ramGroupC.ClosePosition 	= p->ramGroupH.ClosePosition >> p->ramGroupC.PosPrecision;
+    p->ramGroupC.OpenPosition 	= p->ramGroupH.OpenPosition >> p->ramGroupC.PosPrecision;
+    p->ramGroupA.StateTu.all 	= g_Comm.digitInterface.Inputs.all;
+    p->ramGroupA.StateTs.all 	= g_Comm.digitInterface.Outputs.all;
+    p->ramGroupH.ReverseType 	= rvtNone;
 
-	 p->ramGroupB.MOD_FAULT = GpioDataRegs.GPBDAT.bit.GPIO39;
-	 GpioDataRegs.GPBDAT.bit.GPIO48 = p->ramGroupB.RES_ERR;
+    p->ramGroupB.MOD_FAULT = GpioDataRegs.GPBDAT.bit.GPIO39;
+    GpioDataRegs.GPBDAT.bit.GPIO48 = p->ramGroupB.RES_ERR;
+
+    if (STATE_TU24)
+	{p->ramGroupB.InputType = it24;}
+    else if (!STATE_TU24)
+	{p->ramGroupB.InputType = it220;}
 
 }
 //---------------------------------------------------
@@ -189,11 +210,13 @@ void RefreshParams(Uns addr)
 	} else if (addr == REG_DRIVE_TYPE) {
 
 		Core_Drive_Update(&g_Core.Drive);
-		 g_Core.TorqObs.TorqueMax = g_Ram.ramGroupC.MaxTorque * 10; //??? убрать в обновление параметров
 		CubRefresh(&g_Core.TorqObs.Cub1, &g_Ram.ramGroupH.TqCurr);
 		CubRefresh(&g_Core.TorqObs.Cub2, &g_Ram.ramGroupH.TqAngUI);
 
-	} else if (addr == REG_SIN_FILTER_TF){
+	}	else if (addr == REG_MAX_TRQE)
+	{
+		 g_Core.TorqObs.TorqueMax = g_Ram.ramGroupC.MaxTorque * 10; //??? убрать в обновление параметров
+	}	else if (addr == REG_SIN_FILTER_TF){
 
 			peref_ApFilter1Init(&g_Peref.URfltr, (Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);		// »нициализируем фильтры
 			peref_ApFilter1Init(&g_Peref.USfltr, (Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);

@@ -264,12 +264,12 @@ __inline void DriveOpen(TCoreVlvDrvCtrl *p)
 	if (FreeRun) p->Valve.Position = POS_UNDEF;
 	else if (!((*p->Valve.BreakMode == vtOpen) || (*p->Valve.BreakMode == vtBoth)))
 	{
-		p->Valve.Position = (LgInt)p->Valve.CalibFullStep;
+		p->Valve.Position = (LgInt)(*p->Valve.CalibFullStep);
 	}
 	else
 	{
 		p->Valve.BreakFlag = True;
-		p->Valve.Position  = (LgInt)p->Valve.CalibFullStep + (LgInt)p->Valve.BreakDelta;
+		p->Valve.Position  = (LgInt)(*p->Valve.CalibFullStep) + (LgInt)p->Valve.BreakDelta;
 	}
 	p->EvLog.Value = CMD_OPEN;
 

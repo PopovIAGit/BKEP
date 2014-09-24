@@ -13,7 +13,6 @@ typedef struct {
 	Uns *Inom;
 	Uns *MaxTorqe;
 	Uns *GearRatio;
-	TDriveType *DriveType;
 
 } TCoreDrive;
 //------------------- Глобальные переменные --------------------------------

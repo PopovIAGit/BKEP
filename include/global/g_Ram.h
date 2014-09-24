@@ -200,52 +200,59 @@ typedef struct _TRamGroupB
 	Uns				LevelOffOpen220;	 // 41
 	Uns				LevelOnOpen24;		 // 42
 	Uns				LevelOffOpen24;		 // 43
-	Uns				UOpen_Mpy;   		 // 44
-	Uns				p_UOpen_Offset;		 // 45
+	Uns				UOpen_Mpy220;   	 // 44
+	Uns				UOpen_Mpy24;   		 // 45
+	Uns				p_UOpen_Offset;		 // 46
 	//-------------------------------
-	Uns				LevelOnClose220;	 // 46
-	Uns				LevelOffClose220;	 // 47
-	Uns				LevelOnClose24;		 // 48
-	Uns				LevelOffClose24;	 // 49
-	Uns				p_UClose_Mpy;		 // 90
-	Uns				p_UClose_Offset;	 // 51
+	Uns				LevelOnClose220;	 // 47
+	Uns				LevelOffClose220;	 // 48
+	Uns				LevelOnClose24;		 // 49
+	Uns				LevelOffClose24;	 // 50
+	Uns				p_UClose_Mpy220;	 // 51
+	Uns				p_UClose_Mpy24;		 // 52
+	Uns				p_UClose_Offset;	 // 53
 	//-------------------------------
-	Uns				LevelOnStop220;		 // 52
-	Uns				LevelOffStop220;	 // 53
-	Uns				LevelOnStop24;		 // 54
-	Uns				LevelOffStop24;		 // 55
-	Uns				p_UStop_Mpy;		 // 56
-	Uns				p_UStop_Offset;		 // 57
+	Uns				LevelOnStop220;		 // 54
+	Uns				LevelOffStop220;	 // 55
+	Uns				LevelOnStop24;		 // 56
+	Uns				LevelOffStop24;		 // 57
+	Uns				p_UStop_Mpy220;		 // 58
+	Uns				p_UStop_Mpy24;		 // 59
+	Uns				p_UStop_Offset;		 // 60
 	//-------------------------------
-	Uns				LevelOnMU220;		 // 58
-	Uns				LevelOffMU220;		 // 59
-	Uns				LevelOnMU24;		 // 100
-	Uns				LevelOffMU24;		 // 61
-	Uns				p_UMu_Mpy;			 // 62
-	Uns				p_UMu_Offset;		 // 63
+	Uns				LevelOnMU220;		 // 61
+	Uns				LevelOffMU220;		 // 62
+	Uns				LevelOnMU24;		 // 64
+	Uns				LevelOffMU24;		 // 65
+	Uns				p_UMu_Mpy220;		 // 66
+	Uns				p_UMu_Mpy24;		 // 66
+	Uns				p_UMu_Offset;		 // 67
 	//-------------------------------
-	Uns				LevelOnResetAlarm220;// 64
-	Uns				LevelOffResetAlarm220;// 65
-	Uns				LevelOnResetAlarm24; // 66
-	Uns				LevelOffResetAlarm24;// 67
-	Uns				p_UResetAlarm_Mpy;	 // 68
-	Uns				p_UResetAlarm_Offset;// 69
+	Uns				LevelOnResetAlarm220;	 // 68
+	Uns				LevelOffResetAlarm220;	 // 69
+	Uns				LevelOnResetAlarm24; 	 // 70
+	Uns				LevelOffResetAlarm24;	 // 71
+	Uns				p_UResetAlarm_Mpy220;	 // 72
+	Uns				p_UResetAlarm_Mpy24;	 // 73
+	Uns				p_UResetAlarm_Offset;	 // 74
 	//-------------------------------
-	Uns				LevelOnReadyTU220;	 // 110
-	Uns				LevelOffReadyTU220;	 // 71
-	Uns				LevelOnReadyTU24;	 // 72
-	Uns				LevelOffReadyTU24;	 // 73
-	Uns				p_UReadyTu_Mpy;		 // 74
-	Uns				p_UReadyTu_Offset;	 // 75
+	Uns				LevelOnReadyTU220;	 // 75
+	Uns				LevelOffReadyTU220;	 // 76
+	Uns				LevelOnReadyTU24;	 // 77
+	Uns				LevelOffReadyTU24;	 // 78
+	Uns				p_UReadyTu_Mpy220;		 // 79
+	Uns				p_UReadyTu_Mpy24;		 // 80
+	Uns				p_UReadyTu_Offset;	 // 81
 	//-------------------------------
-	Uns				LevelOnDU220;		 // 76
-	Uns				LevelOffDU220;		 // 77
-	Uns				LevelOnDU24;		 // 78
-	Uns				LevelOffDU24;		 // 79
-	Uns				p_UDu_Mpy;			 // 80
-	Uns				p_UDu_Offset;		 // 81
+	Uns				LevelOnDU220;		 // 82
+	Uns				LevelOffDU220;		 // 83
+	Uns				LevelOnDU24;		 // 84
+	Uns				LevelOffDU24;		 // 85
+	Uns				p_UDu_Mpy220;		 // 86
+	Uns				p_UDu_Mpy24;		 // 87
+	Uns				p_UDu_Offset;		 // 88
 	//-------------------------------
-	Uns 			Rsvd3[18];			 // 82 83 84 85 86 87 88 89 // 99
+	Uns 			Rsvd3[3];
 } TRamGroupB;
 
 // Группа C (Адрес = 140, Количество = 120) - Заводские параметры
@@ -433,9 +440,9 @@ typedef struct _TRamGroupH
 	Uns             Rsvd5;          	 // 85.Диагностика сети (для неисправностей)
 	Uns				Imidpr;			 	 // 86 Резерв
 	Uns             Rsvd6;          	 // 87.Диагностика нагрузки
-	Uns             Iu;                  // 88.Ток фазы U
-	Uns             Iv;                  // 89.Ток фазы V
-	Uns             Iw;                  // 90.Ток фазы W
+	Uns             IuPr;                // 88.Ток фазы U
+	Uns             IvPr;                // 89.Ток фазы V
+	Uns             IwPr;                // 90.Ток фазы W
 	Uns             Imid;				 // 91.Средний ток
   	Uns             ISkewValue;          // 92.Асиметрия токов нагрузки
   	LgUns           Position;            // 93-94.Положение
@@ -585,6 +592,7 @@ typedef struct TRam
 
 
 #define REG_DRIVE_TYPE			GetAdr(ramGroupC.DriveType)
+#define REG_MAX_TRQE			GetAdr(ramGroupC.MaxTorque)
 
 #define REG_TORQUE_CURR 		GetAdr(ramGroupH.TqCurr)
 #define REG_TORQUE_ANGLE_UI		GetAdr(ramGroupH.TqAngUI)
@@ -689,6 +697,8 @@ typedef struct TRam
 #define CMD_RES_CYCLE		0x0100	// Сброс счетчика циклов
 #define CMD_PAR_CHANGE		0x0200	// Изменение параметров
 #define CMD_DEFAULTS_FACT 	0x0400	// Заводские параметры по умолчанию
+
+#define STATE_TU24 		GpioDataRegs.GPBDAT.bit.GPIO40
 
 void g_Ram_Init(TRam *);
 void g_Ram_Update(TRam *);

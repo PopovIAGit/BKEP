@@ -83,8 +83,17 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//50 Гц
 	Uns  ts_all=0;
 
 	// ---------------------- ТЕЛЕСИГНАЛИЗАЦИЯ-------------------------------
-	p->Outputs.bit.Opened  = g_Ram.ramGroupA.Status.bit.Opened;	    // 0	Открыто
-	p->Outputs.bit.Closed  = g_Ram.ramGroupA.Status.bit.Closed;	    // 1	Закрыто
+	if (!(g_Ram.ramGroupA.Status.bit.Opened || g_Ram.ramGroupA.Status.bit.Closed))
+	{
+		p->Outputs.bit.Opened  = !g_Ram.ramGroupA.Status.bit.Opened;	    // 0	Открыто
+		p->Outputs.bit.Closed  = !g_Ram.ramGroupA.Status.bit.Closed;	    // 1	Закрыто
+	}
+	else
+	{
+		p->Outputs.bit.Opened  = g_Ram.ramGroupA.Status.bit.Opened;	    // 0	Открыто
+		p->Outputs.bit.Closed  = g_Ram.ramGroupA.Status.bit.Closed;	    // 1	Закрыто
+	}
+
 	p->Outputs.bit.Mufta   = g_Ram.ramGroupA.Status.bit.Mufta;	    // 2	Муфта
 	p->Outputs.bit.Fault   = g_Ram.ramGroupA.Status.bit.Fault;	    // 3	Авария
 	p->Outputs.bit.Defect  = g_Ram.ramGroupA.Status.bit.Defect;	    // 4	Дефект

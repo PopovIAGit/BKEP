@@ -69,7 +69,7 @@
 
 //--------------------- Макросы --------------------------------------------
 #define PRT_CFG_SET(CanBeReseted, Level, Bit, Hyst) \
-	((CanBeReseted<<1)|(Level<<2)|(Bit<<3)|(Hyst<<7))
+	((CanBeReseted<<1)|(Level<<3)|(Bit<<4)|(Hyst<<8))
 //-------------------- Структуры -------------------------------------------
 
 typedef struct {
@@ -115,6 +115,7 @@ typedef struct {
 		TFltUnion			outDefects;			// Неисправности
 
 		Uns 				MuffFlag;			// Флаг муфты
+		Uns					NoMoveFlag;
 		Bool				ShcReset;			// Флаг по которому сбрасывается КЗ
 		Uns					FaultDelay;			// Пауза после инициализации для включения защит
 

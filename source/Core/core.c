@@ -110,13 +110,14 @@ void Core_DefineCtrlParams(TCore *p) // 50 hz
 void Core_CalibStop (TCore *p)
 {
 	Bool StopFlag = False; // внутенний флаг остановки
+	LgInt Position = p->VlvDrvCtrl.Valve.Position;
 
 	if(p->VlvDrvCtrl.Valve.Position == POS_UNDEF) //≈сли целевое положение не определено то уходим
 	{
 		p->MotorControl.TargetPos = POS_UNDEF;
 		return;
 	}
-	p->MotorControl.TargetPos = g_Peref.Position.LinePos - p->VlvDrvCtrl.Valve.Position;
+	p->MotorControl.TargetPos = (g_Peref.Position.LinePos - Position);
 
 	if(p->Status.bit.Stop) return;
 

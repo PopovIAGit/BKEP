@@ -186,15 +186,16 @@ typedef union _TDeviceReg {
 		Uns PosSens:1;		// 0     Сбой датчика положения
 		Uns Memory1:1;		// 1     Сбой памяти 1
 		Uns Memory2:1;		// 2     Сбой памяти 2
-		Uns Rtc:1;			// 3     Сбой часов реального времени
+		Uns Rtc:1;		// 3     Сбой часов реального времени
 		Uns TSens:1;		// 4     Сбой датчика температуры
 		Uns Th_BCP:1;		// 5     Перегрев блока БКП
 		Uns Tl_BCP:1;		// 6     Переохлождение блока БКП
 		Uns Th_BCD:1;		// 7     Перегрев блока БКД
 		Uns Tl_BCD:1;		// 8     Переохлождение блока БКД
-		Uns Dac:1;			// 8     Сбой ЦАП
-		Uns LowPower:1;		// 9     Выключение БКД
-     	Uns Rsvd:5;       	// 11-15 Резерв
+		Uns Dac:1;		// 9     Сбой ЦАП
+		Uns LowPower:1;		// 10     Выключение БКД
+		Uns NoBCP_Connect:1;	// 11
+		Uns Rsvd:4;       	// 12-15 Резерв
   } bit;
 } TDeviceReg;
 
@@ -280,7 +281,7 @@ typedef enum {
 // Управление работой защит
 typedef enum {
   pmOff       = 0,		// Защита выключена
-  pmSignStop  = 1,		// Сигнализация и останов
+  pmOn  = 1,		// Сигнализация и останов
   pmCount     = 2		// Количество режимов
 } TPrtMode;
 

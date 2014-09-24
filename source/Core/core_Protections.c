@@ -20,13 +20,14 @@ void Core_ProtectionsInit(TCoreProtections *p)
 
 	//---------Нет Движенния-----------------------------------------------
 
-	p->NoMove.Cfg.all				= PRT_CFG_SET(CAN_BE_MUFTA, INP_LESS_LEVEL,NoMove_bit,HYST_OFF);
-	p->NoMove.Input					= (Int *)&g_Ram.ramGroupC.Position;
-	p->NoMove.Output				= (Uns *)&p->outFaults.Proc.all;
+	p->NoMove.Cfg.all			= PRT_CFG_SET(CAN_BE_MUFTA, INP_LESS_LEVEL,NoMove_bit,HYST_OFF);
+	p->NoMove.Input				= (Int *)&g_Ram.ramGroupC.Position;
+	p->NoMove.Output			= &p->NoMoveFlag;
 	p->NoMove.EnableLevel			= (Int *)&g_Ram.ramGroupC.MuffZone;
 	p->NoMove.DisableLevel			= (Int *)&g_Ram.ramGroupC.MuffZone;
-	p->NoMove.Timeout				= &g_Ram.ramGroupB.NoMoveTime;
-	p->NoMove.Scale					= PROTECT_SCALE;
+	p->NoMove.Timeout			= &g_Ram.ramGroupB.NoMoveTime;
+	p->NoMove.Scale				= PROTECT_SCALE;
+	p->NoMove.Signal			= 0;
 
 	//---------ЗАЩИТЫ ПО НАПРЯЖЕНИЮ---------------------------------------
 	//---------Пониженное напряжение (авария)---------------------------------------
@@ -43,13 +44,13 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underVoltageS.Output 		= (Uns *)&p->outFaults.Net.all;
 	p->underVoltageT.Output 	 	= (Uns *)&p->outFaults.Net.all;
 
-	p->underVoltageR.EnableLevel  	= (Int *)&g_Ram.ramGroupC.UvLevel;
-	p->underVoltageS.EnableLevel  	= (Int *)&g_Ram.ramGroupC.UvLevel;
-	p->underVoltageT.EnableLevel  	= (Int *)&g_Ram.ramGroupC.UvLevel;
+	p->underVoltageR.EnableLevel  		= (Int *)&g_Ram.ramGroupC.UvLevel;
+	p->underVoltageS.EnableLevel  		= (Int *)&g_Ram.ramGroupC.UvLevel;
+	p->underVoltageT.EnableLevel  		= (Int *)&g_Ram.ramGroupC.UvLevel;
 
-	p->underVoltageR.DisableLevel 	= (Int *)&g_Ram.ramGroupC.UvLevel;
-	p->underVoltageS.DisableLevel 	= (Int *)&g_Ram.ramGroupC.UvLevel;
-	p->underVoltageT.DisableLevel 	= (Int *)&g_Ram.ramGroupC.UvLevel;
+	p->underVoltageR.DisableLevel 		= (Int *)&g_Ram.ramGroupC.UvLevel;
+	p->underVoltageS.DisableLevel 		= (Int *)&g_Ram.ramGroupC.UvLevel;
+	p->underVoltageT.DisableLevel 		= (Int *)&g_Ram.ramGroupC.UvLevel;
 
 	p->underVoltageR.Timeout		= &g_Ram.ramGroupC.UvTime;
 	p->underVoltageS.Timeout		= &g_Ram.ramGroupC.UvTime;
@@ -61,9 +62,9 @@ void Core_ProtectionsInit(TCoreProtections *p)
 
 	//---------Пониженное напряжение (неисправность)---------------------------------------
 
-	p->underDefVoltageR.Cfg.all 	= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,UvR_bit,20);
-	p->underDefVoltageS.Cfg.all 	= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,UvS_bit,20);
-	p->underDefVoltageT.Cfg.all 	= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,UvT_bit,20);
+	p->underDefVoltageR.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,UvR_bit,20);
+	p->underDefVoltageS.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,UvS_bit,20);
+	p->underDefVoltageT.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,UvT_bit,20);
 
 	p->underDefVoltageR.Input 		= (Int *)&g_Ram.ramGroupA.Ur;
 	p->underDefVoltageS.Input 		= (Int *)&g_Ram.ramGroupA.Us;
@@ -73,13 +74,13 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underDefVoltageS.Output 		= (Uns *)&p->outDefects.Net.all;
 	p->underDefVoltageT.Output 	 	= (Uns *)&p->outDefects.Net.all;
 
-	p->underDefVoltageR.EnableLevel = (Int *)&g_Ram.ramGroupC.UvLevel;
-	p->underDefVoltageS.EnableLevel = (Int *)&g_Ram.ramGroupC.UvLevel;
-	p->underDefVoltageT.EnableLevel = (Int *)&g_Ram.ramGroupC.UvLevel;
+	p->underDefVoltageR.EnableLevel 	= (Int *)&g_Ram.ramGroupC.UvLevel;
+	p->underDefVoltageS.EnableLevel 	= (Int *)&g_Ram.ramGroupC.UvLevel;
+	p->underDefVoltageT.EnableLevel 	= (Int *)&g_Ram.ramGroupC.UvLevel;
 
-	p->underDefVoltageR.DisableLevel= (Int *)&g_Ram.ramGroupC.UvLevel;
-	p->underDefVoltageS.DisableLevel= (Int *)&g_Ram.ramGroupC.UvLevel;
-	p->underDefVoltageT.DisableLevel= (Int *)&g_Ram.ramGroupC.UvLevel;
+	p->underDefVoltageR.DisableLevel	= (Int *)&g_Ram.ramGroupC.UvLevel;
+	p->underDefVoltageS.DisableLevel	= (Int *)&g_Ram.ramGroupC.UvLevel;
+	p->underDefVoltageT.DisableLevel	= (Int *)&g_Ram.ramGroupC.UvLevel;
 
 	p->underDefVoltageR.Timeout		= &g_Ram.ramGroupC.UvDTime;
 	p->underDefVoltageS.Timeout		= &g_Ram.ramGroupC.UvDTime;
@@ -102,13 +103,13 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overVoltageS.Output 			= (Uns *)&p->outFaults.Net.all;
 	p->overVoltageT.Output 	 		= (Uns *)&p->outFaults.Net.all;
 
-	p->overVoltageR.EnableLevel  	= (Int *)&g_Ram.ramGroupC.OvLevel;
-	p->overVoltageS.EnableLevel  	= (Int *)&g_Ram.ramGroupC.OvLevel;
-	p->overVoltageT.EnableLevel  	= (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overVoltageR.EnableLevel  		= (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overVoltageS.EnableLevel  		= (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overVoltageT.EnableLevel  		= (Int *)&g_Ram.ramGroupC.OvLevel;
 
-	p->overVoltageR.DisableLevel 	= (Int *)&g_Ram.ramGroupC.OvLevel;
-	p->overVoltageS.DisableLevel 	= (Int *)&g_Ram.ramGroupC.OvLevel;
-	p->overVoltageT.DisableLevel 	= (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overVoltageR.DisableLevel 		= (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overVoltageS.DisableLevel 		= (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overVoltageT.DisableLevel 		= (Int *)&g_Ram.ramGroupC.OvLevel;
 
 	p->overVoltageR.Timeout			= &g_Ram.ramGroupC.OvTime;
 	p->overVoltageS.Timeout			= &g_Ram.ramGroupC.OvTime;
@@ -131,13 +132,13 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overDefVoltageS.Output 		= (Uns *)&p->outDefects.Net.all;
 	p->overDefVoltageT.Output 	 	= (Uns *)&p->outDefects.Net.all;
 
-	p->overDefVoltageR.EnableLevel  = (Int *)&g_Ram.ramGroupC.OvLevel;
-	p->overDefVoltageS.EnableLevel  = (Int *)&g_Ram.ramGroupC.OvLevel;
-	p->overDefVoltageT.EnableLevel  = (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overDefVoltageR.EnableLevel  	= (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overDefVoltageS.EnableLevel  	= (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overDefVoltageT.EnableLevel  	= (Int *)&g_Ram.ramGroupC.OvLevel;
 
-	p->overDefVoltageR.DisableLevel = (Int *)&g_Ram.ramGroupC.OvLevel;
-	p->overDefVoltageS.DisableLevel = (Int *)&g_Ram.ramGroupC.OvLevel;
-	p->overDefVoltageT.DisableLevel = (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overDefVoltageR.DisableLevel 	= (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overDefVoltageS.DisableLevel 	= (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overDefVoltageT.DisableLevel 	= (Int *)&g_Ram.ramGroupC.OvLevel;
 
 	p->overDefVoltageR.Timeout		= &g_Ram.ramGroupC.OvDTime;
 	p->overDefVoltageS.Timeout		= &g_Ram.ramGroupC.OvDTime;
@@ -148,9 +149,9 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overDefVoltageT.Scale 		= PROTECT_SCALE;
 
 	//---------Повышенное напряжение на 47% (АВАРИЯ) ------------------------------------------
-	p->overMax_VoltageR.Cfg.all 	= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,OvR_max_bit,20);
-	p->overMax_VoltageS.Cfg.all 	= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,OvS_max_bit,20);
-	p->overMax_VoltageT.Cfg.all 	= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,OvT_max_bit,20);
+	p->overMax_VoltageR.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,OvR_max_bit,20);
+	p->overMax_VoltageS.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,OvS_max_bit,20);
+	p->overMax_VoltageT.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,OvT_max_bit,20);
 
 	p->overMax_VoltageR.Input 		= (Int *)&g_Ram.ramGroupA.Ur;
 	p->overMax_VoltageS.Input 		= (Int *)&g_Ram.ramGroupA.Us;
@@ -160,13 +161,13 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overMax_VoltageS.Output 		= (Uns *)&p->outFaults.Net.all;
 	p->overMax_VoltageT.Output 	 	= (Uns *)&p->outFaults.Net.all;
 
-	p->overMax_VoltageR.EnableLevel = (Int *)&g_Ram.ramGroupC.OvLevel_max;
-	p->overMax_VoltageS.EnableLevel = (Int *)&g_Ram.ramGroupC.OvLevel_max;
-	p->overMax_VoltageT.EnableLevel = (Int *)&g_Ram.ramGroupC.OvLevel_max;
+	p->overMax_VoltageR.EnableLevel 	= (Int *)&g_Ram.ramGroupC.OvLevel_max;
+	p->overMax_VoltageS.EnableLevel 	= (Int *)&g_Ram.ramGroupC.OvLevel_max;
+	p->overMax_VoltageT.EnableLevel 	= (Int *)&g_Ram.ramGroupC.OvLevel_max;
 
-	p->overMax_VoltageR.DisableLevel= (Int *)&g_Ram.ramGroupC.OvLevel_max;
-	p->overMax_VoltageS.DisableLevel= (Int *)&g_Ram.ramGroupC.OvLevel_max;
-	p->overMax_VoltageT.DisableLevel= (Int *)&g_Ram.ramGroupC.OvLevel_max;
+	p->overMax_VoltageR.DisableLevel	= (Int *)&g_Ram.ramGroupC.OvLevel_max;
+	p->overMax_VoltageS.DisableLevel	= (Int *)&g_Ram.ramGroupC.OvLevel_max;
+	p->overMax_VoltageT.DisableLevel	= (Int *)&g_Ram.ramGroupC.OvLevel_max;
 
 	p->overMax_VoltageR.Timeout		= &g_Ram.ramGroupC.OvTime_max;
 	p->overMax_VoltageS.Timeout		= &g_Ram.ramGroupC.OvTime_max;
@@ -207,22 +208,22 @@ void Core_ProtectionsInit(TCoreProtections *p)
 
 	//---------Ассиметрия напряжений (неисправность)-----------------------------------
 	p->voltSkew.Cfg.all 			= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,VSk_bit,20);
-	p->voltSkew.Input				= (Int *)&g_Ram.ramGroupH.VSkValue;
-	p->voltSkew.Output				= (Uns *)&p->outDefects.Net.all;
+	p->voltSkew.Input			= (Int *)&g_Ram.ramGroupH.VSkValue;
+	p->voltSkew.Output			= (Uns *)&p->outDefects.Net.all;
 	p->voltSkew.EnableLevel			= (Int *)&g_Ram.ramGroupC.VSkLevel;
 	p->voltSkew.DisableLevel		= (Int *)&g_Ram.ramGroupC.VSkLevel;
-	p->voltSkew.Timeout				= &g_Ram.ramGroupC.VSkTime;
-	p->voltSkew.Scale				= PROTECT_SCALE;
+	p->voltSkew.Timeout			= &g_Ram.ramGroupC.VSkTime;
+	p->voltSkew.Scale			= PROTECT_SCALE;
 
 	//---------ЗАЩИТЫ ПО ТОКУ---------------------------------------------
 	//---------Обрыв фаз по току (U V W неисправность)---------------------------------
-	p->breakCurrU.Cfg.all			= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,BvR_bit,HYST_OFF);
-	p->breakCurrV.Cfg.all 			= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,BvS_bit,HYST_OFF);
-	p->breakCurrW.Cfg.all 			= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,BvT_bit,HYST_OFF);
+	p->breakCurrU.Cfg.all			= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,PhlU_bit,HYST_OFF);
+	p->breakCurrV.Cfg.all 			= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,PhlV_bit,HYST_OFF);
+	p->breakCurrW.Cfg.all 			= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,PhlW_bit,HYST_OFF);
 
-	p->breakCurrU.Input 			= (Int *)&g_Ram.ramGroupA.Iu;
-	p->breakCurrV.Input 			= (Int *)&g_Ram.ramGroupA.Iv;
-	p->breakCurrW.Input 			= (Int *)&g_Ram.ramGroupA.Iw;
+	p->breakCurrU.Input 			= (Int *)&g_Ram.ramGroupH.IuPr;
+	p->breakCurrV.Input 			= (Int *)&g_Ram.ramGroupH.IvPr;
+	p->breakCurrW.Input 			= (Int *)&g_Ram.ramGroupH.IwPr;
 
 	p->breakCurrU.Output 			= (Uns *)&p->outDefects.Load.all;
 	p->breakCurrV.Output 			= (Uns *)&p->outDefects.Load.all;
@@ -246,20 +247,21 @@ void Core_ProtectionsInit(TCoreProtections *p)
 
 	//---------Время-токовая перегрузка (авария)-------------------------------------
 	p->I2t.Cfg.bit.Hyst 			= HYST_OFF;
-	p->I2t.Cfg.bit.Num 				= I2t_bit;
+	p->I2t.Cfg.bit.Num 			= I2t_bit;
 	p->I2t.InputCurrentMid 			= &g_Ram.ramGroupH.Imid;
-	p->I2t.NomCurrent 				= &g_Ram.ramGroupC.Inom;
-	p->I2t.Output 					= (Uns *)&p->outFaults.Load.all;
-	p->I2t.Scale 					= PROTECT_SCALE;
+	p->I2t.NomCurrent 			= &g_Ram.ramGroupC.Inom;
+	p->I2t.Output 				= (Uns *)&p->outFaults.Load.all;
+	p->I2t.Scale 				= PROTECT_SCALE;
+	Core_ProtectionI2TInit(&p->I2t);
 
 	//--------Ассиметрия токов (неисправность)----------------------------------------------
 	p->voltSkew.Cfg.all 			= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,ISkew_bit,HYST_OFF);
-	p->voltSkew.Input				= (Int *)&g_Ram.ramGroupH.ISkewValue;
-	p->voltSkew.Output				= (Uns *)&p->outDefects.Load.all;
+	p->voltSkew.Input			= (Int *)&g_Ram.ramGroupH.ISkewValue;
+	p->voltSkew.Output			= (Uns *)&p->outDefects.Load.all;
 	p->voltSkew.EnableLevel			= (Int *)&g_Ram.ramGroupC.ISkewLevel;
 	p->voltSkew.DisableLevel		= (Int *)&g_Ram.ramGroupC.ISkewLevel;
-	p->voltSkew.Timeout				= &g_Ram.ramGroupC.ISkewTime;
-	p->voltSkew.Scale				= PROTECT_SCALE;
+	p->voltSkew.Timeout			= &g_Ram.ramGroupC.ISkewTime;
+	p->voltSkew.Scale			= PROTECT_SCALE;
 
 	//------Короткое замыкание----------------------------------------------
 	p->ShC_U.Cfg.bit.Num 			= ShCU_bit;
@@ -282,9 +284,9 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->ShC_V.LowCurrentLevel		= &g_Ram.ramGroupC.ShC_Down;
 	p->ShC_W.LowCurrentLevel		= &g_Ram.ramGroupC.ShC_Down;
 
-	p->ShC_U.Output					= &p->outFaults.Load.all;
-	p->ShC_V.Output					= &p->outFaults.Load.all;
-	p->ShC_W.Output					= &p->outFaults.Load.all;
+	p->ShC_U.Output				= &p->outFaults.Load.all;
+	p->ShC_V.Output				= &p->outFaults.Load.all;
+	p->ShC_W.Output				= &p->outFaults.Load.all;
 
 	//------ДИАГНОСТИКА УСТРОЙСТВА------------------------------------------
 	//------Перегрев блока БКД----------------------------------------------
@@ -338,6 +340,7 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 	switch (++State)
 	{
 	case 1: //Muffta
+		p->NoMove.Cfg.bit.Enable = ((g_Core.MotorControl.WorkMode & wmMove) != 0);
 		break;
 	case 2:	// Защиты по наряжению
 		Enable = (g_Ram.ramGroupC.Uv != pmOff);						// Понижеие напряжения
@@ -421,43 +424,50 @@ void Core_DevProc_FaultIndic(TCoreProtections *p)
 		p->outDefects.Dev.bit.Rtc 	  = (Uns)g_Peref.Rtc.Error;
 		p->outDefects.Dev.bit.TSens   = (Uns)g_Peref.TSens.Error;
 		p->outDefects.Dev.bit.Dac     = (Uns)g_Peref.Dac.Error;
+		p->outDefects.Dev.bit.NoBCP_Connect = !g_Comm.mbBkp.Frame.ConnFlag;
 	}
 }
 
 void EngPhOrdPrt(TCoreProtections *p)
 {
-	static Bool  Flag = False;          // флаг для единичной проверки прав?е?льности чередования фазы
-	static LgUns StartPos;
-	static Uns   Timer = 0;
-	static Int   EngPhOrdValue = 0;
-	LgInt  Delta;
+    static Bool Flag = False;          // флаг для единичной проверки прав?е?льности чередования фазы
+    static LgUns StartPos;
+    static Uns Timer = 0;
+    static Int EngPhOrdValue = 0;
+    LgInt Delta;
 
-	if ((g_Ram.ramGroupC.PhOrd == pmOff) || (g_Core.Status.bit.Stop))
+    if ((g_Ram.ramGroupC.PhOrd == pmOff) || (g_Core.Status.bit.Stop))
 	{
-		Flag = false;
-		StartPos = g_Ram.ramGroupC.Position;
-		Timer = 0;
-		return;
+	    Flag = false;
+	    StartPos = g_Ram.ramGroupC.Position;
+	    Timer = 0;
+	    return;
 	}
 
-	if (Timer < ((Uns)PROTECT_SCALE * g_Ram.ramGroupC.PhOrdTime)) Timer++;
-	else if (!Flag)
+    if (Timer < (g_Ram.ramGroupC.PhOrdTime * (Uns)PROTECT_SCALE))
+	Timer++;
+    else if (!Flag)
 	{
-		Delta = g_Ram.ramGroupC.Position - StartPos;
+	    Delta = g_Ram.ramGroupC.Position - StartPos;
 
-		if (Delta >  ((REV_MAX+1)/2)) Delta -= (REV_MAX+1);
-		if (Delta < -((REV_MAX+1)/2)) Delta += (REV_MAX+1);
+	    if (Delta > ((REV_MAX + 1) / 2))
+		Delta -= (REV_MAX + 1);
+	    if (Delta < -((REV_MAX + 1) / 2))
+		Delta += (REV_MAX + 1);
 
-		EngPhOrdValue = 0;
-		if(Delta >=  ((LgInt) g_Ram.ramGroupC.PhOrdZone)) EngPhOrdValue = 1;
-		if(Delta <= -((LgInt) g_Ram.ramGroupC.PhOrdZone)) EngPhOrdValue = -1;
+	    EngPhOrdValue = 0;
+	    if (Delta >= ((LgInt) g_Ram.ramGroupC.PhOrdZone))
+		EngPhOrdValue = 1;
+	    if (Delta <= -((LgInt) g_Ram.ramGroupC.PhOrdZone))
+		EngPhOrdValue = -1;
 
-		if(g_Ram.ramGroupB.RodType == rdtInverse) EngPhOrdValue = -EngPhOrdValue;
+	    if (g_Ram.ramGroupB.RodType == rdtInverse)
+		EngPhOrdValue = -EngPhOrdValue;
 
-		if((EngPhOrdValue != 0) && (EngPhOrdValue != g_Core.MotorControl.RequestDir))
-			p->outFaults.Proc.bit.PhOrd = 1;
+	    if ((EngPhOrdValue != 0) && (EngPhOrdValue != g_Core.MotorControl.RequestDir))
+		p->outFaults.Proc.bit.PhOrd = 1;
 
-		Flag = true;
+	    Flag = true;
 	}
 }
 
@@ -467,6 +477,8 @@ void Core_ProtectionsReset(TCoreProtections *p)
 	g_Core.MotorControl.OverWayFlag = 0;		// Сбросили отсусвие уплотнения
 	p->MuffFlag = 0;	// отчистили статус от аварии муфты и неисправености
 	g_Core.Status.bit.Defect = 0;
+	g_Core.Status.bit.Fault = 0;
+	g_Core.Status.bit.Mufta = 0;
 
 	p->outDefects.Load.bit.ISkew = 0;
 	p->outDefects.Load.bit.PhlU = 0;
@@ -475,6 +487,7 @@ void Core_ProtectionsReset(TCoreProtections *p)
 
 	p->outDefects.Proc.bit.Overway = 0;
 	p->outDefects.Proc.bit.NoMove = 0;
+	p->outFaults.Proc.bit.NoMove = 0;
 }
 
 // Сброс всех защит
@@ -509,41 +522,48 @@ void Core_ProtectionsClear(TCoreProtections *p)
 void Core_ProtectionsUpdate(TCoreProtections *p)
 {
 
-	if (p->FaultDelay > 0) return;
+    if (p->FaultDelay > 0)
+	return;
 
-	Uns MuffEnable;
+    Uns MuffEnable;
 
-	Core_ProtecionSHC_Update(&p->ShC_U);
-	Core_ProtecionSHC_Update(&p->ShC_V);
-	Core_ProtecionSHC_Update(&p->ShC_W);
+    Core_ProtecionSHC_Update(&p->ShC_U);
+    Core_ProtecionSHC_Update(&p->ShC_V);
+    Core_ProtecionSHC_Update(&p->ShC_W);
 
-	if(p->outDefects.Dev.all || p->outDefects.Load.all || p->outDefects.Net.all || p->outDefects.Proc.all)
+    p->outFaults.Proc.bit.Mufta = p->MuffFlag;
+
+    if (p->outDefects.Dev.all || p->outDefects.Load.all || p->outDefects.Net.all || p->outDefects.Proc.all)
 	{
-		g_Core.Status.bit.Defect = 1;
+	    g_Core.Status.bit.Defect = 1;
 	}
-	else g_Core.Status.bit.Defect = 0;
-	if(p->outFaults.Dev.all || p->outFaults.Load.all || p->outFaults.Net.all || p->outFaults.Proc.all)
+    else
+	g_Core.Status.bit.Defect = 0;
+    if (p->outFaults.Dev.all || p->outFaults.Load.all || p->outFaults.Net.all || p->outFaults.Proc.all)
 	{
-		g_Core.Status.bit.Fault = 1;
+	    g_Core.Status.bit.Fault = 1;
 	}
-	else g_Core.Status.bit.Fault = 0;
+    else
+	g_Core.Status.bit.Fault = 0;
 
-	if (!g_Core.Status.bit.Stop)
+    if (!g_Core.Status.bit.Stop)
 	{
-		if (p->MuffFlag)
+	    if (p->NoMoveFlag)
 		{
-			if (!g_Core.MotorControl.RequestDir) MuffEnable = 1;
-			else if (g_Core.MotorControl.RequestDir > 0) MuffEnable = !g_Core.Status.bit.Opened;
-			else if (g_Core.MotorControl.RequestDir < 0) MuffEnable = !g_Core.Status.bit.Closed;
+		    if (!g_Core.MotorControl.RequestDir)
+			MuffEnable = 1;
+		    else if (g_Core.MotorControl.RequestDir > 0)
+			MuffEnable = !g_Core.Status.bit.Opened;
+		    else if (g_Core.MotorControl.RequestDir < 0)
+			MuffEnable = !g_Core.Status.bit.Closed;
 
-			p->outFaults.Proc.bit.Mufta = MuffEnable;
+		    p->outFaults.Proc.bit.NoMove = MuffEnable;
 
-			Core_ValveDriveStop(&g_Core.VlvDrvCtrl);
+		    Core_ValveDriveStop(&g_Core.VlvDrvCtrl);
 		}
-
-		if (g_Core.Status.bit.Fault)
+	    if (g_Core.Status.bit.Fault)
 		{
-			Core_ValveDriveStop(&g_Core.VlvDrvCtrl);
+		    Core_ValveDriveStop(&g_Core.VlvDrvCtrl);
 		}
 	}
 
