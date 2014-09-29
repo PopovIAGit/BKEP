@@ -56,6 +56,7 @@ void Comm_Update(TComm *);
 void Comm_50HzCalc(TComm *);
 void UpdateTUTS_Test(TComm *p);
 Uns DigitCmdModeUpdate (Uns *);
+void TekModbusParamsUpdate(void);
 
 extern TComm	g_Comm;
 

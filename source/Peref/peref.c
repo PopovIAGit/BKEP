@@ -255,8 +255,7 @@ void Peref_10HzCalc(TPeref *p)	// 10 Ãö
 //-------- ëîãèêà ÖÀÏ -------------------------------------------------
     if (g_Ram.ramGroupG.Mode)
 	p->Dac.Data = g_Ram.ramGroupG.DacValue;
-    else if (g_Ram.ramGroupH.CalibState != csCalib)
-	p->Dac.Data = 0;
+    else if (g_Ram.ramGroupH.CalibState != csCalib) p->Dac.Data = 0;
     else
 	{
 	    PosPr = g_Ram.ramGroupA.PositionPr;

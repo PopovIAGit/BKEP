@@ -10,6 +10,9 @@
 #include "comm.h"
 #include "g_Ram.h"
 
+#define TEK_DEVICE_FAULT_MASK	0xF910				// Маска на регистр дефектов устройства для модбаса ТЭК
+//#define TEK_DEVICE_FAULT_MASK	0xF990
+
 TComm	g_Comm;
 
 void CommandUpdate(TComm *p);
@@ -205,3 +208,159 @@ Uns DigitCmdModeUpdate (Uns *Output)
 	return result;*/
 }
 //---------------------------------------------------
+
+void TekModbusParamsUpdate(void) //??? необходимы проверки
+{
+	TRamGroupT *tek = &g_Ram.ramGroupT;
+
+	// Заполняем технологический регистр
+	tek->TechReg.bit.Opened  = g_Ram.ramGroupA.Status.bit.Opened;
+	tek->TechReg.bit.Closed  = g_Ram.ramGroupA.Status.bit.Closed;
+	tek->TechReg.bit.Mufta1  = g_Ram.ramGroupA.Status.bit.Mufta;
+	tek->TechReg.bit.Mufta2  = g_Ram.ramGroupA.Status.bit.Mufta;
+	tek->TechReg.bit.MuDu    = !g_Ram.ramGroupA.Status.bit.MuDu;
+	tek->TechReg.bit.Opening = g_Ram.ramGroupA.Status.bit.Opening;
+	tek->TechReg.bit.Closing = g_Ram.ramGroupA.Status.bit.Closing;
+	tek->TechReg.bit.Stop    = g_Ram.ramGroupA.Status.bit.Stop;
+	tek->TechReg.bit.Ten     = g_Ram.ramGroupA.Status.bit.Ten;
+
+	// Заполняем регистр дефектов
+	tek->DefReg.bit.I2t = g_Ram.ramGroupA.Faults.Load.bit.I2t;
+	tek->DefReg.bit.ShC = (g_Ram.ramGroupA.Faults.Load.bit.ShCU || g_Ram.ramGroupA.Faults.Load.bit.ShCV || g_Ram.ramGroupA.Faults.Load.bit.ShCW);
+	tek->DefReg.bit.Drv_T = 0;
+	tek->DefReg.bit.Uv = (g_Ram.ramGroupA.Faults.Net.bit.UvR || g_Ram.ramGroupA.Faults.Net.bit.UvS || g_Ram.ramGroupA.Faults.Net.bit.UvT);
+	tek->DefReg.bit.Phl = (g_Ram.ramGroupA.Faults.Load.bit.PhlU || g_Ram.ramGroupA.Faults.Load.bit.PhlV || g_Ram.ramGroupA.Faults.Load.bit.PhlW);
+	tek->DefReg.bit.NoMove = g_Ram.ramGroupA.Faults.Proc.bit.NoMove;
+	tek->DefReg.bit.Ov = (g_Ram.ramGroupA.Faults.Net.bit.OvR || g_Ram.ramGroupA.Faults.Net.bit.OvS || g_Ram.ramGroupA.Faults.Net.bit.OvT);
+	tek->DefReg.bit.Bv = (g_Ram.ramGroupA.Faults.Net.bit.BvR || g_Ram.ramGroupA.Faults.Net.bit.BvS || g_Ram.ramGroupA.Faults.Net.bit.BvT);
+	tek->DefReg.bit.Th = g_Ram.ramGroupA.Faults.Dev.bit.Th_BCP;
+	tek->DefReg.bit.Tl = g_Ram.ramGroupA.Faults.Dev.bit.Tl_BCP;
+	tek->DefReg.bit.PhOrdU = g_Ram.ramGroupA.Faults.Net.bit.PhOrd;
+	tek->DefReg.bit.PhOrdDrv = g_Ram.ramGroupA.Faults.Proc.bit.PhOrd;
+	tek->DefReg.bit.DevDef 	 = ((g_Ram.ramGroupA.Faults.Dev.all & TEK_DEVICE_FAULT_MASK) != 0); //маску переделать
+
+	// Регистр команд
+	// При срабатывании одной команды, сбрасываем все
+	if (g_Core.VlvDrvCtrl.ActiveControls & CMD_SRC_SERIAL)
+	{
+		if(tek->ComReg.bit.Stop)
+		{
+			g_Ram.ramGroupD.ControlWord = vcwStop;
+
+			tek->ComReg.bit.Stop = 0;
+			tek->ComReg.bit.Open = 0;
+			tek->ComReg.bit.Close = 0;
+		}
+		else if(tek->ComReg.bit.Open)
+		{
+			g_Ram.ramGroupD.ControlWord = vcwOpen;
+
+			tek->ComReg.bit.Stop = 0;
+			tek->ComReg.bit.Open = 0;
+			tek->ComReg.bit.Close = 0;
+		}
+		else if(tek->ComReg.bit.Close)
+		{
+			g_Ram.ramGroupD.ControlWord = vcwClose;
+
+			tek->ComReg.bit.Stop = 0;
+			tek->ComReg.bit.Open = 0;
+			tek->ComReg.bit.Close = 0;
+		}
+	}
+	else
+	{
+		tek->ComReg.bit.Stop = 0;
+		tek->ComReg.bit.Open = 0;
+		tek->ComReg.bit.Close = 0;
+	}
+
+	if (tek->ComReg.bit.PrtReset)
+	{
+		g_Ram.ramGroupD.PrtReset = 1;
+		tek->ComReg.bit.PrtReset = 0;
+	}
+
+	if (tek->ComReg.bit.EnDiscrOutTest)
+	{
+		g_Ram.ramGroupG.DiscrOutTest = 1;
+	}
+	else if (tek->ComReg.bit.DisDiscrOutTest)
+	{
+		if (g_Ram.ramGroupG.DiscrOutTest == 1)
+		{
+			g_Ram.ramGroupG.Mode = 0;
+			g_Ram.ramGroupG.DiscrOutTest = 0;
+		}
+	}
+	else if (tek->ComReg.bit.EnDiscrInTest)
+	{
+		g_Ram.ramGroupG.DiscrInTest = 1;
+	}
+	else if (tek->ComReg.bit.DisDiscrInTest)
+	{
+		if (g_Ram.ramGroupG.DiscrInTest == 1)
+		{
+			g_Ram.ramGroupG.Mode = 0;
+			g_Ram.ramGroupG.DiscrInTest = 0;
+		}
+	}
+
+	// На всякий случай сбрасываем регистр команд
+	if (tek->ComReg.all != 0)
+		tek->ComReg.all = 0;
+
+// Убрали переключение МУ/ДУ
+/*
+	if (tek->ComReg.bit.SetDu && IsStopped())
+		{
+			Mcu.MuDuInput = 0;
+			tek->ComReg.bit.SetDu = 0;
+		}
+	else if (tek->ComReg.bit.SetMu && IsStopped())
+		{
+			Mcu.MuDuInput = 1;
+			tek->ComReg.bit.SetMu = 0;
+		}
+*/
+	tek->PositionPr 	 = g_Ram.ramGroupA.PositionPr;
+	tek->CycleCnt 		 = g_Ram.ramGroupA.CycleCnt;
+	tek->Iu				 = g_Ram.ramGroupA.Iu;
+	tek->Ur				 = g_Ram.ramGroupA.Ur;
+	tek->Torque			 = g_Ram.ramGroupA.Torque;
+	tek->Speed			 = g_Ram.ramGroupA.Speed;
+	tek->RsStation		 = g_Ram.ramGroupB.RsStation;
+
+	//Состояние дискретных входов и выходов
+	tek->TsTu.bit.IsDiscrOutActive = (g_Ram.ramGroupG.DiscrOutTest);
+	tek->TsTu.bit.IsDiscrInActive = (g_Ram.ramGroupG.DiscrInTest);
+
+	tek->TsTu.bit.InOpen 	 = g_Comm.digitInterface.Inputs.bit.Open;
+	tek->TsTu.bit.InClose	 = g_Comm.digitInterface.Inputs.bit.Close;
+	tek->TsTu.bit.InStop 	 = g_Comm.digitInterface.Inputs.bit.Stop;
+	tek->TsTu.bit.InMu 		 = g_Comm.digitInterface.Inputs.bit.Mu;
+	tek->TsTu.bit.InDu 		 = g_Comm.digitInterface.Inputs.bit.Du;
+
+	if (!g_Ram.ramGroupG.DiscrOutTest)
+	{
+		tek->TsTu.bit.OutOpened  = g_Comm.digitInterface.Outputs.bit.Opened;
+		tek->TsTu.bit.OutClosed  = g_Comm.digitInterface.Outputs.bit.Closed;
+	 	tek->TsTu.bit.OutMufta   = g_Comm.digitInterface.Outputs.bit.Mufta;
+		tek->TsTu.bit.OutFault   = g_Comm.digitInterface.Outputs.bit.Fault;
+		tek->TsTu.bit.OutOpening = g_Comm.digitInterface.Outputs.bit.Opening;
+		tek->TsTu.bit.OutClosing = g_Comm.digitInterface.Outputs.bit.Closing;
+		tek->TsTu.bit.OutMuDu 	 = g_Comm.digitInterface.Outputs.bit.MUDU;
+		tek->TsTu.bit.OutNeispr  = g_Comm.digitInterface.Outputs.bit.Defect;
+	}
+	else
+	{
+		g_Comm.digitInterface.Outputs.bit.Opened = tek->TsTu.bit.OutOpened;
+		g_Comm.digitInterface.Outputs.bit.Closed = tek->TsTu.bit.OutClosed;
+		g_Comm.digitInterface.Outputs.bit.Mufta = tek->TsTu.bit.OutMufta;
+		g_Comm.digitInterface.Outputs.bit.Fault = tek->TsTu.bit.OutFault;
+		g_Comm.digitInterface.Outputs.bit.Opening = tek->TsTu.bit.OutOpening;
+		g_Comm.digitInterface.Outputs.bit.Closing = tek->TsTu.bit.OutClosing;
+		g_Comm.digitInterface.Outputs.bit.MUDU = tek->TsTu.bit.OutMuDu;
+		g_Comm.digitInterface.Outputs.bit.Defect = tek->TsTu.bit.OutNeispr;
+	}
+}

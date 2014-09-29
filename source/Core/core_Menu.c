@@ -49,6 +49,7 @@ void Core_MenuInit(TCoreMenu *p)
 
 	// Чтение всех параметров из Eeprom
 	ReadWriteAllParams(F_READ,p);
+	RefreshParams(REG_DRIVE_TYPE);
 	// Проверяем настроен ли ModBus
 	SetModBusParams();
 	// Номер версии
@@ -131,12 +132,12 @@ Bool WriteValue(Uns memory, Uns param, Uns *value) // в EditParam()
 	
 	if (param == REG_CODE)
 	{
-		if ( UpdateCode(REG_PASSW1_NEW, param, *value, g_Ram.ramGroupA.VersionPO) )
+		if ( UpdateCode(REG_PASSW1_NEW, param, *value, DEF_USER_PASS) )
 			return true;
 	}
 	else if (param == REG_FCODE)
 	{
-		if ( UpdateCode(REG_PASSW2_NEW, param, *value, g_Ram.ramGroupA.VersionPO) )
+		if ( UpdateCode(REG_PASSW2_NEW, param, *value, DEF_FACT_PASS) )
 			return true;
 	}
 
@@ -214,12 +215,12 @@ void SetDefaultValues(TCoreMenu *p, Byte *groupNumber) // в Core_MenuDisplay()
 		// Если не Время и не Дата или
 		// Если Код доступа групп B и C
 		if ((((Dcr.Config.all & DefCode) == DefCode)
-				&&(DefAddr != REG_DRIVE_TYPE) // Не тип привода
+				/*&&(DefAddr != REG_DRIVE_TYPE) // Не тип привода
 				&&(DefAddr != REG_GEAR_RATIO) // Не тип редуктора
 				&&(DefAddr != REG_FACTORY_NUMBER) // Не номер
 				&&(DefAddr != REG_PRODUCT_DATE) // Не дата изготовления
 				&&(DefAddr != REG_TASK_TIME)
-				&&(DefAddr != REG_TASK_DATE))
+				&&(DefAddr != REG_TASK_DATE)*/)
 			||(DefAddr == REG_CODE)||(DefAddr == REG_FCODE))//??? а надо ли перезаписывать пароли
 		{
 			*(ToUnsPtr(&g_Ram) + DefAddr) = Dcr.Def;
@@ -272,7 +273,7 @@ void ReadWriteAllParams(Byte cmd, TCoreMenu *p)	// в Core_MenuInit()
 		else ReadWriteEeprom(&Eeprom1,cmd,DefAddr,ToUnsPtr(&g_Ram) + DefAddr,count);
 		while (!IsMemParReady()) {FM25V10_Update(&Eeprom1); DelayUs(1000);}
 		// Инициализация фильтров, масштабов и т.д.
-		RefreshParams(DefAddr);
+		//RefreshParams(DefAddr);
 		DefAddr += count;
 	}
 }

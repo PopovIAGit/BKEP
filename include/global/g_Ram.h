@@ -252,7 +252,7 @@ typedef struct _TRamGroupB
 	Uns				p_UDu_Mpy24;		 // 87
 	Uns				p_UDu_Offset;		 // 88
 	//-------------------------------
-	Uns 			Rsvd3[3];
+	Uns 			Rsvd3[11];//89 90 91 92 93 94 95 96 97 98 99
 } TRamGroupB;
 
 // Группа C (Адрес = 140, Количество = 120) - Заводские параметры

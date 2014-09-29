@@ -12,11 +12,11 @@
 #define CONFIG_
 
 // Глобальные настройки
-#define VERSION				1		// Версия проекта
-#define SUBVERSION			3		// Подверсия проекта
-
 #define SYSCLK				150e6	// Системная частота (кол-во операций в сек)
 #define CLKIN				30e6	// Частота кварца
+
+#define DEF_USER_PASS		2387	// Пароль по-умолчанию (пользовательский)
+#define DEF_FACT_PASS		43072	// Пароль по-умолчанию (заводской)
 
 // Конфигурация операционной системы
 #define Prd18kHZ			18000	// Частота основного прерывания RTOS
@@ -53,6 +53,7 @@
 
 // Подключение заголовочных файлов
 //#include "g_InitHardware.h"
+#include "project_Version.h"
 #include "g_DeviceModification.h"		// Модификация блока
 #include "csl\csl_spi.h"
 #include "csl\csl_sci.h"
