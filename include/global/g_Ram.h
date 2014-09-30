@@ -126,7 +126,7 @@ typedef union _TTek_Discrete
 //----------------------------------------------------*--------------------------
 
 // ПАРАМЕТРЫ НАСТРОЙКИ
-// Группа A (Адрес = 500, Количество = 40) - Диагностика - просмотр
+// Группа A (Адрес = 0, Количество = 40) - Диагностика - просмотр
 typedef struct _TRamGroupA
 {
 	TStatusReg      Status;           	// 0.Статус работы
@@ -187,14 +187,14 @@ typedef struct _TRamGroupB
 	TParityMode		RsMode;				// 26.Режим связи
 	Uns				Rsvd4;				// 27.
 	Uns				KeyInvert;			// 28.Маска кнопок управления
-	Uns				MOD_FAULT;			// 29
-	Uns				RES_ERR;			// 70
-	Uns 			Rsvd2[1];			// 31
+	Uns				MOD_FAULT;
+	Uns				RES_ERR;
+	Uns 			Rsvd2[1];			// 29-31.
 	Uns				NoMoveTime;		   	// 32.Время отсутствия движения
 	Uns				OverwayZone;		// 33.Макси
 	TInputReg		DigitalMode;		// 34.режим потенциальный / импульсный
  	Uns             SleepTime;          // 35.Дежурный режим
- 	Uns 			Rsvd[4];			// 36 37 38 39
+ 	Uns 			Rsvd[4];
  	//------Параметры для ТУ------------------------------------
 	Uns				LevelOnOpen220;		 // 80
 	Uns				LevelOffOpen220;	 // 41
@@ -255,7 +255,7 @@ typedef struct _TRamGroupB
 	Uns 			Rsvd3[3];
 } TRamGroupB;
 
-// Группа C (Адрес = 140, Количество = 120) - Заводские параметры
+// Группа C (Адрес = 90, Количество = 120) - Заводские параметры
 typedef struct _TRamGroupC
 {
 	Uns             FactCode;           // 0.Код доступа
@@ -369,10 +369,10 @@ typedef struct _TRamGroupC
 	Int				Corr60Trq;			// 110 Параметр для корректировки индикации больших моментов (больше 60%)
 	Int				Corr80Trq;			// 111
 	Int				Corr110Trq;			// 112
-	Uns			    Rsvd2[7];			// 113 14 15 16 17 18 - 119 Резерв
+	Uns			    Rsvd2[7];			// 113 - 119 Резерв
 } TRamGroupC;
 
-// Группа D (Адрес = 260, Количество = 20 )  	- Команды
+// Группа D (Адрес = 210, Количество = 20 )  	- Команды
 typedef struct _TRamGroupD
 {
 	TTaskReset     TaskClose;           // 0.Задание закрыто
@@ -391,7 +391,7 @@ typedef struct _TRamGroupD
 } TRamGroupD;
 
 
-// Группа G (Адрес 280, Количество 30)  - Предположительно заводской тест
+// Группа G (Адрес 230, Количество 30)  - Предположительно заводской тест
 typedef struct _TRamGroupG
 {
 	Uns            Mode;                // 0.Режим теста
@@ -402,15 +402,15 @@ typedef struct _TRamGroupG
 	Uns			   TestCamera;			// 5.Тест с камеры
 	Uns			   ThyrGroup;			// 6.Выбор группы тиристоров
 	Uns            SifuEnable;          // 7.Разрешение работы СИФУ
-	Uns			   Rsvd2[10];			// 8 9 10 11 12 13 14 15 16-17.Резерв
+	Uns			   Rsvd2[10];			// 8-17.Резерв
 	Uns			   ThyrOpenAngle;		// 18.Тестовый угол открытия
 	Uns			   DiscrInTest;			// 19. Тест дискретных входов
 	Uns			   DiscrOutTest;		// 20. Тест дискретных выходов
 	Bool		   IsDiscrTestActive;	// 21. Активен ли тест ТС/ТУ
-	Uns 		   Rsvd[8];			    // 22 23 24 25 26 27 28-29.Резерв
+	Uns 		   Rsvd[8];			    // 22-29.Резерв
 } TRamGroupG;
 
-// Группа H (Адрес 310, Количество 200)
+// Группа H (Адрес 260, Количество 200)
 typedef struct _TRamGroupH
 {
 	TCalibState     CalibState;          // 0.Состояние калибровки
@@ -424,7 +424,7 @@ typedef struct _TRamGroupH
 	Uns             CycleCnt;            // 10.Счетчик циклов
 	Uns				CmdKey;				 // 11.Команда с кнопок ЩСУ
 	Uns				CmdButton;			 // 12.Команда с ручек управления
-	Uns				Rsvd1[3];			 // 13 14 15.Резерв
+	Uns				Rsvd1[3];			 // 11-15.Резерв
 	Uns				TransCurr;			 // 16.Ток перехода
 	TCubArray		TqCurr;				 // 17-36.Ток поверхности
 	TCubArray		TqAngUI;			 // 37-56.Углы нагрузки
@@ -444,7 +444,7 @@ typedef struct _TRamGroupH
 	Uns             IvPr;                // 89.Ток фазы V
 	Uns             IwPr;                // 90.Ток фазы W
 	Uns             Imid;				 // 91.Средний ток
-  	Uns             ISkewValue;          // 92.Асиметрия токов нагрузки
+  	Uns             ISkewValue;          // +92.Асиметрия токов нагрузки
   	LgUns           Position;            // 93-94.Положение
 	LgUns  			FullStep;        	 // 95-96.Полный ход
 	TReverseType	ReverseType;         // 97.Тип реверса
@@ -452,7 +452,7 @@ typedef struct _TRamGroupH
 	TInputReg       StateTu;           	 // 99.Состояние дискретных входов
 	TOutputReg      StateTs;          	 // 100.Состояние дискретных выходов
 	Uns             TuReleMode;          // 101.Релейный режим
-	Uns      	    Rsvd2[12];		 	 // 102 3 4 5 6 7 8 9 10 11 -112 113.Нормальное состояние входов
+	Uns      	    Rsvd2[12];		 	 // 102-113.Нормальное состояние входов
 	Uns             StartIndic;			 // 114.Индикация в старте
  	Uns             SleepTime;           // 115.Дежурный режим  mb to C
 	Uns             BusyValue;       	 // 116.Процент исполнения
@@ -470,10 +470,10 @@ typedef struct _TRamGroupH
 	Uns				LogReset;			 // 128. Сброс журналов
 	Uns 			BkpIndication;		 // 129. Индикация на БКП
 	//-------------------------------
-	Uns 			Rsvd8[59];			 // 130-189.Резерв
+	Uns 			Rsvd8[30];			 // 172-200.Резерв
 } TRamGroupH;
 
-// Группа E (Адрес 500+40, Количество 32)
+// Группа E (Адрес 460, Количество 32)
 typedef struct _TRamGroupE
 {
 	TTimeVar       LogTime;				// T.Время
@@ -514,10 +514,10 @@ typedef struct _TRamLogBuff
 
 
 // ОБЩИЕ ПАРАМЕТРЫ
-// Группа E (Адрес 0, Количество 40)
-// начальный адрес 0
-typedef struct _TRamGroupT
+// начальный адрес 40001
+typedef struct _TTek_Mb_Group
 {
+	Uns 			Rsvd;				// 0 Резерв
 	TTek_TechReg 	TechReg;			// 1 Технологический регистр
 	TTek_DefReg  	DefReg;				// 2 Регистр дефектов
 	Uns 		 	PositionPr;			// 3 Текущее положение %
@@ -525,7 +525,7 @@ typedef struct _TRamGroupT
 	Uns 		 	CycleCnt;			// 5 Счетчик циклов
 	Uns			 	Rsvd1;				// 6 Резерв
 	Uns 		 	Iu;					// 7 Ток фазы U
-	Uns 		 	Rsvd2[9];			// 8 9 10 11 12 13 14 15 - 16 Резерв
+	Uns 		 	Rsvd2[9];			// 8 - 16 Резерв
 	Uns 			Ur;					// 17 Напряжение входной сети
 	Uns				Rsvd3;				// 18 Резерв
 	Uns 		 	Speed;				// 19 Текущая скорость
@@ -535,29 +535,27 @@ typedef struct _TRamGroupT
 	Uns				Rsvd6[4];			// 23 - 26 Резерв
 	Uns				RsStation;			// 27 Адрес станции (только для чтения)
 	Uns				Rsvd7;				// 28 Резерв
-	Uns				Rsvd8[12];			// 29 30 31 32 33 34 35 36 37 38 39 Резерв
-} TRamGroupT;
+} TTek_Mb_Group;
 
 
 // Структура параметров устройства
 typedef struct TRam
 {
-  TRamGroupT		ramGroupT;			// ПАРАМЕТРЫ НАСТРОЙКИ
+  TRamGroupA		ramGroupA;			// ПАРАМЕТРЫ НАСТРОЙКИ
   TRamGroupB		ramGroupB;
   TRamGroupC		ramGroupC;
   TRamGroupD		ramGroupD;
   TRamGroupG		ramGroupG;
   TRamGroupH		ramGroupH;
-  TRamGroupA		ramGroupA;			// ПАРАМЕТРЫ НАСТРОЙКИ
   TRamGroupE		ramGroupE;
 } TRam;
 
 // Структура параметров устройства
-/*typedef struct _TTEKDriveData
+typedef struct _TTEKDriveData
 {
 	TTek_Mb_Group	tekGroup;
 } TTekDriveData;
-*/
+
 
 #define RAM_ADR				0
 #define RAM_SIZE			sizeof(TRam)
@@ -708,7 +706,7 @@ Int Max3Int (Int , Int , Int );
 
 
 extern TRam 			g_Ram;
-//extern TTekDriveData	g_RamTek;
+extern TTekDriveData	g_RamTek;
 
 
 #endif
