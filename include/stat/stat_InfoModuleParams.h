@@ -4,10 +4,10 @@
 
 //#include "config.h"
 
-#define IM_FIRMWARE_VERSION		VERSION					// Версия ПО
-#define IM_DEVICE_ID			DEVICE_ID				// Идентификатор устройства
-#define IM_PARAMS_CNT			RAM_DATA_SIZE			// Количество параметров устройства
-#define IM_LOGS_CNT				LOGS_CNT				// Количество журналов устройства
+#define IM_FIRMWARE_VERSION		VERSION_MAJOR*1000+VERSION_MINOR	// Версия ПО
+#define IM_DEVICE_ID			DEVICE_ID							// Идентификатор устройства
+#define IM_PARAMS_CNT			RAM_DATA_SIZE						// Количество параметров устройства
+#define IM_LOGS_CNT				LOGS_CNT							// Количество журналов устройства
 
 #define IM_LOGEV_REC_ADDR		g_Ram.ramGroupH.LogEvAddr			// Текущий адрес журнала событий
 #define IM_LOGCMD_REC_ADDR		g_Ram.ramGroupH.LogCmdAddr			// Текущий адрес журнала команд

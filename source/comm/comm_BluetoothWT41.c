@@ -194,7 +194,14 @@ void BluetoothActivation(TBluetoothHandle bPort)
 	{
 		if (bPort->Connect==true)
 		{
-
+			if (BUTTON_BLUE==1 && bPort->ModeProtocol!=0)//
+			{
+				bPort->ButtActivTimer++;
+				if (bPort->ButtActivTimer>3)//300мс
+				{
+					GpioDataRegs.GPADAT.bit.GPIO27=1;
+				}
+			}
 		} else {
 			if (BUTTON_BLUE==1 && bPort->ModeProtocol!=0)//
 			{
@@ -356,6 +363,7 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 		case 10:	if (!bPort->Timer)
 					{
 						bPort->BlinkConnect = false;
+
 						ClearValues(bPort);	bPort->State=7;
 						McBsp_tx_disable(MCBSPA);
 						McBsp_rx_enable(MCBSPA);

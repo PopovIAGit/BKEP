@@ -47,6 +47,7 @@ void DS3231_Update(DS3231 *p)
 		if(p->Flag) {p->Flag = 0; p->Error = 1;}
 		else for(i = 0; i < 7; i++)
 		{
+			p->Error = 0;
 			Data = I2cMsg.Buffer[i];
 			if(i != 2) {Mode = 0; Data &= 0x7F;}
 			else if (!(Data & 0x40)) {Mode = 0; Data &= 0x3F;}
