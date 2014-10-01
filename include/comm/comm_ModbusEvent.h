@@ -57,9 +57,10 @@ __inline void PreambleEvent(TMbPort *hPort)
 	if (hPort->Params.HardWareType==UART_TYPE) SCI_transmit(hPort->Params.ChannelID, *hPort->Frame.Data++);
 	else if (hPort->Params.HardWareType==MCBSP_TYPE)
 	{
+		McBsp_tx_enable(hPort->Params.ChannelID);
 		//McBsp_transmit(hPort->Params.ChannelID, *hPort->Frame.Data++, 0);
-		DataSend = ((*hPort->Frame.Data++)&0x00FF)|((*hPort->Frame.Data++<<8)&0xFF00);
-		McBsp_transmit(hPort->Params.ChannelID, DataSend, 0);
+		//DataSend = ((*hPort->Frame.Data++)&0x00FF)|((*hPort->Frame.Data++<<8)&0xFF00);
+		//McBsp_transmit(hPort->Params.ChannelID, DataSend, 0);
 
 
 	}
@@ -149,7 +150,7 @@ static void SendFrame(TMbPort *hPort)
 	}
 	else if (hPort->Params.HardWareType==MCBSP_TYPE) {
 			McBsp_rx_disable(hPort->Params.ChannelID);
-			McBsp_tx_enable(hPort->Params.ChannelID);
+			//McBsp_tx_enable(hPort->Params.ChannelID);
 	}
 
 	StartTimer(&hPort->Frame.TimerPre);

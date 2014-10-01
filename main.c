@@ -119,14 +119,14 @@ interrupt void McbspRxAHandler(void) // прерывание приема данных
 {
 
 	BluetoothRxHandler(&g_Comm.Bluetooth, &g_Comm.mbBt);
-    PieCtrlRegs.PIEACK.all = PIEACK_GROUP6;
+    PieCtrlRegs.PIEACK.all |= PIEACK_GROUP6;
 }
 //-------------------------------------------------------------
 interrupt void McbspTxAHandler(void) // прерывание передачи данных
 {
 
 	BluetoothTxHandler(&g_Comm.Bluetooth, &g_Comm.mbBt);
-    PieCtrlRegs.PIEACK.all = PIEACK_GROUP6;
+    PieCtrlRegs.PIEACK.all |= PIEACK_GROUP6;
 }
 //-------------------------------------------------------------
 /*Uns I2CA_setCommand(void)

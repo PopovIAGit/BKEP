@@ -568,6 +568,7 @@ __inline void RxDataMode(TBluetoothHandle bPort, TMbHandle hPort)
 			Frame->Buf[2]=0;
 			bPort->StrIndex=0;
 			GpioDataRegs.GPADAT.bit.GPIO27=0;
+			StartTimer(&Frame->TimerPost);
 		}
 	}
 
@@ -669,7 +670,7 @@ void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 
 	bPort->TxBusy = false;
 
-	if (bPort->Mode == BT_COMMAND_MODE) return;
+	if (bPort->Mode == BT_COMMAND_MODE) { return;}
 
 
 	if (bPort->ModeProtocol==1)
