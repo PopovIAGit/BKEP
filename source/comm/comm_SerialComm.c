@@ -27,7 +27,7 @@ static Uns BrrValues[7] = SCI_DEFAULT_BRR_VALUES;
 
 __inline Byte UpdatePacket(TMbPacket *Packet);
 __inline Byte WriteData(Uns Addr, Uns *Data, Uns Count);
-//__inline Byte WriteDataRegsTek(Uns Addr, Uns *Data, Uns Count);
+__inline Byte WriteDataRegsTek(Uns Addr, Uns *Data, Uns Count);
 
 //---------------------------------------------------
 void InitChanelAsuModbus(TMbHandle hPort)
@@ -125,24 +125,12 @@ void InitChanelBtModbus(TMbHandle hPort)
 
 	hPort->Params.RetryCount  = 0;
 	hPort->Params.Scale       = 2;
-	hPort->Params.ConnTimeout = 40;
-	hPort->Params.RxDelay     = 10;
-	hPort->Params.TxDelay     = 10;
-	hPort->Params.AckTimeout  = 1;//1000;
-	hPort->Params.TrEnable    = &BtMbSetTr;
-	hPort->Frame.TimerPre.Timeout = 1;
-
-	/*
-	 *
-	hPort->Params.RetryCount  = 0;
-	hPort->Params.Scale       = 2;
 	hPort->Params.ConnTimeout = 2;
 	hPort->Params.RxDelay     = 2;
-	hPort->Params.TxDelay     = 10;
+	hPort->Params.TxDelay     = 2;
 	hPort->Params.AckTimeout  = 2;//1000;
 	hPort->Params.TrEnable    = &BtMbSetTr;
 	hPort->Frame.TimerPre.Timeout = 2;
-	 * */
 
 	hPort->Params.HardWareType	= MCBSP_TYPE;
 
@@ -214,12 +202,12 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 			case MB_READ_REGS:
 				switch(Res)
 				{
-					case 1: memcpy(Packet->Data, /*ToUnsPtr*/(&g_Ram.ramGroupT.TechReg) + Packet->Addr, Packet->Count);
+					case 1: memcpy(Packet->Data, ToUnsPtr(&g_Ram) + Packet->Addr, Packet->Count);
 							//Port->Frame.Exception = ReadRegs(Port, (Uint16 *)&Ram, Addr, Count);
 							break;
-					//case 5: memcpy(Packet->Data, ToUnsPtr(&g_RamTek) + (Packet->Addr- TEK_MB_START_ADDR), Packet->Count);
+					case 5: memcpy(Packet->Data, ToUnsPtr(&g_RamTek) + (Packet->Addr- TEK_MB_START_ADDR), Packet->Count);
 							//Port->Frame.Exception = ReadRegs(Port, (Uint16 *)&RamTek, (Addr - TEK_MB_START_ADDR), Count);
-					//		break;
+							break;
 					default: return EX_ILLEGAL_FUNCTION;
 				}
 				break;
@@ -229,9 +217,9 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 					case 1:
 						return WriteData(Packet->Addr, Packet->Data, Packet->Count);
 						//if (!Port->Frame.Exception) SerialCommRefresh();
-					//case 5:
+					case 5:
 						//return WriteRegsTek(Port, (Uint16 *)&RamTek, (Uint16 *)&Ram, (Addr - TEK_MB_START_ADDR), Count);
-						//return WriteDataRegsTek(Packet->Addr, Packet->Data, Packet->Count);
+						return WriteDataRegsTek(Packet->Addr, Packet->Data, Packet->Count);
 						//if (!Port->Frame.Exception) SerialCommRefresh();
 					default: return EX_ILLEGAL_FUNCTION;
 				}
@@ -240,7 +228,7 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 		return 0;
 }
 //---------------------------------------------------
-/*__inline Byte WriteDataRegsTek(Uns Addr, Uns *Data, Uns Count)
+__inline Byte WriteDataRegsTek(Uns Addr, Uns *Data, Uns Count)
 {
 	Uns  *Dest = ToUnsPtr(&g_RamTek) + Addr;
 
@@ -252,7 +240,7 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 	}
 
 	return EX_ILLEGAL_DATA_ADDRESS;
-}*/
+}
 //---------------------------------------------------
 __inline Byte WriteData(Uns Addr, Uns *Data, Uns Count)
 {
