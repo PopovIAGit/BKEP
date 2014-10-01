@@ -45,7 +45,6 @@ void Comm_Init(TComm *p)
 	g_Comm.Bluetooth.Mode	  	  = g_Comm.mbBt.Params.Mode;			//
 	g_Comm.Bluetooth.Parity	   	  = g_Comm.mbBt.Params.Parity;			//
 	SerialCommInit(&g_Comm.mbBt);
-	g_Comm.mbBt.Frame.TimerPost.Timeout=g_Comm.mbBt.Frame.TimerPre.Timeout*2;
 	InitChanelBt(&g_Comm.Bluetooth);
 
 	SerialCommInit(&g_Comm.mbAsu);

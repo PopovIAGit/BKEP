@@ -62,9 +62,6 @@ __inline void PreambleEvent(TMbPort *hPort)
 		//DataSend = ((*hPort->Frame.Data++)&0x00FF)|((*hPort->Frame.Data++<<8)&0xFF00);
 		//McBsp_transmit(hPort->Params.ChannelID, DataSend, 0);
 
-
-	}
-
 	if (timerSend>timer1send) timer1send=timerSend;
 	if (timerSend<timer2send) timer2send=timerSend;
 }
