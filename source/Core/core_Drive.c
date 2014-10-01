@@ -73,7 +73,7 @@
 				break;
 		}
 
-		if (g_Ram.ramGroupC.DriveType < 14)
+		if ((g_Ram.ramGroupC.DriveType < 14)&&(g_Ram.ramGroupC.DriveType != 0))
 		{
 			if ((*p->GearRatio != GearRatioDef[g_Ram.ramGroupC.DriveType - 1])
 					|| (*p->Inom != InomDef[g_Ram.ramGroupC.DriveType - 1])
