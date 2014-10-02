@@ -83,8 +83,6 @@ typedef struct {
 	// ---
 	TDmControl			MotorControl;	// Управление двигателем
 
-	TCoreDrive			Drive;			// Выбор типа приводаф
-
 	Uns 				PrevCycle;		// Предидущее значение счетчика циклов
 } TCore;
 
