@@ -81,7 +81,7 @@
 			{
 				if (IsMemParReady())
 				{
-					*p->GearRatio = GearRatioDef[g_Ram.ramGroupC.DriveType - 1];
+					p->GearRatio = GearRatioDef[g_Ram.ramGroupC.DriveType - 1];
 					*p->Inom = InomDef[g_Ram.ramGroupC.DriveType - 1];
 					*p->MaxTorqe = MomMaxDef[g_Ram.ramGroupC.DriveType - 1];
 					WriteToEeprom(GetAdr(ramGroupC.MaxTorque), &g_Ram.ramGroupC.MaxTorque, 3);

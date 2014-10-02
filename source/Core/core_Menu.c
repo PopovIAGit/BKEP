@@ -215,12 +215,12 @@ void SetDefaultValues(TCoreMenu *p, Byte *groupNumber) // в Core_MenuDisplay()
 		// Если не Время и не Дата или
 		// Если Код доступа групп B и C
 		if ((((Dcr.Config.all & DefCode) == DefCode)
-				/*&&(DefAddr != REG_DRIVE_TYPE) // Не тип привода
+				&&(DefAddr != REG_DRIVE_TYPE) // Не тип привода
 				&&(DefAddr != REG_GEAR_RATIO) // Не тип редуктора
 				&&(DefAddr != REG_FACTORY_NUMBER) // Не номер
 				&&(DefAddr != REG_PRODUCT_DATE) // Не дата изготовления
 				&&(DefAddr != REG_TASK_TIME)
-				&&(DefAddr != REG_TASK_DATE)*/)
+				&&(DefAddr != REG_TASK_DATE))
 			||(DefAddr == REG_CODE)||(DefAddr == REG_FCODE))//??? а надо ли перезаписывать пароли
 		{
 			*(ToUnsPtr(&g_Ram) + DefAddr) = Dcr.Def;
