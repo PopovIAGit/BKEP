@@ -23,8 +23,6 @@ extern Int
 	drive16, drive17, drive18, drive19, drive20;
 //------------------- Протатипы функций ------------------------------------
 
-void Core_Drive_Init(TCoreDrive *);
-void Core_Drive_Update(TCoreDrive *);
-void Core_Drive_ParamSet(TCoreDrive *);
+void Core_Drive_Update(void);
 
 #endif

@@ -209,7 +209,7 @@ void RefreshParams(Uns addr)
 
 	} else if (addr == REG_DRIVE_TYPE) {
 
-		Core_Drive_Update(&g_Core.Drive);
+		Core_Drive_Update();
 		CubRefresh(&g_Core.TorqObs.Cub1, &g_Ram.ramGroupH.TqCurr);
 		CubRefresh(&g_Core.TorqObs.Cub2, &g_Ram.ramGroupH.TqAngUI);
 

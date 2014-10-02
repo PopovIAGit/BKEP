@@ -38,7 +38,6 @@ void Core_Init(TCore *p)
 	Core_TorqueInit(&p->TorqObs);			// Расчет моментов
 	//Core_CommandsInit(&p->commands);		// Получение команд, настройка калибровки
 	Core_ProtectionsInit(&p->Protections);	// Защиты
-	Core_Drive_Init(&p->Drive);				// Выбор типа привода
 
 	p->Status.bit.Stop = 1;					// При включение выставляем стоп
 }
