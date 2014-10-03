@@ -1,6 +1,7 @@
 
 #include "core.h"
 
+	Uns FirstUpdate=0;
 	Int InomDef[13]  	 = {13,11,18,52,52,47,56,110,85,148,240,294,358};						// default значения для Inom для разных приводов
 	Int MomMaxDef[13]  	 = {10,10,40,40,80,100,400,400,1000,1000,1000,1500,2000};				//				для Mmax
 	Int TransCurrDef[10] = {1000,1000,1000,1000,1000,1000,1100,1100,1100,1100};					//				для TransCur править
@@ -9,7 +10,7 @@
 
 	void Core_Drive_Update(void)
 	{
-		WAIT_FOR_EEPROM_READY();
+		//WAIT_FOR_EEPROM_READY();
 		switch(g_Ram.ramGroupC.DriveType)
 		{
 			case dt100_A25:
@@ -72,13 +73,40 @@
 					|| (g_Ram.ramGroupC.Inom!= InomDef[g_Ram.ramGroupC.DriveType - 1])
 					|| (g_Ram.ramGroupC.MaxTorque != MomMaxDef[g_Ram.ramGroupC.DriveType - 1]))
 			{
+				/*if (FirstUpdate==1)
+				{
+					WAIT_FOR_EEPROM_READY();
+					if (IsMemParReady())
+					{
+						g_Ram.ramGroupC.GearRatio = GearRatioDef[g_Ram.ramGroupC.DriveType - 1];
+						g_Ram.ramGroupC.Inom = InomDef[g_Ram.ramGroupC.DriveType - 1];
+						g_Ram.ramGroupC.MaxTorque = MomMaxDef[g_Ram.ramGroupC.DriveType - 1];
+						WriteToEeprom(GetAdr(ramGroupC.MaxTorque), &g_Ram.ramGroupC.MaxTorque, 3);
+					}
+				} else*/
+				if (FirstUpdate==0){
+					g_Ram.ramGroupC.GearRatio = GearRatioDef[g_Ram.ramGroupC.DriveType - 1];
+					g_Ram.ramGroupC.Inom = InomDef[g_Ram.ramGroupC.DriveType - 1];
+					g_Ram.ramGroupC.MaxTorque = MomMaxDef[g_Ram.ramGroupC.DriveType - 1];
+				}
+			}
+		} FirstUpdate=1;
+	}
+
+	void Drive_ReWrite_Update(void)
+	{
+		if ((g_Ram.ramGroupC.DriveType < 14)&&(g_Ram.ramGroupC.DriveType != 0))
+		{
+			if ((g_Ram.ramGroupC.GearRatio != GearRatioDef[g_Ram.ramGroupC.DriveType - 1])
+					|| (g_Ram.ramGroupC.Inom!= InomDef[g_Ram.ramGroupC.DriveType - 1])
+					|| (g_Ram.ramGroupC.MaxTorque != MomMaxDef[g_Ram.ramGroupC.DriveType - 1]))
+			{
 				if (IsMemParReady())
 				{
 					g_Ram.ramGroupC.GearRatio = GearRatioDef[g_Ram.ramGroupC.DriveType - 1];
 					g_Ram.ramGroupC.Inom = InomDef[g_Ram.ramGroupC.DriveType - 1];
 					g_Ram.ramGroupC.MaxTorque = MomMaxDef[g_Ram.ramGroupC.DriveType - 1];
-					WriteToEeprom(GetAdr(ramGroupC.MaxTorque), &g_Ram.ramGroupC.MaxTorque, 3);
-
+					WriteToEeprom(144, &g_Ram.ramGroupC.MaxTorque, 3);
 				}
 			}
 		}

@@ -17,7 +17,7 @@
 #define IsMemParReady()				(!Eeprom1.Func)
 #define IsMemLogReady()				(!Eeprom2.Func)
 
-#define WAIT_FOR_EEPROM_READY() while (!IsMemParReady())	{FM25V10_Update(&Eeprom1); DelayUs(1000);}
+#define WAIT_FOR_EEPROM_READY() while (!IsMemParReady())	{FM25V10_Update(&Eeprom1); /*DelayUs(1000);*/}
 
 #define ReadFromEeprom(addr,buf,count)	ReadWriteEeprom(&Eeprom1,F_READ,addr,buf,count)
 #define WriteToEeprom(addr,buf,count)	ReadWriteEeprom(&Eeprom1,F_WRITE,addr,buf,count)

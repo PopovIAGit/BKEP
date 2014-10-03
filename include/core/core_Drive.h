@@ -24,5 +24,6 @@ extern Int
 //------------------- Протатипы функций ------------------------------------
 
 void Core_Drive_Update(void);
+void Drive_ReWrite_Update(void);
 
 #endif

@@ -30,29 +30,36 @@ void Peref_SensObserverInit(TSensObserver *p)
 
 void Peref_SensTuObserverInit(TSensTuObserver *p)
 {
-	p->parSensors.p_UOpen_Mpy		= &g_Ram.ramGroupB.UOpen_Mpy24;
 	p->parSensors.p_UOpen_Offset		= &g_Ram.ramGroupB.p_UOpen_Offset;
-
-	p->parSensors.p_UClose_Mpy		= &g_Ram.ramGroupB.p_UClose_Mpy24;
 	p->parSensors.p_UClose_Offset		= &g_Ram.ramGroupB.p_UClose_Offset;
-
-	p->parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy24;
 	p->parSensors.p_UStop_Offset		= &g_Ram.ramGroupB.p_UStop_Offset;
-
-	p->parSensors.p_UMu_Mpy			= &g_Ram.ramGroupB.p_UMu_Mpy24;
 	p->parSensors.p_UStop_Offset		= &g_Ram.ramGroupB.p_UStop_Offset;
-
-	p->parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy24;
 	p->parSensors.p_UMu_Offset		= &g_Ram.ramGroupB.p_UMu_Offset;
-
-	p->parSensors.p_UResetAlarm_Mpy		= &g_Ram.ramGroupB.p_UResetAlarm_Mpy24;
 	p->parSensors.p_UResetAlarm_Offset	= &g_Ram.ramGroupB.p_UResetAlarm_Offset;
-
-	p->parSensors.p_UReadyTu_Mpy		= &g_Ram.ramGroupB.p_UReadyTu_Mpy24;
 	p->parSensors.p_UReadyTu_Offset		= &g_Ram.ramGroupB.p_UReadyTu_Offset;
-
-	p->parSensors.p_UDu_Mpy			= &g_Ram.ramGroupB.p_UDu_Mpy24;
 	p->parSensors.p_UDu_Offset		= &g_Ram.ramGroupB.p_UDu_Offset;
+/*
+	if (REG_TU_TYPE==0)
+	{
+		p->parSensors.p_UOpen_Mpy		= &g_Ram.ramGroupB.UOpen_Mpy24;
+		p->parSensors.p_UClose_Mpy		= &g_Ram.ramGroupB.p_UClose_Mpy24;
+		p->parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy24;
+		p->parSensors.p_UMu_Mpy		= &g_Ram.ramGroupB.p_UMu_Mpy24;
+		p->parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy24;
+		p->parSensors.p_UResetAlarm_Mpy= &g_Ram.ramGroupB.p_UResetAlarm_Mpy24;
+		p->parSensors.p_UReadyTu_Mpy	= &g_Ram.ramGroupB.p_UReadyTu_Mpy24;
+		p->parSensors.p_UDu_Mpy		= &g_Ram.ramGroupB.p_UDu_Mpy24;
+	} else
+	{
+		p->parSensors.p_UOpen_Mpy		= &g_Ram.ramGroupB.UOpen_Mpy220;
+		p->parSensors.p_UClose_Mpy		= &g_Ram.ramGroupB.p_UClose_Mpy220;
+		p->parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy220;
+		p->parSensors.p_UMu_Mpy		= &g_Ram.ramGroupB.p_UMu_Mpy220;
+		p->parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy220;
+		p->parSensors.p_UResetAlarm_Mpy= &g_Ram.ramGroupB.p_UResetAlarm_Mpy220;
+		p->parSensors.p_UReadyTu_Mpy	= &g_Ram.ramGroupB.p_UReadyTu_Mpy220;
+		p->parSensors.p_UDu_Mpy		= &g_Ram.ramGroupB.p_UDu_Mpy220;
+	}*/
 
 	p->pOffsetMode = mAutoOffset;
 }

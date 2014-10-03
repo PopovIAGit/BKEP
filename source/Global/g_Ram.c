@@ -20,8 +20,9 @@ void RefreshData(void);
 void WriteAllParams(void);
 void ReadAllParams(void);
 void CubRefresh(TCubStr *v, TCubArray *Array);
+void ReWriteParams(void);
 
-
+Uns RefreshCub=0;
 //---------------------------------------------------
 void g_Ram_Init(TRam *p)
 {
@@ -132,7 +133,7 @@ void g_Ram_Update(TRam *p)
 	    p->ramGroupH.IvPr = (g_Peref.sinObserver.IV.Output * 100) / p->ramGroupC.Inom;
 	    p->ramGroupH.IwPr = (g_Peref.sinObserver.IW.Output * 100) / p->ramGroupC.Inom;
 	    p->ramGroupH.Imidpr = (g_Peref.Imid * 100) / p->ramGroupC.Inom;
-	  //  p->ramGroupA.AngleUI = g_Peref.AngleUI;
+	    p->ramGroupA.AngleUI = g_Peref.AngleUI;
 	    p->ramGroupH.ISkewValue = SkewCalc(g_Peref.sinObserver.IU.Output, g_Peref.sinObserver.IV.Output, g_Peref.sinObserver.IW.Output,
 		    g_Peref.Imid);
 	    if (p->ramGroupB.IIndicMode == imRms)
@@ -181,13 +182,29 @@ void g_Ram_Update(TRam *p)
     else if (!STATE_TU24)
 	{p->ramGroupB.InputType = it220;}
 
+    ReWriteParams();
+
 }
 //---------------------------------------------------
+
+void ReWriteParams(void)
+{
+	Drive_ReWrite_Update();
+
+	if (RefreshCub==1){
+		if (IsMemParReady())
+		{
+			RefreshCub = 0;
+			WriteToEeprom(GetAdr(ramGroupH.TqCurr.Data[0][0]), &g_Ram.ramGroupH.TqCurr.Data[0][0], 40);
+		}
+	}
+
+}
+
 // Обновление значение по требованию
 void RefreshParams(Uns addr)
 {
-	//TCoreProtections *pProtections 	= &g_Core.protections;
-	//TPeref *pPeref 					= &g_Peref;
+
 	TPerefPosition *pPosition 		= &g_Peref.Position;
 
 	if (addr == REG_GEAR_RATIO)	{
@@ -197,22 +214,18 @@ void RefreshParams(Uns addr)
 
 	}else if (addr == REG_OVERWAY_ZONE) { g_Core.VlvDrvCtrl.Valve.BreakDelta = (((LgUns)pPosition->GearRatio * (LgUns)g_Ram.ramGroupB.OverwayZone) << *pPosition->PosSensPow)/10; //CalcClbAbsRev(&Calib, g_Ram.ramGroupB.OverwayZone);
 
-	}else if (addr == REG_TU_INVERT){
-
-		// Все входа не реверсивные
-		// хуйню заменить на нормальный код
-		//TuOpen.Level  = DIN_LEVEL(SBEXT_OPEN,  (Uns)g_Ram.ramGroupB.InputMask.bit.Open);
-		//TuClose.Level = DIN_LEVEL(SBEXT_CLOSE, (Uns)g_Ram.ramGroupB.InputMask.bit.Close);
-		//TuStop.Level  = DIN_LEVEL(SBEXT_STOP,  (Uns)g_Ram.ramGroupB.InputMask.bit.Stop);
-		//TuMu.Level    = DIN_LEVEL(SBEXT_MU,    (Uns)g_Ram.ramGroupB.InputMask.bit.Mu);
-		//TuDu.Level    = DIN_LEVEL(SBEXT_DU,    (Uns)g_Ram.ramGroupB.InputMask.bit.Du);
-
 	} else if (addr == REG_DRIVE_TYPE) {
 
 		Core_Drive_Update();
 		CubRefresh(&g_Core.TorqObs.Cub1, &g_Ram.ramGroupH.TqCurr);
 		CubRefresh(&g_Core.TorqObs.Cub2, &g_Ram.ramGroupH.TqAngUI);
+		RefreshCub = 1;
 
+	}	else if (addr >= REG_TORQUE_CURR && addr < REG_TORQUE_ANG_SF)
+	{
+		CubRefresh(&g_Core.TorqObs.Cub1, &g_Ram.ramGroupH.TqCurr);
+		CubRefresh(&g_Core.TorqObs.Cub2, &g_Ram.ramGroupH.TqAngUI);
+		RefreshCub = 1;
 	}	else if (addr == REG_MAX_TRQE)
 	{
 		 g_Core.TorqObs.TorqueMax = g_Ram.ramGroupC.MaxTorque * 10; //??? убрать в обновление параметров
@@ -233,8 +246,6 @@ void RefreshParams(Uns addr)
 			peref_ApFilter1Init(&g_Peref.UfltrResetAlarm,(Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
 			peref_ApFilter1Init(&g_Peref.UfltrReadyTU, 	 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
 			peref_ApFilter1Init(&g_Peref.UfltrDU, 		 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
-
-
 
 	} else if (addr == REG_RMS_FILTER_TF) {
 
@@ -257,15 +268,31 @@ void RefreshParams(Uns addr)
 			peref_ApFilter3Init(&g_Peref.U3fltrReadyTU,   (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
 			peref_ApFilter3Init(&g_Peref.U3fltrDU, 		  (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
 
-	} else if (addr >= REG_TORQUE_CURR && addr < REG_TORQUE_CURR+20) {
-		//CubRefresh(&Torq.Cub1, &g_Ram.ramGroupGrH->TqCurr);
+	} else if (addr == REG_TU_TYPE) {
 
-	} else if (addr >= REG_TORQUE_ANGLE_UI && addr < REG_TORQUE_ANGLE_UI+20){
-		// CubRefresh(&Torq.Cub2, &g_Ram.ramGroupGrH->TqAngUI);
-
-	}else if (addr >= REG_TORQUE_ANG_SF && addr < REG_TORQUE_ANG_SF+20){
-		//CubRefresh(&Torq.Cub3, &g_Ram.ramGroupGrH->TqAngSf);
+		if (g_Ram.ramGroupB.InputType==it24)
+		{
+			g_Peref.InDigSignalObserver.parSensors.p_UOpen_Mpy		= &g_Ram.ramGroupB.UOpen_Mpy24;
+			g_Peref.InDigSignalObserver.parSensors.p_UClose_Mpy		= &g_Ram.ramGroupB.p_UClose_Mpy24;
+			g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy24;
+			g_Peref.InDigSignalObserver.parSensors.p_UMu_Mpy		= &g_Ram.ramGroupB.p_UMu_Mpy24;
+			g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy24;
+			g_Peref.InDigSignalObserver.parSensors.p_UResetAlarm_Mpy= &g_Ram.ramGroupB.p_UResetAlarm_Mpy24;
+			g_Peref.InDigSignalObserver.parSensors.p_UReadyTu_Mpy	= &g_Ram.ramGroupB.p_UReadyTu_Mpy24;
+			g_Peref.InDigSignalObserver.parSensors.p_UDu_Mpy		= &g_Ram.ramGroupB.p_UDu_Mpy24;
+		} else
+		{
+			g_Peref.InDigSignalObserver.parSensors.p_UOpen_Mpy		= &g_Ram.ramGroupB.UOpen_Mpy220;
+			g_Peref.InDigSignalObserver.parSensors.p_UClose_Mpy		= &g_Ram.ramGroupB.p_UClose_Mpy220;
+			g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy220;
+			g_Peref.InDigSignalObserver.parSensors.p_UMu_Mpy		= &g_Ram.ramGroupB.p_UMu_Mpy220;
+			g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy220;
+			g_Peref.InDigSignalObserver.parSensors.p_UResetAlarm_Mpy= &g_Ram.ramGroupB.p_UResetAlarm_Mpy220;
+			g_Peref.InDigSignalObserver.parSensors.p_UReadyTu_Mpy	= &g_Ram.ramGroupB.p_UReadyTu_Mpy220;
+			g_Peref.InDigSignalObserver.parSensors.p_UDu_Mpy		= &g_Ram.ramGroupB.p_UDu_Mpy220;
+		}
 	}
+
 
 }
 //---------------------------------------------------
