@@ -49,7 +49,9 @@ void Core_MenuInit(TCoreMenu *p)
 
 	// Чтение всех параметров из Eeprom
 	ReadWriteAllParams(F_READ,p);
-	RefreshParams(REG_DRIVE_TYPE);
+	//RefreshParams(REG_DRIVE_TYPE);
+	//RefreshParams(REG_SIN_FILTER_TF);
+	//RefreshParams(REG_RMS_FILTER_TF);
 	// Проверяем настроен ли ModBus
 	SetModBusParams();
 	// Номер версии
@@ -215,12 +217,14 @@ void SetDefaultValues(TCoreMenu *p, Byte *groupNumber) // в Core_MenuDisplay()
 		// Если не Время и не Дата или
 		// Если Код доступа групп B и C
 		if ((((Dcr.Config.all & DefCode) == DefCode)
-				/*&&(DefAddr != REG_DRIVE_TYPE) // Не тип привода
+				&&(DefAddr != REG_DRIVE_TYPE) // Не тип привода
 				&&(DefAddr != REG_GEAR_RATIO) // Не тип редуктора
 				&&(DefAddr != REG_FACTORY_NUMBER) // Не номер
 				&&(DefAddr != REG_PRODUCT_DATE) // Не дата изготовления
 				&&(DefAddr != REG_TASK_TIME)
-				&&(DefAddr != REG_TASK_DATE)*/)
+				&&(DefAddr != REG_MAX_TRQE)
+				&&(DefAddr != REG_I_NOM)
+				&&(DefAddr != REG_TASK_DATE))
 			||(DefAddr == REG_CODE)||(DefAddr == REG_FCODE))//??? а надо ли перезаписывать пароли
 		{
 			*(ToUnsPtr(&g_Ram) + DefAddr) = Dcr.Def;
@@ -270,10 +274,22 @@ void ReadWriteAllParams(Byte cmd, TCoreMenu *p)	// в Core_MenuInit()
 		{
 			*(ToUnsPtr(&g_Ram) + DefAddr) = 0;
 		}
-		else ReadWriteEeprom(&Eeprom1,cmd,DefAddr,ToUnsPtr(&g_Ram) + DefAddr,count);
+		else {
+			if (g_Ram.ramGroupC.DriveType!=0
+					&& (DefAddr==REG_MAX_TRQE || DefAddr==REG_I_NOM || DefAddr==REG_GEAR_RATIO
+						|| (DefAddr>=REG_TORQUE_CURR && DefAddr<REG_TORQUE_ANG_SF)
+					)
+				)
+			{
+
+			} else
+			{
+				ReadWriteEeprom(&Eeprom1,cmd,DefAddr,ToUnsPtr(&g_Ram) + DefAddr,count);
+			}
+		}
 		while (!IsMemParReady()) {FM25V10_Update(&Eeprom1); DelayUs(1000);}
 		// Инициализация фильтров, масштабов и т.д.
-		//RefreshParams(DefAddr);
+		RefreshParams(DefAddr);
 		DefAddr += count;
 	}
 }

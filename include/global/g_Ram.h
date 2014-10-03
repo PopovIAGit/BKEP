@@ -593,6 +593,7 @@ typedef struct TRam
 
 #define REG_DRIVE_TYPE			GetAdr(ramGroupC.DriveType)
 #define REG_MAX_TRQE			GetAdr(ramGroupC.MaxTorque)
+#define REG_I_NOM				GetAdr(ramGroupC.Inom)
 
 #define REG_TORQUE_CURR 		GetAdr(ramGroupH.TqCurr)
 #define REG_TORQUE_ANGLE_UI		GetAdr(ramGroupH.TqAngUI)

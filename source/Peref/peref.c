@@ -227,29 +227,27 @@ void Peref_10HzCalc(TPeref *p)	// 10 Гц
 {
   int16 PosPr = 0;
 
-  //------------- Переключение параметров настройки для режимов 220/24
-
-  if (g_Ram.ramGroupB.InputType == it220)
-      {
-	  p->InDigSignalObserver.parSensors.p_UOpen_Mpy = &g_Ram.ramGroupB.UOpen_Mpy220;
-	  p->InDigSignalObserver.parSensors.p_UOpen_Mpy = &g_Ram.ramGroupB.UOpen_Mpy220;
-	  p->InDigSignalObserver.parSensors.p_UOpen_Mpy = &g_Ram.ramGroupB.UOpen_Mpy220;
-	  p->InDigSignalObserver.parSensors.p_UOpen_Mpy = &g_Ram.ramGroupB.UOpen_Mpy220;
-	  p->InDigSignalObserver.parSensors.p_UOpen_Mpy = &g_Ram.ramGroupB.UOpen_Mpy220;
-	  p->InDigSignalObserver.parSensors.p_UOpen_Mpy = &g_Ram.ramGroupB.UOpen_Mpy220;
-	  p->InDigSignalObserver.parSensors.p_UOpen_Mpy = &g_Ram.ramGroupB.UOpen_Mpy220;
-      }
-  else if (g_Ram.ramGroupB.InputType == it24)
-      {
-	  p->InDigSignalObserver.parSensors.p_UOpen_Mpy = &g_Ram.ramGroupB.UOpen_Mpy220;
-	  p->InDigSignalObserver.parSensors.p_UOpen_Mpy = &g_Ram.ramGroupB.UOpen_Mpy220;
-	  p->InDigSignalObserver.parSensors.p_UOpen_Mpy = &g_Ram.ramGroupB.UOpen_Mpy220;
-	  p->InDigSignalObserver.parSensors.p_UOpen_Mpy = &g_Ram.ramGroupB.UOpen_Mpy220;
-	  p->InDigSignalObserver.parSensors.p_UOpen_Mpy = &g_Ram.ramGroupB.UOpen_Mpy220;
-	  p->InDigSignalObserver.parSensors.p_UOpen_Mpy = &g_Ram.ramGroupB.UOpen_Mpy220;
-	  p->InDigSignalObserver.parSensors.p_UOpen_Mpy = &g_Ram.ramGroupB.UOpen_Mpy220;
-      }
-
+  if (g_Ram.ramGroupB.InputType==it24)
+  {
+		g_Peref.InDigSignalObserver.parSensors.p_UOpen_Mpy		= &g_Ram.ramGroupB.UOpen_Mpy24;
+		g_Peref.InDigSignalObserver.parSensors.p_UClose_Mpy		= &g_Ram.ramGroupB.p_UClose_Mpy24;
+		g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy24;
+		g_Peref.InDigSignalObserver.parSensors.p_UMu_Mpy		= &g_Ram.ramGroupB.p_UMu_Mpy24;
+		g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy24;
+		g_Peref.InDigSignalObserver.parSensors.p_UResetAlarm_Mpy= &g_Ram.ramGroupB.p_UResetAlarm_Mpy24;
+		g_Peref.InDigSignalObserver.parSensors.p_UReadyTu_Mpy	= &g_Ram.ramGroupB.p_UReadyTu_Mpy24;
+		g_Peref.InDigSignalObserver.parSensors.p_UDu_Mpy		= &g_Ram.ramGroupB.p_UDu_Mpy24;
+	} else
+	{
+		g_Peref.InDigSignalObserver.parSensors.p_UOpen_Mpy		= &g_Ram.ramGroupB.UOpen_Mpy220;
+		g_Peref.InDigSignalObserver.parSensors.p_UClose_Mpy		= &g_Ram.ramGroupB.p_UClose_Mpy220;
+		g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy220;
+		g_Peref.InDigSignalObserver.parSensors.p_UMu_Mpy		= &g_Ram.ramGroupB.p_UMu_Mpy220;
+		g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy220;
+		g_Peref.InDigSignalObserver.parSensors.p_UResetAlarm_Mpy= &g_Ram.ramGroupB.p_UResetAlarm_Mpy220;
+		g_Peref.InDigSignalObserver.parSensors.p_UReadyTu_Mpy	= &g_Ram.ramGroupB.p_UReadyTu_Mpy220;
+		g_Peref.InDigSignalObserver.parSensors.p_UDu_Mpy		= &g_Ram.ramGroupB.p_UDu_Mpy220;
+	}
 
  // if (p->Peref_StertDelayTimeout--) return; ???
 //-------- логика ЦАП -------------------------------------------------
