@@ -132,7 +132,7 @@ void g_Ram_Update(TRam *p)
 	    p->ramGroupH.IvPr = (g_Peref.sinObserver.IV.Output * 100) / p->ramGroupC.Inom;
 	    p->ramGroupH.IwPr = (g_Peref.sinObserver.IW.Output * 100) / p->ramGroupC.Inom;
 	    p->ramGroupH.Imidpr = (g_Peref.Imid * 100) / p->ramGroupC.Inom;
-	  //  p->ramGroupA.AngleUI = g_Peref.AngleUI;
+	    p->ramGroupA.AngleUI = g_Peref.AngleUI;
 	    p->ramGroupH.ISkewValue = SkewCalc(g_Peref.sinObserver.IU.Output, g_Peref.sinObserver.IV.Output, g_Peref.sinObserver.IW.Output,
 		    g_Peref.Imid);
 	    if (p->ramGroupB.IIndicMode == imRms)
@@ -197,16 +197,6 @@ void RefreshParams(Uns addr)
 
 	}else if (addr == REG_OVERWAY_ZONE) { g_Core.VlvDrvCtrl.Valve.BreakDelta = (((LgUns)pPosition->GearRatio * (LgUns)g_Ram.ramGroupB.OverwayZone) << *pPosition->PosSensPow)/10; //CalcClbAbsRev(&Calib, g_Ram.ramGroupB.OverwayZone);
 
-	}else if (addr == REG_TU_INVERT){
-
-		// Все входа не реверсивные
-		// хуйню заменить на нормальный код
-		//TuOpen.Level  = DIN_LEVEL(SBEXT_OPEN,  (Uns)g_Ram.ramGroupB.InputMask.bit.Open);
-		//TuClose.Level = DIN_LEVEL(SBEXT_CLOSE, (Uns)g_Ram.ramGroupB.InputMask.bit.Close);
-		//TuStop.Level  = DIN_LEVEL(SBEXT_STOP,  (Uns)g_Ram.ramGroupB.InputMask.bit.Stop);
-		//TuMu.Level    = DIN_LEVEL(SBEXT_MU,    (Uns)g_Ram.ramGroupB.InputMask.bit.Mu);
-		//TuDu.Level    = DIN_LEVEL(SBEXT_DU,    (Uns)g_Ram.ramGroupB.InputMask.bit.Du);
-
 	} else if (addr == REG_DRIVE_TYPE) {
 
 		Core_Drive_Update();
@@ -215,7 +205,7 @@ void RefreshParams(Uns addr)
 
 	}	else if (addr == REG_MAX_TRQE)
 	{
-		 g_Core.TorqObs.TorqueMax = g_Ram.ramGroupC.MaxTorque * 10; //??? убрать в обновление параметров
+		 g_Core.TorqObs.TorqueMax = g_Ram.ramGroupC.MaxTorque * 10;
 	}	else if (addr == REG_SIN_FILTER_TF){
 
 			peref_ApFilter1Init(&g_Peref.URfltr, (Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);		// Инициализируем фильтры
@@ -257,16 +247,7 @@ void RefreshParams(Uns addr)
 			peref_ApFilter3Init(&g_Peref.U3fltrReadyTU,   (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
 			peref_ApFilter3Init(&g_Peref.U3fltrDU, 		  (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
 
-	} else if (addr >= REG_TORQUE_CURR && addr < REG_TORQUE_CURR+20) {
-		//CubRefresh(&Torq.Cub1, &g_Ram.ramGroupGrH->TqCurr);
-
-	} else if (addr >= REG_TORQUE_ANGLE_UI && addr < REG_TORQUE_ANGLE_UI+20){
-		// CubRefresh(&Torq.Cub2, &g_Ram.ramGroupGrH->TqAngUI);
-
-	}else if (addr >= REG_TORQUE_ANG_SF && addr < REG_TORQUE_ANG_SF+20){
-		//CubRefresh(&Torq.Cub3, &g_Ram.ramGroupGrH->TqAngSf);
 	}
-
 }
 //---------------------------------------------------
 Int MinMax3IntValue (Int val1, Int val2, Int val3)

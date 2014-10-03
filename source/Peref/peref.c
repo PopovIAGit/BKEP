@@ -184,13 +184,13 @@ void Peref_50HzCalc(TPeref *p)	// 50 Ãö
     peref_ApFilter3Calc(&p->IV3fltr);
     peref_ApFilter3Calc(&p->IW3fltr);
 
-    p->U3fltrOpen.Input 	= p->InDigSignal.sigOpen.Output;
-    p->U3fltrClose.Input 	= p->InDigSignal.sigClose.Output;
-    p->U3fltrStop.Input 	= p->InDigSignal.sigStop.Output;
-    p->U3fltrMu.Input 		= p->InDigSignal.sigMU.Output;
+    p->U3fltrOpen.Input 		= p->InDigSignal.sigOpen.Output;
+    p->U3fltrClose.Input 		= p->InDigSignal.sigClose.Output;
+    p->U3fltrStop.Input 		= p->InDigSignal.sigStop.Output;
+    p->U3fltrMu.Input 			= p->InDigSignal.sigMU.Output;
     p->U3fltrResetAlarm.Input 	= p->InDigSignal.sigResetAlarm.Output;
-    p->U3fltrReadyTU.Input 	= p->InDigSignal.sigReadyTU.Output;
-    p->U3fltrDU.Input 		= p->InDigSignal.sigDU.Output;
+    p->U3fltrReadyTU.Input 		= p->InDigSignal.sigReadyTU.Output;
+    p->U3fltrDU.Input 			= p->InDigSignal.sigDU.Output;
 
     peref_ApFilter3Calc(&p->U3fltrOpen);
     peref_ApFilter3Calc(&p->U3fltrClose);
