@@ -46,6 +46,7 @@
 #define OvS_max_bit			12
 #define OvT_max_bit			13
 
+
 // Номера битов g_Structs.h -> TLoadReg
 #define PhlU_bit			0
 #define PhlV_bit			1

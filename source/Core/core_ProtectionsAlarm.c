@@ -1,6 +1,6 @@
 /*======================================================================
 Имя файла:          core_ProtectionsAlarm.c
-Автор:				Попов И.А.
+Автор:
 Версия файла:		1.00
 Дата изменения:		25.04.2014
 Описание:
@@ -13,6 +13,7 @@ void Core_ProtectionsAlarmInit(TAlarmElem *p)
 {
 
 }
+
 
 void Core_ProtectionsAlarmUpdate(TAlarmElem *p)
 {

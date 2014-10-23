@@ -278,7 +278,7 @@ typedef struct _TRamGroupC
 	TLedsReg        LedsReg;            // 16.Состояние светодиодов блока
 	THallBlock      HallBlock;          // 17.Состояние датчиков холла блока
 	Uns             SetDefaults;        // 18.Задание параметров по умолчанию
-	Uns       	    Rsvd1;           	// 19.Резерв
+	Uns       	PlugBrakeDisable;    // 19.Запрещение торможения противовключением
 	TPrtMode        DriveTemper;        // 20.Защита от перегрева двигателя. (дописать защиту перегрева блока в H)
 	Uns             OvLevel_max;        // 21.Уровень превышения напряжения при 47% превышения (320В)
 	Uns             OvTime_max;     	// 22.Время превышения напряжения при 47% превышения (1с)
@@ -369,7 +369,10 @@ typedef struct _TRamGroupC
 	Int				Corr60Trq;			// 110 Параметр для корректировки индикации больших моментов (больше 60%)
 	Int				Corr80Trq;			// 111
 	Int				Corr110Trq;			// 112
-	Uns			    Rsvd2[7];			// 113 14 15 16 17 18 - 119 Резерв
+	TNetReg				FaultNetRST;			//обрыв фар питания
+	Uns				LevelBreakRST;
+	Uns				TimeBreakRST;
+	Uns			    Rsvd2[4];			// 113 14 15 16 17 18 - 119 Резерв
 } TRamGroupC;
 
 // Группа D (Адрес = 260, Количество = 20 )  	- Команды

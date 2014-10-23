@@ -195,7 +195,7 @@ void ReWriteParams(void)
 		if (IsMemParReady())
 		{
 			RefreshCub = 0;
-			WriteToEeprom(GetAdr(ramGroupH.TqCurr.Data[0][0]), &g_Ram.ramGroupH.TqCurr.Data[0][0], 40);
+			WriteToEeprom(GetAdr(ramGroupH.TqCurr.Data[0][0])-1, &g_Ram.ramGroupH.TransCurr, 41);
 		}
 	}
 

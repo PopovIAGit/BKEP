@@ -110,10 +110,10 @@ typedef union _TProcessReg {
 	struct {
 		Uns NoMove:1;		// 0     Нет движения
 		Uns PhOrd:1;		// 1     Чередование фаз двигателя
-     	Uns NoClose:1;		// 2     Не задано положение закрыто
-     	Uns NoOpen:1;	   	// 3     Не задано положение открыто
+		Uns NoClose:1;		// 2     Не задано положение закрыто
+		Uns NoOpen:1;	   	// 3     Не задано положение открыто
 		Uns NoCalib:1;		// 4     Калибровка не выполнена
-     	Uns Overway:1;		// 5     Уплотнение не достигнуто
+		Uns Overway:1;		// 5     Уплотнение не достигнуто
 		Uns Mufta:1;		// 6	 Муфта
 		Uns MuDuDef:1;		// 7     Ошибка по дискретным входам Му/Ду
 		Uns Rsvd:8;			// 8-15  Резерв
@@ -127,7 +127,7 @@ typedef union _TProcessReg {
 #define NET_VSK_MASK		0x0080
 #define NET_BV_MASK			0x0700
 #define NET_OV_MAX_MASK		0x3800
-#define NET_EVLOG_MASK		0x3F7F
+#define NET_EVLOG_MASK		0x7FFF //0x3F7F
 
 typedef union _TNetReg {
 	Uns all;
@@ -138,15 +138,16 @@ typedef union _TNetReg {
 		Uns OvR:1;			// 3     Превышение напряжения в фазе R
 		Uns OvS:1;			// 4     Превышение напряжения в фазе S
 		Uns OvT:1;			// 5     Превышение напряжения в фазе T
-		Uns PhOrd:1;		// 6     Неверное чередование фаз сети
+		Uns PhOrd:1;			// 6     Неверное чередование фаз сети
 		Uns VSk:1;			// 7     Асимметрия напряжения входной сети
 		Uns BvR:1;			// 8     Обрыв фазы R входной сети
 		Uns BvS:1;			// 9     Обрыв фазы S входной сети
 		Uns BvT:1;			// 10    Обрыв фазы T входной сети
-		Uns OvR_max:1;		// 11    Превышение напряжения в фазе R на 47%
-		Uns OvS_max:1;		// 12    Превышение напряжения в фазе S на 47%
-		Uns OvT_max:1;		// 13    Превышение напряжения в фазе T на 47%
-		Uns Rsvd:2;			// 14-15 Резерв
+		Uns OvR_max:1;			// 11    Превышение напряжения в фазе R на 47%
+		Uns OvS_max:1;			// 12    Превышение напряжения в фазе S на 47%
+		Uns OvT_max:1;			// 13    Превышение напряжения в фазе T на 47%
+		Uns BreakRST:1;			// 14    Обрыв входного напряжения выключение вводного автомата
+		Uns Rsvd:1;			// 15 Резерв
 	} bit;
 } TNetReg;
 
@@ -165,13 +166,13 @@ typedef union _TLoadReg {
 		Uns PhlV:1;			// 1     Обрыв фазы V
 		Uns PhlW:1;			// 2     Обрыв фазы W
 		Uns I2t:1;			// 3     Время-токовая перегрузка
-		Uns Rsvd1:1;		// 4     Резерв
+		Uns Rsvd1:1;			// 4     Резерв
 		Uns ShCU:1;			// 5	 Короткое замыкание в фазе U
 		Uns ShCV:1;			// 6	 Короткое замыкание в фазе V
 		Uns ShCW:1;			// 7	 Короткое замыкание в фазе W
-		Uns Rsvd2:3;		// 8-10	 Резерв
-		Uns ISkew:1;		// 11    Ассиметрия тока
-		Uns Rsvd:4;			// 12-15 Резерв
+		Uns Rsvd2:3;			// 8-10	 Резерв
+		Uns ISkew:1;			// 11    Ассиметрия тока
+		Uns Rsvd:4;			// 13-15 Резерв
 	} bit;
 } TLoadReg;
 

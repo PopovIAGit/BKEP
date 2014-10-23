@@ -78,4 +78,5 @@ typedef struct {
 void Core_ProtectionsAlarmInit(TAlarmElem *);
 void Core_ProtectionsAlarmUpdate(TAlarmElem *);
 
+
 #endif

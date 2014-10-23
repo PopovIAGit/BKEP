@@ -56,6 +56,8 @@ typedef struct _TScFrame {
 	unsigned int TimerPost;
 	unsigned int TimerConn;
 	unsigned int MsgCount;
+	unsigned int TxDelayTimer;
+	unsigned int TxDelayTimeout;
 } TScFrame;
 
 typedef struct _TScStat {

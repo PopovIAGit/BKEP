@@ -295,7 +295,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overHeatBCD.Output			= &p->outDefects.Dev.all;
 	p->overHeatBCD.EnableLevel		= &g_Ram.ramGroupC.TemperHigh;
 	p->overHeatBCD.DisableLevel		= &g_Ram.ramGroupC.TemperHigh;
-	p->overHeatBCD.Timeout			= 0;
+	p->overHeatBCD.Timeout			= (Uns *)10;
 	p->overHeatBCD.Scale			= PROTECT_SCALE;
 
 	//------Переохлаждение блока БКД----------------------------------------
@@ -304,7 +304,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underColdBCD.Output			= &p->outDefects.Dev.all;
 	p->underColdBCD.EnableLevel		= &g_Ram.ramGroupC.TemperLow;
 	p->underColdBCD.DisableLevel	= &g_Ram.ramGroupC.TemperLow;
-	p->underColdBCD.Timeout			= 0;
+	p->underColdBCD.Timeout			= (Uns *)10;
 	p->underColdBCD.Scale			= PROTECT_SCALE;
 
 	//------Перегрев блока БКП----------------------------------------------
@@ -313,7 +313,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overHeatBCP.Output			= &p->outFaults.Dev.all;
 	p->overHeatBCP.EnableLevel		= &g_Ram.ramGroupC.TemperHigh;
 	p->overHeatBCP.DisableLevel		= &g_Ram.ramGroupC.TemperHigh;
-	p->overHeatBCP.Timeout			= 0;
+	p->overHeatBCP.Timeout			= (Uns *)100;
 	p->overHeatBCP.Scale			= PROTECT_SCALE;
 
 	//------Переохлаждение блока БКП----------------------------------------
@@ -322,7 +322,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underColdBCP.Output			= &p->outDefects.Dev.all;
 	p->underColdBCP.EnableLevel		= &g_Ram.ramGroupC.TemperLow;
 	p->underColdBCP.DisableLevel	= &g_Ram.ramGroupC.TemperLow;
-	p->underColdBCP.Timeout			= 0;
+	p->underColdBCP.Timeout			= (Uns *)100;
 	p->underColdBCP.Scale			= PROTECT_SCALE;
 
 	p->FaultDelay = (Uns)(Prd10HZ * 2);
@@ -372,8 +372,8 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 	case 3: // Защиты по току
 		Enable = (g_Ram.ramGroupC.Phl != pmOff) && (!g_Core.Status.bit.Stop);					// Обрыв выходных фаз (двиг.)
 		p->breakCurrU.Cfg.bit.Enable 		= Enable;
-		p->breakCurrU.Cfg.bit.Enable 		= Enable;
-		p->breakCurrU.Cfg.bit.Enable 		= Enable;
+		p->breakCurrV.Cfg.bit.Enable 		= Enable;
+		p->breakCurrW.Cfg.bit.Enable 		= Enable;
 
 		Enable = (g_Ram.ramGroupC.ShC != pmOff) && (!g_Core.Status.bit.Stop);					// Короткое замыкание
 		p->ShC_U.Cfg.bit.Enable 			= Enable;
@@ -476,9 +476,17 @@ void Core_ProtectionsReset(TCoreProtections *p)
 {
 	g_Core.MotorControl.OverWayFlag = 0;		// Сбросили отсусвие уплотнения
 	p->MuffFlag = 0;	// отчистили статус от аварии муфты и неисправености
+	p->outFaults.Proc.bit.Mufta = 0;
 	g_Core.Status.bit.Defect = 0;
 	g_Core.Status.bit.Fault = 0;
 	g_Core.Status.bit.Mufta = 0;
+	p->NoMoveFlag=0;
+
+	p->outDefects.Proc.bit.Mufta=0;
+	p->outFaults.Proc.bit.Mufta=0;
+
+	p->outDefects.Proc.bit.NoMove=0;
+	p->outFaults.Proc.bit.NoMove=0;
 
 	p->outDefects.Load.bit.ISkew = 0;
 	p->outDefects.Load.bit.PhlU = 0;
@@ -527,9 +535,28 @@ void Core_ProtectionsUpdate(TCoreProtections *p)
 
     Uns MuffEnable;
 
-    Core_ProtecionSHC_Update(&p->ShC_U);
-    Core_ProtecionSHC_Update(&p->ShC_V);
-    Core_ProtecionSHC_Update(&p->ShC_W);
+    /*if (g_Ram.ramGroupC.FaultNetRST.bit.BvR==1 && g_Ram.ramGroupC.FaultNetRST.bit.BvS==1 && g_Ram.ramGroupC.FaultNetRST.bit.BvT==1)
+	{
+	    if (!g_Core.Status.bit.Stop)
+	    {
+	    	//формируем запись в память об аварийном отключении
+		p->outFaults.Net.bit.BreakRST = 1;
+	    }
+	}
+*/
+
+    /*if ((g_Core.Protections.outFaults.Net.all&0x700)>>8==7)
+	{
+	   if (!g_Core.Status.bit.Stop)
+	   {
+		//формируем запись в память об аварийном отключении
+	   }
+	}*/
+
+
+    //Core_ProtecionSHC_Update(&p->ShC_U);
+    //Core_ProtecionSHC_Update(&p->ShC_V);
+    //Core_ProtecionSHC_Update(&p->ShC_W);
 
     p->outFaults.Proc.bit.Mufta = p->MuffFlag;
 
