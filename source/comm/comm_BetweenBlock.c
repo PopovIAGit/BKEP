@@ -61,6 +61,7 @@ void SciMasterConnBetweenBlockInit(TMbBBHandle Port)
 	Port->Params.TimeoutPost = 5;
 	Port->Params.TimeoutConn = CONN_SCALE/50;
 	Port->Params.RetryCount  = 3;
+	Port->Frame.TxDelayTimeout = CONN_SCALE/500;
 	Port->Params.TrEnable    = BkpConnTrEnable;
 
 	Port->TxPacket.Data[0]   = 0x78;
@@ -141,7 +142,13 @@ void SciMasterConnBetweenBlockUpdate(TMbBBHandle Port)
 			return;
 		}
 
+		if(Port->Frame.TxDelayTimer > 0) Port->Frame.TxDelayTimer--;
+
 		if(!Port->TxPacket.Flag) return;
+
+		if(Port->Frame.TxDelayTimer) return;
+		Port->Frame.TxDelayTimer = Port->Frame.TxDelayTimeout;
+
 		Port->TxPacket.Flag = 0;
 
 		Port->TxPacket.State = BEGIN_FRAME;
@@ -171,8 +178,8 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 	bPort->RxPacket.Flag = 0;
 
 	g_Ram.ramGroupA.VersionPOBkp     = bPort->RxPacket.Data[0];
-	BkpEncPostion       = (Uint32)bPort->RxPacket.Data[4] << 24;
-	BkpEncPostion      |= (Uint32)bPort->RxPacket.Data[3] << 16;
+	//BkpEncPostion       = (Uint32)bPort->RxPacket.Data[4] << 24;
+	//BkpEncPostion      |= (Uint32)bPort->RxPacket.Data[3] << 16;
 	BkpEncPostion      |= (Uint32)bPort->RxPacket.Data[2] << 8;
 	BkpEncPostion      |= (Uint32)bPort->RxPacket.Data[1] << 0;
 	g_Ram.ramGroupH.Position 		= BkpEncPostion;

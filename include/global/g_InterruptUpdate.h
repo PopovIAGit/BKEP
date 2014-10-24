@@ -87,7 +87,7 @@ TPeriodicalFunction Task18kHz[] =
 	PrdElemInit(Peref_SensTuObserverUpdate,				&g_Peref.InDigSignalObserver),
 	PrdElemInit(Peref_18kHzCalc,						&g_Peref),
 	PrdElemInit(SciMasterConnBetweenBlockCommTimer,		&g_Comm.mbBkp),	//на 18к√ц
-	PrdElemInit(MonitorUpdate,							NULL),
+	//PrdElemInit(MonitorUpdate,							NULL),
 	PrdElemInit(Core_ProtectionsUpdate,					&g_Core.Protections),
 };
 
@@ -151,9 +151,9 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakVoltR),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakVoltS),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakVoltT),
-	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.voltSkew),
+	//PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.voltSkew),
 	PrdElemInit(Core_ProtectionI2TUpdate,		&g_Core.Protections.I2t),
-	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.currSkew),
+	//PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.currSkew),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakCurrU),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakCurrV),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakCurrW),
@@ -161,6 +161,7 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.overHeatBCP),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.underColdBCD),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.underColdBCP),
+	//PrdElemInit(Core_ProtectionsBreakRST,	        &g_Core.Protections),
 	PrdElemInit(Comm_50HzCalc,					&g_Comm),
 	PrdElemInit(GetCurrentCmd,					&g_Stat),
 	PrdElemInit(Core_MenuDisplay,				&g_Core.menu),

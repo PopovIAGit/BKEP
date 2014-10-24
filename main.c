@@ -21,7 +21,7 @@ void main(void)
 	// Сначала инициализируется процессор
 	InitHardware();
 	memset(&g_Core, 	0, sizeof(TCore));
-	memset(&g_Ram, 	    0, sizeof(TRam));
+	memset(&g_Ram, 	    	0, sizeof(TRam));
 	//memset(&g_RamTek, 	0, sizeof(TTekDriveData));
 	memset(&g_Comm, 	0, sizeof(TComm));
 	memset(&g_Peref,	0, sizeof(TPeref));

@@ -82,7 +82,7 @@ typedef struct {
 	TContactorControl 	ContactorControl;	// Управление контакторами
 	//-------------------------------
 	Uns 				Umid;
-	Uns 				Imid;
+	Float 				Imid;
 	Uns 				AngleUI;
 	//---------------------------
 	TLeds				leds;

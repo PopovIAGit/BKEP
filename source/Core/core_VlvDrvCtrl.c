@@ -204,9 +204,9 @@ __inline void UnitControl(TCoreVlvDrvCtrl *p)
 				case vcwTestClose: DriveClose(p); 	break;
 				case vcwOpen:
 				case vcwTestOpen:  DriveOpen(p);  	break;
-				case vcwDemo:        				break;
-				case vcwTestEng:
-				default: p->StartControl(*p->ControlWord);
+				//case vcwDemo:        				break;
+				//case vcwTestEng:
+				default: break;//p->StartControl(*p->ControlWord);
 			}
 			*p->ControlWord = vcwNone;
 		}

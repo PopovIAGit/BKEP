@@ -74,7 +74,7 @@ void MonitorUpdate(void)
 
 	switch (MonSelect)
 	{
-	 	case 0: DlogCh1 = AdcRegs.ADCRESULT0;
+	 	case 0: DlogCh1 = AdcRegs.ADCRESULT2;
 		        DlogCh2 = (Uns)(g_Peref.IUfltr.Output); break;
 	 	case 1: DlogCh1 = (Uns)(g_Peref.IUfltr.Output);
 	 			DlogCh2 = (Uns)(g_Peref.IU3fltr.Output); break;

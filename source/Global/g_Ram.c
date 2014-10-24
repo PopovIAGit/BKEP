@@ -6,7 +6,7 @@
 Описание:
 Обновление переменной g_Ram
 ======================================================================*/
-
+//
 #include "g_Ram.h"
 #include "core.h"
 //#include "drive.h"
@@ -132,7 +132,9 @@ void g_Ram_Update(TRam *p)
 	    p->ramGroupH.IuPr = (g_Peref.sinObserver.IU.Output * 100) / p->ramGroupC.Inom;
 	    p->ramGroupH.IvPr = (g_Peref.sinObserver.IV.Output * 100) / p->ramGroupC.Inom;
 	    p->ramGroupH.IwPr = (g_Peref.sinObserver.IW.Output * 100) / p->ramGroupC.Inom;
-	    p->ramGroupH.Imidpr = (g_Peref.Imid * 100) / p->ramGroupC.Inom;
+	    p->ramGroupH.Imidpr = (g_Peref.Imid * 1000) / p->ramGroupC.Inom;
+	    p->ramGroupH.IwPr = p->ramGroupH.Imidpr; //???
+	    p->ramGroupH.Imid 	= g_Peref.Imid;
 	    p->ramGroupA.AngleUI = g_Peref.AngleUI;
 	    p->ramGroupH.ISkewValue = SkewCalc(g_Peref.sinObserver.IU.Output, g_Peref.sinObserver.IV.Output, g_Peref.sinObserver.IW.Output,
 		    g_Peref.Imid);
@@ -141,14 +143,12 @@ void g_Ram_Update(TRam *p)
 		    p->ramGroupA.Iu = g_Peref.sinObserver.IU.Output;
 		    p->ramGroupA.Iv = g_Peref.sinObserver.IV.Output;
 		    p->ramGroupA.Iw = g_Peref.sinObserver.IW.Output;
-		    p->ramGroupH.Imid = g_Peref.Imid;
 		}
 	    if (p->ramGroupB.IIndicMode == imPercent)
 		{
 		    p->ramGroupA.Iu = p->ramGroupH.IuPr;
 		    p->ramGroupA.Iv = p->ramGroupH.IvPr;
 		    p->ramGroupA.Iw = p->ramGroupH.IwPr;
-		    p->ramGroupH.Imid = p->ramGroupH.Imidpr;
 		}
 	}
     else
@@ -195,7 +195,7 @@ void ReWriteParams(void)
 		if (IsMemParReady())
 		{
 			RefreshCub = 0;
-			WriteToEeprom(GetAdr(ramGroupH.TqCurr.Data[0][0]), &g_Ram.ramGroupH.TqCurr.Data[0][0], 40);
+			WriteToEeprom(GetAdr(ramGroupH.TqCurr.Data[0][0])-1, &g_Ram.ramGroupH.TransCurr, 41);
 		}
 	}
 

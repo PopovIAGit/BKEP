@@ -26,6 +26,7 @@ typedef struct
 	unsigned	inputBit;			// входной сигнал 
 	unsigned	outputBit;			// выходной сигнал 
 	int    		Timer;				// Таймер
+	unsigned	signalType;			// тип сигнала (Инверсный/не инверсный)
 
 } TDigitalInputBit;
 
@@ -43,6 +44,7 @@ typedef struct
 	Uns 				timeDelay;		// Величина "срабатывания" сигнала
 	Uns					deltOn;			// Инкремент 
 	Uns 				deltOff;		// Декремент
+	Uns				*TypeLogicSignal;// тип сигнала по логике нормально розомкнутый/замкнутый - 0/1
 } TDigitalInput;
 
 void DigitalInputInit (TDigitalInput *, Uns, Uns, Uns);

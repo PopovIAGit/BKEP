@@ -40,6 +40,9 @@ void Core_Init(TCore *p)
 	Core_ProtectionsInit(&p->Protections);	// Защиты
 
 	p->Status.bit.Stop = 1;					// При включение выставляем стоп
+
+	g_Ram.ramGroupC.LevelBreakRST=60;
+	g_Ram.ramGroupC.TimeBreakRST=150;
 }
 
 // Функция задания момента в зависимости от положения и направления движения
@@ -102,7 +105,7 @@ void Core_DefineCtrlParams(TCore *p) // 50 hz
 	}
 
 	// пересчитываем задание на момент
-	p->MotorControl.TorqueSetPr = (p->MotorControl.TorqueSet * 100)/p->TorqObs.TorqueMax;
+	p->MotorControl.TorqueSetPr = (Uns)(((LgUns)p->MotorControl.TorqueSet * 100)/p->TorqObs.TorqueMax);
 }
 
 // Остановка по калибровке
@@ -207,11 +210,15 @@ void StopPowerControl(void)
 	{
 		g_Core.MotorControl.WorkMode = wmStop;  // Переходим в стейт машину стоп
 	}
-	else if (g_Core.MotorControl.CalibStop) g_Core.MotorControl.WorkMode = wmPlugBreak;
+	else if (g_Core.MotorControl.CalibStop) {
+		if (g_Ram.ramGroupC.PlugBrakeDisable==1) g_Core.MotorControl.WorkMode = wmStop;  // Переходим в стейт машину стоп
+		else g_Core.MotorControl.WorkMode = wmPlugBreak;
+	}
 	else g_Core.MotorControl.WorkMode = wmStop;
 
 	g_Core.MotorControl.CalibStop = 0;
 	g_Core.VlvDrvCtrl.StartDelay = (Uns)START_DELAY_TIME; // Выставляем задержку перед следующим пуском
+	g_Core.TorqObs.ObsEnable = false;
 }
 
 // Действия при пуске
@@ -219,6 +226,18 @@ void StartPowerControl(TValveCmd ControlWord)
 {
 	//Если КЗ то return
 	if (g_Ram.ramGroupA.Faults.Load.all & LOAD_SHC_MASK) return;
+
+	// сброс аварий необходимый для пуска
+	Core_ProtectionsReset(&g_Core.Protections);
+
+	if(g_Core.Protections.outFaults.Dev.all || g_Core.Protections.outFaults.Load.all ||g_Core.Protections.outFaults.Net.all ||g_Core.Protections.outFaults.Proc.all)
+	    return;
+
+	g_Core.TorqObs.ObsEnable = true;
+	g_Core.MotorControl.PlugBreakStep = 0;
+	g_Core.Status.bit.Stop 			= 0;
+	g_Core.MotorControl.TorqueSet 	= 0xFFFF;
+	g_Core.MotorControl.MufTimer = 0;
 
 	switch (ControlWord)
 	{
@@ -246,11 +265,7 @@ void StartPowerControl(TValveCmd ControlWord)
 			break;
 	}
 
-	// сброс аварий необходимый для пуска
-		Core_ProtectionsReset(&g_Core.Protections);
-	g_Core.MotorControl.PlugBreakStep = 0;
-	g_Core.Status.bit.Stop 			= 0;
-	g_Core.MotorControl.TorqueSet 	= 0xFFFF;
+
 //	if(g_Core.MotorControl.RequestDir < 0) g_Core.Status.bit.Closing = 1;
 //	if(g_Core.MotorControl.RequestDir > 0) g_Core.Status.bit.Opening = 1;
 
@@ -259,6 +274,8 @@ void StartPowerControl(TValveCmd ControlWord)
 // Стэйт машина
 void Core_ControlMode(TCore *p)
 {
+    p->Status.bit.Mufta = p->Protections.outFaults.Proc.bit.Mufta;
+
 	switch(p->MotorControl.WorkMode)
 	{
 	case wmStop:
@@ -279,6 +296,7 @@ void Core_ControlMode(TCore *p)
 		break;
 	case wmPlugBreak:
 		g_Ram.ramGroupA.Torque = 0;				// отображаем момент
+
 		if (p->MotorControl.PlugBreakTimer > 0) p->MotorControl.PlugBreakTimer--;
 		switch(p->MotorControl.PlugBreakStep)
 		{
@@ -304,16 +322,21 @@ void Core_ControlMode(TCore *p)
 
 void Core_LowPowerControl(TCore *p)
 {
-	Uns ShCState = 0;
-	ShCState = p->Protections.outFaults.Load.all & LOAD_SHC_MASK;
+
+    Uns ShCState = 0;
+
+    if (p->Protections.FaultDelay > 0)
+	return;
+
+    ShCState = p->Protections.outFaults.Load.all & LOAD_SHC_MASK;
 
 	// Событие выключения блока
-	if ((g_Ram.ramGroupA.Ur < 100) && (g_Ram.ramGroupA.Us < 100)
-			&& (g_Ram.ramGroupA.Ut < 100))
+	if ((g_Ram.ramGroupA.Ur < 60) && (g_Ram.ramGroupA.Us < 60)
+			&& (g_Ram.ramGroupA.Ut < 60))
 	{
-		p->Protections.outFaults.Dev.bit.LowPower = 1;
+		p->Protections.outDefects.Dev.bit.LowPower = 1;
 	}
-	else p->Protections.outFaults.Dev.bit.LowPower = 0;
+	else p->Protections.outDefects.Dev.bit.LowPower = 0;
 
 	// Запись КЗ
 	if (ShCState && !g_Ram.ramGroupH.ScFaults)

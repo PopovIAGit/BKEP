@@ -72,6 +72,8 @@ typedef struct {
 	TCubStr 	Cub2;			// куб по току
 	TCubConfig 	TqCurr;			// Настройки для куба по току
 	TCubConfig 	TqAngUI;		// Настройки для куба по углу фи
+	Uns		Tmp;
+	Uns             TorqIndication;
 } TTorqObs;
 
 

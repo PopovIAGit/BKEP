@@ -139,21 +139,26 @@ void InitHardware(void)
 
 
 	   AdcRegs.ADCTRL3.bit.ADCCLKPS = 4;		// clock prescaler, FCLK=HSPCLK/(2*ADCCLKPS)
-	   AdcRegs.ADCTRL1.bit.CPS 		= 0;		// ADCCLK = FCLK/2
+	   AdcRegs.ADCTRL1.bit.CPS 	= 0;		// ADCCLK = FCLK/2
 	   AdcRegs.ADCTRL1.bit.SEQ_CASC = 1;        // 1  Cascaded mode
 	   AdcRegs.ADCTRL1.bit.CONT_RUN = 1;        // Setup continuous run
 	   AdcRegs.ADCTRL1.bit.SUSMOD 	= 0;
-	   AdcRegs.ADCTRL1.bit.ACQ_PS 	= 8; // 16
+	   AdcRegs.ADCTRL1.bit.ACQ_PS 	= 8;//8 // 16
 	   AdcRegs.ADCTRL1.bit.SEQ_OVRD = 0;
 
 	   AdcRegs.ADCMAXCONV.all = 0x000F;       // Setup 2 conv's on SEQ1
+	   /*AdcRegs.ADCCHSELSEQ1.all      = 0x3210;
+	   AdcRegs.ADCCHSELSEQ2.all      = 0x7654;
+	   AdcRegs.ADCCHSELSEQ3.all      = 0xBA98;
+	   AdcRegs.ADCCHSELSEQ4.all      = 0xFEDC;*/
 	   AdcRegs.ADCCHSELSEQ1.bit.CONV00 = 0x0; // Setup ADCINA3 as 1st SEQ1 conv.
 	   AdcRegs.ADCCHSELSEQ1.bit.CONV01 = 0x1; // Setup ADCINA2 as 2nd SEQ1 conv.
-	   AdcRegs.ADCCHSELSEQ1.bit.CONV02 = 0x3; // Setup ADCINA3 as 1st SEQ1 conv.
+	   AdcRegs.ADCCHSELSEQ1.bit.CONV02 = 0x2; // Setup ADCINA3 as 1st SEQ1 conv.
+	   AdcRegs.ADCCHSELSEQ1.bit.CONV03 = 0x3; // Setup ADCINA3 as 1st SEQ1 conv.
    	   AdcRegs.ADCCHSELSEQ2.bit.CONV04 = 0x4; // Setup ADCINA2 as 2nd SEQ1 conv.
    	   AdcRegs.ADCCHSELSEQ2.bit.CONV05 = 0x5; // Setup ADCINA2 as 2nd SEQ1 conv.
    	   AdcRegs.ADCCHSELSEQ2.bit.CONV06 = 0x6; // Setup ADCINA2 as 2nd SEQ1 conv.
-   	   AdcRegs.ADCCHSELSEQ2.bit.CONV07 = 0x7; // Setup ADCINA2 as 2nd SEQ1 conv.
+   	   //AdcRegs.ADCCHSELSEQ2.bit.CONV07 = 0x7; // Setup ADCINA2 as 2nd SEQ1 conv.
 
    	   AdcRegs.ADCCHSELSEQ3.bit.CONV08 = 0x8; // Setup ADCINA2 as 2nd SEQ1 conv.
    	   AdcRegs.ADCCHSELSEQ3.bit.CONV09 = 0x9; // Setup ADCINA2 as 2nd SEQ1 conv.
@@ -165,12 +170,12 @@ void InitHardware(void)
    	   AdcRegs.ADCCHSELSEQ4.bit.CONV14 = 0xE; // Setup ADCINA2 as 2nd SEQ1 conv.
    	   AdcRegs.ADCCHSELSEQ4.bit.CONV15 = 0xF; // Setup ADCINA2 as 2nd SEQ1 conv.
 
-   	   //AdcRegs.ADCTRL2.bit.EPWM_SOCA_SEQ1 = 1;// Enable SOCA from ePWM to start SEQ1
-   	   //AdcRegs.ADCTRL2.bit.INT_ENA_SEQ1 = 1;  // Enable SEQ1 interrupt (every EOS)
+   	   /*AdcRegs.ADCTRL2.bit.EPWM_SOCA_SEQ1 = 1;// Enable SOCA from ePWM to start SEQ1
+   	   AdcRegs.ADCTRL2.bit.INT_ENA_SEQ1 = 1;  // Enable SEQ1 interrupt (every EOS)
 
-	   //AdcRegs.ADCTRL2.bit.EPWM_SOCB_SEQ2 = 1;// Enable SOCA from ePWM to start SEQ1
-   	   //AdcRegs.ADCTRL2.bit.INT_ENA_SEQ2 = 1;  // Enable SEQ1 interrupt (every EOS)
-
+	   AdcRegs.ADCTRL2.bit.EPWM_SOCB_SEQ2 = 1;// Enable SOCA from ePWM to start SEQ1
+   	   AdcRegs.ADCTRL2.bit.INT_ENA_SEQ2 = 1;  // Enable SEQ1 interrupt (every EOS)
+*/
    	   // Assumes ePWM1 clock is already enabled in InitSysCtrl();
 	   EPwm1Regs.ETSEL.bit.SOCAEN = 1;        // Enable SOC on A group
 	   EPwm1Regs.ETSEL.bit.SOCBEN = 1;        // Enable SOC on B group
