@@ -343,7 +343,7 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 		p->NoMove.Cfg.bit.Enable = ((g_Core.MotorControl.WorkMode & wmMove) != 0);
 		break;
 	case 2:	// Защиты по наряжению
-		Enable = (g_Ram.ramGroupC.Uv != pmOff);						// Понижеие напряжения
+		Enable = (g_Ram.ramGroupC.Uv != pmOff) && (!p->outDefects.Dev.bit.LowPower);						// Понижеие напряжения
 		p->underVoltageR.Cfg.bit.Enable 	= Enable;
 		p->underVoltageS.Cfg.bit.Enable 	= Enable;
 		p->underVoltageT.Cfg.bit.Enable 	= Enable;
@@ -362,7 +362,7 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 		p->overMax_VoltageS.Cfg.bit.Enable 	= Enable;
 		p->overMax_VoltageT.Cfg.bit.Enable 	= Enable;
 
-		Enable = (g_Ram.ramGroupC.Bv != pmOff);						// Обрыв фаз напряжения
+		Enable = (g_Ram.ramGroupC.Bv != pmOff) && (!p->outDefects.Dev.bit.LowPower);						// Обрыв фаз напряжения
 		p->breakVoltR.Cfg.bit.Enable 		= Enable;
 		p->breakVoltS.Cfg.bit.Enable 		= Enable;
 		p->breakVoltT.Cfg.bit.Enable 		= Enable;
@@ -535,28 +535,9 @@ void Core_ProtectionsUpdate(TCoreProtections *p)
 
     Uns MuffEnable;
 
-    /*if (g_Ram.ramGroupC.FaultNetRST.bit.BvR==1 && g_Ram.ramGroupC.FaultNetRST.bit.BvS==1 && g_Ram.ramGroupC.FaultNetRST.bit.BvT==1)
-	{
-	    if (!g_Core.Status.bit.Stop)
-	    {
-	    	//формируем запись в память об аварийном отключении
-		p->outFaults.Net.bit.BreakRST = 1;
-	    }
-	}
-*/
-
-    /*if ((g_Core.Protections.outFaults.Net.all&0x700)>>8==7)
-	{
-	   if (!g_Core.Status.bit.Stop)
-	   {
-		//формируем запись в память об аварийном отключении
-	   }
-	}*/
-
-
-    //Core_ProtecionSHC_Update(&p->ShC_U);
-    //Core_ProtecionSHC_Update(&p->ShC_V);
-    //Core_ProtecionSHC_Update(&p->ShC_W);
+    Core_ProtecionSHC_Update(&p->ShC_U);
+    Core_ProtecionSHC_Update(&p->ShC_V);
+    Core_ProtecionSHC_Update(&p->ShC_W);
 
     p->outFaults.Proc.bit.Mufta = p->MuffFlag;
 

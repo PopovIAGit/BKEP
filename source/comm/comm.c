@@ -74,7 +74,7 @@ void Comm_50HzCalc(TComm *p)
 {
 	//	КОМАНДЫ С МПУ !!!
 	// передаем команду с кнопок управления
-	if (g_Ram.ramGroupH.CmdButton != KEY_STOP)
+	//if (g_Ram.ramGroupH.CmdButton != KEY_STOP)
 	g_Ram.ramGroupH.CmdKey = Comm_LocalKeyUpdate(&p->localControl);
 
 	// передаем команду с ручек БКП
@@ -84,11 +84,11 @@ void Comm_50HzCalc(TComm *p)
 		g_Ram.ramGroupH.CmdButton = KEY_STOP;
 		break;
 	case BTN_OPEN_BIT:
-		if (g_Ram.ramGroupH.CmdKey == KEY_STOP) break;
+		//if (g_Ram.ramGroupH.CmdKey == KEY_STOP) break;
 		g_Ram.ramGroupH.CmdButton = KEY_OPEN;
 		break;
 	case BTN_CLOSE_BIT:
-		if (g_Ram.ramGroupH.CmdKey == KEY_STOP) break;
+		//if (g_Ram.ramGroupH.CmdKey == KEY_STOP) break;
 		g_Ram.ramGroupH.CmdButton = KEY_CLOSE;
 		break;
 	default:

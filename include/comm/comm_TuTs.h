@@ -86,9 +86,9 @@ typedef union _TOutputReg {
 		Uns Closing:1;		// 3	Закрывается
 		Uns Defect:1;		// 4	Питание
 		Uns Mufta:1;		// 5	Муфта
-		Uns Alarm:1;		// 6	Авария
+		Uns Fault:1;		// 6	Авария
 		Uns MUDU:1;			// 7	МУ/ДУ
-		Uns Fault:1;		// 8	Неисправность 
+		Uns Rzvd1:1;		// 8	Неисправность
 		Uns Rsvd:7;			// 9-15  Резерв
 	} bit;
 } TOutputReg;

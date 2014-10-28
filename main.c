@@ -7,6 +7,8 @@
 #include "peref.h"
 #include "stat.h"
 
+Uint16 CpuLoad = 0;
+Uint16 CpuLoadMax = 0;
 
 TRam			g_Ram;
 //TTekDriveData	g_RamTek;
@@ -58,8 +60,14 @@ void main(void)
 
 interrupt void CpuTimer0IsrHandler(void)	//	18 000
 {
-	InterruptUpdate();
-	PieCtrlRegs.PIEACK.bit.ACK1 = 1;
+    CpuTimer1Regs.TIM.all = 0;
+
+    InterruptUpdate();
+
+    CpuLoad = 100 * (-CpuTimer1Regs.TIM.all) / CpuTimer0Regs.PRD.all;
+    if (CpuLoadMax < CpuLoad) CpuLoadMax = CpuLoad;
+
+    PieCtrlRegs.PIEACK.bit.ACK1 = 1;
 }
 
 //-------------------------------------------------------------

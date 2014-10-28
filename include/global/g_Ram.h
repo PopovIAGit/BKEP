@@ -189,7 +189,7 @@ typedef struct _TRamGroupB
 	Uns				KeyInvert;			// 28.Маска кнопок управления
 	Uns				MOD_FAULT;			// 29
 	Uns				RES_ERR;			// 70
-	Uns 			Rsvd2[1];			// 31
+	Uns 				Sec3Mode;			// 31
 	Uns				NoMoveTime;		   	// 32.Время отсутствия движения
 	Uns				OverwayZone;		// 33.Макси
 	TInputReg		DigitalMode;		// 34.режим потенциальный / импульсный

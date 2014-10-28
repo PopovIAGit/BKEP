@@ -133,7 +133,6 @@ void g_Ram_Update(TRam *p)
 	    p->ramGroupH.IvPr = (g_Peref.sinObserver.IV.Output * 100) / p->ramGroupC.Inom;
 	    p->ramGroupH.IwPr = (g_Peref.sinObserver.IW.Output * 100) / p->ramGroupC.Inom;
 	    p->ramGroupH.Imidpr = (g_Peref.Imid * 1000) / p->ramGroupC.Inom;
-	    p->ramGroupH.IwPr = p->ramGroupH.Imidpr; //???
 	    p->ramGroupH.Imid 	= g_Peref.Imid;
 	    p->ramGroupA.AngleUI = g_Peref.AngleUI;
 	    p->ramGroupH.ISkewValue = SkewCalc(g_Peref.sinObserver.IU.Output, g_Peref.sinObserver.IV.Output, g_Peref.sinObserver.IW.Output,
