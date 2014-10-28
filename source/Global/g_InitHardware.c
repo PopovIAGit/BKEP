@@ -59,7 +59,6 @@ void InitHardware(void)
 	InitFlash();
 
 	DINT;
-	//DRTM;
 	
 	// Initialize the PIE control registers to their default state
 	InitPieCtrl();
@@ -72,9 +71,6 @@ void InitHardware(void)
 	// Service Routines (ISR)
 	InitPieVectTable();
 	
-	//spi_fifo_init();	// Initialize the Spi FIFO
-    //spi_init();			// init SPI
-
 	// User interrupts that are used in this project are re-mapped to
 	// ISR functions found within this file
 	EALLOW;
@@ -94,7 +90,6 @@ void InitHardware(void)
 	// Initialize all the Device Peripherals
 	InitAdc();
 
-	//I2CA_Init();
 	InitI2C();
 
 	// Configure CPU-Timer 0, 1, and 2 to interrupt every second:
@@ -117,9 +112,7 @@ void InitHardware(void)
 	PieCtrlRegs.PIEIER6.bit.INTx5 = 1; // PIE Group 6, INT5 // MCBSPRXA
 	PieCtrlRegs.PIEIER6.bit.INTx6 = 1; // PIE Group 6, INT6 // MCBSPTXA
 
-	//PieCtrlRegs.PIEIER1.bit.INTx1 = 1; // ADC
 	PieCtrlRegs.PIEIER1.bit.INTx6 = 1;
-	//PieCtrlRegs.PIEIER8.bit.INTx1 = 1; // I2C
 
     //IER |= M_INT8;   // для I2C
 	IER |= M_INT1;   // для АЦП
@@ -127,73 +120,45 @@ void InitHardware(void)
 	IER |= M_INT9;   // для SCI A,B,C
 	EnableCpuTimer0();
 
-		// Configure ADC
+	// Configure ADC
 
-		/*AdcRegs.ADCTRL1.bit.ACQ_PS = 1;  // Sequential mode: Sample rate   = 1/[(2+ACQ_PS)*ADC clock in ns]
-		//                     = 1/(3*40ns) =8.3MHz (for 150 MHz SYSCLKOUT)
-		//                     = 1/(3*80ns) =4.17MHz (for 100 MHz SYSCLKOUT)
-		// If Simultaneous mode enabled: Sample rate = 1/[(3+ACQ_PS)*ADC clock in ns]*/
+	/*AdcRegs.ADCTRL1.bit.ACQ_PS = 1;  // Sequential mode: Sample rate   = 1/[(2+ACQ_PS)*ADC clock in ns]
+	//                     = 1/(3*40ns) =8.3MHz (for 150 MHz SYSCLKOUT)
+	//                     = 1/(3*80ns) =4.17MHz (for 100 MHz SYSCLKOUT)
+	// If Simultaneous mode enabled: Sample rate = 1/[(3+ACQ_PS)*ADC clock in ns]*/
 
+	AdcRegs.ADCREFSEL.bit.REF_SEL = 0;		// internal
 
-	   AdcRegs.ADCREFSEL.bit.REF_SEL = 0;			// internal
+	AdcRegs.ADCTRL3.bit.ADCCLKPS = 4;		// clock prescaler, FCLK=HSPCLK/(2*ADCCLKPS)
+	AdcRegs.ADCTRL1.bit.CPS 	 = 0;		// ADCCLK = FCLK/2
+	AdcRegs.ADCTRL1.bit.SEQ_CASC = 1;       // 1  Cascaded mode
+	AdcRegs.ADCTRL1.bit.CONT_RUN = 1;       // Setup continuous run
+	AdcRegs.ADCTRL1.bit.SUSMOD 	 = 0;
+	AdcRegs.ADCTRL1.bit.ACQ_PS 	 = 8;		// 8 // 16
+	AdcRegs.ADCTRL1.bit.SEQ_OVRD = 0;
 
+	AdcRegs.ADCMAXCONV.all        = 0x000F; // Setup 2 conv's on SEQ1
+	AdcRegs.ADCCHSELSEQ1.all      = 0x3210;
+	AdcRegs.ADCCHSELSEQ2.all      = 0x7654;
+	AdcRegs.ADCCHSELSEQ3.all      = 0xBA98;
+	AdcRegs.ADCCHSELSEQ4.all      = 0xFEDC;
 
-	   AdcRegs.ADCTRL3.bit.ADCCLKPS = 4;		// clock prescaler, FCLK=HSPCLK/(2*ADCCLKPS)
-	   AdcRegs.ADCTRL1.bit.CPS 	= 0;		// ADCCLK = FCLK/2
-	   AdcRegs.ADCTRL1.bit.SEQ_CASC = 1;        // 1  Cascaded mode
-	   AdcRegs.ADCTRL1.bit.CONT_RUN = 1;        // Setup continuous run
-	   AdcRegs.ADCTRL1.bit.SUSMOD 	= 0;
-	   AdcRegs.ADCTRL1.bit.ACQ_PS 	= 8;//8 // 16
-	   AdcRegs.ADCTRL1.bit.SEQ_OVRD = 0;
+	// Assumes ePWM1 clock is already enabled in InitSysCtrl();
+	EPwm1Regs.ETSEL.bit.SOCAEN = 1;        // Enable SOC on A group
+	EPwm1Regs.ETSEL.bit.SOCBEN = 1;        // Enable SOC on B group
 
-	   AdcRegs.ADCMAXCONV.all = 0x000F;       // Setup 2 conv's on SEQ1
-	   /*AdcRegs.ADCCHSELSEQ1.all      = 0x3210;
-	   AdcRegs.ADCCHSELSEQ2.all      = 0x7654;
-	   AdcRegs.ADCCHSELSEQ3.all      = 0xBA98;
-	   AdcRegs.ADCCHSELSEQ4.all      = 0xFEDC;*/
-	   AdcRegs.ADCCHSELSEQ1.bit.CONV00 = 0x0; // Setup ADCINA3 as 1st SEQ1 conv.
-	   AdcRegs.ADCCHSELSEQ1.bit.CONV01 = 0x1; // Setup ADCINA2 as 2nd SEQ1 conv.
-	   AdcRegs.ADCCHSELSEQ1.bit.CONV02 = 0x2; // Setup ADCINA3 as 1st SEQ1 conv.
-	   AdcRegs.ADCCHSELSEQ1.bit.CONV03 = 0x3; // Setup ADCINA3 as 1st SEQ1 conv.
-   	   AdcRegs.ADCCHSELSEQ2.bit.CONV04 = 0x4; // Setup ADCINA2 as 2nd SEQ1 conv.
-   	   AdcRegs.ADCCHSELSEQ2.bit.CONV05 = 0x5; // Setup ADCINA2 as 2nd SEQ1 conv.
-   	   AdcRegs.ADCCHSELSEQ2.bit.CONV06 = 0x6; // Setup ADCINA2 as 2nd SEQ1 conv.
-   	   //AdcRegs.ADCCHSELSEQ2.bit.CONV07 = 0x7; // Setup ADCINA2 as 2nd SEQ1 conv.
+	EPwm1Regs.ETSEL.bit.SOCASEL = 4;       // Select SOC from from CPMA on upcount
+	EPwm1Regs.ETPS.bit.SOCAPRD = 1;        // Generate pulse on 1st event
 
-   	   AdcRegs.ADCCHSELSEQ3.bit.CONV08 = 0x8; // Setup ADCINA2 as 2nd SEQ1 conv.
-   	   AdcRegs.ADCCHSELSEQ3.bit.CONV09 = 0x9; // Setup ADCINA2 as 2nd SEQ1 conv.
-   	   AdcRegs.ADCCHSELSEQ3.bit.CONV10 = 0xA; // Setup ADCINA2 as 2nd SEQ1 conv.
-   	   AdcRegs.ADCCHSELSEQ3.bit.CONV11 = 0xB; // Setup ADCINA2 as 2nd SEQ1 conv.
+	EPwm1Regs.ETSEL.bit.SOCBSEL = 4;       // Select SOC from from CPMA on upcount
+	EPwm1Regs.ETPS.bit.SOCBPRD = 1;        // Generate pulse on 1st event
 
-   	   AdcRegs.ADCCHSELSEQ4.bit.CONV12 = 0xC; // Setup ADCINA2 as 2nd SEQ1 conv.
-   	   AdcRegs.ADCCHSELSEQ4.bit.CONV13 = 0xD; // Setup ADCINA2 as 2nd SEQ1 conv.
-   	   AdcRegs.ADCCHSELSEQ4.bit.CONV14 = 0xE; // Setup ADCINA2 as 2nd SEQ1 conv.
-   	   AdcRegs.ADCCHSELSEQ4.bit.CONV15 = 0xF; // Setup ADCINA2 as 2nd SEQ1 conv.
+	EPwm1Regs.CMPA.half.CMPA = 0x0080;	   // Set compare A value
+	EPwm1Regs.TBPRD = 0xFFFF;              // Set period for ePWM1
+	EPwm1Regs.TBCTL.bit.CTRMODE = 0;	   // count up and start
 
-   	   /*AdcRegs.ADCTRL2.bit.EPWM_SOCA_SEQ1 = 1;// Enable SOCA from ePWM to start SEQ1
-   	   AdcRegs.ADCTRL2.bit.INT_ENA_SEQ1 = 1;  // Enable SEQ1 interrupt (every EOS)
-
-	   AdcRegs.ADCTRL2.bit.EPWM_SOCB_SEQ2 = 1;// Enable SOCA from ePWM to start SEQ1
-   	   AdcRegs.ADCTRL2.bit.INT_ENA_SEQ2 = 1;  // Enable SEQ1 interrupt (every EOS)
-*/
-   	   // Assumes ePWM1 clock is already enabled in InitSysCtrl();
-	   EPwm1Regs.ETSEL.bit.SOCAEN = 1;        // Enable SOC on A group
-	   EPwm1Regs.ETSEL.bit.SOCBEN = 1;        // Enable SOC on B group
-
-	   EPwm1Regs.ETSEL.bit.SOCASEL = 4;       // Select SOC from from CPMA on upcount
-	   EPwm1Regs.ETPS.bit.SOCAPRD = 1;        // Generate pulse on 1st event
-
-	   EPwm1Regs.ETSEL.bit.SOCBSEL = 4;       // Select SOC from from CPMA on upcount
-   	   EPwm1Regs.ETPS.bit.SOCBPRD = 1;        // Generate pulse on 1st event
-
-	   EPwm1Regs.CMPA.half.CMPA = 0x0080;	  // Set compare A value
-	   EPwm1Regs.TBPRD = 0xFFFF;              // Set period for ePWM1
-	   EPwm1Regs.TBCTL.bit.CTRMODE = 0;		  // count up and start
-
-
-	   AdcRegs.ADCTRL2.bit.SOC_SEQ1 = 1;
-	   AdcRegs.ADCTRL2.bit.SOC_SEQ2 = 1;
-
+	AdcRegs.ADCTRL2.bit.SOC_SEQ1 = 1;
+	AdcRegs.ADCTRL2.bit.SOC_SEQ2 = 1;
 
 }
 //---------------------------------------------------
@@ -257,17 +222,6 @@ void InitGpio(void)
 	GpioCtrlRegs.GPBMUX1.all  = 0x0;	 // All GPIO
 	//GpioCtrlRegs.GPBMUX2.all  = 0x0;	 // All GPIO
 	GpioCtrlRegs.GPBDIR.all   = 0x0;	 // All inputs
-
-	//выходы
-	//GpioCtrlRegs.GPBDIR.bit.GPIO43	= 1;
-	//GpioDataRegs.GPBDAT.bit.GPIO43	= 0;
-
-	//---------------------------
-	//GpioCtrlRegs.GPAMUX2.bit.GPIO31 = 0;
-	//GpioCtrlRegs.GPADIR.bit.GPIO31 = 1;
-	//GpioCtrlRegs.GPBMUX1.bit.GPIO34 = 0;
-	//GpioCtrlRegs.GPBDIR.bit.GPIO34 = 1;
-	//---------------------------
 
 	//входы
 
@@ -415,31 +369,6 @@ void InitGpio(void)
 
 	EDIS;
 }
-
-//------ SPI ----------------------------------------
-
-/*void spi_init()
-{
-	SpiaRegs.SPICCR.all =0x000F;	             // Reset on, rising edge, 16-bit char bits
-	SpiaRegs.SPICTL.all =0x0006;    		     // Enable master mode, normal phase,
-                                                 // enable talk, and SPI int disabled.
-	SpiaRegs.SPIBRR =0x007F;
-    SpiaRegs.SPICCR.all =0x009F;		         // Relinquish SPI from Reset
-    SpiaRegs.SPIPRI.bit.FREE = 1;                // Set so breakpoints don't disturb xmission
-}*/
-
-/*void spi_xmit(Uint16 a)
-{
-    SpiaRegs.SPITXBUF=a;
-} */
-
-/*void spi_fifo_init()
-{
-// Initialize SPI FIFO registers
-    SpiaRegs.SPIFFTX.all=0xE040;
-    SpiaRegs.SPIFFRX.all=0x204f;
-    SpiaRegs.SPIFFCT.all=0x0;
-}*/
 
 //--------------Конец файла--------------------------
 

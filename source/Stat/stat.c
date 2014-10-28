@@ -161,17 +161,6 @@ void InitInfoModule(TInfoModule *im)
 	im->IsLogTransmit	= False;
 
 	im->DeviceDataPtr   = (Uns *)&g_Ram;
-	//im->DownloadBuffer  = &ImReadBuf[0];
-	//memset(im->ImReadBuf[0],	0, sizeof(IM_READ_BUF_SIZE*2)); // Ѕуфер информационного модул€
-
-
-	//memset(im->RdBuffer[0],	0, sizeof(IM_RD_BUFFER_SIZE));
-	//memset(im->WrBuffer[0],	0, sizeof(IM_WR_BUFFER_SIZE));
-
-	//??? EnableBtRx
-	//??? void (*EnableReceive)(void);
-	//??? void (*EnableTransmit)(void);
-	//??? void (*TransmitByte)(Byte Data);
 	// ƒл€ информационного модул€
 	im->EnableReceive	 = g_Comm.Bluetooth.EnableRx;
 	im->EnableTransmit	 = g_Comm.Bluetooth.EnableTx;
@@ -181,8 +170,6 @@ void InitInfoModule(TInfoModule *im)
 //---------------------------------------------------
 void InitLogEvent(TLogEvent *le)
 {
-	//TLogEv			LogEv = LOG_EV_DEFAULTS;				// Ёкземпл€р структуры журнала событий
-
 	le->Enable		= false;						// –азрешение работы журнала событий
 	le->ExecFlag	= false;						// ‘лаг формировани€ буфера журнала
 	le->WriteFlag	= false;						// ‘лаг разрешени€ записи журнала в пам€ть
@@ -216,8 +203,6 @@ void InitLogEvent(TLogEvent *le)
 //---------------------------------------------------
 void InitLogCmd(TLogCmd *lc)
 {
-	//TLogCmd			LogCmd = LOG_CMD_DEFAULTS;				// Ёкземпл€р структуры журнала команд
-
 	lc->Enable 		= false;							// ‘лаг разрешени€ работы журнала
 	lc->ExecFlag 	= false;							// ‘лаг формировани€ буфера журнала
 	lc->WriteFlag 	= false;							// ‘лаг разрешени€ записи журнала
@@ -233,7 +218,6 @@ void InitLogCmd(TLogCmd *lc)
 //---------------------------------------------------
 void InitLogParam(TLogParam *lp)
 {
-	//TLogParam 		LogParam = LOG_PARAM_DEFAULTS;			// Ёкземпл€р структуры журнала изменени€ параметров
 
 	lp->Enable		= false;							// ‘лаг разрешени€ работы журнала
 	lp->ExecFlag 	= false;							// ‘лаг формировани€ буфера журнала

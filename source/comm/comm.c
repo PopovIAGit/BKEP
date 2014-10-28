@@ -67,7 +67,6 @@ void Comm_Update(TComm *p)
 
 	//SerialCommUpdate(&Mb);
 
-
 }
 
 void Comm_50HzCalc(TComm *p)

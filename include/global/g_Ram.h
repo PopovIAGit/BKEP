@@ -152,7 +152,8 @@ typedef struct _TRamGroupA
 	Int             TemperBKP;          // 23.Температура блока БКП
 	Uns             VersionPO;       	// 24.Версия ПО
 	Uns             VersionPOBkp;      	// 25.Версия ПО БКП
-	Uns Rsvd[14];
+	Uns				RevErrValue;		// 26.Колво сбоев датчика положения
+	Uns 			Rsvd[13];
 } TRamGroupA;
 
 // Группа B (Адрес = 40, Количество = 50) - Параметры пользователя
@@ -332,7 +333,7 @@ typedef struct _TRamGroupC
 	Int             TemperLow;          // 71.Уровень переохлаждения блока
 	Int             TenOnValue;         // 72.Уровень включения ТЕНа
 	Int             TenOffValue;        // 73.Уровень выключения ТЕНа
-	Int             CorrTemper;         // 74.Корректировка температуры блока
+	Int             CorrTemper;         // 74.Корректировка температуры блока БКП
 	TPrtMode        MuDuDef;        	// 75.Защита ошибки входов Му/Ду
 	Int				IU_Input;			// 76.параметр для подстройки оффсетов тока IU
 	Int				IV_Input;			// 77.параметр для подстройки оффсетов тока IV
