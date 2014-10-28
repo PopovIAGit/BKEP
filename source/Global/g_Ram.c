@@ -9,7 +9,6 @@
 //
 #include "g_Ram.h"
 #include "core.h"
-//#include "drive.h"
 #include "comm.h"
 #include "peref.h"
 #include "stat.h"

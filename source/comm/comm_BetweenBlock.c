@@ -168,24 +168,27 @@ void SciMasterConnBetweenBlockUpdate(TMbBBHandle Port)
 
 void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 {
-	Uint32 BkpEncPostion=0;
+	Uns BkpEncPostion=0;
+	Uns BkpEncErr=0;
 
 	SciMasterConnBetweenBlockUpdate(bPort);
 
-	bPort->TxPacket.Data[4] = g_Ram.ramGroupH.BkpIndication;// GrC->LedsReg.all;
+	bPort->TxPacket.Data[4] = g_Ram.ramGroupH.BkpIndication;// индикация светодиодов
+	bPort->TxPacket.Data[5] = g_Core.Temper.OnOffTEN;		// управление теном
 
 	if(!bPort->RxPacket.Flag) return;
 	bPort->RxPacket.Flag = 0;
 
 	g_Ram.ramGroupA.VersionPOBkp     = bPort->RxPacket.Data[0];
-	//BkpEncPostion       = (Uint32)bPort->RxPacket.Data[4] << 24;
-	//BkpEncPostion      |= (Uint32)bPort->RxPacket.Data[3] << 16;
-	BkpEncPostion      |= (Uint32)bPort->RxPacket.Data[2] << 8;
-	BkpEncPostion      |= (Uint32)bPort->RxPacket.Data[1] << 0;
+	BkpEncErr  			= (Uns)bPort->RxPacket.Data[4] << 8;
+	BkpEncErr 		   |= (Uns)bPort->RxPacket.Data[3] << 0;
+	BkpEncPostion      	= (Uns)bPort->RxPacket.Data[2] << 8;
+	BkpEncPostion      |= (Uns)bPort->RxPacket.Data[1] << 0;
 	g_Ram.ramGroupH.Position 		= BkpEncPostion;
 	g_Ram.ramGroupC.HallBlock.all   = bPort->RxPacket.Data[5];
 	g_Ram.ramGroupA.TemperBKP       = (int16)bPort->RxPacket.Data[6];
 	g_Core.Status.bit.Ten 			= bPort->RxPacket.Data[7];
+	g_Ram.ramGroupA.RevErrValue		= BkpEncErr;
 
 	bPort->TxPacket.Flag = 1;
 

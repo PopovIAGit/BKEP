@@ -157,10 +157,6 @@ void Peref_18kHzCalc(TPeref *p) // 18 êÃö
 	    p->Phifltr.Input = p->sinObserver.US.CurAngle;
 	    g_Ram.ramGroupA.AngleUI =  p->sinObserver.US.CurAngle;
 	}
-
-
-
-
     //-------------------------------------------------------------
 }
 

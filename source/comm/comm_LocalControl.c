@@ -101,6 +101,7 @@ Uns Comm_LocalButtonUpdate(TCommMPU *p)
 	else
 	{
 
+		//if (p->inputBCP_Data->all!=12)
 		if (!(p->inputBCP_Data->bit.StopDU && p->inputBCP_Data->bit.StopMU))
 		{
 			if (p->inputBCP_Data->bit.Open)

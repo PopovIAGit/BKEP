@@ -39,6 +39,9 @@ Outputs
 #define START_DELAY_TIME		(Uint16)(2.000 * Prd50HZ)		// Ограничение времени паузы между остановом и след. запуском
 #define MOVE_STATE_TIME			(Uint16)(1.000 * Prd50HZ)		// Ограничение времени перехода в муфту
 #define BREAK_SCALE				(Uint16)(0.010 * Prd50HZ)		//
+
+#define TEN_OFF				1
+#define TEN_ON				0
 //--------------------- Макросы --------------------------------------------
 //-------------------- Структуры -------------------------------------------
 
@@ -66,6 +69,12 @@ typedef struct _TDmControl {
 	Uns 		PlugBreakStep;			// Шаги противовключения (Пауза, торможение, выключение)
 } TDmControl;
 
+typedef struct _TCoreTemper {
+
+	Uns CurrTemper;
+	Uns OnOffTEN;
+}TCoreTemper;
+
 typedef struct {
 	// ---
 	TStatusReg 			Status;			// Статус работы
@@ -88,6 +97,7 @@ typedef struct {
 	Uns 				Sec3Timer;		// Таймер для работы с 3 секундами
 	Uns 				SaveDirection;	// Сохраненное направление вращения
 	Uns 				PowerLostFlag;  // Флаг показывающий пропажу напряжения
+	TCoreTemper			Temper;			// Обработка температур БКП и БКД
 } TCore;
 
 //------------------- Глобальные переменные --------------------------------
@@ -106,6 +116,7 @@ void Core_DefineCtrlParams(TCore *);		// Задача контролируемых параметров (Момен
 void Core_ControlMode(TCore *);				// Стэйт машина
 void Core_LowPowerControl(TCore *);			// Действия при отключении питания
 void Core_MuDuControl(TCore *);				// управление режимами мустное дистанция
+void Core_OnOff_TEN(TCoreTemper *);			// функия управления теном на БКП
 
 void Core_ProtectionsBreakRST(TCoreProtections *);
 

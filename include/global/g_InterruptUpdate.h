@@ -181,8 +181,9 @@ TPeriodicalFunction Task10Hz[] =        //не более  200-т задач
 	PrdElemInit(RTC_Control,				NULL),				//на 10 √ц
 	PrdElemInit(BluetoothActivation,		&g_Comm.Bluetooth),	//на 10 √ц
 	PrdElemInit(ImTimerIndex,				&g_Stat.Im),		//на 10 √ц
-	PrdElemInit(Core_MuDuControl,			&g_Core),		//на 10 √ц
+	PrdElemInit(Core_MuDuControl,			&g_Core),			//на 10 √ц
 	PrdElemInit(Core_DevProc_FaultIndic,	&g_Core.Protections),
+	PrdElemInit(Core_OnOff_TEN,             &g_Core.Temper),
 	PrdElemInit(TekModbusParamsUpdate,		NULL),				//на 10 √ц
 
 };
