@@ -535,9 +535,28 @@ void Core_ProtectionsUpdate(TCoreProtections *p)
 
     Uns MuffEnable;
 
-    Core_ProtecionSHC_Update(&p->ShC_U);
-    Core_ProtecionSHC_Update(&p->ShC_V);
-    Core_ProtecionSHC_Update(&p->ShC_W);
+    /*if (g_Ram.ramGroupC.FaultNetRST.bit.BvR==1 && g_Ram.ramGroupC.FaultNetRST.bit.BvS==1 && g_Ram.ramGroupC.FaultNetRST.bit.BvT==1)
+	{
+	    if (!g_Core.Status.bit.Stop)
+	    {
+	    	//формируем запись в память об аварийном отключении
+		p->outFaults.Net.bit.BreakRST = 1;
+	    }
+	}
+*/
+
+    /*if ((g_Core.Protections.outFaults.Net.all&0x700)>>8==7)
+	{
+	   if (!g_Core.Status.bit.Stop)
+	   {
+		//формируем запись в память об аварийном отключении
+	   }
+	}*/
+
+
+    //Core_ProtecionSHC_Update(&p->ShC_U);
+    //Core_ProtecionSHC_Update(&p->ShC_V);
+    //Core_ProtecionSHC_Update(&p->ShC_W);
 
     p->outFaults.Proc.bit.Mufta = p->MuffFlag;
 
