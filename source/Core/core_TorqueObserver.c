@@ -11,9 +11,10 @@
 
 // фиксированные точки для снятия момента
 Int VoltArray[CUB_COUNT1] = {160, 190,  220,  250};
-Int CurrArray[CUB_COUNT2] = {40, 80, 120, 160, 200};
+//Int CurrArray[CUB_COUNT2] = {40, 80, 120, 160, 200};
+Int CurrArray[CUB_COUNT2] = {400, 800, 1200, 1600, 2000};
 Int AnUIArray[CUB_COUNT2] = { 25,  35,   50,   65,   80};
-//Int AnUIArray[CUB_COUNT2] = { 40,  45,   50,   60,   70};
+
 
 
 void CubInit(TCubStr *p, TCubConfig *Cfg)	//инициализация куба

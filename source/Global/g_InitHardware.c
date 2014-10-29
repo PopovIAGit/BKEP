@@ -96,6 +96,11 @@ void InitHardware(void)
 	// 30MHz CPU Freq, 18êÃö  (55 in uSeconds)
 	InitCpuTimers();
 	ConfigCpuTimer(&CpuTimer0, 150, 55);
+	ConfigCpuTimer(&CpuTimer1, 150, 1);
+
+	CpuTimer1Regs.TCR.bit.TIE = 0;
+	CpuTimer1Regs.PRD.all     = -1UL;
+	CpuTimer1Regs.TCR.bit.TSS = 0;
 
 	PieCtrlRegs.PIEIER1.bit.INTx7 = 1; // TINT0
 	PieCtrlRegs.PIECTRL.bit.ENPIE = 1; // Enable the PIE block

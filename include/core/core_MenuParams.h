@@ -99,7 +99,7 @@ const struct MENU_PARAM params[] = {
 		"B28.ляй ймно ыяс", "    ", 	0,     7,  		4, M_BINE|M_RMAX(2),						//28
 		"   B29.MOD_FAULT", "    ", 	0,  65535,  	0, M_SHOW|M_RMAX(4),						//29
 		"   B30.RES_ERR  ", "    ", 	0,  65535,  	0, M_EDIT|M_RMAX(4),						//3070
-		"   B31.пегепб   ", "    ", 	0,  65535,  	0, M_SHOW|M_RMAX(4),						//31
+		"   B31.пеф 3 яей", "    ", 	0,  	1,  	0, M_EDIT|M_RMAX(4),						//31
 		"B32.бп нря дбхф ", "я   ", 	3,    100,     20, M_EDIT|M_RMAX(2)|M_PREC(1),				//32
 		"B33.осрэ сокнрм ", "на  ", 	1,   1000,    100, M_EDIT|M_RMAX(3)|M_PREC(1),				//33
 		"  B34.пефхл рс  ", "    ", 	0,  65535,  	0, M_SHOW|M_RMAX(4),						//34

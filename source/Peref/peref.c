@@ -212,7 +212,8 @@ void Peref_50HzCalc(TPeref *p)	// 50 Ãö
     peref_ApFilter1Calc(&p->Umfltr);
     p->Umid = _IQtoIQ16(p->Umfltr.Output);
 
-    p->Imfltr.Input = Mid3ValueUns(p->sinObserver.IU.Output, p->sinObserver.IV.Output, p->sinObserver.IW.Output);
+   // p->Imfltr.Input = Mid3ValueUns(p->sinObserver.IU.Output, p->sinObserver.IV.Output, p->sinObserver.IW.Output);
+    p->Imfltr.Input = ((p->sinObserver.IV.Output + p->sinObserver.IV.Output + p->sinObserver.IV.Output)/3.0);
     peref_ApFilter3Calc(&p->Imfltr);
     p->Imid = _IQtoIQ16(p->Imfltr.Output);
 
@@ -230,8 +231,8 @@ void Peref_10HzCalc(TPeref *p)	// 10 Ãö
 		g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy24;
 		g_Peref.InDigSignalObserver.parSensors.p_UMu_Mpy		= &g_Ram.ramGroupB.p_UMu_Mpy24;
 		g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy24;
-		g_Peref.InDigSignalObserver.parSensors.p_UResetAlarm_Mpy= &g_Ram.ramGroupB.p_UResetAlarm_Mpy24;
-		g_Peref.InDigSignalObserver.parSensors.p_UReadyTu_Mpy	= &g_Ram.ramGroupB.p_UReadyTu_Mpy24;
+		g_Peref.InDigSignalObserver.parSensors.p_UResetAlarm_Mpy	= &g_Ram.ramGroupB.p_UResetAlarm_Mpy24;
+		g_Peref.InDigSignalObserver.parSensors.p_UReadyTu_Mpy		= &g_Ram.ramGroupB.p_UReadyTu_Mpy24;
 		g_Peref.InDigSignalObserver.parSensors.p_UDu_Mpy		= &g_Ram.ramGroupB.p_UDu_Mpy24;
 	} else
 	{
@@ -240,8 +241,8 @@ void Peref_10HzCalc(TPeref *p)	// 10 Ãö
 		g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy220;
 		g_Peref.InDigSignalObserver.parSensors.p_UMu_Mpy		= &g_Ram.ramGroupB.p_UMu_Mpy220;
 		g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy220;
-		g_Peref.InDigSignalObserver.parSensors.p_UResetAlarm_Mpy= &g_Ram.ramGroupB.p_UResetAlarm_Mpy220;
-		g_Peref.InDigSignalObserver.parSensors.p_UReadyTu_Mpy	= &g_Ram.ramGroupB.p_UReadyTu_Mpy220;
+		g_Peref.InDigSignalObserver.parSensors.p_UResetAlarm_Mpy	= &g_Ram.ramGroupB.p_UResetAlarm_Mpy220;
+		g_Peref.InDigSignalObserver.parSensors.p_UReadyTu_Mpy		= &g_Ram.ramGroupB.p_UReadyTu_Mpy220;
 		g_Peref.InDigSignalObserver.parSensors.p_UDu_Mpy		= &g_Ram.ramGroupB.p_UDu_Mpy220;
 	}
 

@@ -343,7 +343,7 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 		p->NoMove.Cfg.bit.Enable = ((g_Core.MotorControl.WorkMode & wmMove) != 0);
 		break;
 	case 2:	// Защиты по наряжению
-		Enable = (g_Ram.ramGroupC.Uv != pmOff);						// Понижеие напряжения
+		Enable = (g_Ram.ramGroupC.Uv != pmOff) && (!p->outDefects.Dev.bit.LowPower);						// Понижеие напряжения
 		p->underVoltageR.Cfg.bit.Enable 	= Enable;
 		p->underVoltageS.Cfg.bit.Enable 	= Enable;
 		p->underVoltageT.Cfg.bit.Enable 	= Enable;
@@ -362,7 +362,7 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 		p->overMax_VoltageS.Cfg.bit.Enable 	= Enable;
 		p->overMax_VoltageT.Cfg.bit.Enable 	= Enable;
 
-		Enable = (g_Ram.ramGroupC.Bv != pmOff);						// Обрыв фаз напряжения
+		Enable = (g_Ram.ramGroupC.Bv != pmOff) && (!p->outDefects.Dev.bit.LowPower);						// Обрыв фаз напряжения
 		p->breakVoltR.Cfg.bit.Enable 		= Enable;
 		p->breakVoltS.Cfg.bit.Enable 		= Enable;
 		p->breakVoltT.Cfg.bit.Enable 		= Enable;

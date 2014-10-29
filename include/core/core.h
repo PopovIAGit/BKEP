@@ -93,6 +93,10 @@ typedef struct {
 	TDmControl			MotorControl;	// Управление двигателем
 
 	Uns 				PrevCycle;		// Предидущее значение счетчика циклов
+	//---- 3 секунды------
+	Uns 				Sec3Timer;		// Таймер для работы с 3 секундами
+	Uns 				SaveDirection;	// Сохраненное направление вращения
+	Uns 				PowerLostFlag;  // Флаг показывающий пропажу напряжения
 	TCoreTemper			Temper;			// Обработка температур БКП и БКД
 } TCore;
 

@@ -170,8 +170,8 @@ void Peref_LedsUpdate(pLeds p)
 		p->leds.all |= LED_MUDU_MASK;				// Гасим светодиод
 
 
-	LED_MUFTA	= p->leds.bit.Mufta;	//DELAY_US(1);
-	LED_DEFECT	= p->leds.bit.Defect;	//DELAY_US(1);
+	LED_MUFTA	= p->leds.bit.Mufta;	DELAY_US(1);
+	LED_DEFECT	= p->leds.bit.Defect;	DELAY_US(1);
 	LED_FAULT	= p->leds.bit.Fault;	//DELAY_US(1);
 
 	LED_CLOSING = p->leds.bit.Closing;	//DELAY_US(1);

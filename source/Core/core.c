@@ -330,7 +330,7 @@ void Core_LowPowerControl(TCore *p)
 
     ShCState = p->Protections.outFaults.Load.all & LOAD_SHC_MASK;
 
-	// Событие выключения блока
+	// Событие выключения блока----------------------------------------------------
 	if ((g_Ram.ramGroupA.Ur < 60) && (g_Ram.ramGroupA.Us < 60)
 			&& (g_Ram.ramGroupA.Ut < 60))
 	{
@@ -338,7 +338,7 @@ void Core_LowPowerControl(TCore *p)
 	}
 	else p->Protections.outDefects.Dev.bit.LowPower = 0;
 
-	// Запись КЗ
+	// Запись КЗ----------------------------------------------------------------------
 	if (ShCState && !g_Ram.ramGroupH.ScFaults)
 	{
 		if (IsMemParReady())
@@ -349,7 +349,7 @@ void Core_LowPowerControl(TCore *p)
 	}
 	if (g_Ram.ramGroupH.ScFaults)
 	{
-		g_Ram.ramGroupA.Faults.Load.all |= g_Ram.ramGroupH.ScFaults;
+		p->Protections.outFaults.Load.all |= g_Ram.ramGroupH.ScFaults;
 	}
 	if (p->Protections.ShcReset && IsMemParReady())
 	{
@@ -358,6 +358,34 @@ void Core_LowPowerControl(TCore *p)
 		WriteToEeprom(REG_SHC_FAULT, &g_Ram.ramGroupH.ScFaults, 1);
 	}
 
+	// 3 sec -----------------------------------------------------------------------
+	if (g_Ram.ramGroupB.Sec3Mode)
+	{
+	    if (p->Protections.outDefects.Dev.bit.LowPower)	// Если питание	пропало
+	    {
+		    p->Sec3Timer++;
+		    p->PowerLostFlag = 1;
+		    g_Ram.ramGroupD.ControlWord = vcwStop;
+	    }
+	    else if (p->PowerLostFlag && (!p->Protections.outDefects.Dev.bit.LowPower))	// Если питание вернулось
+	    {
+		    if (p->Sec3Timer < (4 * Prd200HZ))
+		    {
+			    g_Ram.ramGroupD.ControlWord = p->SaveDirection;
+
+		    }
+		    p->Sec3Timer = 0;
+		    p->PowerLostFlag = 0;
+		    p->SaveDirection = 0;
+	    }
+	    else											// Если питание еще не пропало
+	    {
+		    p->Sec3Timer = 0;
+		    if (p->Status.bit.Closing) p->SaveDirection = vcwClose;
+		    else if (p->Status.bit.Opening) p->SaveDirection = vcwOpen;
+	    }
+	}
+	//--------------------------------------------------------------------------
 }
 
 void Core_MuDuControl(TCore *p)

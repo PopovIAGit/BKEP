@@ -7,6 +7,9 @@
 #include "peref.h"
 #include "stat.h"
 
+Uint16 CpuLoad = 0;
+Uint16 CpuLoadMax = 0;
+
 TRam			g_Ram;
 
 extern void InterruptInit  (void);
@@ -17,7 +20,7 @@ void main(void)
 	// Сначала инициализируется процессор
 	InitHardware();
 	memset(&g_Core, 	0, sizeof(TCore));
-	memset(&g_Ram, 	    0, sizeof(TRam));
+	memset(&g_Ram, 	    	0, sizeof(TRam));
 	memset(&g_Comm, 	0, sizeof(TComm));
 	memset(&g_Peref,	0, sizeof(TPeref));
 	memset(&g_Stat,		0, sizeof(TStat));
@@ -50,8 +53,14 @@ void main(void)
 
 interrupt void CpuTimer0IsrHandler(void)	//	18 000
 {
-	InterruptUpdate();
-	PieCtrlRegs.PIEACK.bit.ACK1 = 1;
+    CpuTimer1Regs.TIM.all = 0;
+
+    InterruptUpdate();
+
+    CpuLoad = 100 * (-CpuTimer1Regs.TIM.all) / CpuTimer0Regs.PRD.all;
+    if (CpuLoadMax < CpuLoad) CpuLoadMax = CpuLoad;
+
+    PieCtrlRegs.PIEACK.bit.ACK1 = 1;
 }
 
 //-------------------------------------------------------------

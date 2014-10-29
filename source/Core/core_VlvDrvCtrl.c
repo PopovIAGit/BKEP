@@ -29,7 +29,7 @@ void Core_ValveDriveInit(TCoreVlvDrvCtrl *p)
 	p->ReverseType			= &g_Ram.ramGroupH.ReverseType;
 	p->Mpu.Enable			= true;
 	p->Mpu.BtnKey			= &g_Ram.ramGroupH.CmdButton;
-	p->Mpu.PduKey			= &g_Ram.ramGroupH.CmdKey;
+	p->Mpu.ScuKey			= &g_Ram.ramGroupH.CmdKey;
 	p->Mpu.CancelFlag		= false;
 	p->Tu.Enable			= true;
 	p->Tu.LocalFlag			= false;
@@ -129,12 +129,12 @@ __inline void MpuControl(TCoreVlvDrvCtrl *p)
 			*p->Mpu.BtnKey = 0;					// Сбросили команду
 		}
 
-		if (*p->Mpu.PduKey)						//Аналогично
+		if (*p->Mpu.ScuKey)						//Аналогично
 		{
-			Key = *p->Mpu.PduKey;
+			Key = *p->Mpu.ScuKey;
 			Active = (p->ActiveControls & CMD_SRC_PDU);
 			p->EvLog.Source = CMD_SRC_PDU;
-			*p->Mpu.PduKey = 0;
+			*p->Mpu.ScuKey = 0;
 		}
 
 		switch (Key)							// Обработка пришедшей команды
