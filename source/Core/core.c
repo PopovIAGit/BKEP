@@ -291,7 +291,7 @@ void Core_ControlMode(TCore *p)
 
 		if(p->TorqObs.Indication < p->MotorControl.TorqueSet)
 			p->MotorControl.MufTimer = 0;
-		else if (++p->MotorControl.MufTimer >= MOVE_STATE_TIME)
+		else if (++p->MotorControl.MufTimer >= (5 * g_Ram.ramGroupB.MuffTimer))
 			p->Protections.MuffFlag = 1;	// выставляем муфту если в течении секунды момент больше заданного
 		break;
 	case wmPlugBreak:
@@ -329,8 +329,6 @@ void Core_LowPowerControl(TCore *p)
     if (p->Protections.FaultDelay > 0)
 	return;
 
-    ShCState = cs;//p->Protections.outFaults.Load.all & LOAD_SHC_MASK;
-
 	// Событие выключения блока----------------------------------------------------
 	if ((g_Ram.ramGroupA.Ur < 60) && (g_Ram.ramGroupA.Us < 60)
 			&& (g_Ram.ramGroupA.Ut < 60))
@@ -339,14 +337,29 @@ void Core_LowPowerControl(TCore *p)
 	}
 	else p->Protections.outDefects.Dev.bit.LowPower = 0;
 
+
+	ShCState = p->Protections.ShcTmpState & LOAD_SHC_MASK; //p->Protections.outFaults.Load.all & LOAD_SHC_MASK;
+
+	// сброс ложного срабатывания КЗ
+	if (ShCState && !p->Protections.outDefects.Dev.bit.LowPower)
+	    {
+		if (p->ShcResetTimer++ >= (2 * Prd200HZ))
+		    {
+			p->ShcResetTimer = 0;
+			ShCState = 0;
+			p->Protections.ShcTmpState = 0;
+		    }
+	    }
+
 	// Запись КЗ----------------------------------------------------------------------
-	if (ShCState && !g_Ram.ramGroupH.ScFaults)
+	if (ShCState && !g_Ram.ramGroupH.ScFaults && p->Protections.outDefects.Dev.bit.LowPower)
 	{
 		if (IsMemParReady())
 		{
 			g_Ram.ramGroupH.ScFaults = ShCState;
 			WriteToEeprom(REG_SHC_FAULT, &g_Ram.ramGroupH.ScFaults, 1);			// то записали состояние КЗ
 		}
+		p->ShcResetTimer = 0;
 	}
 	if (g_Ram.ramGroupH.ScFaults)
 	{
@@ -357,7 +370,12 @@ void Core_LowPowerControl(TCore *p)
 		p->Protections.ShcReset = false;
 		g_Ram.ramGroupH.ScFaults = 0;
 		WriteToEeprom(REG_SHC_FAULT, &g_Ram.ramGroupH.ScFaults, 1);
+		p->Protections.outFaults.Load.bit.ShCU = 0;
+		p->Protections.outFaults.Load.bit.ShCV = 0;
+		p->Protections.outFaults.Load.bit.ShCW = 0;
 	}
+
+
 
 	// 3 sec -----------------------------------------------------------------------
 	if (g_Ram.ramGroupB.Sec3Mode)
@@ -373,8 +391,11 @@ void Core_LowPowerControl(TCore *p)
 		    if (p->Sec3Timer < (4 * Prd200HZ))
 		    {
 			    g_Ram.ramGroupD.ControlWord = p->SaveDirection;
-
 		    }
+		    else
+			{
+			    p->SaveDirection = 0;
+			}
 		    p->Sec3Timer = 0;
 		    p->PowerLostFlag = 0;
 		    p->SaveDirection = 0;
@@ -403,7 +424,6 @@ void Core_MuDuControl(TCore *p)
 			p->Protections.outDefects.Proc.bit.MuDuDef = 0;
 			break;
 		case mdSelect:
-			if (p->Status.bit.Stop)
 			{
 				if(!g_Ram.ramGroupA.StateTu.bit.Mu && !g_Ram.ramGroupA.StateTu.bit.Du)
 				{

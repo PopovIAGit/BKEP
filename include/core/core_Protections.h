@@ -107,18 +107,19 @@ typedef struct {
 		TAlarmSHC			ShC_V;				// Короткое замыкание фазы V - авария
 		TAlarmSHC			ShC_W;				// Короткое замыкание фазы W - авария
 	// -------- Диагностика устройства ----------
-		TAlarmElem			overHeatBCP;		// Перегрев	БКП - авария
-		TAlarmElem			underColdBCP; 		// Переохлаждение БКП - неисправность
-		TAlarmElem			overHeatBCD;		// Перегрев БКД - неисправность
-		TAlarmElem			underColdBCD; 		// Переохлаждение БКД - неисправность
+		TAlarmElem			overHeatBCP;			// Перегрев	БКП - авария
+		TAlarmElem			underColdBCP; 			// Переохлаждение БКП - неисправность
+		TAlarmElem			overHeatBCD;			// Перегрев БКД - неисправность
+		TAlarmElem			underColdBCD; 			// Переохлаждение БКД - неисправность
 	// Выходы ---------------------------------------------------------
 		TFltUnion			outFaults;			// Аварии
 		TFltUnion			outDefects;			// Неисправности
+		Uns				ShcTmpState;			// Промежуточная переменная для определения КЗ
 
 		Uns 				MuffFlag;			// Флаг муфты
-		Uns					NoMoveFlag;
+		Uns				NoMoveFlag;
 		Bool				ShcReset;			// Флаг по которому сбрасывается КЗ
-		Uns					FaultDelay;			// Пауза после инициализации для включения защит
+		Uns				FaultDelay;			// Пауза после инициализации для включения защит
 
 }TCoreProtections;
 

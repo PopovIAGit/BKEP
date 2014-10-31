@@ -47,7 +47,7 @@ typedef union {
 	Uns all;
   	struct {
 		Uns Closing:1;		// 0	Светодиод "Закрывается"
-		Uns MuDu:1;		    // 8	Светодиод "Му/Ду"
+		Uns MuDu:1;		// 8	Светодиод "Му/Ду"
 		Uns Close:1;		// 2	Светодиод "Закрыто"
 		Uns Fault:1;		// 3	Светодиод "Авария"
 		Uns Defect:1;		// 4    Светодиод "Неисправность"
