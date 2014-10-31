@@ -97,6 +97,8 @@ typedef struct {
 	Uns 				Sec3Timer;		// Таймер для работы с 3 секундами
 	Uns 				SaveDirection;	// Сохраненное направление вращения
 	Uns 				PowerLostFlag;  // Флаг показывающий пропажу напряжения
+	Uns 				ShcResetTimer;	// Таймер для сброса ложного срабатывания КЗ
+
 	TCoreTemper			Temper;			// Обработка температур БКП и БКД
 } TCore;
 

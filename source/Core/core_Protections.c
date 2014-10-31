@@ -284,9 +284,9 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->ShC_V.LowCurrentLevel		= &g_Ram.ramGroupC.ShC_Down;
 	p->ShC_W.LowCurrentLevel		= &g_Ram.ramGroupC.ShC_Down;
 
-	p->ShC_U.Output				= &p->outFaults.Load.all;
-	p->ShC_V.Output				= &p->outFaults.Load.all;
-	p->ShC_W.Output				= &p->outFaults.Load.all;
+	p->ShC_U.Output				= &p->ShcTmpState;//&p->outFaults.Load.all;
+	p->ShC_V.Output				= &p->ShcTmpState;//&p->outFaults.Load.all;
+	p->ShC_W.Output				= &p->ShcTmpState;//&p->outFaults.Load.all;
 
 	//------ÄÈÀÃÍÎÑÒÈÊÀ ÓÑÒÐÎÉÑÒÂÀ------------------------------------------
 	//------Ïåðåãðåâ áëîêà ÁÊÄ----------------------------------------------
@@ -321,7 +321,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underColdBCP.Input			= &g_Ram.ramGroupA.TemperBKP;
 	p->underColdBCP.Output			= &p->outDefects.Dev.all;
 	p->underColdBCP.EnableLevel		= &g_Ram.ramGroupC.TemperLow;
-	p->underColdBCP.DisableLevel	= &g_Ram.ramGroupC.TemperLow;
+	p->underColdBCP.DisableLevel		= &g_Ram.ramGroupC.TemperLow;
 	p->underColdBCP.Timeout			= (Uns *)100;
 	p->underColdBCP.Scale			= PROTECT_SCALE;
 
@@ -424,7 +424,11 @@ void Core_DevProc_FaultIndic(TCoreProtections *p)
 		p->outDefects.Dev.bit.Rtc 	  = (Uns)g_Peref.Rtc.Error;
 		p->outDefects.Dev.bit.TSens   = (Uns)g_Peref.TSens.Error;
 		p->outDefects.Dev.bit.Dac     = (Uns)g_Peref.Dac.Error;
-		p->outDefects.Dev.bit.NoBCP_Connect = !g_Comm.mbBkp.Frame.ConnFlag;
+
+		if (g_Comm.Bluetooth.ModeProtocol!=2) p->outDefects.Dev.bit.NoBCP_Connect = !g_Comm.mbBkp.Frame.ConnFlag;
+		else p->outDefects.Dev.bit.NoBCP_Connect = 0;
+
+		//p->outDefects.Dev.bit.NoBCP_Connect = !g_Comm.mbBkp.Frame.ConnFlag;
 	}
 }
 
@@ -523,6 +527,7 @@ void Core_ProtectionsClear(TCoreProtections *p)
 	Eeprom2.Error  = False;
 	TempSens.Error = False;
 	 */
+	p->ShcTmpState = 0;
 	p->ShcReset = true;
 
 }
@@ -554,9 +559,9 @@ void Core_ProtectionsUpdate(TCoreProtections *p)
 	}*/
 
 
-    //Core_ProtecionSHC_Update(&p->ShC_U);
-    //Core_ProtecionSHC_Update(&p->ShC_V);
-    //Core_ProtecionSHC_Update(&p->ShC_W);
+    Core_ProtecionSHC_Update(&p->ShC_U);
+    Core_ProtecionSHC_Update(&p->ShC_V);
+    Core_ProtecionSHC_Update(&p->ShC_W);
 
     p->outFaults.Proc.bit.Mufta = p->MuffFlag;
 

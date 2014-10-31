@@ -163,20 +163,22 @@ void Peref_LedsUpdate(pLeds p)
 	// ------Му/Ду----------------------------------------
 	if (*p->pStatus & STATUS_MU_DU)// Если неисправность
 	{
-		LedTurnOnOff(&p->ledMuDu, p->leds.bit.MuDu);// Зажигаем светодиод
+		LedTurnOnOff(&p->ledMuDu, p->leds.bit.MuDu);
 		p->leds.bit.MuDu = p->ledMuDu.status;
 	}
 	else 											// Если статус нет "Неисправности"
-		p->leds.all |= LED_MUDU_MASK;				// Гасим светодиод
+	{
+	    p->leds.bit.MuDu = 1;
+	}
 
 
 	LED_MUFTA	= p->leds.bit.Mufta;	DELAY_US(1);
 	LED_DEFECT	= p->leds.bit.Defect;	DELAY_US(1);
-	LED_FAULT	= p->leds.bit.Fault;	//DELAY_US(1);
+	LED_FAULT	= p->leds.bit.Fault;	DELAY_US(1);
 
-	LED_CLOSING = p->leds.bit.Closing;	//DELAY_US(1);
-	LED_OPENING = p->leds.bit.Opening;	//DELAY_US(1);
-	LED_MUDU	= !p->leds.bit.MuDu;		//DELAY_US(1);
+	LED_CLOSING = p->leds.bit.Closing;	DELAY_US(1);
+	LED_OPENING = p->leds.bit.Opening;	DELAY_US(1);
+	LED_MUDU	= !p->leds.bit.MuDu;		DELAY_US(1);
 
 	if (/*(!(*p->pStatus & STATUS_OPENING)) && (!(*p->pStatus & STATUS_CLOSING)) && */(!(*p->pStatus & STATUS_CLOSED)) && (!(*p->pStatus & STATUS_OPENED)))
 	{
