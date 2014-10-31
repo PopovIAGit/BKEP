@@ -324,11 +324,12 @@ void Core_LowPowerControl(TCore *p)
 {
 
     Uns ShCState = 0;
+    static Uns cs=0;
 
     if (p->Protections.FaultDelay > 0)
 	return;
 
-    ShCState = p->Protections.outFaults.Load.all & LOAD_SHC_MASK;
+    ShCState = cs;//p->Protections.outFaults.Load.all & LOAD_SHC_MASK;
 
 	// Событие выключения блока----------------------------------------------------
 	if ((g_Ram.ramGroupA.Ur < 60) && (g_Ram.ramGroupA.Us < 60)

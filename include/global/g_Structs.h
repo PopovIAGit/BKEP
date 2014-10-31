@@ -158,7 +158,7 @@ typedef union _TNetReg {
 #define LOAD_UNL_MASK		0x0400
 #define LOAD_ISK_MASK		0x0800
 #define LOAD_RESET_MASK		0x0807
-#define LOAD_EVLOG_MASK		0x0807
+#define LOAD_EVLOG_MASK		0x00EF
 typedef union _TLoadReg {
 	Uns all;
 	struct {
