@@ -324,6 +324,7 @@ void Core_LowPowerControl(TCore *p)
 {
 
     Uns ShCState = 0;
+    static Uns cs=0;
 
     if (p->Protections.FaultDelay > 0)
 	return;

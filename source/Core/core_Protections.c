@@ -375,7 +375,8 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 		p->breakCurrV.Cfg.bit.Enable 		= Enable;
 		p->breakCurrW.Cfg.bit.Enable 		= Enable;
 
-		Enable = (g_Ram.ramGroupC.ShC != pmOff) && (!g_Core.Status.bit.Stop);					// Короткое замыкание
+		//Enable = (g_Ram.ramGroupC.ShC != pmOff) && (!g_Core.Status.bit.Stop);					// Короткое замыкание
+		Enable = (g_Ram.ramGroupC.ShC != pmOff);
 		p->ShC_U.Cfg.bit.Enable 			= Enable;
 		p->ShC_V.Cfg.bit.Enable 			= Enable;
 		p->ShC_W.Cfg.bit.Enable 			= Enable;
