@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Table DeviceId="5000" DeviceName="БКД" FirmwareVersion="1001">
   <Group Name="Группа A" Type="Show" Description="Индикация">
-    <Parameter Index="А0" Name="Статус работы">
+    <Parameter Index="A0" Name="Статус работы">
       <Address>500</Address>
       <Configuration>
         <Type>Public</Type>
@@ -9,7 +9,7 @@
       </Configuration>
       <ValueDescription>
         <Minimum>0</Minimum>
-        <Maximum>65530</Maximum>
+        <Maximum>65535</Maximum>
         <Default>0</Default>
         <Type>Union</Type>
         <Fields>
@@ -23,13 +23,12 @@
           <Field BitValue="7" Description="Открыто" />
           <Field BitValue="8" Description="Муфта" />
           <Field BitValue="9" Description="Местное управление" />
-          <Field BitValue="10" Description="Включен ТЕН" />
+          <Field BitValue="10" Description="Включен ТЭН" />
           <Field BitValue="11" Description="Резервное питание" />
           <Field BitValue="12" Description="Резерв" />
           <Field BitValue="13" Description="Резерв" />
           <Field BitValue="14" Description="Неисправность" />
-          <Field BitValue="15" Description="Резерв" />
-          <Field BitValue="16" Description="Резерв" />
+          <Field BitValue="15" Description="Описание" />
         </Fields>
       </ValueDescription>
       <Info>
@@ -91,6 +90,37 @@
           <Field BitValue="13" Description="Превышение напряжения фазы S на 47%" SpecialDescription="ev25" />
           <Field BitValue="14" Description="Превышение напряжения фазы T на 47%" SpecialDescription="ev25" />
           <Field BitValue="15" Description="Выключение вводного автомата" SpecialDescription="ev26" />
+        </Fields>
+      </ValueDescription>
+      <Info>
+        <Description />
+      </Info>
+    </Parameter>
+    <Parameter Index="A3" Name="Диагностика нагрузки">
+      <Address>503</Address>
+      <Configuration>
+        <Type>Public</Type>
+        <Appointment>Fault</Appointment>
+      </Configuration>
+      <ValueDescription>
+        <Minimum>0</Minimum>
+        <Maximum>65535</Maximum>
+        <Default>0</Default>
+        <Type>Union</Type>
+        <Fields>
+          <Field BitValue="0" Description="Нет аварий" />
+          <Field BitValue="1" Description="Обрыв фазы U" />
+          <Field BitValue="2" Description="Обрыв фазы V" />
+          <Field BitValue="3" Description="Обрыв фазы W" />
+          <Field BitValue="4" Description="Время-токовая перегреузка" />
+          <Field BitValue="5" Description="Резерв" />
+          <Field BitValue="6" Description="Короткое замыкание в фазе U" />
+          <Field BitValue="7" Description="Короткое замыкание в фазе V" />
+          <Field BitValue="8" Description="Короткое замыкание в фазе W" />
+          <Field BitValue="9" Description="Резерв" />
+          <Field BitValue="10" Description="Резерв" />
+          <Field BitValue="11" Description="Резерв" />
+          <Field BitValue="12" Description="Асимметрия тока" />
         </Fields>
       </ValueDescription>
       <Info>
@@ -5997,7 +6027,8 @@
           <Field BitValue="8" Description="Открывается" />
           <Field BitValue="9" Description="Закрывается" />
           <Field BitValue="10" Description="Стоп" />
-          <Field BitValue="13" Description="Включен тен" />
+          <Field BitValue="13" Description="Включен ТЭН" />
+          <Field BitValue="15" Description="Готов к работе" />
         </Fields>
       </ValueDescription>
       <Info>
@@ -6023,12 +6054,15 @@
           <Field BitValue="4" Description="Обрыв фазы электродвигателя" />
           <Field BitValue="5" Description="Нет движения" />
           <Field BitValue="6" Description="Перенапряжение на входе" />
-          <Field BitValue="7" Description="Критическое снижение напряжения на входе" />
+          <Field BitValue="7" Description="Обрыв входной фазы" />
+          <Field BitValue="8" Description="Резерв" />
           <Field BitValue="9" Description="Перегрев блока" />
           <Field BitValue="10" Description="Переохлаждение блока" />
-          <Field BitValue="12" Description="Неверное чередование фаз сети" />
+          <Field BitValue="11" Description="Резерв" />
+          <Field BitValue="12" Description="Чередование фаз сети" />
           <Field BitValue="13" Description="Чередование фаз двигателя" />
           <Field BitValue="14" Description="Дефект устройства" />
+          <Field BitValue="15" Description="Резерв" />
         </Fields>
       </ValueDescription>
       <Info>
@@ -6043,10 +6077,11 @@
       </Configuration>
       <ValueDescription>
         <Minimum>0</Minimum>
-        <Maximum>65530</Maximum>
+        <Maximum>32000</Maximum>
         <Default>0</Default>
-        <Type>Uns</Type>
+        <Type>Int</Type>
         <Unit>%</Unit>
+        <Coefficient>0,1</Coefficient>
       </ValueDescription>
       <Info>
         <Description />
@@ -6063,16 +6098,17 @@
         <Minimum>0</Minimum>
         <Maximum>65530</Maximum>
         <Default>0</Default>
-        <Type>Union</Type>
+        <Type>Enum</Type>
         <Fields>
-          <Field BitValue="0" Description="Стоп" />
-          <Field BitValue="1" Description="Открыть" />
-          <Field BitValue="2" Description="Закрыть" />
-          <Field BitValue="5" Description="Сброс защит" />
-          <Field BitValue="8" Description="Включение тестирования дискретных входов" />
-          <Field BitValue="9" Description="Выключение тестирования дискретных входов" />
-          <Field BitValue="10" Description="Включение тестирования дискретных выходов" />
-          <Field BitValue="11" Description="Выключение тестирования дискретных выходов" />
+          <Field BitValue="0" Description="Нет команды" />
+          <Field BitValue="1" Description="Стоп" />
+          <Field BitValue="2" Description="Открыть" />
+          <Field BitValue="4" Description="Закрыть" />
+          <Field BitValue="16" Description="Сброс защит" />
+          <Field BitValue="256" Description="Включение тестирования дискретных входов" />
+          <Field BitValue="512" Description="Выключение тестирования дискретных входов" />
+          <Field BitValue="1024" Description="Включение тестирования дискретных выходов" />
+          <Field BitValue="2048" Description="Выключение тестирования дискретных выходов" />
         </Fields>
       </ValueDescription>
       <Info>
@@ -6107,6 +6143,7 @@
         <Default>0</Default>
         <Type>Uns</Type>
         <Unit>А</Unit>
+        <Coefficient>0,1</Coefficient>
       </ValueDescription>
       <Info>
         <Description />

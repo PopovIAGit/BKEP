@@ -216,12 +216,12 @@ void TekModbusParamsUpdate(void) //??? необходимы проверки
 	tek->TechReg.bit.Opened  = g_Ram.ramGroupA.Status.bit.Opened;
 	tek->TechReg.bit.Closed  = g_Ram.ramGroupA.Status.bit.Closed;
 	tek->TechReg.bit.Mufta1  = g_Ram.ramGroupA.Status.bit.Mufta;
-	tek->TechReg.bit.Mufta2  = g_Ram.ramGroupA.Status.bit.Mufta;
 	tek->TechReg.bit.MuDu    = !g_Ram.ramGroupA.Status.bit.MuDu;
 	tek->TechReg.bit.Opening = g_Ram.ramGroupA.Status.bit.Opening;
 	tek->TechReg.bit.Closing = g_Ram.ramGroupA.Status.bit.Closing;
 	tek->TechReg.bit.Stop    = g_Ram.ramGroupA.Status.bit.Stop;
 	tek->TechReg.bit.Ten     = g_Ram.ramGroupA.Status.bit.Ten;
+	tek->TechReg.bit.Ready   = !g_Ram.ramGroupA.Status.bit.Fault;
 
 	// Заполняем регистр дефектов
 	tek->DefReg.bit.I2t = g_Ram.ramGroupA.Faults.Load.bit.I2t;
