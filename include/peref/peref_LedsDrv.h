@@ -47,14 +47,14 @@ typedef union {
 	Uns all;
   	struct {
 		Uns Closing:1;		// 0	Светодиод "Закрывается"
-		Uns	Connect:1;		// 1 	Светодиод "Сеть"
+		Uns MuDu:1;		// 8	Светодиод "Му/Ду"
 		Uns Close:1;		// 2	Светодиод "Закрыто"
 		Uns Fault:1;		// 3	Светодиод "Авария"
 		Uns Defect:1;		// 4    Светодиод "Неисправность"
 		Uns Mufta:1;		// 5	Светодиод "Муфта"
 		Uns Open:1;			// 6	Светодиод "Открыто"
 		Uns Opening:1;		// 7	Светодиод "Открывается"
-		Uns MuDu:1;		// 8	Светодиод "Му/Ду"
+		Uns	Connect:1;		// 1 	Светодиод "Сеть"
 		Uns Bluetooth:1;	// 9	Светодиод "Работа Bluetooth"
      	Uns rsvd:6; 		// 10-15  Резерв
   } bit;

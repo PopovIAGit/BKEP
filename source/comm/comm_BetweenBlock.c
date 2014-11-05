@@ -73,13 +73,8 @@ void SciMasterConnBetweenBlockInit(TMbBBHandle Port)
 
 	Port->Params.TrEnable(0);
 
-	SCI_init(BKP_SCI_ID, Port->Params.BrrValue, 0, 8);
-
-	//SCI_init(Port->Params.UartID, Port->Params.BrrValue,
-		//	Port->Params.Parity, 8);
-
-	/*SCI_init(Port->Params.UartID, Port->Params.BrrValue,
-		Port->Params.Parity, 8, (Port->Params.Parity & 0x4) ? 2 : 1);*/
+	SCI_init(Port->Params.UartID, Port->Params.BrrValue,
+		Port->Params.Parity, 8);
 
 	if(Port->Params.Mode)
 	{
@@ -352,6 +347,7 @@ static void async_wrap_char(TMbBBHandle Port)
 			}
 			break;
 		case LINK_ESCAPE:
+			Port->TxPacket.Fcs = FCS_CALC(Port->TxPacket.Fcs, byte);
 			byte = byte ^ TRANS;
 			Port->TxPacket.State = INSIDE_FRAME;
 			Port->TxPacket.Len++;
