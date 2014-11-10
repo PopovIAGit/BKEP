@@ -45,15 +45,15 @@ typedef union _TTek_TechReg
 		Uns Opened:1;		// 0
 		Uns Closed:1;		// 1
 		Uns Mufta1:1;		// 2
-		Uns Mufta2:1;		// 3
-		Uns Rsvd2:3;		// 4-6
+		Uns Rsvd1:4;		// 3-6
 		Uns MuDu:1;			// 7
 		Uns Opening:1;		// 8
 		Uns Closing:1;		// 9
 		Uns Stop:1;			// 10
 		Uns Rsvd3:2;		// 11-12
 		Uns Ten:1;			// 13
-		Uns Rsvd4:2;		// 14-15
+		Uns Rsvd4:1;		// 14
+		Uns Ready:1;		// 15
 	} bit;
 } TTek_TechReg;
 
@@ -62,20 +62,20 @@ typedef union _TTek_DefReg
 	Uns all;
 	struct
 	{
-		Uns I2t:1;		// 0
-		Uns ShC:1;		// 1
-		Uns Drv_T:1;	// 2
-		Uns Uv:1;		// 3
-		Uns Phl:1;		// 4
-		Uns NoMove:1;	// 5
-		Uns Ov:1;		// 6
-		Uns Bv:1;		// 7
-		Uns Rsvd:1;		// 8
-		Uns Th:1;		// 9
+		Uns I2t:1;		// 0	времятоковая защита
+		Uns ShC:1;		// 1	короткое замыкание
+		Uns Drv_T:1;	// 2	перегрев электродвигателя
+		Uns Uv:1;		// 3	пониженное напряжение входной сети
+		Uns Phl:1;		// 4	Резерв
+		Uns NoMove:1;	// 5	Отсутствие движения
+		Uns Ov:1;		// 6	Повышенное напряжение входной сети
+		Uns Bv:1;		// 7	Обрыв фаз входной сети
+		Uns Rsvd:1;		// 8	Резерв
+		Uns Th:1;		// 9	Перегрев блока
 		Uns Tl:1;		// 10
 		Uns Rsvd1:1;	// 11
-		Uns PhOrdU:1;	// 12
-		Uns PhOrdDrv:1;	// 13
+		Uns PhOrdU:1;	// 12	Неверное чередование фаз сети
+		Uns PhOrdDrv:1;	// 13	Неверное чередование фаз двигателя
 		Uns DevDef:1;	// 14
 		Uns Rsvd2:1;	// 15
 	} bit;
