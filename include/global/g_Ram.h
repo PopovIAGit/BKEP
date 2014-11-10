@@ -186,7 +186,7 @@ typedef struct _TRamGroupB
 	TBaudRate       RsBaudRate;         // B24. 64 Скорость связи
 	Uns             RsStation;          // B25. 65 Адрес станции
 	TParityMode		RsMode;				// B26. 66 Режим связи
-	Uns				Rsvd4;				// B27. 67
+	Uns				MuffTimer;			// B27. 67
 	Uns				KeyInvert;			// B28. 68 Маска кнопок управления
 	Uns				MOD_FAULT;			// B29. 69
 	Uns				RES_ERR;			// B30. 70

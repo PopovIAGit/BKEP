@@ -287,7 +287,7 @@ void ReadWriteAllParams(Byte cmd, TCoreMenu *p)	// в Core_MenuInit()
 				ReadWriteEeprom(&Eeprom1,cmd,DefAddr,ToUnsPtr(&g_Ram) + DefAddr,count);
 			}
 		}
-		while (!IsMemParReady()) {FM25V10_Update(&Eeprom1); DelayUs(1000);}
+		while (!IsMemParReady()) {FM25V10_Update(&Eeprom1); DELAY_US(1000);}
 		// Инициализация фильтров, масштабов и т.д.
 		RefreshParams(DefAddr);
 		DefAddr += count;

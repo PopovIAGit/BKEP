@@ -324,7 +324,6 @@ void Core_LowPowerControl(TCore *p)
 {
 
     Uns ShCState = 0;
-    static Uns cs=0;
 
     if (p->Protections.FaultDelay > 0)
 	return;
@@ -390,7 +389,7 @@ void Core_LowPowerControl(TCore *p)
 	    {
 		    if (p->Sec3Timer < (4 * Prd200HZ))
 		    {
-			    g_Ram.ramGroupD.ControlWord = p->SaveDirection;
+			    g_Ram.ramGroupD.ControlWord = (TValveCmd)p->SaveDirection;
 		    }
 		    else
 			{

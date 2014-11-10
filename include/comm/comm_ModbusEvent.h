@@ -45,7 +45,6 @@ __inline void NewFrameEvent(TMbPort *hPort)
 //-------------------------------------------------------------------------------
 __inline void PreambleEvent(TMbPort *hPort)
 {
-	Uns DataSend=0;
 	hPort->Frame.Data = hPort->Frame.Buf;
 
 	if (hPort->Params.HardWareType==MCBSP_TYPE)
