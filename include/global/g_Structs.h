@@ -243,6 +243,13 @@ typedef enum {
 	spFire 		= 1 		// 1 Пожарка
 }TSettingPlace;
 
+// Метод останова
+typedef enum {
+	smSlowDown 		= 0,	// выбег
+	smReverse   	= 1,	// реверс
+	smDynBreak  	= 2		// динамика
+} TStopMethod;
+
 // Управление контакторами д
 typedef enum {
 	cgStop  = 0,

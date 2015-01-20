@@ -7,7 +7,7 @@
 Модуль ModBus
 ======================================================================*/
 
-//#define _MASTER_
+#define _MASTER_
 #define _SLAVE_
 
 #include "comm_ModbusRtu.h"
@@ -16,6 +16,8 @@
 #include "comm_ModbusEvent.h"
 #include "comm_ModbusFrame.h"
 #include "comm_ModbusInterrupts.h"
+
+extern Uns LVS_flag;
 
 // Локальные переменные
 static Bool CrcTableGenFlag = false;
@@ -40,8 +42,6 @@ __inline void MasterConfirmation(TMbPort *hPort);
 __inline void SlaveIndication(TMbPort *hPort);
 __inline void SlaveResponse(TMbPort *hPort);
 #endif
-
-
 
 void ModBusInit(TMbPort *hPort)
 {
@@ -73,11 +73,11 @@ void ModBusInvoke(TMbPort *hPort)
 	else
 	{
 		//#if defined(_MASTER_)
-		//if (IsMaster()) MasterRequest(hPort);
-		//#endif
-		//#if defined(_SLAVE_)
+		if (IsMaster()) MasterRequest(hPort);
+	//	#endif
+	//	#if defined(_SLAVE_)
 		if (IsSlave())  SlaveResponse(hPort);
-		//#endif
+	//	#endif
 	}
 }
 
@@ -162,12 +162,13 @@ __inline void UpdateNewFrame(TMbPort *hPort)
 	
 	Stat->BusMsgCount++;
 	
-	#if defined(_MASTER_)
+//	#if defined(_MASTER_)
 	if (IsMaster()) MasterConfirmation(hPort);
-	#endif
-	#if defined(_SLAVE_)
+//	#endif
+
+//	#if defined(_SLAVE_)
 	if (IsSlave())  SlaveIndication(hPort);
-	#endif
+//	#endif
 	return;
 	
 FRAMING_ERROR:
@@ -190,8 +191,10 @@ __inline void MasterRequest(TMbPort *hPort)
 	if (!Packet->Request) return;
 	if (hPort->Frame.WaitResponse) return;
 	
-	if (hPort->Params.HardWareType==UART_TYPE) SCI_rx_disable(hPort->Params.ChannelID);
-	else if (hPort->Params.HardWareType==MCBSP_TYPE) McBsp_rx_disable(hPort->Params.ChannelID);
+	if (hPort->Params.HardWareType==UART_TYPE)
+		SCI_rx_disable(hPort->Params.ChannelID);
+	else if (hPort->Params.HardWareType==MCBSP_TYPE)
+		McBsp_rx_disable(hPort->Params.ChannelID);
 
 	Packet->Exception = 0;
 	switch(Packet->Request)
@@ -224,11 +227,13 @@ __inline void MasterRequest(TMbPort *hPort)
 	}
 
 	if (Packet->Exception || !hPort->Params.Slave)
-		SendMasterResponse(hPort);
+		SendMasterResponse(hPort);//???
 	else
 	{
 		hPort->Frame.WaitResponse = TRUE;
 		StartTimer(&hPort->Frame.TimerConn);
+		//if(LVS_flag ==3) LVS_flag = 1;
+		LVS_flag++;
 		SendFrame(hPort);	
 	}
 }
@@ -339,8 +344,6 @@ __inline void MasterConfirmation(TMbPort *hPort)
 {
 	TMbPacket *Packet = &hPort->Packet;
 	TMbFrame *Frame = &hPort->Frame;
-	
-  StopTimer(&Frame->TimerConn);
 
 	if ((Frame->Buf[1] & 0x7F) != Packet->Request)
 	{
@@ -387,12 +390,18 @@ __inline void MasterConfirmation(TMbPort *hPort)
 		case MB_REPORT_ID:   ReportSlaveIdConfirmation(hPort); break;
 	}
 	
-	if (Packet->Exception) hPort->Stat.BusErrCount++;
+	if (Packet->Exception) {
+		hPort->Stat.BusErrCount++;
+		if (hPort->Frame.RetryCounter < hPort->Params.RetryCount) hPort->Frame.RetryCounter++;
+		else hPort->Packet.Exception = EX_NO_CONNECTION; //???
+	}
 	else
 	{
 		hPort->Stat.SlaveMsgCount++;
 		SendMasterResponse(hPort);
+		StopTimer(&Frame->TimerConn);
 	}
+
 }
 #endif
 

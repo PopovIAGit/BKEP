@@ -99,10 +99,10 @@ __inline void PostambleEvent(TMbPort *hPort)
 __inline void ConnTimeoutEvent(TMbPort *hPort)
 {
 	//hPort->Frame.Data = hPort->Frame.Buf;
-	/*#if defined(_MASTER_)
+	#if defined(_MASTER_)
 	if (IsMaster())
 	{
-		if (!hPort->Packet.Exception)
+		if (hPort->Packet.Exception)
 		{
 			hPort->Stat.SlaveNoRespCount++;
 			hPort->Frame.RetryCounter++;
@@ -115,15 +115,18 @@ __inline void ConnTimeoutEvent(TMbPort *hPort)
 		}
 		SendMasterResponse(hPort);
 	}
-	#endif*/
+	#endif
 	
 	#if defined(_SLAVE_)
 	//if (IsSlave()) hPort->Packet.Exception = EX_NO_CONNECTION;
+	if(IsSlave())
+	{
 		if (hPort->Params.ChannelID==SCIB)
 		{
 			//hPort->Serial.RsState=EX_NO_CONNECTION;
 			hPort->Packet.Exception = EX_NO_CONNECTION;
 		}
+	}
 	#endif
 }
 

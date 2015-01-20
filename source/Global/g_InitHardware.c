@@ -79,8 +79,8 @@ void InitHardware(void)
 	PieVectTable.SCITXINTA = &SciaTxIsrHandler;
 	PieVectTable.SCIRXINTB = &ScibRxIsrHandler;
 	PieVectTable.SCITXINTB = &ScibTxIsrHandler;
-	//PieVectTable.SCIRXINTC = &ScicRxIsrHandler;
-	//PieVectTable.SCITXINTC = &ScicTxIsrHandler;
+	PieVectTable.SCIRXINTC = &ScicRxIsrHandler;
+	PieVectTable.SCITXINTC = &ScicTxIsrHandler;
 	PieVectTable.ADCINT    = &adc_isr;
 	//PieVectTable.I2CINT1A  = &i2c_int1a_isr;
 	PieVectTable.MRINTA= &McbspRxAHandler;
@@ -119,7 +119,7 @@ void InitHardware(void)
 
 	PieCtrlRegs.PIEIER1.bit.INTx6 = 1;
 
-    //IER |= M_INT8;   // הכÿ I2C
+    IER |= M_INT8;   // הכÿ I2C
 	IER |= M_INT1;   // הכÿ ְײֿ
 	IER |= M_INT6;   // הכÿ McBSP
 	IER |= M_INT9;   // הכÿ SCI A,B,C

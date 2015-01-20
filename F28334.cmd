@@ -84,10 +84,10 @@ PAGE 0:    /* Program Memory */
    FLASHH      : origin = 0x320000, length = 0x004000     /* on-chip FLASH */
    FLASHG      : origin = 0x324000, length = 0x004000     /* on-chip FLASH */
    FLASHF      : origin = 0x328000, length = 0x004000     /* on-chip FLASH */
-   FLASHE      : origin = 0x32C000, length = 0x004000     /* on-chip FLASH */
-   FLASHD      : origin = 0x330000, length = 0x000100     /* on-chip FLASH */
-   FLASHC      : origin = 0x330100, length = 0x000100     /* on-chip FLASH */
-   FLASHA      : origin = 0x330200, length = 0x00BF80     /* on-chip FLASH */
+   FLASHE      : origin = 0x32C000, length = 0x000100     /* on-chip FLASH */
+   FLASHD      : origin = 0x32C100, length = 0x000100     /* on-chip FLASH */
+   FLASHC      : origin = 0x32C200, length = 0x000100     /* on-chip FLASH */
+   FLASHA      : origin = 0x32C300, length = 0x00FE80     /* on-chip FLASH */
    CSM_RSVD    : origin = 0x33FF80, length = 0x000076     /* Part of FLASHA.  Program with all 0x0000 when CSM is in use. */
    BEGIN       : origin = 0x33FFF6, length = 0x000002     /* Part of FLASHA.  Used for "boot to Flash" bootloader mode. */
    CSM_PWL     : origin = 0x33FFF8, length = 0x000008     /* Part of FLASHA.  CSM password locations in FLASHA */
@@ -100,6 +100,19 @@ PAGE 0:    /* Program Memory */
    ROM         : origin = 0x3FF27C, length = 0x000D44     /* Boot ROM */          
    RESET       : origin = 0x3FFFC0, length = 0x000002     /* part of boot ROM  */
    VECTORS     : origin = 0x3FFFC2, length = 0x00003E     /* part of boot ROM  */
+
+//	 было так
+//   FLASHH      : origin = 0x320000, length = 0x004000     /* on-chip FLASH */
+//   FLASHG      : origin = 0x324000, length = 0x004000     /* on-chip FLASH */
+//   FLASHF      : origin = 0x328000, length = 0x004000     /* on-chip FLASH */
+//   FLASHE      : origin = 0x32C000, length = 0x004000     /* on-chip FLASH */
+//   FLASHD      : origin = 0x330000, length = 0x000100     /* on-chip FLASH */
+//   FLASHC      : origin = 0x330100, length = 0x000100     /* on-chip FLASH */
+//   FLASHA      : origin = 0x330200, length = 0x00BF80     /* on-chip FLASH */
+
+
+
+
 
 PAGE 1 :   /* Data Memory */
            /* Memory (RAM/FLASH/OTP) blocks can be moved to PAGE0 for program allocation */

@@ -93,30 +93,37 @@ void InitChanelAsuModbus(TMbHandle hPort)
 //---------------------------------------------------
 void InitChanelShnModbus(TMbHandle hPort)
 {
-	/*hPort->Params.ChannelID   = SHN_SCI_ID;
+	hPort->Params.ChannelID   = SHN_SCI_ID;
 	hPort->Params.Mode     = MB_MASTER;
 	hPort->Params.Slave    = 1;//g_Ram.ramGroupB.RS_STATION;
 	hPort->Params.BaudRate = BaudRates[3];//BaudRates[g_Ram.ramGroupB.RS_BAUD_RATE];
 	hPort->Params.UartBaud = BrrValues[3];//BrrValues[g_Ram.ramGroupB.RS_BAUD_RATE];
 	hPort->Params.Parity   = 0;//g_Ram.ramGroupB.RS_MODE;
 
-	hPort->Params.RetryCount  = 0;
+/*	hPort->Params.RetryCount  = 5;
 	hPort->Params.Scale       = MB_SCALE;
-//	hPort->Params.ConnTimeout = Serial->RsIndicTime * 100;
-	hPort->Params.ConnTimeout = 10;//  ÈÊ
+	hPort->Params.ConnTimeout = 400;
 	hPort->Params.RxDelay     = 10;
-//	hPort->Params.TxDelay     = Serial->RsWaitTime - 3;
-	hPort->Params.TxDelay     = 10;//  ÈÊ
-	hPort->Params.AckTimeout  = 1000;
+	hPort->Params.TxDelay     = 0;
+	hPort->Params.AckTimeout  = 2000;
 	hPort->Params.TrEnable    = &ShnMbSetTr;
-	hPort->Frame.TimerPre.Timeout = 10; //  ÈÊ
+	hPort->Frame.TimerPre.Timeout = 10;*/
 
-	hPort->Params.HardWareType	= UART_TYPE;*/
+	hPort->Params.RetryCount  = 5;
+		hPort->Params.Scale       = MB_SCALE;
+		hPort->Params.ConnTimeout = 400;
+		hPort->Params.RxDelay     = 10;
+		hPort->Params.TxDelay     = 200;
+		hPort->Params.AckTimeout  = 2000;//1000;
+		hPort->Params.TrEnable    = &ShnMbSetTr;
+		hPort->Frame.TimerPre.Timeout = 1;
+
+	hPort->Params.HardWareType	= UART_TYPE;
 }
 //---------------------------------------------------
 void InitChanelBtModbus(TMbHandle hPort)
 {
-	hPort->Params.ChannelID   = BT_MCBSP_ID;
+	hPort->Params.ChannelID= BT_MCBSP_ID;
 	hPort->Params.Mode     = MB_SLAVE;
 	hPort->Params.Slave    = 1;//g_Ram.ramGroupB.RS_STATION;
 	hPort->Params.BaudRate = 1152;//BaudRates[g_Ram.ramGroupB.RS_BAUD_RATE];
@@ -152,7 +159,7 @@ void InitChanelBtModbus(TMbHandle hPort)
 
 void SerialCommInit(TMbHandle hPort)
 {
-	ModBusSlaveReset(hPort);
+	ModBusSlaveReset(hPort);// ModBusReset
 }
 //---------------------------------------------------
 void SerialCommTimings(TMbHandle hPort)
@@ -168,21 +175,32 @@ void ModBusSlaveReset(TMbHandle hPort)
 void ModBusUpdate(TMbHandle hPort)
 {
 	TMbPacket *Packet = &hPort->Packet;
-	
-	//	if (g_Ram.ramGroupB.LockControl&BIT2>0 || prog_mode==1) {return;}
-	//if (prog_mode) return; // ÈÊ
 
-	if (Packet->Request)
+	if (IsSlave())
 	{
-		Packet->Exception = UpdatePacket(Packet);
-		Packet->Response  = Packet->Request;
-		Packet->Request   = 0;
-		if (hPort->Params.HardWareType==MCBSP_TYPE)
+		if (Packet->Request)
 		{
-			GpioDataRegs.GPATOGGLE.bit.GPIO27=1;
+			Packet->Exception = UpdatePacket(Packet);
+			Packet->Response  = Packet->Request;
+			Packet->Request   = 0;
+			if (hPort->Params.HardWareType==MCBSP_TYPE)
+			{
+				GpioDataRegs.GPATOGGLE.bit.GPIO27=1;
+			}
 		}
 	}
-	
+
+	/*if(IsMaster())
+	{
+		if (Packet->Response)
+		{
+			switch (Packet->Response)
+			{
+
+			}
+		}
+	}*/
+
 	hPort->Serial.RsState = Packet->Exception; //???MbConnect = !Packet->Exception;
 	
 	ModBusInvoke(hPort);

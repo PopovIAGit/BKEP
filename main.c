@@ -95,13 +95,13 @@ interrupt void ScicRxIsrHandler(void)
 	if (ScicRegs.SCIRXST.bit.BRKDT) SCI_reset(SCIC);
 	else ModBusRxIsr(&g_Comm.mbShn);
 
-	PieCtrlRegs.PIEACK.bit.ACK8 = 1;
+	PieCtrlRegs.PIEACK.bit.ACK8 = 1;	//???
 }
 //-------------------------------------------------------------
 interrupt void ScicTxIsrHandler(void)
 {
 	ModBusTxIsr(&g_Comm.mbShn);
-	PieCtrlRegs.PIEACK.bit.ACK8 = 1;
+	PieCtrlRegs.PIEACK.bit.ACK8 = 1;	//???
 }
 //-------------------------------------------------------------
 interrupt void McbspRxAHandler(void) // прерывание приема данных

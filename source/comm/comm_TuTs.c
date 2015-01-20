@@ -103,8 +103,8 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//50 Ãö
 	// ----------------------ÈÍÂÅÐÑÈß ÒÅËÅÑÈÃÍÀËÈÇÀÖÈÈ-------------------------------
 
 	//èíâåðñèÿ ÒÑ
-	g_Ram.ramGroupA.StateTs.all = p->Outputs.all ^g_Ram.ramGroupB.TsInvert.all;
-	ts_all = p->Outputs.all ^g_Ram.ramGroupB.TsInvert.all;
+	g_Ram.ramGroupA.StateTs.all = p->Outputs.all ^ g_Ram.ramGroupB.TsInvert.all;
+	ts_all = p->Outputs.all ^ g_Ram.ramGroupB.TsInvert.all;
 
 	// ----------------------ÂÛÂÎÄ ÒÅËÅÑÈÃÍÀËÈÇÀÖÈÈ----------------------------------
 	TS_1 = !((ts_all>>0) & 0x01); DELAY_US(1);

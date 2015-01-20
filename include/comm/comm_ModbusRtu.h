@@ -79,7 +79,7 @@ extern "C" {
 typedef void (*TMbTrFunc)(Byte);
 
 typedef struct _TMbParams {
-	Byte ChannelID;               // Идентификатор UART-порта
+	Byte ChannelID;            // Идентификатор UART-порта
 	Byte Mode;                 // Режим работы
 	Byte Slave;                // Адрес подчиненного устройства
 	Uns  BaudRate;             // Скорость обмена / 100

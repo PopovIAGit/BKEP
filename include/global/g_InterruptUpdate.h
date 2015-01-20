@@ -95,10 +95,10 @@ TPeriodicalFunction Task18kHz[] =
 
 // ================================ 2 к√ц ==================================
 
-TPeriodicalFunction Task2kHz[] =          //Ќе более 4-х задач
+TPeriodicalFunction Task2kHz[] =          //Ќе более 8-х задач
 {
 	PrdElemInit(SerialCommTimings,						&g_Comm.mbAsu),	//на 2 к√ц
-	//PrdElemInit(SerialCommTimings,						&g_Comm.mbShn),
+	PrdElemInit(SerialCommTimings,						&g_Comm.mbShn),
 	PrdElemInit(SerialCommTimings,						&g_Comm.mbBt),	//на 2 к√ц
 	PrdElemInit(FM25V10_Update,							&Eeprom1),		//на 2 к√ц
 	PrdElemInit(FM25V10_Update,							&Eeprom2),		//на 2 к√ц
@@ -131,7 +131,7 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(Core_TorqueCalc, 				&g_Core.TorqObs),
 	PrdElemInit(Core_ValveDriveUpdate, 			&g_Core.VlvDrvCtrl),
 	PrdElemInit(Core_ProtectionsEnable,		    &g_Core.Protections),
-	PrdElemInit(EngPhOrdPrt,			&g_Core.Protections),
+	PrdElemInit(EngPhOrdPrt,					&g_Core.Protections),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.NoMove),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.overVoltageR),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.overVoltageS),
@@ -161,7 +161,6 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.overHeatBCP),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.underColdBCD),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.underColdBCP),
-	//PrdElemInit(Core_ProtectionsBreakRST,	        &g_Core.Protections),
 	PrdElemInit(Comm_50HzCalc,					&g_Comm),
 	PrdElemInit(GetCurrentCmd,					&g_Stat),
 	PrdElemInit(Core_MenuDisplay,				&g_Core.menu),

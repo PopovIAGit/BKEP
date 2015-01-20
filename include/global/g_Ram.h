@@ -190,12 +190,13 @@ typedef struct _TRamGroupB
 	Uns				KeyInvert;			// B28. 68 Маска кнопок управления
 	Uns				MOD_FAULT;			// B29. 69
 	Uns				RES_ERR;			// B30. 70
-	Uns 				Sec3Mode;		// B31. 71
+	Uns 			Sec3Mode;			// B31. 71
 	Uns				NoMoveTime;		   	// B32. 72 Время отсутствия движения
 	Uns				OverwayZone;		// B33. 73 Макси
 	TInputReg		DigitalMode;		// B34. 74 режим потенциальный / импульсный
  	Uns             SleepTime;          // B35. 75 Дежурный режим
- 	Uns 			Rsvd[4];			// B36-39. 76-79
+ 	TStopMethod		StopMethod;			// B36. 76 Выбор типа торможения (Динамика, Противовключение)
+ 	Uns 			Rsvd[3];			// B36-39. 77-79
  	//------Параметры для ТУ------------------------------------
 	Uns				LevelOnOpen220;		 // B40. 80
 	Uns				LevelOffOpen220;	 // B41. 81
@@ -279,7 +280,7 @@ typedef struct _TRamGroupC
 	TLedsReg        LedsReg;            // C16. 156 Состояние светодиодов блока
 	THallBlock      HallBlock;          // C17. 157 Состояние датчиков холла блока
 	Uns             SetDefaults;        // C18. 158 Задание параметров по умолчанию
-	Uns       	PlugBrakeDisable;    	// C19. 159 Запрещение торможения противовключением
+	Uns       		StopShnTime;   		// C19. 159 Время торможения динамическим торможением
 	TPrtMode        DriveTemper;        // C20. 160 Защита от перегрева двигателя. (дописать защиту перегрева блока в H)
 	Uns             OvLevel_max;        // C21. 161 Уровень превышения напряжения при 47% превышения (320В)
 	Uns             OvTime_max;     	// C22. 162 Время превышения напряжения при 47% превышения (1с)
@@ -370,10 +371,8 @@ typedef struct _TRamGroupC
 	Int				Corr60Trq;			// C110. 250 Параметр для корректировки индикации больших моментов (больше 60%)
 	Int				Corr80Trq;			// C111. 251
 	Int				Corr110Trq;			// C112. 252
-	TNetReg				FaultNetRST;	// C113. 253 обрыв фар питания
-	Uns				LevelBreakRST;		// C114. 254
-	Uns				TimeBreakRST;		// C115. 255
-	Uns			    Rsvd2[4];			// C116-119. 256-259 Резерв
+	Int				BreakZone;			// C113. 253 Число оборотов дв за которое начинаем тормозить
+	Uns			    Rsvd2[6];			// C114-119. 254-259 Резерв
 } TRamGroupC;
 
 // Группа D (Адрес = 260, Количество = 20 )  	- Команды
@@ -569,6 +568,10 @@ typedef struct TRam
 #define RAM_DATA_SIZE		(RAM_SIZE)
 #define RAM_DATA_SIZE_GRB   sizeof(TRam_groupB)
 #define RAM_EADR			(RAM_DATA_SIZE - 1)
+
+#define SHN_DATA_ADR		4000
+#define SHN_DATA_SIZE		50
+#define SHN_DATA_LADR		(SHN_DATA_ADR + SHN_DATA_SIZE - 1)
 
 #define DLOG_ADR			0x0500
 #define DLOG_SIZE			0x0200
