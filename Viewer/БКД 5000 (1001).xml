@@ -6006,6 +6006,176 @@
         <Description />
       </Info>
     </Parameter>
+    <Parameter Index="H130" Name="Плохие задачи прерывания 2кГц">
+      <Address>440</Address>
+      <Configuration>
+        <Type>None</Type>
+        <Appointment>Regular</Appointment>
+      </Configuration>
+      <ValueDescription>
+        <Minimum>0</Minimum>
+        <Maximum>65535</Maximum>
+        <Default>0</Default>
+        <Type>Bin</Type>
+      </ValueDescription>
+      <Info>
+        <Description />
+      </Info>
+    </Parameter>
+    <Parameter Index="H131" Name="Плохие задачи прерывания 200 Гц">
+      <Address>441</Address>
+      <Configuration>
+        <Type>None</Type>
+        <Appointment>Regular</Appointment>
+      </Configuration>
+      <ValueDescription>
+        <Minimum>0</Minimum>
+        <Maximum>65535</Maximum>
+        <Default>0</Default>
+        <Type>Bin</Type>
+      </ValueDescription>
+      <Info>
+        <Description />
+      </Info>
+    </Parameter>
+    <Parameter Index="H132" Name="Плохие задачи прерывания 50 Гц (0-15)">
+      <Address>442</Address>
+      <Configuration>
+        <Type>None</Type>
+        <Appointment>Regular</Appointment>
+      </Configuration>
+      <ValueDescription>
+        <Minimum>0</Minimum>
+        <Maximum>65535</Maximum>
+        <Default>0</Default>
+        <Type>Bin</Type>
+      </ValueDescription>
+      <Info>
+        <Description />
+      </Info>
+    </Parameter>
+    <Parameter Index="H133" Name="Плохие задачи прерывания 50 Гц (16-31)">
+      <Address>443</Address>
+      <Configuration>
+        <Type>None</Type>
+        <Appointment>Regular</Appointment>
+      </Configuration>
+      <ValueDescription>
+        <Minimum>0</Minimum>
+        <Maximum>65535</Maximum>
+        <Default>0</Default>
+        <Type>Bin</Type>
+      </ValueDescription>
+      <Info>
+        <Description />
+      </Info>
+    </Parameter>
+    <Parameter Index="H134" Name="Плохие задачи прерывания 50 Гц (32-40)">
+      <Address>444</Address>
+      <Configuration>
+        <Type>None</Type>
+        <Appointment>Regular</Appointment>
+      </Configuration>
+      <ValueDescription>
+        <Minimum>0</Minimum>
+        <Maximum>65535</Maximum>
+        <Default>0</Default>
+        <Type>Bin</Type>
+      </ValueDescription>
+      <Info>
+        <Description />
+      </Info>
+    </Parameter>
+    <Parameter Index="H135" Name="Плохие задачи прерывания 10 Гц">
+      <Address>445</Address>
+      <Configuration>
+        <Type>None</Type>
+        <Appointment>Regular</Appointment>
+      </Configuration>
+      <ValueDescription>
+        <Minimum>0</Minimum>
+        <Maximum>65535</Maximum>
+        <Default>0</Default>
+        <Type>Bin</Type>
+      </ValueDescription>
+      <Info>
+        <Description />
+      </Info>
+    </Parameter>
+    <Parameter Index="H136" Name="Сброс регистров плохих задач">
+      <Address>446</Address>
+      <Configuration>
+        <Type>None</Type>
+        <Appointment>Regular</Appointment>
+        <CanEdit>True</CanEdit>
+      </Configuration>
+      <ValueDescription>
+        <Minimum>0</Minimum>
+        <Maximum>1</Maximum>
+        <Default>0</Default>
+        <Type>Uns</Type>
+      </ValueDescription>
+      <Info>
+        <Description />
+      </Info>
+    </Parameter>
+    <Parameter Index="H137" Name="Процессорное время">
+      <Address>447</Address>
+      <Configuration>
+        <Type>None</Type>
+        <Appointment>Regular</Appointment>
+      </Configuration>
+      <ValueDescription>
+        <Minimum>0</Minimum>
+        <Maximum>65535</Maximum>
+        <Default>0</Default>
+        <Type>Uns</Type>
+      </ValueDescription>
+      <Info>
+        <Description />
+      </Info>
+    </Parameter>
+    <Parameter Index="H138" Name="Список задач">
+      <Address>448</Address>
+      <Configuration>
+        <Type>None</Type>
+        <Appointment>Regular</Appointment>
+        <CanEdit>True</CanEdit>
+      </Configuration>
+      <ValueDescription>
+        <Minimum>0</Minimum>
+        <Maximum>65535</Maximum>
+        <Default>0</Default>
+        <Type>Enum</Type>
+        <Fields>
+          <Field BitValue="0" Description="18 кГц" />
+          <Field BitValue="1" Description="2 кГц" />
+          <Field BitValue="2" Description="200 Гц" />
+          <Field BitValue="3" Description="50 Гц" />
+          <Field BitValue="4" Description="10 Гц" />
+        </Fields>
+      </ValueDescription>
+      <Info>
+        <Description />
+      </Info>
+    </Parameter>
+    <Parameter Index="H139" Name="Номер задачи">
+      <Address>449</Address>
+      <Configuration>
+        <Type>None</Type>
+        <Appointment>Regular</Appointment>
+        <CanEdit>True</CanEdit>
+      </Configuration>
+      <ValueDescription>
+        <Minimum>0</Minimum>
+        <Maximum>255</Maximum>
+        <Default>0</Default>
+        <Type>Uns</Type>
+      </ValueDescription>
+      <Info>
+        <Description />
+      </Info>
+    </Parameter>
   </Group>
   <Group Name="Группа T" Type="None" Description="Группа параметров по ТЭКу">
     <Parameter Index="T1" Name="Технологический регистр">

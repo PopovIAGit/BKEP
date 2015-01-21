@@ -35,7 +35,7 @@ void g_Ram_Init(TRam *p)
 	g_Core.PrevCycle = p->ramGroupH.CycleCnt;
 	p->ramGroupA.VersionPO = VERSION_MAJOR*1000+VERSION_MINOR;
 	p->ramGroupC.SubVersionPO = SUBVERSION;
-
+	p->ramGroupH.TaskList = 0;
 	//if (p->ramGroupH.ScFaults) LowPowerReset |= BIT0;
 
 }
@@ -174,6 +174,15 @@ void g_Ram_Update(TRam *p)
 
     p->ramGroupB.MOD_FAULT = GpioDataRegs.GPBDAT.bit.GPIO39;
     GpioDataRegs.GPBDAT.bit.GPIO48 = p->ramGroupB.RES_ERR;
+
+	if (p->ramGroupH.BadTask_Reset)
+	{
+		p->ramGroupH.BadTask_Reset = 0;
+		p->ramGroupH.BadTask_2kHz = 0;
+		p->ramGroupH.BadTask_200Hz = 0;
+		p->ramGroupH.BadTask_50Hz[0] = p->ramGroupH.BadTask_50Hz[1] = p->ramGroupH.BadTask_50Hz[2] = 0;
+		p->ramGroupH.BadTask_10Hz = 0;
+	}
 
     if (STATE_TU24)
 	{p->ramGroupB.InputType = it24;}
