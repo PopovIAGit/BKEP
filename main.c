@@ -7,9 +7,6 @@
 #include "peref.h"
 #include "stat.h"
 
-Uint16 CpuLoad = 0;
-Uint16 CpuLoadMax = 0;
-
 TRam			g_Ram;
 
 extern void InterruptInit  (void);
@@ -33,8 +30,6 @@ void main(void)
 
 	MonitorInit();
 
-	InterruptInit();
-
 	StartCpuTimer0();
 
 	EINT;          						// Enable Global interrupt INTM
@@ -53,13 +48,7 @@ void main(void)
 
 interrupt void CpuTimer0IsrHandler(void)	//	18 000
 {
-    CpuTimer1Regs.TIM.all = 0;
-
     InterruptUpdate();
-
-    CpuLoad = 100 * (-CpuTimer1Regs.TIM.all) / CpuTimer0Regs.PRD.all;
-    if (CpuLoadMax < CpuLoad) CpuLoadMax = CpuLoad;
-
     PieCtrlRegs.PIEACK.bit.ACK1 = 1;
 }
 
@@ -95,13 +84,13 @@ interrupt void ScicRxIsrHandler(void)
 	if (ScicRegs.SCIRXST.bit.BRKDT) SCI_reset(SCIC);
 	else ModBusRxIsr(&g_Comm.mbShn);
 
-	PieCtrlRegs.PIEACK.bit.ACK8 = 1;
+	PieCtrlRegs.PIEACK.bit.ACK8 = 1;	//???
 }
 //-------------------------------------------------------------
 interrupt void ScicTxIsrHandler(void)
 {
 	ModBusTxIsr(&g_Comm.mbShn);
-	PieCtrlRegs.PIEACK.bit.ACK8 = 1;
+	PieCtrlRegs.PIEACK.bit.ACK8 = 1;	//???
 }
 //-------------------------------------------------------------
 interrupt void McbspRxAHandler(void) // прерывание приема данных

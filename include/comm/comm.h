@@ -19,6 +19,7 @@
 #include "comm_BetweenBlock.h"
 #include "comm_BluetoothWT41.h"
 #include "comm_TuTs.h"
+#include "comm_ATS48regs.h"
 
 
 #ifdef __cplusplus
@@ -30,6 +31,22 @@ extern "C" {
 //--------------------------------------------------------
 //================== КОММУНИКАЦИИ ========================
 //--------------------------------------------------------
+
+typedef struct {
+
+	Uint16 SHN_Connected;
+	Uint16 SHN_Busy;
+	Uint16 SHN_ReadFlag;
+	Uint16 SHN_WriteFlag;
+	Uint16 SHN_TaskFunc;
+	Uint16 SHN_TaskAddr;
+	Uint16 *SHN_TaskData;
+	Uint16 SHN_TaskStage;
+	Uint16 SHN_TaskEx;
+	Uint16 SHN_Mode;
+	Uint16 SHN_StopFlag;
+
+} TShn;
 
 typedef struct {
 	TCommMPU			localControl;	// Пульт местного управления
@@ -46,6 +63,8 @@ typedef struct {
 	TMbPort  			mbAsu;			// ModBus - АСУ
 	TMbPort  			mbShn;			// ModBus - УПП
 	TMbPort  			mbBt;			// ModBus - Bluetooth
+	TATS48_Regs			SHN_Regs;		// Регистры для работы с софстартером шнайдер
+	TShn				Shn;
 	TBluetoothPort		Bluetooth;		// Bluetooth
 	TBKPData			BkpData;		// структура обмена данными с БКП
 } TComm;
@@ -59,7 +78,7 @@ Uns DigitCmdModeUpdate (Uns *);
 void TekModbusParamsUpdate(void);
 
 extern TComm	g_Comm;
-
+extern Uint16 		SHN_Data[10];
 #ifdef __cplusplus
 }
 #endif // extern "C"

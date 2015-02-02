@@ -38,7 +38,9 @@ Outputs
 
 #define START_DELAY_TIME		(Uint16)(2.000 * Prd50HZ)		// Ограничение времени паузы между остановом и след. запуском
 #define MOVE_STATE_TIME			(Uint16)(1.000 * Prd50HZ)		// Ограничение времени перехода в муфту
-#define BREAK_SCALE				(Uint16)(0.010 * Prd50HZ)		//
+#define BREAK_SCALE				(Uint16)(0.100 * Prd50HZ)		//
+#define SHN_CONTROL_ERR_TIME	(Uint16)(2.000 * Prd50HZ)		// время ожидания для определения ошибки алгоритма упп
+#define SHN_MODE_TIME			(Uint16)(0.200 * Prd50HZ)
 
 #define TEN_OFF				1
 #define TEN_ON				0
@@ -51,7 +53,12 @@ Outputs
 typedef enum {
 	wmStop       = 1,					// Режим стоп
 	wmMove     	 = 2,					// Режим движения
-	wmPlugBreak	 = 3					// Режим торможения
+	wmPlugBreak	 = 3,					// Режим торможения
+	wmStart		 = 4,
+	wmShnStart 	 = 5,
+	wmShnStop	 = 6,
+	wmSpeedTest	 = 7
+
 } TWorkMode;
 
 // Структура для цифрового управления приводом
@@ -67,6 +74,10 @@ typedef struct _TDmControl {
 	Uns 		CalibStop;				// Остановка по калибровке
 	Uns 		PlugBreakTimer;			// Таймер используемый для торможения противовключением (пауза перед и само противовключение)
 	Uns 		PlugBreakStep;			// Шаги противовключения (Пауза, торможение, выключение)
+	Uns 		DinBreakTimer;			// Таймер используемый для динамического торможения
+	Uns 		ShnControlStep;			// Шаги для работы упп
+	Uns 		ShnControlErrTimer;		// Таймер остановки если упп не отработает
+	Uns 		ShnControlErr;			// ошибка отработки упп
 } TDmControl;
 
 typedef struct _TCoreTemper {
@@ -103,6 +114,7 @@ typedef struct {
 } TCore;
 
 //------------------- Глобальные переменные --------------------------------
+extern Uns LVS_flag;
 //------------------- Протатипы функций ------------------------------------
 
 void Core_Init(TCore *);

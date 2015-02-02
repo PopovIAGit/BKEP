@@ -220,7 +220,7 @@ void InitPll(Uint16 val, Uint16 divsel)
 	{
 		EALLOW;
 	    SysCtrlRegs.PLLSTS.bit.DIVSEL = 2;
-	    DelayUs(50L);
+	    DELAY_US(50L);
 	    SysCtrlRegs.PLLSTS.bit.DIVSEL = 3;
 	    EDIS;
     }

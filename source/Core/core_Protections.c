@@ -536,10 +536,10 @@ void Core_ProtectionsClear(TCoreProtections *p)
 void Core_ProtectionsUpdate(TCoreProtections *p)
 {
 
+    Uns MuffEnable;
+
     if (p->FaultDelay > 0)
 	return;
-
-    Uns MuffEnable;
 
     /*if (g_Ram.ramGroupC.FaultNetRST.bit.BvR==1 && g_Ram.ramGroupC.FaultNetRST.bit.BvS==1 && g_Ram.ramGroupC.FaultNetRST.bit.BvT==1)
 	{
@@ -564,7 +564,10 @@ void Core_ProtectionsUpdate(TCoreProtections *p)
     Core_ProtecionSHC_Update(&p->ShC_V);
     Core_ProtecionSHC_Update(&p->ShC_W);
 
-    p->outFaults.Proc.bit.Mufta = p->MuffFlag;
+
+     p->outFaults.Proc.bit.Mufta = p->MuffFlag;
+
+
 
     if (p->outDefects.Dev.all || p->outDefects.Load.all || p->outDefects.Net.all || p->outDefects.Proc.all)
 	{

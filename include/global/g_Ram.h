@@ -45,15 +45,15 @@ typedef union _TTek_TechReg
 		Uns Opened:1;		// 0
 		Uns Closed:1;		// 1
 		Uns Mufta1:1;		// 2
-		Uns Mufta2:1;		// 3
-		Uns Rsvd2:3;		// 4-6
+		Uns Rsvd1:4;		// 3-6
 		Uns MuDu:1;			// 7
 		Uns Opening:1;		// 8
 		Uns Closing:1;		// 9
 		Uns Stop:1;			// 10
 		Uns Rsvd3:2;		// 11-12
 		Uns Ten:1;			// 13
-		Uns Rsvd4:2;		// 14-15
+		Uns Rsvd4:1;		// 14
+		Uns Ready:1;		// 15
 	} bit;
 } TTek_TechReg;
 
@@ -62,20 +62,20 @@ typedef union _TTek_DefReg
 	Uns all;
 	struct
 	{
-		Uns I2t:1;		// 0
-		Uns ShC:1;		// 1
-		Uns Drv_T:1;	// 2
-		Uns Uv:1;		// 3
-		Uns Phl:1;		// 4
-		Uns NoMove:1;	// 5
-		Uns Ov:1;		// 6
-		Uns Bv:1;		// 7
-		Uns Rsvd:1;		// 8
-		Uns Th:1;		// 9
+		Uns I2t:1;		// 0	времятоковая защита
+		Uns ShC:1;		// 1	короткое замыкание
+		Uns Drv_T:1;	// 2	перегрев электродвигателя
+		Uns Uv:1;		// 3	пониженное напряжение входной сети
+		Uns Phl:1;		// 4	Резерв
+		Uns NoMove:1;	// 5	Отсутствие движения
+		Uns Ov:1;		// 6	Повышенное напряжение входной сети
+		Uns Bv:1;		// 7	Обрыв фаз входной сети
+		Uns Rsvd:1;		// 8	Резерв
+		Uns Th:1;		// 9	Перегрев блока
 		Uns Tl:1;		// 10
 		Uns Rsvd1:1;	// 11
-		Uns PhOrdU:1;	// 12
-		Uns PhOrdDrv:1;	// 13
+		Uns PhOrdU:1;	// 12	Неверное чередование фаз сети
+		Uns PhOrdDrv:1;	// 13	Неверное чередование фаз двигателя
 		Uns DevDef:1;	// 14
 		Uns Rsvd2:1;	// 15
 	} bit;
@@ -186,16 +186,17 @@ typedef struct _TRamGroupB
 	TBaudRate       RsBaudRate;         // B24. 64 Скорость связи
 	Uns             RsStation;          // B25. 65 Адрес станции
 	TParityMode		RsMode;				// B26. 66 Режим связи
-	Uns				Rsvd4;				// B27. 67
+	Uns				MuffTimer;			// B27. 67
 	Uns				KeyInvert;			// B28. 68 Маска кнопок управления
 	Uns				MOD_FAULT;			// B29. 69
 	Uns				RES_ERR;			// B30. 70
-	Uns 				Sec3Mode;		// B31. 71
+	Uns 			Sec3Mode;			// B31. 71
 	Uns				NoMoveTime;		   	// B32. 72 Время отсутствия движения
 	Uns				OverwayZone;		// B33. 73 Макси
 	TInputReg		DigitalMode;		// B34. 74 режим потенциальный / импульсный
  	Uns             SleepTime;          // B35. 75 Дежурный режим
- 	Uns 			Rsvd[4];			// B36-39. 76-79
+ 	TStopMethod		StopMethod;			// B36. 76 Выбор типа торможения (Динамика, Противовключение)
+ 	Uns 			Rsvd[3];			// B36-39. 77-79
  	//------Параметры для ТУ------------------------------------
 	Uns				LevelOnOpen220;		 // B40. 80
 	Uns				LevelOffOpen220;	 // B41. 81
@@ -279,7 +280,7 @@ typedef struct _TRamGroupC
 	TLedsReg        LedsReg;            // C16. 156 Состояние светодиодов блока
 	THallBlock      HallBlock;          // C17. 157 Состояние датчиков холла блока
 	Uns             SetDefaults;        // C18. 158 Задание параметров по умолчанию
-	Uns       	PlugBrakeDisable;    	// C19. 159 Запрещение торможения противовключением
+	Uns       		StopShnTime;   		// C19. 159 Время торможения динамическим торможением
 	TPrtMode        DriveTemper;        // C20. 160 Защита от перегрева двигателя. (дописать защиту перегрева блока в H)
 	Uns             OvLevel_max;        // C21. 161 Уровень превышения напряжения при 47% превышения (320В)
 	Uns             OvTime_max;     	// C22. 162 Время превышения напряжения при 47% превышения (1с)
@@ -370,10 +371,8 @@ typedef struct _TRamGroupC
 	Int				Corr60Trq;			// C110. 250 Параметр для корректировки индикации больших моментов (больше 60%)
 	Int				Corr80Trq;			// C111. 251
 	Int				Corr110Trq;			// C112. 252
-	TNetReg				FaultNetRST;	// C113. 253 обрыв фар питания
-	Uns				LevelBreakRST;		// C114. 254
-	Uns				TimeBreakRST;		// C115. 255
-	Uns			    Rsvd2[4];			// C116-119. 256-259 Резерв
+	Int				BreakZone;			// C113. 253 Число оборотов дв за которое начинаем тормозить
+	Uns			    Rsvd2[6];			// C114-119. 254-259 Резерв
 } TRamGroupC;
 
 // Группа D (Адрес = 260, Количество = 20 )  	- Команды
@@ -448,15 +447,25 @@ typedef struct _TRamGroupH
 	Uns             IvPr;                // H89. 399 Ток фазы V
 	Uns             IwPr;                // H90. 400 Ток фазы W
 	Uns             Imid;				 // H91. 401 Средний ток
-  	Uns             ISkewValue;          // H92. 402 Асиметрия токов нагрузки
-  	LgUns           Position;            // H93-94. 403-404 Положение
-	LgUns  			FullStep;        	 // H95-96. 405-406 Полный ход
+  	LgUns           Position;            // H92-93. 402-403 Положение
+	LgUns  			FullStep;        	 // H94-95. 404-405 Полный ход
+  	Uns             ISkewValue;          // H96. 406 Асиметрия токов нагрузки
 	TReverseType	ReverseType;         // H97. 407 Тип реверса
 	Uns				Rsvd4;				 // H98. 408
 	TInputReg       StateTu;           	 // H99. 409 Состояние дискретных входов
 	TOutputReg      StateTs;          	 // H100. 410 Состояние дискретных выходов
 	Uns             TuReleMode;          // H101. 411 Релейный режим
-	Uns      	    Rsvd2[12];		 	 // H102-113. 412-423Нормальное состояние входов
+	//-------------------------------
+	Uns				BadTask_2kHz;        // H102. 412 Регистр "плохих" задач прерывания 2 кГц
+	Uns				BadTask_200Hz;       // H103. 413 Регистр "плохих" задач прерывания 200 Гц
+	Uns				BadTask_50Hz[3];     // H104-106. 414-416 Регистр "плохих" задач прерывания 50 Гц
+	Uns				BadTask_10Hz;        // H107. 417 Регистр "плохих" задач прерывания 10 Гц
+	Uns				BadTask_Reset;       // H108. 418 Сброс регистров "плохих" задач
+	Uns				CpuTime;             // H109. 419 Процессорное время конкретной задачи
+	Uns				TaskList;            // H110. 420 Номер списка задач
+	Uns				TaskNumber;          // H111. 421 Номер задачи в списке
+	//-------------------------------
+	Uns      	    Rsvd2[2];		 	 // H112-113. 422-423 Резерв
 	Uns             StartIndic;			 // H114. 424 Индикация в старте
  	Uns             SleepTime;           // H115. 425 Дежурный режим  mb to C
 	Uns             BusyValue;       	 // H116. 426 Процент исполнения
@@ -569,6 +578,10 @@ typedef struct TRam
 #define RAM_DATA_SIZE		(RAM_SIZE)
 #define RAM_DATA_SIZE_GRB   sizeof(TRam_groupB)
 #define RAM_EADR			(RAM_DATA_SIZE - 1)
+
+#define SHN_DATA_ADR		4000
+#define SHN_DATA_SIZE		50
+#define SHN_DATA_LADR		(SHN_DATA_ADR + SHN_DATA_SIZE - 1)
 
 #define DLOG_ADR			0x0500
 #define DLOG_SIZE			0x0200

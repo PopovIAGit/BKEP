@@ -29,7 +29,7 @@
 // Макрос преобразования функции в указатель на функцию,
 // аргумента функции в указатель на аргумент функции
 #define PrdElemInit(Name, Argument) \
-	{ (TPrdFunc)(Name), (void *)(Argument) }
+	{ (TPrdFunc)(Name), (void *)(Argument), 0 }
 
 // Макрос подсчета количества элементов массива
 #define TaskCount(List)	(sizeof(List) / sizeof(TPeriodicalFunction))
@@ -47,35 +47,11 @@ typedef struct _TPrdElem				// Определение типа данных структуры, которая содерж
 {
 	TPrdFunc Func;						// - указатель на функцию;
     void *Data;							// - указатель на аргумент функции
+    Uns CpuTime;						// - процессорное время выполнения
 } TPeriodicalFunction;					// Объявление структуры соответствующего типа
 
 //---------ПРОТОТИПЫ---ФУНКЦИЙ-----------------------------------------------
-
-        void task1				(void);				//Периодическая функция
-        void task1_10Hz			(void);		//Периодическая функция, выполняемая на частоте 10 Гц
-        void task1_18Hz			(void);		//Периодическая функция, выполняемая на частоте 18 Гц
-extern  void InterruptInit		(void);		//Функция инициализации прерываний
 extern  void InterruptUpdate	(void); 		//Функция обработки прерываний
-
-//-------ОБЪЯВЛЕНИЕ--ПЕРЕМЕННЫХ----------------------------------------------
-
-int     count18kHz,             //Счетчик прерываний частотой 18 кГц
-        count2kHz,              //Счетчик прерываний частотой 2  кГц
-        count200Hz,             //Счетчик прерываний частотой 200 Гц
-        count50Hz,              //Счетчик прерываний частотой 10  Гц
-
-        tskCnt2kHz,             //Счетчик выполненных задач 2 кГц. Он же номер выполняемой задачи
-        tskCnt200Hz,            //Счетчик выполненных задач 200Гц. Он же номер выполняемой задачи
-        tskCnt50Hz,             //Счетчик выполненных задач 50 Гц. Он же номер выполняемой задачи
-        tskCnt10Hz,             //Счетчик выполненных задач 10 Гц. Он же номер выполняемой задачи
-
-        tskMaxCnt18kHz,			//Количество задач для частоты 18 кГц
-        tskMaxCnt2kHz,          //Количество задач для частоты 2  кГц
-        tskMaxCnt200Hz,         //Количество задач для частоты 200 Гц
-        tskMaxCnt50Hz,          //Количество задач для частоты 50  Гц
-        tskMaxCnt10Hz;          //Количество задач для частоты 10  Гц
-
-LgUns  X, X10, X18;
 
 // Высокоприоритетные прерывания на частоте 18 кГц
 
@@ -95,10 +71,10 @@ TPeriodicalFunction Task18kHz[] =
 
 // ================================ 2 кГц ==================================
 
-TPeriodicalFunction Task2kHz[] =          //Не более 4-х задач
+TPeriodicalFunction Task2kHz[] =          //Не более 8-х задач
 {
 	PrdElemInit(SerialCommTimings,						&g_Comm.mbAsu),	//на 2 кГц
-	//PrdElemInit(SerialCommTimings,						&g_Comm.mbShn),
+	PrdElemInit(SerialCommTimings,						&g_Comm.mbShn),
 	PrdElemInit(SerialCommTimings,						&g_Comm.mbBt),	//на 2 кГц
 	PrdElemInit(FM25V10_Update,							&Eeprom1),		//на 2 кГц
 	PrdElemInit(FM25V10_Update,							&Eeprom2),		//на 2 кГц
@@ -131,7 +107,7 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(Core_TorqueCalc, 				&g_Core.TorqObs),
 	PrdElemInit(Core_ValveDriveUpdate, 			&g_Core.VlvDrvCtrl),
 	PrdElemInit(Core_ProtectionsEnable,		    &g_Core.Protections),
-	PrdElemInit(EngPhOrdPrt,			&g_Core.Protections),
+	PrdElemInit(EngPhOrdPrt,					&g_Core.Protections),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.NoMove),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.overVoltageR),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.overVoltageS),
@@ -161,7 +137,6 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.overHeatBCP),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.underColdBCD),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.underColdBCP),
-	//PrdElemInit(Core_ProtectionsBreakRST,	        &g_Core.Protections),
 	PrdElemInit(Comm_50HzCalc,					&g_Comm),
 	PrdElemInit(GetCurrentCmd,					&g_Stat),
 	PrdElemInit(Core_MenuDisplay,				&g_Core.menu),

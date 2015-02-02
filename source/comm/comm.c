@@ -14,9 +14,12 @@
 //#define TEK_DEVICE_FAULT_MASK	0xF990
 
 TComm	g_Comm;
+Uint16 ASU_Data[10];
+Uint16 SHN_Data[10];
 
 void CommandUpdate(TComm *p);
 Uns DigitCmdModeUpdate (Uns *Output);
+static char ReadRegs(TMbPort *Port, Uint16 *Data, Uint16 Addr, Uint16 Count);
 //---------------------------------------------------
 void Comm_Init(TComm *p)
 {
@@ -34,7 +37,7 @@ void Comm_Init(TComm *p)
 	//канал связи с верхним уровнем контроллеров
 	InitChanelAsuModbus(&g_Comm.mbAsu);
 
-	//InitChanelShnModbus(&g_Comm.mbShn);
+	InitChanelShnModbus(&g_Comm.mbShn);
 	InitChanelBtModbus(&g_Comm.mbBt);
 
 	//настраиваем один и тот же физический канал для драйвера Bluetooth и Modbus
@@ -49,23 +52,149 @@ void Comm_Init(TComm *p)
 	InitChanelBt(&g_Comm.Bluetooth);
 
 	SerialCommInit(&g_Comm.mbAsu);
-	//SerialCommInit(&g_Comm.mbShn);
+	SerialCommInit(&g_Comm.mbShn);
 	Comm_LocalControlInit(&g_Comm.localControl);
 
+	// настройка работы шнайдера
+
+	p->Shn.SHN_ReadFlag = 0;
+	p->Shn.SHN_Mode = 1;
 }
+
+
 //---------------------------------------------------
 void Comm_Update(TComm *p)
 {
 
-	if (g_Comm.Bluetooth.ModeProtocol==0) ModBusUpdate(&g_Comm.mbAsu); 	// slave канал связи с верхним уровнем АСУ
-	//ModBusUpdate(&g_Comm.mbShn);  // master канал связи с устройством плавного пуска
+	Uint16 lAddr;
+
+	if (g_Comm.Bluetooth.ModeProtocol == 0)
+	{
+		ModBusUpdate(&g_Comm.mbAsu); 	// slave канал связи с верхним уровнем АСУ
+	}
+
+	if (g_Comm.Bluetooth.ModeProtocol == 0)
+	{
+		ModBusUpdate(&g_Comm.mbShn);  // master канал связи с устройством плавного пуска
+		if (!p->Shn.SHN_Busy)
+		{
+			/*if(p->Shn.SHN_TaskFunc && (p->Shn.SHN_TaskStage == 1))
+			{
+				p->mbShn.Packet.Addr = p->Shn.SHN_TaskAddr;
+				p->mbShn.Packet.Count = 1;
+				if(p->Shn.SHN_TaskFunc == MB_WRITE_REGS) p->mbShn.Packet.Data[0] = *p->Shn.SHN_TaskData;
+				p->mbShn.Packet.Request = p->Shn.SHN_TaskFunc;
+				p->Shn.SHN_TaskEx = 0;
+				p->Shn.SHN_Busy = 0;
+			}
+			else*/ if (p->Shn.SHN_WriteFlag)
+			{
+				//p->Shn.SHN_ReadFlag = 0;
+				if (p->Shn.SHN_Mode==1)
+				{
+					p->mbShn.Packet.Addr = ATS48_CONTROL_REG;
+					p->mbShn.Packet.Count = 1;
+					p->mbShn.Packet.Data[0] = p->SHN_Regs.Control.all;
+					//if(LVS_flag ==2) LVS_flag = 3;
+				}
+				else if (p->Shn.SHN_Mode==0)
+				{
+					p->Shn.SHN_Mode=1;
+					//p->mbShn.Packet.Addr = 0;
+					//p->mbShn.Packet.Count = 10;
+					//memcpy(p->mbShn.Packet.Data, SHN_Data, p->mbShn.Packet.Count);
+				} else if (p->Shn.SHN_Mode==2) {
+
+				}
+				p->mbShn.Packet.Request = MB_WRITE_REGS;
+				p->Shn.SHN_Busy = 1;
+			}
+			else if (p->Shn.SHN_ReadFlag==1)
+			{
+				//p->Shn.SHN_WriteFlag=0;
+				if(p->Shn.SHN_Mode)
+				{
+					p->mbShn.Packet.Addr = ATS48_STATUS_REG;
+					p->mbShn.Packet.Count = 3;
+				}
+				else
+				{
+					//p->Shn.SHN_Mode=1;
+					//p->mbShn.Packet.Addr = 0;
+					//p->mbShn.Packet.Count = 10;
+				}
+
+				p->mbShn.Packet.Request = MB_READ_REGS;
+				p->Shn.SHN_Busy = 1;
+			}
+		}
+		else if (!p->mbShn.Packet.Request && !p->mbShn.Frame.WaitResponse)
+		{
+			p->Shn.SHN_Busy = 0;
+			//g_Comm.Shn.SHN_WriteFlag=0;
+		}
+		else if (p->mbShn.Packet.Response)
+		{
+			if(p->mbShn.Packet.Exception)
+			{
+				if(p->Shn.SHN_TaskStage == 1)
+				{
+					p->Shn.SHN_TaskEx = p->mbShn.Packet.Exception;
+					p->Shn.SHN_TaskStage = 2;
+				}
+				p->mbShn.Packet.Exception = 0;
+			}
+			else switch (p->mbShn.Packet.Response)
+			{
+			case MB_READ_REGS:
+
+				if(p->Shn.SHN_Mode)
+				{
+					if (p->mbShn.Packet.Addr == ATS48_STATUS_REG)
+					{
+						p->SHN_Regs.Status.all = p->mbShn.Packet.Data[0];
+						p->SHN_Regs.ExStatus.all = p->mbShn.Packet.Data[1];
+						p->SHN_Regs.Ex2Status.all = p->mbShn.Packet.Data[2];
+					}
+
+					if (p->mbShn.Packet.Addr == 402)
+					{
+						SHN_Data[0]= p->mbShn.Packet.Data[0];
+					}
+				}
+				else
+				{
+					memcpy(SHN_Data, p->mbShn.Packet.Data, p->mbShn.Packet.Count);
+				}
+				break;
+			case MB_WRITE_REGS:
+
+				//if(p->mbShn.Packet.Addr == p->Shn.SHN_TaskAddr) p->Shn.SHN_TaskStage = 2;
+				if(p->mbShn.Packet.Addr == ATS48_CONTROL_REG) p->Shn.SHN_WriteFlag = 0;
+				if(p->mbShn.Packet.Addr == ATS48_BIG_CONTROL_REG) p->Shn.SHN_WriteFlag = 0;
+
+				p->Shn.SHN_WriteFlag = 0;
+
+				break;
+			}
+			p->mbShn.Packet.Response = 0;
+			p->Shn.SHN_Busy = 0;
+		}
+		//ModBusUpdate(&g_Comm.mbShn);  // master канал связи с устройством плавного пуска
+
+
+	}
 
 	//SciMasterConnBetweenBlockUpdate(&g_Comm.mbBkp);// master канал связи с
 
 	BluetoothWTUpdate(&g_Comm.Bluetooth); //драйвер Bluetooth
 	if (g_Comm.Bluetooth.ModeProtocol>0) ModBusUpdate(&g_Comm.mbBt);  // slave
 
-	//SerialCommUpdate(&Mb);
+}
+static char ReadRegs(TMbPort *Port, Uint16 *Data, Uint16 Addr, Uint16 Count)
+{
+	memcpy(Port->Packet.Data, &Data[Addr], Count);
+	return 0;
 }
 
 void Comm_50HzCalc(TComm *p)
@@ -101,7 +230,7 @@ void CommandUpdate(TComm *p)
 {
 	static Byte clrReset=0;
 
-	p->outputCmdReg = 0;//CMD_NO;
+	p->outputCmdReg = 0;
 
 	//здесь не только обработка ТС но и вывод ТС
 	Comm_TuTsUpdate(&p->digitInterface); // Телеуправление, телесигнализация
@@ -215,12 +344,12 @@ void TekModbusParamsUpdate(void) //??? необходимы проверки
 	tek->TechReg.bit.Opened  = g_Ram.ramGroupA.Status.bit.Opened;
 	tek->TechReg.bit.Closed  = g_Ram.ramGroupA.Status.bit.Closed;
 	tek->TechReg.bit.Mufta1  = g_Ram.ramGroupA.Status.bit.Mufta;
-	tek->TechReg.bit.Mufta2  = g_Ram.ramGroupA.Status.bit.Mufta;
 	tek->TechReg.bit.MuDu    = !g_Ram.ramGroupA.Status.bit.MuDu;
 	tek->TechReg.bit.Opening = g_Ram.ramGroupA.Status.bit.Opening;
 	tek->TechReg.bit.Closing = g_Ram.ramGroupA.Status.bit.Closing;
 	tek->TechReg.bit.Stop    = g_Ram.ramGroupA.Status.bit.Stop;
 	tek->TechReg.bit.Ten     = g_Ram.ramGroupA.Status.bit.Ten;
+	tek->TechReg.bit.Ready   = !g_Ram.ramGroupA.Status.bit.Fault;
 
 	// Заполняем регистр дефектов
 	tek->DefReg.bit.I2t = g_Ram.ramGroupA.Faults.Load.bit.I2t;
