@@ -66,7 +66,6 @@ void Comm_Update(TComm *p)
 	if (g_Comm.Bluetooth.ModeProtocol>0) ModBusUpdate(&g_Comm.mbBt);  // slave
 
 	//SerialCommUpdate(&Mb);
-
 }
 
 void Comm_50HzCalc(TComm *p)

@@ -56,7 +56,7 @@ void Peref_SinObserverUpdateFloat(TSinPhaseObserverFloat *p)		// –мс, угол, пол€
 	}
 }
 
-void Peref_SinObserverUpdate(TSinPhaseObserver *p)		// –мс, угол, пол€рность сигнала Int
+/*void Peref_SinObserverUpdate(TSinPhaseObserver *p)		// –мс, угол, пол€рность сигнала Int
 {
 	register Uns Sign;
 
@@ -85,7 +85,7 @@ void Peref_SinObserverUpdate(TSinPhaseObserver *p)		// –мс, угол, пол€рность сиг
 		p->Sum = 0;
 		p->Counter = 0;
 	}
-}
+}*/
 
 void Peref_PhaseOrderUpdate(TPhaseOrder *p)		// чередование фаз
 {

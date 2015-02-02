@@ -289,11 +289,11 @@ void Core_ControlMode(TCore *p)
 		if (CONTACTOR_1_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
 		if (CONTACTOR_2_STATUS && g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
 
-		if(p->TorqObs.Indication < p->MotorControl.TorqueSet)
+		/*if(p->TorqObs.Indication < p->MotorControl.TorqueSet)
 			p->MotorControl.MufTimer = 0;
 		else if (++p->MotorControl.MufTimer >= (5 * g_Ram.ramGroupB.MuffTimer))
 			p->Protections.MuffFlag = 1;	// выставляем муфту если в течении секунды момент больше заданного
-		break;
+		break;*/
 	case wmPlugBreak:
 		g_Ram.ramGroupA.Torque = 0;				// отображаем момент
 

@@ -3,7 +3,7 @@
 #define AM_PM_MASK  (RTC_AM_PM|RTC_AM_PM_MODE)
 
 
-void RTC_Update(void *p)
+/*void RTC_Update(void *p)
 {
 	RTC_Obj *Obj = (RTC_Obj *)p;
 	char Mode = Obj->Hour & AM_PM_MASK;
@@ -38,9 +38,9 @@ void RTC_Update(void *p)
 	if (Obj->Month > 12) {Obj->Year++; Obj->Month = 1;}
 
 	if (Obj->Year > 99) Obj->Year = 0;
-}
+}*/
 
-void RTC_Tick(void *p)
+/*void RTC_Tick(void *p)
 {
 	RTC_Lite *Obj = (RTC_Lite *)p;
 
@@ -57,7 +57,7 @@ void RTC_Tick(void *p)
 		}
 		Obj->Sec = 0;
 	}
-}
+}*/
 
 char RTC_DefMaxDay(char Year, char Month)
 {

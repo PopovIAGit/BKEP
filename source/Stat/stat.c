@@ -160,6 +160,10 @@ void InitInfoModule(TInfoModule *im)
 	im->IsBufReady		= False;
 	im->IsLogTransmit	= False;
 
+	im->HardwareSrc		= imSrcBluetooth;
+	im->HardwareSrc		= imSrcModbus;
+	im->HardwareSrc		= imSrcNone;
+
 	im->DeviceDataPtr   = (Uns *)&g_Ram;
 	// Для информационного модуля
 	im->EnableReceive	 = g_Comm.Bluetooth.EnableRx;
@@ -298,17 +302,16 @@ Bool ReadWriteEeprom(pFM25V10 eeprom, Byte func, Uns addr, Uns *pData, Uns count
 	return true;
 }
 //----------------------------------------------------
-
 // -- РАБОТА С ЖУРНАЛОМ ------------------------------
+
 void DataBufferPre(TStat *s)
 {
 	static Uns PreTimer = 0;
 
 	if (g_Ram.ramGroupH.LogReset > 0)							// Обнуляем записи и адреса журналов
 	{
-		g_Ram.ramGroupH.LogReset 	   = 0;
-
-		g_Ram.ramGroupH.LogEvAddr 	   = 0;
+		g_Ram.ramGroupH.LogReset 	  = 0;
+		g_Ram.ramGroupH.LogEvAddr 	  = 0;
 		g_Ram.ramGroupH.LogCmdAddr    = 0;
 		g_Ram.ramGroupH.LogParamAddr  = 0;
 		g_Ram.ramGroupH.LogEvCount    = 0;

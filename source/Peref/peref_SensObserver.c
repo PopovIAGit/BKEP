@@ -82,7 +82,6 @@ void Peref_SensObserverUpdate(TSensObserver *p) // 18000 Ãö
 	p->IUout = ADC_CONV(p->IUinp, *p->parSensors.p_IU_Mpy, *p->parSensors.p_IU_Offset);
 	p->IVout = ADC_CONV(p->IVinp, *p->parSensors.p_IV_Mpy, *p->parSensors.p_IV_Offset);
 	p->IWout = ADC_CONV(p->IWinp, *p->parSensors.p_IW_Mpy, *p->parSensors.p_IW_Offset);
-
 }
 
 void Peref_SensTuObserverUpdate(TSensTuObserver *p) // 18000 Ãö
@@ -92,7 +91,7 @@ void Peref_SensTuObserverUpdate(TSensTuObserver *p) // 18000 Ãö
     p->UCloseInp 	= TU_SIG_CLOSE;
     p->UStopInp 	= TU_SIG_STOP;
     p->UMuInp 		= TU_SIG_MU;
-    p->UResetAlarmInp 	= TU_SIG_RESETALARM;
+    p->UResetAlarmInp = TU_SIG_RESETALARM;
     p->UReadyTuInp 	= TU_SIG_READYTU;
     p->UDuInp 		= TU_SIG_DU;
 
