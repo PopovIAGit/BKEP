@@ -605,7 +605,7 @@ __inline void RxDataMode(TBluetoothHandle bPort, TMbHandle hPort)
 
 			// Прием данных для инф.модуля
 			ImReceiveData(&g_Stat.Im, (char)(Data1&0x00FF));
-			//ImReceiveData(&g_Stat.Im, (char)(Data2&0x00FF));
+			//ImReceiveData(&g_Stat.Im, (char)(Data2&0x00FF));//27.07  18-14 открыл коментарий
 
 		}else
 		{

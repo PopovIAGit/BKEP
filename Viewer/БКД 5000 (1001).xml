@@ -5960,7 +5960,7 @@
       </Info>
     </Parameter>
     <Parameter Index="H127" Name="Команды БУР">
-      <Address>438</Address>
+      <Address>437</Address>
       <Configuration>
         <Type>None</Type>
         <Appointment>LogCmdControlWord</Appointment>
@@ -5984,6 +5984,10 @@
           <Field BitValue="10" Description="Стоп по аварии" SpecialDescription="Stop" />
           <Field BitValue="11" Description="Тест дискретных выходов" />
           <Field BitValue="12" Description="Тест дискретных входов" />
+          <Field BitValue="2048" Description="ПДУ" />
+          <Field BitValue="4096" Description="МПУ" />
+          <Field BitValue="8192" Description="ТУ" />
+          <Field BitValue="16384" Description="RS-485" />
         </Fields>
       </ValueDescription>
       <Info>
@@ -5991,7 +5995,7 @@
       </Info>
     </Parameter>
     <Parameter Index="H125" Name="Секунды">
-      <Address>436</Address>
+      <Address>435</Address>
       <Configuration>
         <Type>Hide</Type>
         <Appointment>Seconds</Appointment>

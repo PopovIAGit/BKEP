@@ -455,6 +455,11 @@ void GetCurrentCmd(TStat *s)
 		default: LogControlWord = bcmNone; break;
 	}
 
+	if (LogControlWord!=bcmNone) {
+		LogControlWord = LogControlWord | g_Core.VlvDrvCtrl.EvLog.Source;
+		g_Core.VlvDrvCtrl.EvLog.Source = 0;
+	}
+
 	if (g_Core.VlvDrvCtrl.EvLog.Value != 0)
 	{
 		PrevEvLogValue = g_Core.VlvDrvCtrl.EvLog.Value;
@@ -497,6 +502,7 @@ void LogCmdControl(TStat *s)
 	//--------------------------------------------------------------------------------
 		else if (s->LogCmd.WriteFlag)														// Проверяем готовность ПЗУ
 		{																				// Проверяем наличие флага разрешения записи журнала
+
 			Addr = LOG_CMD_START_ADDR + g_Ram.ramGroupH.LogCmdAddr * LOG_CMD_DATA_CNT;				// Формируем начальный адрес записи
 			WritePar(Addr, s->LogCmd.Data, LOG_CMD_DATA_CNT);								// Отправляем на запись драйверу Eeprom1
 

@@ -271,6 +271,9 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 				switch(Res)
 				{
 					case 1:
+						if (Addr>=REG_TASKCLOSE && Addr<=REG_RSRESET) {
+							g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_SERIAL;
+						}
 						return WriteData(Packet->Addr, Packet->Data, Packet->Count);
 						//if (!Port->Frame.Exception) SerialCommRefresh();
 					case 5:
