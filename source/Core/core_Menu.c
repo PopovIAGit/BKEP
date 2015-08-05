@@ -183,11 +183,13 @@ void Core_MenuDisplay(TCoreMenu *p)	// 50 Гц
 	// По умолчанию
 	if (g_Ram.ramGroupD.SetDefaults)
 	{
+		g_Core.VlvDrvCtrl.EvLog.Value = CMD_DEFAULTS_USER;
 		p->setDefaultGroupNumber = 1;
 		g_Ram.ramGroupD.SetDefaults = 0;
 	}
 	if (g_Ram.ramGroupC.SetDefaults)
 	{
+		g_Core.VlvDrvCtrl.EvLog.Value = CMD_DEFAULTS_FACT;
 		p->setDefaultGroupNumber = 2;
 		g_Ram.ramGroupC.SetDefaults = 0;
 	}

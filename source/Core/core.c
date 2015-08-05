@@ -191,6 +191,7 @@ void Core_CalibControl(TCore *p)
 			g_Peref.Position.CycleData = 0;
 			p->VlvDrvCtrl.EvLog.Value = CMD_RES_CYCLE;
 		}
+		g_Ram.ramGroupD.CycleReset = 0;
 	}
 
 	if (IsMemParReady())																	// если есть готовность к записи параметров

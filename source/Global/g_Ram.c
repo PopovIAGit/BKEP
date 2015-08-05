@@ -33,7 +33,8 @@ void g_Ram_Init(TRam *p)
 	p->ramGroupA.CycleCnt =  p->ramGroupH.CycleCnt;
 	//PrevCycle = p->ramGroupH.CycleCnt;
 	g_Core.PrevCycle = p->ramGroupH.CycleCnt;
-	p->ramGroupA.VersionPO = VERSION_MAJOR*1000+VERSION_MINOR;
+	p->ramGroupA.VersionPO = (DEVICE_GROUP * 1000) + VERSION; // 2*1000+030 = 2030
+
 	p->ramGroupC.SubVersionPO = SUBVERSION;
 	p->ramGroupH.TaskList = 0;
 	//if (p->ramGroupH.ScFaults) LowPowerReset |= BIT0;

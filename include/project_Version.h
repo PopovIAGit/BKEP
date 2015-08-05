@@ -15,9 +15,10 @@
 extern "C" {
 #endif
 
-#define VERSION_MAJOR				1		// Версия проекта
-#define VERSION_MINOR				1		// Версия проекта
-#define SUBVERSION					1		// Подверсия проекта
+#define DEVICE_GROUP				4
+#define VERSION					    1		// Версия проекта
+#define MODULE_VERSION			    10
+#define SUBVERSION					2		// Подверсия проекта
 
 #ifdef __cplusplus
 }

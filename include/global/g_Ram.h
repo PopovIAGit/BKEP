@@ -642,7 +642,7 @@ typedef struct TRam
 #define REG_FACTORY_NUMBER	GetAdr(ramGroupC.FactoryNumber)
 #define REG_PRODUCT_DATE	GetAdr(ramGroupC.ProductYear)
 #define REG_CYCLE_CNT		GetAdr(ramGroupH.CycleCnt)
-
+#define REG_SET_DEFAULTS	GetAdr(ramGroupC.SetDefaults)
 #define REG_SHC_FAULT		GetAdr(ramGroupH.ScFaults)
 /*
 #define REG_TASK_TIME		GetAdr(ramGroupD.TASK_TIME)

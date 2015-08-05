@@ -596,10 +596,12 @@ void Core_ProtectionsUpdate(TCoreProtections *p)
 		    p->outFaults.Proc.bit.NoMove = MuffEnable;
 
 		    Core_ValveDriveStop(&g_Core.VlvDrvCtrl);
+		    g_Core.VlvDrvCtrl.EvLog.Value = CMD_DEFSTOP;
 		}
 	    if (g_Core.Status.bit.Fault)
 		{
 		    Core_ValveDriveStop(&g_Core.VlvDrvCtrl);
+		    g_Core.VlvDrvCtrl.EvLog.Value = CMD_DEFSTOP;
 		}
 	}
 

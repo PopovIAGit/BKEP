@@ -310,6 +310,7 @@ void DataBufferPre(TStat *s)
 
 	if (g_Ram.ramGroupH.LogReset > 0)							// Обнуляем записи и адреса журналов
 	{
+		g_Core.VlvDrvCtrl.EvLog.Value = CMD_CLR_LOG;
 		g_Ram.ramGroupH.LogReset 	  = 0;
 		g_Ram.ramGroupH.LogEvAddr 	  = 0;
 		g_Ram.ramGroupH.LogCmdAddr    = 0;
@@ -449,15 +450,10 @@ void GetCurrentCmd(TStat *s)
 		case CMD_CLR_LOG: 		LogControlWord = bcmLogClear; 			break;
 		case CMD_RES_CYCLE:		LogControlWord = bcmCycleReset;			break;
 		case CMD_DEFAULTS_FACT: LogControlWord = bcmSetDefaultsFact;	break;
-		case CMD_DEFSTOP:		LogControlWord = bcmDefStop;			break;
+		case CMD_DEFSTOP:		LogControlWord = bcmDefStop;	g_Core.VlvDrvCtrl.EvLog.Source = 0;	break;
 		case CDM_DISCROUT_TEST: LogControlWord = bcmDiscrOutTest;		break;
 		case CMD_DISCRIN_TEST: 	LogControlWord = bcmDiscrInTest; 		break;
 		default: LogControlWord = bcmNone; break;
-	}
-
-	if (LogControlWord!=bcmNone) {
-		LogControlWord = LogControlWord | g_Core.VlvDrvCtrl.EvLog.Source;
-		g_Core.VlvDrvCtrl.EvLog.Source = 0;
 	}
 
 	if (g_Core.VlvDrvCtrl.EvLog.Value != 0)
@@ -473,7 +469,13 @@ void GetCurrentCmd(TStat *s)
 				LogControlWord = bcmNone;
 		}
 	}
+	if (g_Core.VlvDrvCtrl.EvLog.Value)
+	{
+		if (!g_Core.VlvDrvCtrl.EvLog.Source) g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_BLOCK;
 
+		LogControlWord = LogControlWord | g_Core.VlvDrvCtrl.EvLog.Source;
+		g_Core.VlvDrvCtrl.EvLog.Source = 0;
+	}
 	g_Core.VlvDrvCtrl.EvLog.Value = 0;
 
 	s->LogCmd.CmdReg = LogControlWord;
