@@ -642,7 +642,10 @@ void Core_MuDuControl(TCore *p)
 
 void Core_OnOff_TEN(TCoreTemper *t)
 {
-	t->CurrTemper = g_Ram.ramGroupA.TemperBKP + g_Ram.ramGroupC.CorrTemper;
-	if (t->CurrTemper>=g_Ram.ramGroupC.TenOffValue) t->OnOffTEN=TEN_OFF;
-	else if (t->CurrTemper<=g_Ram.ramGroupC.TenOnValue) t->OnOffTEN=TEN_ON;
+	//t->CurrTemper = g_Ram.ramGroupA.TemperBKP + g_Ram.ramGroupC.CorrTemper;
+	g_Ram.ramGroupA.TemperBKP = g_Ram.ramGroupH.BKP_Temper + g_Ram.ramGroupC.CorrTemper;
+	if (g_Ram.ramGroupA.TemperBKP >= g_Ram.ramGroupC.TenOffValue)
+		t->OnOffTEN=TEN_OFF;
+	else if (g_Ram.ramGroupA.TemperBKP <= g_Ram.ramGroupC.TenOnValue)
+		t->OnOffTEN=TEN_ON;
 }

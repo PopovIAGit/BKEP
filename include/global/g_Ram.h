@@ -440,7 +440,7 @@ typedef struct _TRamGroupH
 	Uns             Umid;             	 // H82. 392 Среднее напряжение
 	Uns             VSkValue;          	 // H83. 393 Асиметрия фаз питающей сети
   	Uns     	    PhOrdValue;        	 // H84. 394 Чередование фаз сети
-	Uns             Rsvd5;          	 // H85. 395 Диагностика сети (для неисправностей)
+	Uns             BKP_Temper;          // H85. 395 Температура БКП
 	Uns				Imidpr;			 	 // H86 396 Резерв
 	Uns             Rsvd6;          	 // H87. 397 Диагностика нагрузки
 	Uns             IuPr;                // H88. 398 Ток фазы U

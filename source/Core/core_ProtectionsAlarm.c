@@ -32,7 +32,7 @@ void Core_ProtectionsAlarmUpdate(TAlarmElem *p)
 
 	if(p->Cfg.bit.CanBeReseted == CAN_BE_MUFTA)
 	{
-		if ((int16) labs(ToLong(p->Input) - p->Signal) >= *p->EnableLevel)
+		if ( abs(*p->Input - p->Signal) >= (Uns)*p->EnableLevel)
 		{
 			p->Timer = 0;
 			p->Signal = *p->Input; //ToLong(p->Input);

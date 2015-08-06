@@ -19,7 +19,7 @@ extern "C" {
 #define BKP_SCI_TX_TIMEOUT	(Uns)(0.00017 * 18000)
 #define BKP_CONN_TIMEOUT	(Uns)(1.00000 * 18000)
 //#define BKP_SCI_ID			SCIA
-#define BKP_SCI_BAUD		SCI_BRR(1152)
+#define BKP_SCI_BAUD		SCI_BRR(384)
 #define SCI_BREAK			0x20
 
 #define BKP_SCI_TX_ENABLE()		RS485_DIR_BKD = 1
