@@ -349,6 +349,16 @@ __inline Byte WriteData(Uns Addr, Uns *Data, Uns Count)
 
 	//if (!g_Core.menu.EnableEdit(Val->PaswwPrt)) return FR_SUCCESS;
 
+	//	Проверяем была ли подана команда по последовательному интерфейсу.
+	//	Если была подана, а режим ДУ отключен, то выдаем исключение
+
+	if (Addr == REG_CONTROL)
+	{
+		// Если стоит блокировка, то не пропускаем команды, кроме команды стоп
+		if (!(g_Core.VlvDrvCtrl.ActiveControls & CMD_SRC_SERIAL) && (*Data != vcwStop) )
+			return EX_ILLEGAL_DATA_VALUE;
+	}
+
 	//проверка на обработку записи значения в память
 	if (Nvm && !IsMemParReady()) return EX_SLAVE_DEVICE_BUSY;
 

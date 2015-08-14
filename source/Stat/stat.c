@@ -67,7 +67,7 @@ void Stat_Init(TStat *s)
 		s->LogEventBuffer[i].LogInputs	 = 0;
 		s->LogEventBuffer[i].LogOutputs	 = 0;
 	}
-
+	g_Ram.ramGroupH.LogReset = 0;
 	InitTables();
 	// Инициализация основной флеш
 	//memset(&g_MainFlash, 0, sizeof(TAT25DF041A));
@@ -432,11 +432,14 @@ void GetCurrentCmd(TStat *s)
 	if (g_Core.VlvDrvCtrl.EvLog.Value != 0)
 		LogControlWord = bcmNone;
 
-	// Отсекаем повторяющуся команду Стоп
-	if ((g_Core.VlvDrvCtrl.EvLog.Value == CMD_STOP) && (PrevEvLogValue == CMD_STOP))
+	// Отсекаем повторяющуся команду Стоп, открыть, закрыть
+	if (g_Core.VlvDrvCtrl.EvLog.Value <= CMD_OPEN)
 	{
-		g_Core.VlvDrvCtrl.EvLog.Value = 0;
-		return;
+		if (g_Core.VlvDrvCtrl.EvLog.Value == PrevEvLogValue)
+		{
+			g_Core.VlvDrvCtrl.EvLog.Value = 0;
+			return;
+		}
 	}
 
 	switch(g_Core.VlvDrvCtrl.EvLog.Value)
@@ -456,7 +459,7 @@ void GetCurrentCmd(TStat *s)
 		default: LogControlWord = bcmNone; break;
 	}
 
-	if (g_Core.VlvDrvCtrl.EvLog.Value != 0)
+	if (g_Core.VlvDrvCtrl.EvLog.Value)
 	{
 		PrevEvLogValue = g_Core.VlvDrvCtrl.EvLog.Value;
 
@@ -468,9 +471,6 @@ void GetCurrentCmd(TStat *s)
 			if (g_Core.VlvDrvCtrl.EvLog.Value == CMD_STOP)
 				LogControlWord = bcmNone;
 		}
-	}
-	if (g_Core.VlvDrvCtrl.EvLog.Value)
-	{
 		if (!g_Core.VlvDrvCtrl.EvLog.Source) g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_BLOCK;
 
 		LogControlWord = LogControlWord | g_Core.VlvDrvCtrl.EvLog.Source;

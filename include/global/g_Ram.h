@@ -624,6 +624,7 @@ typedef struct TRam
 
 #define REG_OVERWAY_ZONE		GetAdr(ramGroupB.OverwayZone)
 
+#define REG_CONTROL				GetAdr(ramGroupD.ControlWord)
 #define REG_TASKCLOSE			GetAdr(ramGroupD.TaskClose)
 #define REG_RSRESET				GetAdr(ramGroupD.RsReset)
 

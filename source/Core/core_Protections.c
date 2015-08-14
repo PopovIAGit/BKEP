@@ -295,7 +295,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overHeatBCD.Output			= &p->outDefects.Dev.all;
 	p->overHeatBCD.EnableLevel		= &g_Ram.ramGroupC.TemperHigh;
 	p->overHeatBCD.DisableLevel		= &g_Ram.ramGroupC.TemperHigh;
-	p->overHeatBCD.Timeout			= (Uns *)10;
+	p->overHeatBCD.Timeout			= &g_Ram.ramGroupC.BvTime;
 	p->overHeatBCD.Scale			= PROTECT_SCALE;
 
 	//------Переохлаждение блока БКД----------------------------------------
@@ -304,7 +304,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underColdBCD.Output			= &p->outDefects.Dev.all;
 	p->underColdBCD.EnableLevel		= &g_Ram.ramGroupC.TemperLow;
 	p->underColdBCD.DisableLevel	= &g_Ram.ramGroupC.TemperLow;
-	p->underColdBCD.Timeout			= (Uns *)10;
+	p->underColdBCD.Timeout			= &g_Ram.ramGroupC.BvTime;
 	p->underColdBCD.Scale			= PROTECT_SCALE;
 
 	//------Перегрев блока БКП----------------------------------------------
@@ -313,7 +313,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overHeatBCP.Output			= &p->outFaults.Dev.all;
 	p->overHeatBCP.EnableLevel		= &g_Ram.ramGroupC.TemperHigh;
 	p->overHeatBCP.DisableLevel		= &g_Ram.ramGroupC.TemperHigh;
-	p->overHeatBCP.Timeout			= (Uns *)100;
+	p->overHeatBCP.Timeout			= &g_Ram.ramGroupC.BvTime;
 	p->overHeatBCP.Scale			= PROTECT_SCALE;
 
 	//------Переохлаждение блока БКП----------------------------------------
@@ -322,7 +322,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underColdBCP.Output			= &p->outDefects.Dev.all;
 	p->underColdBCP.EnableLevel		= &g_Ram.ramGroupC.TemperLow;
 	p->underColdBCP.DisableLevel		= &g_Ram.ramGroupC.TemperLow;
-	p->underColdBCP.Timeout			= (Uns *)100;
+	p->underColdBCP.Timeout			= &g_Ram.ramGroupC.BvTime;
 	p->underColdBCP.Scale			= PROTECT_SCALE;
 
 	p->FaultDelay = (Uns)(Prd10HZ * 2);

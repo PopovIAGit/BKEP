@@ -400,9 +400,16 @@ static void StartMode(void)
 	{
 		g_Core.MotorControl.WorkMode = wmMove;
 	}
-
-	if(g_Core.MotorControl.RequestDir == -1) g_Ram.ramGroupH.ContGroup = cgClose;
-	if(g_Core.MotorControl.RequestDir == 1)	 g_Ram.ramGroupH.ContGroup = cgOpen;
+	if (g_Peref.phaseOrder.Direction == -1)
+	{
+		if(g_Core.MotorControl.RequestDir == -1) g_Ram.ramGroupH.ContGroup = cgClose;
+		if(g_Core.MotorControl.RequestDir == 1)	 g_Ram.ramGroupH.ContGroup = cgOpen;
+	}
+	else if (g_Peref.phaseOrder.Direction == 1)
+	{
+		if(g_Core.MotorControl.RequestDir == -1) g_Ram.ramGroupH.ContGroup = cgOpen;
+		if(g_Core.MotorControl.RequestDir == 1)	 g_Ram.ramGroupH.ContGroup = cgClose;
+	}
 }
 
 static void ShnControlMode(void)
