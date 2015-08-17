@@ -19,6 +19,7 @@ __inline void DriveOpen(TCoreVlvDrvCtrl *);			// ... при открыть
 __inline void UpdateComm(TCoreVlvDrvCtrl *);		// Обработка внутренней команды при обработке реверса
 static   void ReverseDrive(TCoreVlvDrvCtrl *);		// Действия при реверсеы
 
+Bool Flag = False;
 
 void Core_ValveDriveInit(TCoreVlvDrvCtrl *p)
 {
@@ -79,7 +80,7 @@ void Core_ValveDriveUpdate(TCoreVlvDrvCtrl *p)
 //
 __inline void GetActiveControls(TCoreVlvDrvCtrl *p)
 {
-		Bool Flag = False;
+
 		Uns  DigState = 0;
 
 		p->ActiveControls = 0;
@@ -87,9 +88,9 @@ __inline void GetActiveControls(TCoreVlvDrvCtrl *p)
 		switch(*p->MuDuSetup)
 		{
 			case mdOff:    p->Status->bit.MuDu = 0; Flag = True; break;
-			case mdSelect: p->Status->bit.MuDu = p->MuDuInput; break;
-			case mdMuOnly: p->Status->bit.MuDu = 1; break;
-			case mdDuOnly: p->Status->bit.MuDu = 0; break;
+			case mdSelect: p->Status->bit.MuDu = p->MuDuInput; Flag = false; break;
+			case mdMuOnly: p->Status->bit.MuDu = 1; Flag = false;  break;
+			case mdDuOnly: p->Status->bit.MuDu = 0; Flag = false;  break;
 			default:       return;
 		}
 
@@ -117,7 +118,7 @@ __inline void MpuControl(TCoreVlvDrvCtrl *p)
 	Uns Key = 0;
 			Uns  Active = 0;
 
-		p->Mpu.Enable = p->Status->bit.MuDu;
+		p->Mpu.Enable = p->Status->bit.MuDu | Flag;
 
 		if(!p->Mpu.Enable) return;				// выключено выходим
 

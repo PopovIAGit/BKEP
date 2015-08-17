@@ -18,7 +18,7 @@ extern "C" {
 #define DEVICE_GROUP				4
 #define VERSION					    1		// Версия проекта
 #define MODULE_VERSION			    10
-#define SUBVERSION					4		// Подверсия проекта
+#define SUBVERSION					5		// Подверсия проекта
 
 #ifdef __cplusplus
 }

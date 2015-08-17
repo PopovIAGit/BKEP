@@ -535,7 +535,7 @@ void Core_ProtectionsClear(TCoreProtections *p)
 
 void Core_ProtectionsUpdate(TCoreProtections *p)
 {
-
+	static Uns prevStatus = 0;
     Uns MuffEnable;
 
     if (p->FaultDelay > 0)
@@ -559,6 +559,44 @@ void Core_ProtectionsUpdate(TCoreProtections *p)
 	   }
 	}*/
 
+	if (p->outDefects.Net.all & NET_BV_MASK) p->outDefects.Load.all &= 0xFFF8;				// Если в движенни обрыв входной фазы - обрыв фазы двигателя не выставляем
+	if (p->outFaults.Net.bit.BvR & p->outDefects.Net.bit.UvR) p->outDefects.Net.bit.UvR = 0; // Если сработала авария по обрыву, неисправность "пониженное напр." не выставляем
+	if (p->outFaults.Net.bit.BvS & p->outDefects.Net.bit.UvS) p->outDefects.Net.bit.UvS = 0;
+	if (p->outFaults.Net.bit.BvT & p->outDefects.Net.bit.UvT) p->outDefects.Net.bit.UvT = 0;
+	if (prevStatus != g_Ram.ramGroupA.Status.bit.Stop)										// По переходу из "движения" в "стоп" и обратно
+	{
+		prevStatus = g_Ram.ramGroupA.Status.bit.Stop;										// переинициализируем защиту по обрыву питающих фаз как аварию или как неисправность
+		if (g_Ram.ramGroupA.Status.bit.Stop == 1)		// Если в СТОПе
+		{
+			p->breakVoltR.Cfg.bit.CanBeReseted = CAN_NOT_BE_RESETED;
+			p->breakVoltS.Cfg.bit.CanBeReseted = CAN_NOT_BE_RESETED;
+			p->breakVoltT.Cfg.bit.CanBeReseted = CAN_NOT_BE_RESETED;
+
+			p->breakVoltR.Output 			= (Uns *)&p->outFaults.Net.all;
+			p->breakVoltS.Output 			= (Uns *)&p->outFaults.Net.all;
+			p->breakVoltT.Output 	 		= (Uns *)&p->outFaults.Net.all;
+
+			p->breakVoltR.EnableLevel  		= (Int *)&g_Ram.ramGroupC.BvLevel;
+			p->breakVoltS.EnableLevel  		= (Int *)&g_Ram.ramGroupC.BvLevel;
+			p->breakVoltT.EnableLevel  		= (Int *)&g_Ram.ramGroupC.BvLevel;
+
+			p->outDefects.Net.all &= !NET_BV_MASK;
+		}
+		else
+		{
+			p->breakVoltR.Cfg.bit.CanBeReseted = CAN_BE_RESETED;
+			p->breakVoltS.Cfg.bit.CanBeReseted = CAN_BE_RESETED;
+			p->breakVoltT.Cfg.bit.CanBeReseted = CAN_BE_RESETED;
+
+			p->breakVoltR.Output 			= (Uns *)&p->outDefects.Net.all;
+			p->breakVoltS.Output 			= (Uns *)&p->outDefects.Net.all;
+			p->breakVoltT.Output 	 		= (Uns *)&p->outDefects.Net.all;
+
+			p->breakVoltR.EnableLevel  		= (Int *)&g_Ram.ramGroupC.BvLevelMove;
+			p->breakVoltS.EnableLevel  		= (Int *)&g_Ram.ramGroupC.BvLevelMove;
+			p->breakVoltT.EnableLevel  		= (Int *)&g_Ram.ramGroupC.BvLevelMove;
+		}
+	}
 
     Core_ProtecionSHC_Update(&p->ShC_U);
     Core_ProtecionSHC_Update(&p->ShC_V);
