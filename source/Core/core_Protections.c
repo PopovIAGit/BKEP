@@ -225,9 +225,12 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->breakCurrV.Input 			= (Int *)&g_Ram.ramGroupH.IvPr;
 	p->breakCurrW.Input 			= (Int *)&g_Ram.ramGroupH.IwPr;
 
-	p->breakCurrU.Output 			= (Uns *)&p->outDefects.Load.all;
-	p->breakCurrV.Output 			= (Uns *)&p->outDefects.Load.all;
-	p->breakCurrW.Output 	 		= (Uns *)&p->outDefects.Load.all;
+	//p->breakCurrU.Output 			= (Uns *)&p->outDefects.Load.all;
+	//p->breakCurrV.Output 			= (Uns *)&p->outDefects.Load.all;
+	//p->breakCurrW.Output 	 		= (Uns *)&p->outDefects.Load.all;
+	p->breakCurrU.Output 			= (Uns *)&p->registerBrCurr;
+	p->breakCurrV.Output 			= (Uns *)&p->registerBrCurr;
+	p->breakCurrW.Output 	 		= (Uns *)&p->registerBrCurr;
 
 	p->breakCurrU.EnableLevel  		= (Int *)&g_Ram.ramGroupC.PhlLevel;
 	p->breakCurrV.EnableLevel  		= (Int *)&g_Ram.ramGroupC.PhlLevel;
@@ -326,7 +329,8 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underColdBCP.Scale			= PROTECT_SCALE;
 
 	p->FaultDelay = (Uns)(Prd10HZ * 2);
-
+	p->registerBrCurr = 0;
+	p->registerBrVolt = 0;
 }
 
 // Функция включения/выключения защит
@@ -497,6 +501,7 @@ void Core_ProtectionsReset(TCoreProtections *p)
 	p->outDefects.Load.bit.PhlU = 0;
 	p->outDefects.Load.bit.PhlV = 0;
 	p->outDefects.Load.bit.PhlW = 0;
+	p->registerBrCurr = 0;
 
 	p->outDefects.Proc.bit.Overway = 0;
 	p->outDefects.Proc.bit.NoMove = 0;
@@ -520,6 +525,8 @@ void Core_ProtectionsClear(TCoreProtections *p)
 	p->outDefects.Dev.all  = 0;					// сбросили все неисправности
 	p->outDefects.Net.all  = 0;
 	p->outDefects.Load.all = 0;
+	p->registerBrCurr = 0;
+	p->registerBrVolt = 0;
 	p->outDefects.Proc.all = 0;
 
 	/* ??? сброс ошибок памяти энкодера и ДТ
@@ -541,25 +548,22 @@ void Core_ProtectionsUpdate(TCoreProtections *p)
     if (p->FaultDelay > 0)
 	return;
 
-    /*if (g_Ram.ramGroupC.FaultNetRST.bit.BvR==1 && g_Ram.ramGroupC.FaultNetRST.bit.BvS==1 && g_Ram.ramGroupC.FaultNetRST.bit.BvT==1)
-	{
-	    if (!g_Core.Status.bit.Stop)
-	    {
-	    	//формируем запись в память об аварийном отключении
-		p->outFaults.Net.bit.BreakRST = 1;
-	    }
-	}
-*/
+    if (p->registerBrVolt) // Если имеются неисправности по обрыву фаз питания (в движении)
+    {
+    	if (p->registerBrCurr)	// Если вместе с тем имеются неисправности по обрыву фаз двигателя
+    	{
+      		p->outDefects.Net.all =  (p->outDefects.Net.all & ~NET_BV_MASK) | p->registerBrVolt;// то выставляем обрыв фаз питания
+      		p->outDefects.Load.all &=  ~LOAD_PHL_MASK;
+    	}
+    	else					// Если обрыва фаз двигателя не наблюдается
+    		p->outDefects.Net.all &=  ~NET_BV_MASK;
+    }
+    else					// Если неисправность по обрыву фаз отсутствует
+    {
+    	p->outDefects.Load.all = (p->outDefects.Load.all & ~LOAD_PHL_MASK) | p->registerBrCurr;
+    	p->outDefects.Net.all &=  ~NET_BV_MASK;
+    }
 
-    /*if ((g_Core.Protections.outFaults.Net.all&0x700)>>8==7)
-	{
-	   if (!g_Core.Status.bit.Stop)
-	   {
-		//формируем запись в память об аварийном отключении
-	   }
-	}*/
-
-	if (p->outDefects.Net.all & NET_BV_MASK) p->outDefects.Load.all &= 0xFFF8;				// Если в движенни обрыв входной фазы - обрыв фазы двигателя не выставляем
 	if (p->outFaults.Net.bit.BvR & p->outDefects.Net.bit.UvR) p->outDefects.Net.bit.UvR = 0; // Если сработала авария по обрыву, неисправность "пониженное напр." не выставляем
 	if (p->outFaults.Net.bit.BvS & p->outDefects.Net.bit.UvS) p->outDefects.Net.bit.UvS = 0;
 	if (p->outFaults.Net.bit.BvT & p->outDefects.Net.bit.UvT) p->outDefects.Net.bit.UvT = 0;
@@ -580,7 +584,12 @@ void Core_ProtectionsUpdate(TCoreProtections *p)
 			p->breakVoltS.EnableLevel  		= (Int *)&g_Ram.ramGroupC.BvLevel;
 			p->breakVoltT.EnableLevel  		= (Int *)&g_Ram.ramGroupC.BvLevel;
 
-			p->outDefects.Net.all &= !NET_BV_MASK;
+			if (p->outDefects.Net.all & NET_BV_MASK) // Если имеется неисправность по обрыву, превращаем неисправность в аварию
+			{
+				p->outFaults.Net.all = (p->outFaults.Net.all & ~ NET_BV_MASK) | (p->outDefects.Net.all & NET_BV_MASK);
+				p->outDefects.Net.all &=  ~NET_BV_MASK;
+				p->registerBrVolt = 0;
+			}
 		}
 		else
 		{
@@ -588,9 +597,12 @@ void Core_ProtectionsUpdate(TCoreProtections *p)
 			p->breakVoltS.Cfg.bit.CanBeReseted = CAN_BE_RESETED;
 			p->breakVoltT.Cfg.bit.CanBeReseted = CAN_BE_RESETED;
 
-			p->breakVoltR.Output 			= (Uns *)&p->outDefects.Net.all;
-			p->breakVoltS.Output 			= (Uns *)&p->outDefects.Net.all;
-			p->breakVoltT.Output 	 		= (Uns *)&p->outDefects.Net.all;
+			//p->breakVoltR.Output 			= (Uns *)&p->outDefects.Net.all;
+			//p->breakVoltS.Output 			= (Uns *)&p->outDefects.Net.all;
+			//p->breakVoltT.Output 	 		= (Uns *)&p->outDefects.Net.all;
+			p->breakVoltR.Output 			= (Uns *)&p->registerBrVolt;
+			p->breakVoltS.Output 			= (Uns *)&p->registerBrVolt;
+			p->breakVoltT.Output 	 		= (Uns *)&p->registerBrVolt;
 
 			p->breakVoltR.EnableLevel  		= (Int *)&g_Ram.ramGroupC.BvLevelMove;
 			p->breakVoltS.EnableLevel  		= (Int *)&g_Ram.ramGroupC.BvLevelMove;
