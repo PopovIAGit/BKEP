@@ -191,6 +191,7 @@ void Core_CalibControl(TCore *p)
 			g_Peref.Position.CycleData = 0;
 			p->VlvDrvCtrl.EvLog.Value = CMD_RES_CYCLE;
 		}
+		g_Ram.ramGroupD.CycleReset = 0;
 	}
 
 	if (IsMemParReady())																	// если есть готовность к записи параметров
@@ -399,9 +400,16 @@ static void StartMode(void)
 	{
 		g_Core.MotorControl.WorkMode = wmMove;
 	}
-
-	if(g_Core.MotorControl.RequestDir == -1) g_Ram.ramGroupH.ContGroup = cgClose;
-	if(g_Core.MotorControl.RequestDir == 1)	 g_Ram.ramGroupH.ContGroup = cgOpen;
+	if (g_Peref.phaseOrder.Direction == -1)
+	{
+		if(g_Core.MotorControl.RequestDir == -1) g_Ram.ramGroupH.ContGroup = cgClose;
+		if(g_Core.MotorControl.RequestDir == 1)	 g_Ram.ramGroupH.ContGroup = cgOpen;
+	}
+	else if (g_Peref.phaseOrder.Direction == 1)
+	{
+		if(g_Core.MotorControl.RequestDir == -1) g_Ram.ramGroupH.ContGroup = cgOpen;
+		if(g_Core.MotorControl.RequestDir == 1)	 g_Ram.ramGroupH.ContGroup = cgClose;
+	}
 }
 
 static void ShnControlMode(void)
@@ -641,7 +649,10 @@ void Core_MuDuControl(TCore *p)
 
 void Core_OnOff_TEN(TCoreTemper *t)
 {
-	t->CurrTemper = g_Ram.ramGroupA.TemperBKP + g_Ram.ramGroupC.CorrTemper;
-	if (t->CurrTemper>=g_Ram.ramGroupC.TenOffValue) t->OnOffTEN=TEN_OFF;
-	else if (t->CurrTemper<=g_Ram.ramGroupC.TenOnValue) t->OnOffTEN=TEN_ON;
+	//t->CurrTemper = g_Ram.ramGroupA.TemperBKP + g_Ram.ramGroupC.CorrTemper;
+	g_Ram.ramGroupA.TemperBKP = g_Ram.ramGroupH.BKP_Temper + g_Ram.ramGroupC.CorrTemper;
+	if (g_Ram.ramGroupA.TemperBKP >= g_Ram.ramGroupC.TenOffValue)
+		t->OnOffTEN=TEN_OFF;
+	else if (g_Ram.ramGroupA.TemperBKP <= g_Ram.ramGroupC.TenOnValue)
+		t->OnOffTEN=TEN_ON;
 }

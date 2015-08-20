@@ -67,7 +67,7 @@ void Stat_Init(TStat *s)
 		s->LogEventBuffer[i].LogInputs	 = 0;
 		s->LogEventBuffer[i].LogOutputs	 = 0;
 	}
-
+	g_Ram.ramGroupH.LogReset = 0;
 	InitTables();
 	// Инициализация основной флеш
 	//memset(&g_MainFlash, 0, sizeof(TAT25DF041A));
@@ -159,6 +159,10 @@ void InitInfoModule(TInfoModule *im)
 	im->IsReadRecBusy	= False;
 	im->IsBufReady		= False;
 	im->IsLogTransmit	= False;
+
+	im->HardwareSrc		= imSrcBluetooth;
+	im->HardwareSrc		= imSrcModbus;
+	im->HardwareSrc		= imSrcNone;
 
 	im->DeviceDataPtr   = (Uns *)&g_Ram;
 	// Для информационного модуля
@@ -298,17 +302,17 @@ Bool ReadWriteEeprom(pFM25V10 eeprom, Byte func, Uns addr, Uns *pData, Uns count
 	return true;
 }
 //----------------------------------------------------
-
 // -- РАБОТА С ЖУРНАЛОМ ------------------------------
+
 void DataBufferPre(TStat *s)
 {
 	static Uns PreTimer = 0;
 
 	if (g_Ram.ramGroupH.LogReset > 0)							// Обнуляем записи и адреса журналов
 	{
-		g_Ram.ramGroupH.LogReset 	   = 0;
-
-		g_Ram.ramGroupH.LogEvAddr 	   = 0;
+		g_Core.VlvDrvCtrl.EvLog.Value = CMD_CLR_LOG;
+		g_Ram.ramGroupH.LogReset 	  = 0;
+		g_Ram.ramGroupH.LogEvAddr 	  = 0;
 		g_Ram.ramGroupH.LogCmdAddr    = 0;
 		g_Ram.ramGroupH.LogParamAddr  = 0;
 		g_Ram.ramGroupH.LogEvCount    = 0;
@@ -428,11 +432,14 @@ void GetCurrentCmd(TStat *s)
 	if (g_Core.VlvDrvCtrl.EvLog.Value != 0)
 		LogControlWord = bcmNone;
 
-	// Отсекаем повторяющуся команду Стоп
-	if ((g_Core.VlvDrvCtrl.EvLog.Value == CMD_STOP) && (PrevEvLogValue == CMD_STOP))
+	// Отсекаем повторяющуся команду Стоп, открыть, закрыть
+	if (g_Core.VlvDrvCtrl.EvLog.Value <= CMD_OPEN)
 	{
-		g_Core.VlvDrvCtrl.EvLog.Value = 0;
-		return;
+		if (g_Core.VlvDrvCtrl.EvLog.Value == PrevEvLogValue)
+		{
+			g_Core.VlvDrvCtrl.EvLog.Value = 0;
+			return;
+		}
 	}
 
 	switch(g_Core.VlvDrvCtrl.EvLog.Value)
@@ -446,13 +453,13 @@ void GetCurrentCmd(TStat *s)
 		case CMD_CLR_LOG: 		LogControlWord = bcmLogClear; 			break;
 		case CMD_RES_CYCLE:		LogControlWord = bcmCycleReset;			break;
 		case CMD_DEFAULTS_FACT: LogControlWord = bcmSetDefaultsFact;	break;
-		case CMD_DEFSTOP:		LogControlWord = bcmDefStop;			break;
+		case CMD_DEFSTOP:		LogControlWord = bcmDefStop;	g_Core.VlvDrvCtrl.EvLog.Source = 0;	break;
 		case CDM_DISCROUT_TEST: LogControlWord = bcmDiscrOutTest;		break;
 		case CMD_DISCRIN_TEST: 	LogControlWord = bcmDiscrInTest; 		break;
 		default: LogControlWord = bcmNone; break;
 	}
 
-	if (g_Core.VlvDrvCtrl.EvLog.Value != 0)
+	if (g_Core.VlvDrvCtrl.EvLog.Value)
 	{
 		PrevEvLogValue = g_Core.VlvDrvCtrl.EvLog.Value;
 
@@ -464,8 +471,11 @@ void GetCurrentCmd(TStat *s)
 			if (g_Core.VlvDrvCtrl.EvLog.Value == CMD_STOP)
 				LogControlWord = bcmNone;
 		}
-	}
+		if (!g_Core.VlvDrvCtrl.EvLog.Source) g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_BLOCK;
 
+		LogControlWord = LogControlWord | g_Core.VlvDrvCtrl.EvLog.Source;
+		g_Core.VlvDrvCtrl.EvLog.Source = 0;
+	}
 	g_Core.VlvDrvCtrl.EvLog.Value = 0;
 
 	s->LogCmd.CmdReg = LogControlWord;
@@ -494,6 +504,7 @@ void LogCmdControl(TStat *s)
 	//--------------------------------------------------------------------------------
 		else if (s->LogCmd.WriteFlag)														// Проверяем готовность ПЗУ
 		{																				// Проверяем наличие флага разрешения записи журнала
+
 			Addr = LOG_CMD_START_ADDR + g_Ram.ramGroupH.LogCmdAddr * LOG_CMD_DATA_CNT;				// Формируем начальный адрес записи
 			WritePar(Addr, s->LogCmd.Data, LOG_CMD_DATA_CNT);								// Отправляем на запись драйверу Eeprom1
 

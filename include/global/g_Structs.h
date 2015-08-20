@@ -104,7 +104,8 @@ typedef struct _TPduData {
 #define PROC_OVERW_MASK		0x0020
 #define PROC_DRV_T_MASK 	0x0040
 #define PROC_RESET_MASK		0x00A1
-#define PROCESS_EVLOG_MASK	0x00A1
+//#define PROCESS_EVLOG_MASK	0x00A1
+#define PROCESS_EVLOG_MASK	0x00D3
 typedef union _TProcessReg {
 	Uns all;
 	struct {
@@ -127,7 +128,8 @@ typedef union _TProcessReg {
 #define NET_VSK_MASK		0x0080
 #define NET_BV_MASK			0x0700
 #define NET_OV_MAX_MASK		0x3800
-#define NET_EVLOG_MASK		0x7FFF //0x3F7F
+//#define NET_EVLOG_MASK		0x7FFF //0x3F7F
+#define NET_EVLOG_MASK		0x3F3F
 
 typedef union _TNetReg {
 	Uns all;
@@ -180,7 +182,8 @@ typedef union _TLoadReg {
 #define DEV_ERR_MASK		0x009F
 #define DEV_TMP_MASK		0x0060
 #define DEV_RSC_MASK		0x0800
-#define DEV_EVLOG_MASK		0x0400
+//#define DEV_EVLOG_MASK		0x0400
+#define DEV_EVLOG_MASK		0x0421
 typedef union _TDeviceReg {
 	Uns all;
   struct {

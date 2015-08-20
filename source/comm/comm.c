@@ -184,7 +184,6 @@ void Comm_Update(TComm *p)
 	if (g_Comm.Bluetooth.ModeProtocol>0) ModBusUpdate(&g_Comm.mbBt);  // slave
 
 }
-
 static char ReadRegs(TMbPort *Port, Uint16 *Data, Uint16 Addr, Uint16 Count)
 {
 	memcpy(Port->Packet.Data, &Data[Addr], Count);

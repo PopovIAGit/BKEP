@@ -32,7 +32,7 @@ void Core_ProtectionsAlarmUpdate(TAlarmElem *p)
 
 	if(p->Cfg.bit.CanBeReseted == CAN_BE_MUFTA)
 	{
-		if ((int16) labs(ToLong(p->Input) - p->Signal) >= *p->EnableLevel)
+		if ( abs(*p->Input - p->Signal) >= (Uns)*p->EnableLevel)
 		{
 			p->Timer = 0;
 			p->Signal = *p->Input;
@@ -77,9 +77,11 @@ void Core_ProtectionsAlarmUpdate(TAlarmElem *p)
 			switch(p->Cfg.bit.Level)
 			{
 				// Если Level = 0, то p->Level - нижний допустимый предел значения сигнала
-				case 0: Tmp = (*p->Input >= (*p->DisableLevel + (Int)p->Cfg.bit.Hyst)); break;// проверка, превысил ли входной сигнал минимальный предел
+				//case 0: Tmp = (*p->Input >= (*p->DisableLevel + (Int)p->Cfg.bit.Hyst)); break;// проверка, превысил ли входной сигнал минимальный предел
+				case 0: Tmp = (*p->Input >= (*p->EnableLevel + (Int)p->Cfg.bit.Hyst)); break;// проверка, превысил ли входной сигнал минимальный предел
 				// Если Level = 1, то p->Level - верхний допустимый предел сигнала
-				case 1: Tmp = (*p->Input <= (*p->DisableLevel - (Int)p->Cfg.bit.Hyst)); break;// проверка, упал ли ниже входной сигнал максимального предела
+				//case 1: Tmp = (*p->Input <= (*p->DisableLevel - (Int)p->Cfg.bit.Hyst)); break;// проверка, упал ли ниже входной сигнал максимального предела
+				case 1: Tmp = (*p->Input <= (*p->EnableLevel - (Int)p->Cfg.bit.Hyst)); break;// проверка, упал ли ниже входной сигнал максимального предела
 			}
 			if (Tmp)	// Если входное значение восстановилось до номального значения
 			{

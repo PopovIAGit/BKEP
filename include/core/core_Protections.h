@@ -114,8 +114,9 @@ typedef struct {
 	// Выходы ---------------------------------------------------------
 		TFltUnion			outFaults;			// Аварии
 		TFltUnion			outDefects;			// Неисправности
-		Uns				ShcTmpState;			// Промежуточная переменная для определения КЗ
-
+		Uns					ShcTmpState;		// Промежуточная переменная для определения КЗ
+		Uns					registerBrCurr;		// Регистр аварий обрыва фаз двигателя
+		Uns					registerBrVolt;		// Регистр аварий обрыва фаз питания
 		Uns 				MuffFlag;			// Флаг муфты
 		Uns				NoMoveFlag;
 		Bool				ShcReset;			// Флаг по которому сбрасывается КЗ

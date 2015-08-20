@@ -225,9 +225,12 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->breakCurrV.Input 			= (Int *)&g_Ram.ramGroupH.IvPr;
 	p->breakCurrW.Input 			= (Int *)&g_Ram.ramGroupH.IwPr;
 
-	p->breakCurrU.Output 			= (Uns *)&p->outDefects.Load.all;
-	p->breakCurrV.Output 			= (Uns *)&p->outDefects.Load.all;
-	p->breakCurrW.Output 	 		= (Uns *)&p->outDefects.Load.all;
+	//p->breakCurrU.Output 			= (Uns *)&p->outDefects.Load.all;
+	//p->breakCurrV.Output 			= (Uns *)&p->outDefects.Load.all;
+	//p->breakCurrW.Output 	 		= (Uns *)&p->outDefects.Load.all;
+	p->breakCurrU.Output 			= (Uns *)&p->registerBrCurr;
+	p->breakCurrV.Output 			= (Uns *)&p->registerBrCurr;
+	p->breakCurrW.Output 	 		= (Uns *)&p->registerBrCurr;
 
 	p->breakCurrU.EnableLevel  		= (Int *)&g_Ram.ramGroupC.PhlLevel;
 	p->breakCurrV.EnableLevel  		= (Int *)&g_Ram.ramGroupC.PhlLevel;
@@ -295,7 +298,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overHeatBCD.Output			= &p->outDefects.Dev.all;
 	p->overHeatBCD.EnableLevel		= &g_Ram.ramGroupC.TemperHigh;
 	p->overHeatBCD.DisableLevel		= &g_Ram.ramGroupC.TemperHigh;
-	p->overHeatBCD.Timeout			= (Uns *)10;
+	p->overHeatBCD.Timeout			= &g_Ram.ramGroupC.BvTime;
 	p->overHeatBCD.Scale			= PROTECT_SCALE;
 
 	//------Переохлаждение блока БКД----------------------------------------
@@ -304,7 +307,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underColdBCD.Output			= &p->outDefects.Dev.all;
 	p->underColdBCD.EnableLevel		= &g_Ram.ramGroupC.TemperLow;
 	p->underColdBCD.DisableLevel	= &g_Ram.ramGroupC.TemperLow;
-	p->underColdBCD.Timeout			= (Uns *)10;
+	p->underColdBCD.Timeout			= &g_Ram.ramGroupC.BvTime;
 	p->underColdBCD.Scale			= PROTECT_SCALE;
 
 	//------Перегрев блока БКП----------------------------------------------
@@ -313,7 +316,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overHeatBCP.Output			= &p->outFaults.Dev.all;
 	p->overHeatBCP.EnableLevel		= &g_Ram.ramGroupC.TemperHigh;
 	p->overHeatBCP.DisableLevel		= &g_Ram.ramGroupC.TemperHigh;
-	p->overHeatBCP.Timeout			= (Uns *)100;
+	p->overHeatBCP.Timeout			= &g_Ram.ramGroupC.BvTime;
 	p->overHeatBCP.Scale			= PROTECT_SCALE;
 
 	//------Переохлаждение блока БКП----------------------------------------
@@ -322,11 +325,12 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underColdBCP.Output			= &p->outDefects.Dev.all;
 	p->underColdBCP.EnableLevel		= &g_Ram.ramGroupC.TemperLow;
 	p->underColdBCP.DisableLevel		= &g_Ram.ramGroupC.TemperLow;
-	p->underColdBCP.Timeout			= (Uns *)100;
+	p->underColdBCP.Timeout			= &g_Ram.ramGroupC.BvTime;
 	p->underColdBCP.Scale			= PROTECT_SCALE;
 
 	p->FaultDelay = (Uns)(Prd10HZ * 2);
-
+	p->registerBrCurr = 0;
+	p->registerBrVolt = 0;
 }
 
 // Функция включения/выключения защит
@@ -497,6 +501,7 @@ void Core_ProtectionsReset(TCoreProtections *p)
 	p->outDefects.Load.bit.PhlU = 0;
 	p->outDefects.Load.bit.PhlV = 0;
 	p->outDefects.Load.bit.PhlW = 0;
+	p->registerBrCurr = 0;
 
 	p->outDefects.Proc.bit.Overway = 0;
 	p->outDefects.Proc.bit.NoMove = 0;
@@ -520,6 +525,8 @@ void Core_ProtectionsClear(TCoreProtections *p)
 	p->outDefects.Dev.all  = 0;					// сбросили все неисправности
 	p->outDefects.Net.all  = 0;
 	p->outDefects.Load.all = 0;
+	p->registerBrCurr = 0;
+	p->registerBrVolt = 0;
 	p->outDefects.Proc.all = 0;
 
 	/* ??? сброс ошибок памяти энкодера и ДТ
@@ -535,10 +542,73 @@ void Core_ProtectionsClear(TCoreProtections *p)
 
 void Core_ProtectionsUpdate(TCoreProtections *p)
 {
+	static Uns prevStatus = 0;
     Uns MuffEnable;
 
     if (p->FaultDelay > 0)
 	return;
+
+    if (p->registerBrVolt) // Если имеются неисправности по обрыву фаз питания (в движении)
+    {
+    	if (p->registerBrCurr)	// Если вместе с тем имеются неисправности по обрыву фаз двигателя
+    	{
+      		p->outDefects.Net.all =  (p->outDefects.Net.all & ~NET_BV_MASK) | p->registerBrVolt;// то выставляем обрыв фаз питания
+      		p->outDefects.Load.all &=  ~LOAD_PHL_MASK;
+    	}
+    	else					// Если обрыва фаз двигателя не наблюдается
+    		p->outDefects.Net.all &=  ~NET_BV_MASK;
+    }
+    else					// Если неисправность по обрыву фаз отсутствует
+    {
+    	p->outDefects.Load.all = (p->outDefects.Load.all & ~LOAD_PHL_MASK) | p->registerBrCurr;
+    	p->outDefects.Net.all &=  ~NET_BV_MASK;
+    }
+
+	if (p->outFaults.Net.bit.BvR & p->outDefects.Net.bit.UvR) p->outDefects.Net.bit.UvR = 0; // Если сработала авария по обрыву, неисправность "пониженное напр." не выставляем
+	if (p->outFaults.Net.bit.BvS & p->outDefects.Net.bit.UvS) p->outDefects.Net.bit.UvS = 0;
+	if (p->outFaults.Net.bit.BvT & p->outDefects.Net.bit.UvT) p->outDefects.Net.bit.UvT = 0;
+	if (prevStatus != g_Ram.ramGroupA.Status.bit.Stop)										// По переходу из "движения" в "стоп" и обратно
+	{
+		prevStatus = g_Ram.ramGroupA.Status.bit.Stop;										// переинициализируем защиту по обрыву питающих фаз как аварию или как неисправность
+		if (g_Ram.ramGroupA.Status.bit.Stop == 1)		// Если в СТОПе
+		{
+			p->breakVoltR.Cfg.bit.CanBeReseted = CAN_NOT_BE_RESETED;
+			p->breakVoltS.Cfg.bit.CanBeReseted = CAN_NOT_BE_RESETED;
+			p->breakVoltT.Cfg.bit.CanBeReseted = CAN_NOT_BE_RESETED;
+
+			p->breakVoltR.Output 			= (Uns *)&p->outFaults.Net.all;
+			p->breakVoltS.Output 			= (Uns *)&p->outFaults.Net.all;
+			p->breakVoltT.Output 	 		= (Uns *)&p->outFaults.Net.all;
+
+			p->breakVoltR.EnableLevel  		= (Int *)&g_Ram.ramGroupC.BvLevel;
+			p->breakVoltS.EnableLevel  		= (Int *)&g_Ram.ramGroupC.BvLevel;
+			p->breakVoltT.EnableLevel  		= (Int *)&g_Ram.ramGroupC.BvLevel;
+
+			if (p->outDefects.Net.all & NET_BV_MASK) // Если имеется неисправность по обрыву, превращаем неисправность в аварию
+			{
+				p->outFaults.Net.all = (p->outFaults.Net.all & ~ NET_BV_MASK) | (p->outDefects.Net.all & NET_BV_MASK);
+				p->outDefects.Net.all &=  ~NET_BV_MASK;
+				p->registerBrVolt = 0;
+			}
+		}
+		else
+		{
+			p->breakVoltR.Cfg.bit.CanBeReseted = CAN_BE_RESETED;
+			p->breakVoltS.Cfg.bit.CanBeReseted = CAN_BE_RESETED;
+			p->breakVoltT.Cfg.bit.CanBeReseted = CAN_BE_RESETED;
+
+			//p->breakVoltR.Output 			= (Uns *)&p->outDefects.Net.all;
+			//p->breakVoltS.Output 			= (Uns *)&p->outDefects.Net.all;
+			//p->breakVoltT.Output 	 		= (Uns *)&p->outDefects.Net.all;
+			p->breakVoltR.Output 			= (Uns *)&p->registerBrVolt;
+			p->breakVoltS.Output 			= (Uns *)&p->registerBrVolt;
+			p->breakVoltT.Output 	 		= (Uns *)&p->registerBrVolt;
+
+			p->breakVoltR.EnableLevel  		= (Int *)&g_Ram.ramGroupC.BvLevelMove;
+			p->breakVoltS.EnableLevel  		= (Int *)&g_Ram.ramGroupC.BvLevelMove;
+			p->breakVoltT.EnableLevel  		= (Int *)&g_Ram.ramGroupC.BvLevelMove;
+		}
+	}
 
     Core_ProtecionSHC_Update(&p->ShC_U);
     Core_ProtecionSHC_Update(&p->ShC_V);
@@ -573,10 +643,12 @@ void Core_ProtectionsUpdate(TCoreProtections *p)
 		    p->outFaults.Proc.bit.NoMove = MuffEnable;
 
 		    Core_ValveDriveStop(&g_Core.VlvDrvCtrl);
+		    g_Core.VlvDrvCtrl.EvLog.Value = CMD_DEFSTOP;
 		}
 	    if (g_Core.Status.bit.Fault)
 		{
 		    Core_ValveDriveStop(&g_Core.VlvDrvCtrl);
+		    g_Core.VlvDrvCtrl.EvLog.Value = CMD_DEFSTOP;
 		}
 	}
 

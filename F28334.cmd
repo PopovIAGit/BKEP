@@ -121,9 +121,9 @@ PAGE 1 :   /* Data Memory */
    BOOT_RSVD   : origin = 0x000000, length = 0x000050     /* Part of M0, BOOT rom will use this for stack */
    RAMM0       : origin = 0x000050, length = 0x0003B0     /* on-chip RAM block M0 */
    RAMM1       : origin = 0x000400, length = 0x000400     /* on-chip RAM block M1 */
-   RAML4       : origin = 0x00C000, length = 0x001F00     /* on-chip RAM block L1 */
-   RAML5       : origin = 0x00DF00, length = 0x000100     /* on-chip RAM block L1 */
-   RAML6       : origin = 0x00E000, length = 0x001000     /* on-chip RAM block L1 */
+   RAML4       : origin = 0x00C000, length = 0x002D00     /* on-chip RAM block L1 */
+   RAML5       : origin = 0x00ED00, length = 0x000100     /* on-chip RAM block L1 */
+   RAML6       : origin = 0x00EE00, length = 0x000200     /* on-chip RAM block L1 */
    RAML7       : origin = 0x00F000, length = 0x001000     /* on-chip RAM block L1 */
    ZONE7B      : origin = 0x20FC00, length = 0x000400     /* XINTF zone 7 - data space */
    FLASHB      : origin = 0x338000, length = 0x004000     /* on-chip FLASH */

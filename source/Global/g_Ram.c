@@ -172,6 +172,15 @@ void g_Ram_Update(TRam *p)
     p->ramGroupB.MOD_FAULT = GpioDataRegs.GPBDAT.bit.GPIO39;
     GpioDataRegs.GPBDAT.bit.GPIO48 = p->ramGroupB.RES_ERR;
 
+	if (p->ramGroupH.BadTask_Reset)
+	{
+		p->ramGroupH.BadTask_Reset = 0;
+		p->ramGroupH.BadTask_2kHz = 0;
+		p->ramGroupH.BadTask_200Hz = 0;
+		p->ramGroupH.BadTask_50Hz[0] = p->ramGroupH.BadTask_50Hz[1] = p->ramGroupH.BadTask_50Hz[2] = 0;
+		p->ramGroupH.BadTask_10Hz = 0;
+	}
+
     if (STATE_TU24)
 	{p->ramGroupB.InputType = it24;}
     else if (!STATE_TU24)

@@ -12,7 +12,7 @@
 #define IM_LOGPARAMS_TYPE		3
 
 #define IM_RD_BUFFER_SIZE			10
-#define IM_WR_BUFFER_SIZE			170
+#define IM_WR_BUFFER_SIZE			200
 #define IM_DOWNLOAD_BUFFER_SIZE		IM_READ_BUF_SIZE
 
 #define RECEIVE_FUNC_MODE			0
@@ -38,6 +38,14 @@ typedef enum
 	imParamDownload = 12
 } TIMFuncState;
 
+typedef enum
+{
+	imSrcNone = 0,
+	imSrcBluetooth = 1,
+	imSrcModbus = 2
+} TImSrc;
+
+
 typedef struct
 {
 	Byte ControlMode;
@@ -59,6 +67,7 @@ typedef struct
 
 	Uns *DeviceDataPtr;
 	//Uns *DownloadBuffer;
+	TImSrc HardwareSrc;
 		
 	void (*EnableReceive)(void);
 	void (*EnableTransmit)(void);
@@ -66,6 +75,11 @@ typedef struct
 
 	Byte RdBuffer[IM_RD_BUFFER_SIZE];
 	Byte WrBuffer[IM_WR_BUFFER_SIZE];
+
+	Byte WrBufferMb[IM_WR_BUFFER_SIZE];
+	Uns  AddrData;
+	Byte IndexMb;
+	Byte CanSendDataMb;
 
 	Uns ImReadBuf[(IM_READ_BUF_SIZE * 2)];			// Буфер информационного модуля
 

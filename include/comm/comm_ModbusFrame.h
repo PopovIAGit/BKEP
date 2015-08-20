@@ -108,7 +108,7 @@ __inline void EchoResponse(TMbPort *hPort)
 __inline void ReadRegsRequest(TMbPort *hPort)
 {
 	Byte *Buf = hPort->Frame.Buf;
-	if (!hPort->Packet.Count || (hPort->Packet.Count > 125))
+	if (!hPort->Packet.Count || (hPort->Packet.Count > 210))
 	{
 		hPort->Packet.Exception = FR_ERR_BAD_DATA_NUM;
 		return;
@@ -129,7 +129,7 @@ __inline void ReadRegsIndication(TMbPort *hPort)
 	}
 	hPort->Packet.Addr  = WordUnPack(&hPort->Frame.Buf[2]);
 	hPort->Packet.Count = WordUnPack(&hPort->Frame.Buf[4]);
-	if (!hPort->Packet.Count || (hPort->Packet.Count > 125)) 
+	if (!hPort->Packet.Count || (hPort->Packet.Count > 210))
 		hPort->Packet.Exception = EX_ILLEGAL_DATA_VALUE;
 }
 
@@ -210,7 +210,7 @@ __inline void WriteRegConfirmation(TMbPort *hPort)
 //-------------------------------------------------------------------------------
 __inline void ReturnQueryDataRequest(TMbPort *hPort)
 {
-	if (!hPort->Packet.Count || (hPort->Packet.Count > 125))
+	if (!hPort->Packet.Count || (hPort->Packet.Count > 210))
 	{
 		hPort->Packet.Exception = FR_ERR_BAD_DATA_NUM;
 		return;

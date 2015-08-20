@@ -22,8 +22,13 @@ Bool MbBtConnect=False;
 static Uns BaudRates[7] = SCI_DEFAULT_BAUD_RATES;
 static Uns BrrValues[7] = SCI_DEFAULT_BRR_VALUES;
 
-#define TEK_MB_START_ADDR		40000
-#define CHECK_TEK_MB_ADDR(Addr)	(((Addr>>8) & 0x9C) == 0x9C)
+//#define TEK_MB_START_ADDR		40000
+//#define CHECK_TEK_MB_ADDR(Addr)	(((Addr>>8) & 0x9C) == 0x9C)
+
+#define IM_MB_START_ADDR		65123
+#define CHECK_IM_MB_ADDR(Addr)	(Addr==IM_MB_START_ADDR)
+#define IM_MB_START_DATA_ADDR		65124
+#define CHECK_IM_MB_DATA_ADDR(Addr)	(Addr==IM_MB_START_DATA_ADDR)
 
 __inline Byte UpdatePacket(TMbPacket *Packet);
 __inline Byte WriteData(Uns Addr, Uns *Data, Uns Count);
@@ -216,13 +221,16 @@ void ModBusControl(TMbHandle hPort)
 
 __inline Byte UpdatePacket(TMbPacket *Packet)
 {
-	Uns Addr=0, Res=0, Tmp=0;
+	Uns Addr=0, Res=0, Tmp=0, i=0;
 
-		Addr = Packet->Addr + (Packet->Count - 1);
+		Addr = Packet->Addr;// + (Packet->Count - 1);//??? чё за хрень ???
+
 		Tmp  = Packet->Addr + Packet->Count - 1;
 
 		if (Tmp <= (RAM_DATA_SIZE + 5)) {Res = 1;}
-		else if (CHECK_TEK_MB_ADDR(Addr))	{Res = 5;}
+		else if (CHECK_IM_MB_ADDR(Addr))	{Res = 5;}
+		else if (CHECK_IM_MB_DATA_ADDR(Addr))	{Res = 6;}
+		else if (Addr==65125)	{Res = 6;}
 		else {Res = 0;}
 
 		if (!Res) {return EX_ILLEGAL_DATA_ADDRESS;}
@@ -235,7 +243,25 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 					case 1: memcpy(Packet->Data, /*ToUnsPtr*/(&g_Ram.ramGroupT.TechReg) + Packet->Addr, Packet->Count);
 							//Port->Frame.Exception = ReadRegs(Port, (Uint16 *)&Ram, Addr, Count);
 							break;
-					//case 5: memcpy(Packet->Data, ToUnsPtr(&g_RamTek) + (Packet->Addr- TEK_MB_START_ADDR), Packet->Count);
+					case 5:
+						//Packet->Count = g_Stat.Im.IndexMb;
+						memcpy(Packet->Data, ToUnsPtr(&g_Stat.Im.WrBufferMb[0]), Packet->Count);
+						g_Stat.Im.HardwareSrc=imSrcModbus;
+						g_Stat.Im.AddrData = 0;
+						g_Stat.Im.CanSendDataMb = 0;
+						break;
+					case 6:
+						if (Addr==65125) g_Stat.Im.AddrData = g_Stat.Im.AddrData - Packet->Count;
+						memcpy(Packet->Data, ToUnsPtr(&g_Stat.Im.WrBufferMb[g_Stat.Im.AddrData]), Packet->Count);
+						g_Stat.Im.AddrData = g_Stat.Im.AddrData + Packet->Count;
+						if (g_Stat.Im.AddrData>=g_Stat.Im.IndexMb)
+						{
+							g_Stat.Im.CanSendData = false;
+							g_Stat.Im.CanSendDataMb = 0;
+							g_Stat.Im.AddrData = 0;
+							*g_Stat.Im.IsTxBusy = false;
+						}
+						break;
 							//Port->Frame.Exception = ReadRegs(Port, (Uint16 *)&RamTek, (Addr - TEK_MB_START_ADDR), Count);
 					//		break;
 					default: return EX_ILLEGAL_FUNCTION;
@@ -245,9 +271,25 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 				switch(Res)
 				{
 					case 1:
+						if (Addr>=REG_TASKCLOSE && Addr<=REG_RSRESET)
+							g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_SERIAL;
+						if (Addr == REG_SET_DEFAULTS)
+							g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_SERIAL;
 						return WriteData(Packet->Addr, Packet->Data, Packet->Count);
 						//if (!Port->Frame.Exception) SerialCommRefresh();
-					//case 5:
+					case 5:
+						for(i=0; i<Packet->Count; i++)
+						{
+							g_Stat.Im.RdBuffer[i] = g_Comm.mbAsu.Frame.Buf[8+i*2];
+						}
+						//memcpy(g_Stat.Im.RdBuffer, ToUnsPtr(&g_Comm.mbAsu.Frame.Buf[4]), Packet->Count);
+						g_Stat.Im.Index = Packet->Count;
+						g_Stat.Im.HardwareSrc=imSrcModbus;
+						g_Stat.Im.CanSendDataMb = 0;
+						//*g_Stat.Im.IsTxBusy = true;
+						//g_Stat.Im.CanSendData = false;
+						//g_Stat.Im.AddrData = 0;
+						return 0;
 						//return WriteRegsTek(Port, (Uint16 *)&RamTek, (Uint16 *)&Ram, (Addr - TEK_MB_START_ADDR), Count);
 						//return WriteDataRegsTek(Packet->Addr, Packet->Data, Packet->Count);
 						//if (!Port->Frame.Exception) SerialCommRefresh();
@@ -306,6 +348,16 @@ __inline Byte WriteData(Uns Addr, Uns *Data, Uns Count)
 	*/
 
 	//if (!g_Core.menu.EnableEdit(Val->PaswwPrt)) return FR_SUCCESS;
+
+	//	Проверяем была ли подана команда по последовательному интерфейсу.
+	//	Если была подана, а режим ДУ отключен, то выдаем исключение
+
+	if (Addr == REG_CONTROL)
+	{
+		// Если стоит блокировка, то не пропускаем команды, кроме команды стоп
+		if (!(g_Core.VlvDrvCtrl.ActiveControls & CMD_SRC_SERIAL) && (*Data != vcwStop) )
+			return EX_ILLEGAL_DATA_VALUE;
+	}
 
 	//проверка на обработку записи значения в память
 	if (Nvm && !IsMemParReady()) return EX_SLAVE_DEVICE_BUSY;

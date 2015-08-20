@@ -170,8 +170,13 @@ void ReceiveFunc(TInfoModule *p)
 					break;
 
 		// Parameters
-		case 0x06:	if (p->CorrectCount==1 && p->Index>=4) p->Index = 3;
-					if (p->Index == 3)
+		case 0x06:	if (p->CorrectCount==1 && p->Index>=4)
+					{
+						if (p->HardwareSrc==imSrcModbus) p->Index = 4;
+						else p->Index = 3;
+					}
+					if (((p->Index == 3)&&(p->HardwareSrc!=imSrcModbus)) ||
+						((p->Index == 4)&&(p->HardwareSrc==imSrcModbus)))
 					{
 						 IsFuncReceived = true;
 						 p->FuncState = imParamDownload;
@@ -194,7 +199,7 @@ void DownloadFunc(TInfoModule *p)
 {
 		switch (p->FuncState)
 		{
-			case imInit:				p->EnableReceive();
+			case imInit:				if (p->HardwareSrc==imSrcBluetooth) p->EnableReceive();
 										ImReset(p);
 										p->FuncState = imIdle;
 			break;
@@ -248,7 +253,7 @@ void DownloadFunc(TInfoModule *p)
 
 			p->Timer = p->Period;
 			p->TimerIndex = p->PeriodIndex;
-			p->EnableTransmit();
+			if (p->HardwareSrc==imSrcBluetooth) p->EnableTransmit();
 		}
 
 
@@ -273,12 +278,14 @@ void ImReceiveData(TInfoModule *p, Byte Data)
 	// На всякий случай заводим таймер сброса
 	p->Timer = p->Period;
 	p->TimerIndex = p->PeriodIndex;
+	p->HardwareSrc = imSrcBluetooth;
 }
 
 
 void SendData(TInfoModule *p)
 {
 	Byte Data = 0;
+	Byte i=0;
 
 	if (!p->CanSendData)
 		return;
@@ -295,18 +302,41 @@ void SendData(TInfoModule *p)
 
 			//p->IsLogTransmit = false;
 
-			if (!p->IsLogTransmit)				// Включаем передатчик, если не осуществляется
+			if (p->HardwareSrc==imSrcBluetooth) {
+				if (!p->IsLogTransmit)				// Включаем передатчик, если не осуществляется
 				p->EnableReceive();				// непрерывная передача журнала
+			}
 
 			//p->FuncState = imInit;
 		}
 		else
 		{
-			p->TimerIndex = p->PeriodIndex;				// Заводим таймер сброса
+			p->TimerIndex = p->PeriodIndex;		// Заводим таймер сброса
 			p->Timer = p->Period;				// Заводим таймер сброса
 			*p->IsTxBusy = true;				// Выставляем флаг занятости передатчика. Нужно делать это именно в ИМ
-			Data = p->WrBuffer[p->TxIndex++];
-			p->TransmitByte(Data);// в драйвере Bluetooth
+
+			if (p->HardwareSrc==imSrcBluetooth) {
+				Data = p->WrBuffer[p->TxIndex++];
+				p->TransmitByte(Data);// в драйвере Bluetooth
+			}
+			else if (p->HardwareSrc==imSrcModbus) {
+				if (p->CanSendDataMb) return;
+				for (i=0; i<p->Index+1; i++)
+				{
+					p->WrBufferMb[i] = p->WrBuffer[i];
+					p->IndexMb=p->TxIndex;
+					p->TxIndex++;
+				}
+				if (p->FuncState==imLogDownload) {
+					p->CanSendData = true;
+					p->CanSendDataMb = 1;
+				} else p->CanSendData = false;
+				*p->IsTxBusy = false;
+				p->TxIndex = 0;						// Сбрасываем параметры
+				p->Index = 0;
+				p->Timer = 0;
+			}
+
 		}
 	}
 }

@@ -4,8 +4,6 @@
 
 #include "stat_LogEvent.h"
 
-
-
 void LogEventUpdate(TLogEvent *p)
 {
 	Uns i, Temp, *Fltr, *FltrPrev, *pBuf = p->Data;
@@ -101,6 +99,7 @@ void LogCmdUpdate(TLogCmd *p)
 		p->WriteFlag = true;
 		p->ExecFlag  = false;
 	}
+
 }
 
 void LogParamUpdate(TLogParam *p)
