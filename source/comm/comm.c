@@ -61,7 +61,6 @@ void Comm_Init(TComm *p)
 	p->Shn.SHN_Mode = 1;
 }
 
-
 //---------------------------------------------------
 void Comm_Update(TComm *p)
 {
@@ -156,7 +155,6 @@ void Comm_Update(TComm *p)
 						p->SHN_Regs.ExStatus.all = p->mbShn.Packet.Data[1];
 						p->SHN_Regs.Ex2Status.all = p->mbShn.Packet.Data[2];
 					}
-
 					if (p->mbShn.Packet.Addr == 402)
 					{
 						SHN_Data[0]= p->mbShn.Packet.Data[0];
@@ -168,20 +166,15 @@ void Comm_Update(TComm *p)
 				}
 				break;
 			case MB_WRITE_REGS:
-
-				//if(p->mbShn.Packet.Addr == p->Shn.SHN_TaskAddr) p->Shn.SHN_TaskStage = 2;
 				if(p->mbShn.Packet.Addr == ATS48_CONTROL_REG) p->Shn.SHN_WriteFlag = 0;
 				if(p->mbShn.Packet.Addr == ATS48_BIG_CONTROL_REG) p->Shn.SHN_WriteFlag = 0;
 
 				p->Shn.SHN_WriteFlag = 0;
-
 				break;
 			}
 			p->mbShn.Packet.Response = 0;
 			p->Shn.SHN_Busy = 0;
 		}
-		//ModBusUpdate(&g_Comm.mbShn);  // master канал связи с устройством плавного пуска
-
 
 	}
 
@@ -202,8 +195,6 @@ void Comm_50HzCalc(TComm *p)
 {
 	//	КОМАНДЫ С МПУ !!!
 	// передаем команду с кнопок управления
-	//if (g_Ram.ramGroupH.CmdButton != KEY_STOP)
-	g_Ram.ramGroupH.CmdKey = Comm_LocalKeyUpdate(&p->localControl);
 
 	// передаем команду с ручек БКП
 	switch (Comm_LocalButtonUpdate(&p->localControl))
@@ -261,7 +252,7 @@ void CommandUpdate(TComm *p)
 		clrReset=0;
 	}
 //	p->outputCmdReg |= DigitCmdModeUpdate(&p->digitInput.output);
-///	if (p->outputCmdReg)
+// 	if (p->outputCmdReg)
 //	{
 //		p->outputCmdSrc = CMD_SRC_DIGITAL;
 //	}
@@ -305,7 +296,6 @@ Uns DigitCmdModeUpdate (Uns *Output)
 	prevOutput = *Output;						// Запоминаем предыдущие значение сигнала с ТУ
 	return result;
 
-
 	//--------------------------------------------------------------------
 	/*if (IsImpulseMode())						// Если режим - импульсный
 	{
@@ -320,7 +310,7 @@ Uns DigitCmdModeUpdate (Uns *Output)
 		{
 			if (*Output != prevOutput)			// Если сигнал изменился
 				result = *Output;				// Что нажали - туда и едем
-			else								// Иначе (Сигнал не изменился)
+			else								// Иначе (Сигнал не изменился
 				result = 0;						// Никаких команд не подаем
 		}
 		else									// Если сигнал ушел

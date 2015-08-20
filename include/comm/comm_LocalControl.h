@@ -1,8 +1,8 @@
 /*======================================================================
 Имя файла:          comm_LocalControl.h
 Автор:
-Версия файла:      	1.0
-Дата изменения:		12.05.2014
+Версия файла:      	1.1
+Дата изменения:		11.06.2015
 Описание:
 Заголовочный файл модуля обработки сигналов с кнопок МПУ
 ======================================================================*/
@@ -49,36 +49,11 @@ typedef union _THallBlock {
 	} bit;
 } THallBlock;
 
-/*
-typedef union _THallBlock
-{
-	Uns all;
-	struct
-	{
-		Uns Open:1;		// 0 - кнопка 1 (левая ручка)
-		Uns Close:1;		// 1 - кнопка 2 (левая ручка)
-		Uns StopMU:1;		// 2 - кнопка 3 (правая ручка)
-		Uns	StopDU:1;		// 3 - кнопка 4 (правая ручка)
-		Uns rsvd2:12;	// 4-15 - резерв
-	} bit;
-} THallBlock;*/
-
 typedef struct {
 	Uns					upLevel;		// Уровень срабатывания
 	Uns 				timer;			// Таймер
 	Uns 				timeout;		// Время срабатывания
 } TButtonsParams;
-
-// Маска кнопок управления
-typedef union _TKeyInvert {
-	Uns all;
-	 struct {
-		Uns Open:1;       	// 0     Открыть
-		Uns Close:1;      	// 1     Закрыть
-		Uns Stop:1;       	// 2     Стоп
-		Uns Rsvd:13;      	// 3-15  Резерв
-	 } bit;
-} TKeyInvert;
 
 // Структура для кнопок МПУ
 typedef struct
@@ -88,16 +63,12 @@ typedef struct
 	TButtonsParams		btn2Param;		 // Параметры кнопоки 2
 	TButtonsParams		btn3Param;		 // Параметры кнопоки 3
 	TButtonsParams		btn4Param;		 // Параметры кнопоки 4
-	TButtonsParams		key1Param;		 // Параметры кнопоки ЩСУ 1
-	TButtonsParams		key2Param;		 // Параметры кнопоки ЩСУ 2
-	TButtonsParams		key3Param;		 // Параметры кнопоки ЩСУ 3
-	TKeyInvert			*KeyLogicSignal; //  тип сигнала по логике нормально розомкнутый/замкнутый - 0/1
+
 } TCommMPU;
 //------------------- Глобальные переменные --------------------------------
 //------------------- Протатипы функций ------------------------------------
 void Comm_LocalControlInit(TCommMPU *);
 void Comm_LocalControlUpdate(TCommMPU *);
-Uns Comm_LocalKeyUpdate(TCommMPU *);
 Uns Comm_LocalButtonUpdate(TCommMPU *);
 
 #endif

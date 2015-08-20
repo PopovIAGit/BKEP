@@ -1,8 +1,8 @@
 /*======================================================================
 Имя файла:          core_Protections.h
 Автор:				Попов И.А.
-Версия файла:		1.00
-Дата изменения:		25.04.2014
+Версия файла:		1.01
+Дата изменения:		10.06.2015
 Описание:
 модуль защит электропривода
 ======================================================================*/
@@ -23,8 +23,8 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->NoMove.Cfg.all			= PRT_CFG_SET(CAN_BE_MUFTA, INP_LESS_LEVEL,NoMove_bit,HYST_OFF);
 	p->NoMove.Input				= (Int *)&g_Ram.ramGroupC.Position;
 	p->NoMove.Output			= &p->NoMoveFlag;
-	p->NoMove.EnableLevel			= (Int *)&g_Ram.ramGroupC.MuffZone;
-	p->NoMove.DisableLevel			= (Int *)&g_Ram.ramGroupC.MuffZone;
+	p->NoMove.EnableLevel		= (Int *)&g_Ram.ramGroupC.MuffZone;
+	p->NoMove.DisableLevel		= (Int *)&g_Ram.ramGroupC.MuffZone;
 	p->NoMove.Timeout			= &g_Ram.ramGroupB.NoMoveTime;
 	p->NoMove.Scale				= PROTECT_SCALE;
 	p->NoMove.Signal			= 0;
@@ -103,13 +103,13 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overVoltageS.Output 			= (Uns *)&p->outFaults.Net.all;
 	p->overVoltageT.Output 	 		= (Uns *)&p->outFaults.Net.all;
 
-	p->overVoltageR.EnableLevel  		= (Int *)&g_Ram.ramGroupC.OvLevel;
-	p->overVoltageS.EnableLevel  		= (Int *)&g_Ram.ramGroupC.OvLevel;
-	p->overVoltageT.EnableLevel  		= (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overVoltageR.EnableLevel  	= (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overVoltageS.EnableLevel  	= (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overVoltageT.EnableLevel  	= (Int *)&g_Ram.ramGroupC.OvLevel;
 
-	p->overVoltageR.DisableLevel 		= (Int *)&g_Ram.ramGroupC.OvLevel;
-	p->overVoltageS.DisableLevel 		= (Int *)&g_Ram.ramGroupC.OvLevel;
-	p->overVoltageT.DisableLevel 		= (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overVoltageR.DisableLevel 	= (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overVoltageS.DisableLevel 	= (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overVoltageT.DisableLevel 	= (Int *)&g_Ram.ramGroupC.OvLevel;
 
 	p->overVoltageR.Timeout			= &g_Ram.ramGroupC.OvTime;
 	p->overVoltageS.Timeout			= &g_Ram.ramGroupC.OvTime;
@@ -132,13 +132,13 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overDefVoltageS.Output 		= (Uns *)&p->outDefects.Net.all;
 	p->overDefVoltageT.Output 	 	= (Uns *)&p->outDefects.Net.all;
 
-	p->overDefVoltageR.EnableLevel  	= (Int *)&g_Ram.ramGroupC.OvLevel;
-	p->overDefVoltageS.EnableLevel  	= (Int *)&g_Ram.ramGroupC.OvLevel;
-	p->overDefVoltageT.EnableLevel  	= (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overDefVoltageR.EnableLevel  = (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overDefVoltageS.EnableLevel  = (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overDefVoltageT.EnableLevel  = (Int *)&g_Ram.ramGroupC.OvLevel;
 
-	p->overDefVoltageR.DisableLevel 	= (Int *)&g_Ram.ramGroupC.OvLevel;
-	p->overDefVoltageS.DisableLevel 	= (Int *)&g_Ram.ramGroupC.OvLevel;
-	p->overDefVoltageT.DisableLevel 	= (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overDefVoltageR.DisableLevel = (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overDefVoltageS.DisableLevel = (Int *)&g_Ram.ramGroupC.OvLevel;
+	p->overDefVoltageT.DisableLevel = (Int *)&g_Ram.ramGroupC.OvLevel;
 
 	p->overDefVoltageR.Timeout		= &g_Ram.ramGroupC.OvDTime;
 	p->overDefVoltageS.Timeout		= &g_Ram.ramGroupC.OvDTime;
@@ -161,9 +161,9 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overMax_VoltageS.Output 		= (Uns *)&p->outFaults.Net.all;
 	p->overMax_VoltageT.Output 	 	= (Uns *)&p->outFaults.Net.all;
 
-	p->overMax_VoltageR.EnableLevel 	= (Int *)&g_Ram.ramGroupC.OvLevel_max;
-	p->overMax_VoltageS.EnableLevel 	= (Int *)&g_Ram.ramGroupC.OvLevel_max;
-	p->overMax_VoltageT.EnableLevel 	= (Int *)&g_Ram.ramGroupC.OvLevel_max;
+	p->overMax_VoltageR.EnableLevel	= (Int *)&g_Ram.ramGroupC.OvLevel_max;
+	p->overMax_VoltageS.EnableLevel	= (Int *)&g_Ram.ramGroupC.OvLevel_max;
+	p->overMax_VoltageT.EnableLevel	= (Int *)&g_Ram.ramGroupC.OvLevel_max;
 
 	p->overMax_VoltageR.DisableLevel	= (Int *)&g_Ram.ramGroupC.OvLevel_max;
 	p->overMax_VoltageS.DisableLevel	= (Int *)&g_Ram.ramGroupC.OvLevel_max;
@@ -480,7 +480,7 @@ void EngPhOrdPrt(TCoreProtections *p)
 void Core_ProtectionsReset(TCoreProtections *p)
 {
 	g_Core.MotorControl.OverWayFlag = 0;		// Сбросили отсусвие уплотнения
-	p->MuffFlag = 0;	// отчистили статус от аварии муфты и неисправености
+	p->MuffFlag = 0;							// отчистили статус от аварии муфты и неисправености
 	p->outFaults.Proc.bit.Mufta = 0;
 	g_Core.Status.bit.Defect = 0;
 	g_Core.Status.bit.Fault = 0;
@@ -535,39 +535,16 @@ void Core_ProtectionsClear(TCoreProtections *p)
 
 void Core_ProtectionsUpdate(TCoreProtections *p)
 {
-
     Uns MuffEnable;
 
     if (p->FaultDelay > 0)
 	return;
 
-    /*if (g_Ram.ramGroupC.FaultNetRST.bit.BvR==1 && g_Ram.ramGroupC.FaultNetRST.bit.BvS==1 && g_Ram.ramGroupC.FaultNetRST.bit.BvT==1)
-	{
-	    if (!g_Core.Status.bit.Stop)
-	    {
-	    	//формируем запись в память об аварийном отключении
-		p->outFaults.Net.bit.BreakRST = 1;
-	    }
-	}
-*/
-
-    /*if ((g_Core.Protections.outFaults.Net.all&0x700)>>8==7)
-	{
-	   if (!g_Core.Status.bit.Stop)
-	   {
-		//формируем запись в память об аварийном отключении
-	   }
-	}*/
-
-
     Core_ProtecionSHC_Update(&p->ShC_U);
     Core_ProtecionSHC_Update(&p->ShC_V);
     Core_ProtecionSHC_Update(&p->ShC_W);
 
-
-     p->outFaults.Proc.bit.Mufta = p->MuffFlag;
-
-
+    p->outFaults.Proc.bit.Mufta = p->MuffFlag;
 
     if (p->outDefects.Dev.all || p->outDefects.Load.all || p->outDefects.Net.all || p->outDefects.Proc.all)
 	{

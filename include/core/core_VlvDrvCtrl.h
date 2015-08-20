@@ -90,7 +90,6 @@ typedef enum {
 typedef struct {
 	Bool				 Enable;				// Наличие местного управления
 	Uns				 	*BtnKey;				// Команда с ручек
-	Uns				 	*ScuKey;				// Команда с кнопок ЩСУ
 	Bool				 CancelFlag;			// Флаг отмена команды
 } TMpuControl;
 

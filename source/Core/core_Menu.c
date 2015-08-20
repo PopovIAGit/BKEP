@@ -17,7 +17,7 @@ Byte 	showLog = 0,
 		startReadLog = 0, 
 		TimeOutReadLog = 0, 
 		taskStartShow = 0;
-Uns grcGear = 0;
+Uns 	grcGear = 0;
 
 Byte SelectParamShow=0;
 

@@ -30,14 +30,12 @@ void g_Ram_Init(TRam *p)
 
 	p->ramGroupA.Status.all = 0x01;
 	p->ramGroupA.CalibState = p->ramGroupH.CalibState;
-	p->ramGroupA.CycleCnt =  p->ramGroupH.CycleCnt;
-	//PrevCycle = p->ramGroupH.CycleCnt;
+	p->ramGroupA.CycleCnt = p->ramGroupH.CycleCnt;
 	g_Core.PrevCycle = p->ramGroupH.CycleCnt;
-	p->ramGroupA.VersionPO = VERSION_MAJOR*1000+VERSION_MINOR;
-	p->ramGroupC.SubVersionPO = SUBVERSION;
 
-	//if (p->ramGroupH.ScFaults) LowPowerReset |= BIT0;
-
+	// Версия софта - Пример 4.001.3.0.01
+	p->ramGroupA.VersionPO = DEVICE_GROUP*1000+VERSION;				// 4001
+	p->ramGroupC.SubVersionPO = MODULE_VERSION*100 + SUBVERSION; 	// 3001
 }
 
 /*void ReadWriteAllParams(Byte cmd)
@@ -134,8 +132,7 @@ void g_Ram_Update(TRam *p)
 	    p->ramGroupH.Imidpr = (g_Peref.Imid * 1000) / p->ramGroupC.Inom;
 	    p->ramGroupH.Imid 	= g_Peref.Imid;
 	    p->ramGroupA.AngleUI = g_Peref.AngleUI;
-	    p->ramGroupH.ISkewValue = SkewCalc(g_Peref.sinObserver.IU.Output, g_Peref.sinObserver.IV.Output, g_Peref.sinObserver.IW.Output,
-		    g_Peref.Imid);
+	    p->ramGroupH.ISkewValue = SkewCalc(g_Peref.sinObserver.IU.Output, g_Peref.sinObserver.IV.Output, g_Peref.sinObserver.IW.Output,  g_Peref.Imid);
 	    if (p->ramGroupB.IIndicMode == imRms)
 		{
 		    p->ramGroupA.Iu = g_Peref.sinObserver.IU.Output;
@@ -163,11 +160,11 @@ void g_Ram_Update(TRam *p)
     p->ramGroupA.Speed = LVS_flag;
     p->ramGroupA.CycleCnt = p->ramGroupH.CycleCnt;
 
-    p->ramGroupC.Position 	= p->ramGroupH.Position >> p->ramGroupC.PosPrecision;
+    p->ramGroupC.Position 	= p->ramGroupH.Position;
     p->ramGroupA.Position 	= p->ramGroupC.Position;
     p->ramGroupH.FullStep 	= g_Peref.Position.FullStep;
-    p->ramGroupC.ClosePosition 	= p->ramGroupH.ClosePosition >> p->ramGroupC.PosPrecision;
-    p->ramGroupC.OpenPosition 	= p->ramGroupH.OpenPosition >> p->ramGroupC.PosPrecision;
+    p->ramGroupC.ClosePosition 	= p->ramGroupH.ClosePosition;
+    p->ramGroupC.OpenPosition 	= p->ramGroupH.OpenPosition;
     p->ramGroupA.StateTu.all 	= g_Comm.digitInterface.Inputs.all;
     p->ramGroupA.StateTs.all 	= g_Comm.digitInterface.Outputs.all;
     p->ramGroupH.ReverseType 	= rvtNone;
@@ -188,7 +185,6 @@ void g_Ram_Update(TRam *p)
 void ReWriteParams(void)
 {
 	Drive_ReWrite_Update();
-
 	if (RefreshCub==1){
 		if (IsMemParReady())
 		{
@@ -196,7 +192,6 @@ void ReWriteParams(void)
 			WriteToEeprom(GetAdr(ramGroupH.TqCurr.Data[0][0])-1, &g_Ram.ramGroupH.TransCurr, 41);
 		}
 	}
-
 }
 
 // Обновление значение по требованию
@@ -229,16 +224,16 @@ void RefreshParams(Uns addr)
 		 g_Core.TorqObs.TorqueMax = g_Ram.ramGroupC.MaxTorque * 10; //??? убрать в обновление параметров
 	}	else if (addr == REG_SIN_FILTER_TF){
 
-			peref_ApFilter1Init(&g_Peref.URfltr, (Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);		// Инициализируем фильтры
-			peref_ApFilter1Init(&g_Peref.USfltr, (Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);
-			peref_ApFilter1Init(&g_Peref.UTfltr, (Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);
-			peref_ApFilter1Init(&g_Peref.IUfltr, (Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);
-			peref_ApFilter1Init(&g_Peref.IVfltr, (Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);
-			peref_ApFilter1Init(&g_Peref.IWfltr, (Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.URfltr, 		(Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);		// Инициализируем фильтры
+			peref_ApFilter1Init(&g_Peref.USfltr,		(Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.UTfltr, 		(Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.IUfltr, 		(Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.IVfltr, 		(Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.IWfltr, 		(Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);
 
 
 			peref_ApFilter1Init(&g_Peref.UfltrOpen, 	 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);		// Инициализируем фильтры
-			peref_ApFilter1Init(&g_Peref.UfltrClose, 	 (Uns)Prd18kHZ, g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.UfltrClose, 	 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
 			peref_ApFilter1Init(&g_Peref.UfltrStop, 	 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
 			peref_ApFilter1Init(&g_Peref.UfltrMu, 		 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
 			peref_ApFilter1Init(&g_Peref.UfltrResetAlarm,(Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
@@ -278,7 +273,8 @@ void RefreshParams(Uns addr)
 			g_Peref.InDigSignalObserver.parSensors.p_UResetAlarm_Mpy= &g_Ram.ramGroupB.p_UResetAlarm_Mpy24;
 			g_Peref.InDigSignalObserver.parSensors.p_UReadyTu_Mpy	= &g_Ram.ramGroupB.p_UReadyTu_Mpy24;
 			g_Peref.InDigSignalObserver.parSensors.p_UDu_Mpy		= &g_Ram.ramGroupB.p_UDu_Mpy24;
-		} else
+		}
+		else
 		{
 			g_Peref.InDigSignalObserver.parSensors.p_UOpen_Mpy		= &g_Ram.ramGroupB.UOpen_Mpy220;
 			g_Peref.InDigSignalObserver.parSensors.p_UClose_Mpy		= &g_Ram.ramGroupB.p_UClose_Mpy220;
@@ -290,8 +286,6 @@ void RefreshParams(Uns addr)
 			g_Peref.InDigSignalObserver.parSensors.p_UDu_Mpy		= &g_Ram.ramGroupB.p_UDu_Mpy220;
 		}
 	}
-
-
 }
 //---------------------------------------------------
 Int MinMax3IntValue (Int val1, Int val2, Int val3)

@@ -78,7 +78,7 @@ Uns DigitCmdModeUpdate (Uns *);
 void TekModbusParamsUpdate(void);
 
 extern TComm	g_Comm;
-extern Uint16 		SHN_Data[10];
+extern Uint16 	SHN_Data[10];
 #ifdef __cplusplus
 }
 #endif // extern "C"

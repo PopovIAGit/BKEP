@@ -35,7 +35,7 @@ void Core_ProtectionsAlarmUpdate(TAlarmElem *p)
 		if ((int16) labs(ToLong(p->Input) - p->Signal) >= *p->EnableLevel)
 		{
 			p->Timer = 0;
-			p->Signal = *p->Input; //ToLong(p->Input);
+			p->Signal = *p->Input;
 		}
 		else
 		{

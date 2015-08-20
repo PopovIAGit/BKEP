@@ -96,7 +96,6 @@ extern "C" {
 #define TU_SIG_DU			AdcRegs.ADCRESULT12
 #define TU_SIG_RZVD			AdcRegs.ADCRESULT15
 
-
 //--- FRAM --------------------------------------------
 #define SC_EEPROM1 			GpioDataRegs.GPCDAT.bit.GPIO79
 #define SC_EEPROM2 			GpioDataRegs.GPCDAT.bit.GPIO78
@@ -104,7 +103,6 @@ extern "C" {
 //----------------------------------------
 // Toggle GPIO32 once per 500 milliseconds
 //----------------------------------------
-
 //---system config------------
 #define ADC_INT_ENABLE		1
 #define CPU0_INT_ENABLE		1

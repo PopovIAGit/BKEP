@@ -42,7 +42,6 @@ extern "C" {
 #define DOUT_ALARM_BIT 		6
 #define DOUT_MUDU_BIT 		7
 
-
 // Тип входного сигнала
 typedef enum {
 	it24  =  0,		// 0 Тип сигнала 24 В
@@ -74,7 +73,6 @@ typedef union _TInputReg {
 		Uns NoUse:9;		// 7-15	Не используются
 	} bit;
 } TInputReg;
-
 
 // Состояние дискретных выходов ТС
 typedef union _TOutputReg {

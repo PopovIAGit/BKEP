@@ -222,20 +222,20 @@ typedef struct _TRamGroupB
 	Uns				p_UStop_Mpy24;		 // B59. 99
 	Uns				p_UStop_Offset;		 // B60. 100
 	//-------------------------------
-	Uns				LevelOnMU220;		 // B61. 101
-	Uns				LevelOffMU220;		 // B62. 102
-	Uns				LevelOnMU24;		 // B63. 103
-	Uns				LevelOffMU24;		 // B64. 104
-	Uns				p_UMu_Mpy220;		 // B65. 105
-	Uns				p_UMu_Mpy24;		 // B66. 106
-	Uns				p_UMu_Offset;		 // B67. 107
+	Uns				LevelOnMU220;		 	 // B61. 101
+	Uns				LevelOffMU220;		 	 // B62. 102
+	Uns				LevelOnMU24;		 	 // B63. 103
+	Uns				LevelOffMU24;		 	 // B64. 104
+	Uns				p_UMu_Mpy220;		 	 // B65. 105
+	Uns				p_UMu_Mpy24;		 	 // B66. 106
+	Uns				p_UMu_Offset;		 	 // B67. 107
 	//-------------------------------
 	Uns				LevelOnResetAlarm220;	 // B68. 108
 	Uns				LevelOffResetAlarm220;	 // B69. 109
 	Uns				LevelOnResetAlarm24; 	 // B70. 110
 	Uns				LevelOffResetAlarm24;	 // B71. 111
 	Uns				p_UResetAlarm_Mpy220;	 // B72. 112
-	Uns				p_UResetAlarm_Mpy24;	 // B73. 113
+	Uns				p_UResetAlarm_Mpy24; 	 // B73. 113
 	Uns				p_UResetAlarm_Offset;	 // B74. 114
 	//-------------------------------
 	Uns				LevelOnReadyTU220;	 // B75. 115
@@ -267,6 +267,9 @@ typedef struct _TRamGroupC
   	Uns             MaxTorque;          // C4. 144 Максимальный момент привода
 	Uns             Inom;               // C5. 145 Номинальный ток
   	Uns             GearRatio;          // C6. 146 Передаточное число редуктора
+
+
+
 	Int             BlockToGearRatio;   // C7. 147 Коэффициент передачи блок-редуктор коэффициент скорости
 	Uns             PosPrecision;       // C8. 148 Точность положения
 	Uns             PhOrdZone;      	// C9. 149 Расстояние чередования фаз двигателя
@@ -425,7 +428,8 @@ typedef struct _TRamGroupH
 	Uns             ScFaults;            // H8. 318 Аварии КЗ
 	Uns				UporOnly;			 // H9. 319 Параметр включающий работу только на упоре
 	Uns             CycleCnt;            // H10. 320 Счетчик циклов
-	Uns				CmdKey;				 // H11. 321 Команда с кнопок ЩСУ
+	Uns             Rsvd10;              // H10. 320 Счетчик циклов
+//	Uns				CmdKey;				 // H11. 321 Команда с кнопок ЩСУ
 	Uns				CmdButton;			 // H12. 322 Команда с ручек управления
 	Uns				Rsvd1[3];			 // H13-15. 323-325 Резерв
 	Uns				TransCurr;			 // H16. 326 Ток перехода
