@@ -160,11 +160,8 @@ void g_Ram_Update(TRam *p)
     p->ramGroupA.Speed = LVS_flag;
     p->ramGroupA.CycleCnt = p->ramGroupH.CycleCnt;
 
-    p->ramGroupC.Position 	= p->ramGroupH.Position;
-    p->ramGroupA.Position 	= p->ramGroupC.Position;
-    p->ramGroupH.FullStep 	= g_Peref.Position.FullStep;
-    p->ramGroupC.ClosePosition 	= p->ramGroupH.ClosePosition;
-    p->ramGroupC.OpenPosition 	= p->ramGroupH.OpenPosition;
+    p->ramGroupA.Position 		= p->ramGroupH.Position;
+    p->ramGroupH.FullStep 		= g_Peref.Position.FullStep;
     p->ramGroupA.StateTu.all 	= g_Comm.digitInterface.Inputs.all;
     p->ramGroupA.StateTs.all 	= g_Comm.digitInterface.Outputs.all;
     p->ramGroupH.ReverseType 	= rvtNone;
@@ -181,10 +178,14 @@ void g_Ram_Update(TRam *p)
 		p->ramGroupH.BadTask_10Hz = 0;
 	}
 
-    if (STATE_TU24)
-	{p->ramGroupB.InputType = it24;}
-    else if (!STATE_TU24)
-	{p->ramGroupB.InputType = it220;}
+    if (p->ramGroupB.InputType == it220)
+    {
+    	TU_24_220 = 1;
+    }
+    else if (p->ramGroupB.InputType == it24)
+    {
+    	TU_24_220 = 0;
+    }
 
     ReWriteParams();
 
@@ -243,10 +244,10 @@ void RefreshParams(Uns addr)
 
 			peref_ApFilter1Init(&g_Peref.UfltrOpen, 	 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);		// Инициализируем фильтры
 			peref_ApFilter1Init(&g_Peref.UfltrClose, 	 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
-			peref_ApFilter1Init(&g_Peref.UfltrStop, 	 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.UfltrStopOpen,  (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
 			peref_ApFilter1Init(&g_Peref.UfltrMu, 		 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
 			peref_ApFilter1Init(&g_Peref.UfltrResetAlarm,(Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
-			peref_ApFilter1Init(&g_Peref.UfltrReadyTU, 	 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
+			peref_ApFilter1Init(&g_Peref.UfltrStopClose, (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
 			peref_ApFilter1Init(&g_Peref.UfltrDU, 		 (Uns)Prd18kHZ,  g_Ram.ramGroupC.SinTf);
 
 	} else if (addr == REG_RMS_FILTER_TF) {
@@ -264,35 +265,33 @@ void RefreshParams(Uns addr)
 
 			peref_ApFilter3Init(&g_Peref.U3fltrOpen, 	  (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);		// Инициализируем фильтры
 			peref_ApFilter3Init(&g_Peref.U3fltrClose, 	  (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
-			peref_ApFilter3Init(&g_Peref.U3fltrStop, 	  (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.U3fltrStopOpen,  (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
 			peref_ApFilter3Init(&g_Peref.U3fltrMu, 		  (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
 			peref_ApFilter3Init(&g_Peref.U3fltrResetAlarm,(Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
-			peref_ApFilter3Init(&g_Peref.U3fltrReadyTU,   (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.U3fltrStopClose, (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
 			peref_ApFilter3Init(&g_Peref.U3fltrDU, 		  (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
 
 	} else if (addr == REG_TU_TYPE) {
 
 		if (g_Ram.ramGroupB.InputType==it24)
 		{
-			g_Peref.InDigSignalObserver.parSensors.p_UOpen_Mpy		= &g_Ram.ramGroupB.UOpen_Mpy24;
-			g_Peref.InDigSignalObserver.parSensors.p_UClose_Mpy		= &g_Ram.ramGroupB.p_UClose_Mpy24;
-			g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy24;
-			g_Peref.InDigSignalObserver.parSensors.p_UMu_Mpy		= &g_Ram.ramGroupB.p_UMu_Mpy24;
-			g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy24;
-			g_Peref.InDigSignalObserver.parSensors.p_UResetAlarm_Mpy= &g_Ram.ramGroupB.p_UResetAlarm_Mpy24;
-			g_Peref.InDigSignalObserver.parSensors.p_UReadyTu_Mpy	= &g_Ram.ramGroupB.p_UReadyTu_Mpy24;
-			g_Peref.InDigSignalObserver.parSensors.p_UDu_Mpy		= &g_Ram.ramGroupB.p_UDu_Mpy24;
+			g_Peref.InDigSignalObserver.parSensors.p_UOpen_Mpy		= &g_Ram.ramGroupC.p_UOpen_Mpy24;
+			g_Peref.InDigSignalObserver.parSensors.p_UClose_Mpy		= &g_Ram.ramGroupC.p_UClose_Mpy24;
+			g_Peref.InDigSignalObserver.parSensors.p_UStopOpen_Mpy	= &g_Ram.ramGroupC.p_UStopOpen_Mpy24;
+			g_Peref.InDigSignalObserver.parSensors.p_UMu_Mpy		= &g_Ram.ramGroupC.p_UMu_Mpy24;
+			g_Peref.InDigSignalObserver.parSensors.p_UStopClose_Mpy	= &g_Ram.ramGroupC.p_UStopClose_Mpy24;
+			g_Peref.InDigSignalObserver.parSensors.p_UResetAlarm_Mpy= &g_Ram.ramGroupC.p_UResetAlarm_Mpy24;
+			g_Peref.InDigSignalObserver.parSensors.p_UDu_Mpy		= &g_Ram.ramGroupC.p_UDu_Mpy24;
 		}
 		else
 		{
-			g_Peref.InDigSignalObserver.parSensors.p_UOpen_Mpy		= &g_Ram.ramGroupB.UOpen_Mpy220;
-			g_Peref.InDigSignalObserver.parSensors.p_UClose_Mpy		= &g_Ram.ramGroupB.p_UClose_Mpy220;
-			g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy220;
-			g_Peref.InDigSignalObserver.parSensors.p_UMu_Mpy		= &g_Ram.ramGroupB.p_UMu_Mpy220;
-			g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy220;
-			g_Peref.InDigSignalObserver.parSensors.p_UResetAlarm_Mpy= &g_Ram.ramGroupB.p_UResetAlarm_Mpy220;
-			g_Peref.InDigSignalObserver.parSensors.p_UReadyTu_Mpy	= &g_Ram.ramGroupB.p_UReadyTu_Mpy220;
-			g_Peref.InDigSignalObserver.parSensors.p_UDu_Mpy		= &g_Ram.ramGroupB.p_UDu_Mpy220;
+			g_Peref.InDigSignalObserver.parSensors.p_UOpen_Mpy		= &g_Ram.ramGroupC.p_UOpen_Mpy220;
+			g_Peref.InDigSignalObserver.parSensors.p_UClose_Mpy		= &g_Ram.ramGroupC.p_UClose_Mpy220;
+			g_Peref.InDigSignalObserver.parSensors.p_UStopOpen_Mpy	= &g_Ram.ramGroupC.p_UStopOpen_Mpy220;
+			g_Peref.InDigSignalObserver.parSensors.p_UMu_Mpy		= &g_Ram.ramGroupC.p_UMu_Mpy220;
+			g_Peref.InDigSignalObserver.parSensors.p_UStopClose_Mpy	= &g_Ram.ramGroupC.p_UStopClose_Mpy220;
+			g_Peref.InDigSignalObserver.parSensors.p_UResetAlarm_Mpy= &g_Ram.ramGroupC.p_UResetAlarm_Mpy220;
+			g_Peref.InDigSignalObserver.parSensors.p_UDu_Mpy		= &g_Ram.ramGroupC.p_UDu_Mpy220;
 		}
 	}
 }

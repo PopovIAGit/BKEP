@@ -25,6 +25,8 @@ Outputs
 #include "g_InitHardware.h"
 #include "csl\csl_memory.h"
 #include "stat_fm25v10.h"
+#include "core_DisplayFaults.h"
+
 //#include "core_MotorControl.h"
 
 //--------------------- Константы-------------------------------------------
@@ -41,6 +43,7 @@ Outputs
 #define BREAK_SCALE				(Uint16)(0.100 * Prd50HZ)		//
 #define SHN_CONTROL_ERR_TIME	(Uint16)(2.000 * Prd50HZ)		// время ожидания для определения ошибки алгоритма упп
 #define SHN_MODE_TIME			(Uint16)(0.200 * Prd50HZ)
+
 
 #define TEN_OFF				1
 #define TEN_ON				0
@@ -89,11 +92,8 @@ typedef struct _TCoreTemper {
 typedef struct {
 	// ---
 	TStatusReg 			Status;			// Статус работы
-	TStatusReg 			TestStatus;		// переменная для проверки
 	// ---
 	TCoreProtections	Protections;	// Защиты
-	// ---
-	//TCoreParams		params;			// Параметры
 	// ---
 	TCoreMenu			menu;			// Меню
 	// ---
@@ -102,7 +102,7 @@ typedef struct {
 	TCoreVlvDrvCtrl		VlvDrvCtrl;		// Управление задвижкой
 	// ---
 	TDmControl			MotorControl;	// Управление двигателем
-
+	// ---
 	Uns 				PrevCycle;		// Предидущее значение счетчика циклов
 	//---- 3 секунды------
 	Uns 				Sec3Timer;		// Таймер для работы с 3 секундами
@@ -110,7 +110,11 @@ typedef struct {
 	Uns 				PowerLostFlag;  // Флаг показывающий пропажу напряжения
 	Uns 				ShcResetTimer;	// Таймер для сброса ложного срабатывания КЗ
 
+	Uns 				MuDuDefTimer;	// таймер для выставления защиты по МУ ДУ
+
 	TCoreTemper			Temper;			// Обработка температур БКП и БКД
+	TCoreDislpayFaults  DisplayFaults;   // Отображение аварий/неисправностей на дисплее
+
 } TCore;
 
 //------------------- Глобальные переменные --------------------------------

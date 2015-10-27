@@ -19,6 +19,8 @@
 #define BTN_STOPDU_BIT  BIT3
 #define BTN_STOP		(BTN_STOPDU_BIT|BTN_STOPMU_BIT)
 
+#define BTN_RESET_ALARM GpioDataRegs.GPBDAT.bit.GPIO47
+
 
 //--------------------- Макросы --------------------------------------------
 #define BTN_ENABLE_TIME			(0.300 * Prd50HZ)

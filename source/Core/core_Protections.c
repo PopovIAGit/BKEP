@@ -21,7 +21,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	//---------Нет Движенния-----------------------------------------------
 
 	p->NoMove.Cfg.all			= PRT_CFG_SET(CAN_BE_MUFTA, INP_LESS_LEVEL,NoMove_bit,HYST_OFF);
-	p->NoMove.Input				= (Int *)&g_Ram.ramGroupC.Position;
+	p->NoMove.Input				= (Int *)&g_Ram.ramGroupA.Position;
 	p->NoMove.Output			= &p->NoMoveFlag;
 	p->NoMove.EnableLevel		= (Int *)&g_Ram.ramGroupC.MuffZone;
 	p->NoMove.DisableLevel		= (Int *)&g_Ram.ramGroupC.MuffZone;
@@ -250,21 +250,21 @@ void Core_ProtectionsInit(TCoreProtections *p)
 
 	//---------Время-токовая перегрузка (авария)-------------------------------------
 	p->I2t.Cfg.bit.Hyst 			= HYST_OFF;
-	p->I2t.Cfg.bit.Num 			= I2t_bit;
+	p->I2t.Cfg.bit.Num 				= I2t_bit;
 	p->I2t.InputCurrentMid 			= &g_Ram.ramGroupH.Imid;
-	p->I2t.NomCurrent 			= &g_Ram.ramGroupC.Inom;
-	p->I2t.Output 				= (Uns *)&p->outFaults.Load.all;
-	p->I2t.Scale 				= PROTECT_SCALE;
+	p->I2t.NomCurrent 				= &g_Ram.ramGroupC.Inom;
+	p->I2t.Output 					= (Uns *)&p->outFaults.Load.all;
+	p->I2t.Scale 					= PROTECT_SCALE;
 	Core_ProtectionI2TInit(&p->I2t);
 
 	//--------Ассиметрия токов (неисправность)----------------------------------------------
 	p->voltSkew.Cfg.all 			= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,ISkew_bit,HYST_OFF);
-	p->voltSkew.Input			= (Int *)&g_Ram.ramGroupH.ISkewValue;
-	p->voltSkew.Output			= (Uns *)&p->outDefects.Load.all;
+	p->voltSkew.Input				= (Int *)&g_Ram.ramGroupH.ISkewValue;
+	p->voltSkew.Output				= (Uns *)&p->outDefects.Load.all;
 	p->voltSkew.EnableLevel			= (Int *)&g_Ram.ramGroupC.ISkewLevel;
 	p->voltSkew.DisableLevel		= (Int *)&g_Ram.ramGroupC.ISkewLevel;
-	p->voltSkew.Timeout			= &g_Ram.ramGroupC.ISkewTime;
-	p->voltSkew.Scale			= PROTECT_SCALE;
+	p->voltSkew.Timeout				= &g_Ram.ramGroupC.ISkewTime;
+	p->voltSkew.Scale				= PROTECT_SCALE;
 
 	//------Короткое замыкание----------------------------------------------
 	p->ShC_U.Cfg.bit.Num 			= ShCU_bit;
@@ -287,9 +287,9 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->ShC_V.LowCurrentLevel		= &g_Ram.ramGroupC.ShC_Down;
 	p->ShC_W.LowCurrentLevel		= &g_Ram.ramGroupC.ShC_Down;
 
-	p->ShC_U.Output				= &p->ShcTmpState;//&p->outFaults.Load.all;
-	p->ShC_V.Output				= &p->ShcTmpState;//&p->outFaults.Load.all;
-	p->ShC_W.Output				= &p->ShcTmpState;//&p->outFaults.Load.all;
+	p->ShC_U.Output					= &p->ShcTmpState;//&p->outFaults.Load.all;
+	p->ShC_V.Output					= &p->ShcTmpState;//&p->outFaults.Load.all;
+	p->ShC_W.Output					= &p->ShcTmpState;//&p->outFaults.Load.all;
 
 	//------ДИАГНОСТИКА УСТРОЙСТВА------------------------------------------
 	//------Перегрев блока БКД----------------------------------------------
@@ -448,7 +448,7 @@ void EngPhOrdPrt(TCoreProtections *p)
     if ((g_Ram.ramGroupC.PhOrd == pmOff) || (g_Core.Status.bit.Stop))
 	{
 	    Flag = false;
-	    StartPos = g_Ram.ramGroupC.Position;
+	    StartPos = g_Ram.ramGroupA.Position;
 	    Timer = 0;
 	    return;
 	}
@@ -457,7 +457,7 @@ void EngPhOrdPrt(TCoreProtections *p)
 	Timer++;
     else if (!Flag)
 	{
-	    Delta = g_Ram.ramGroupC.Position - StartPos;
+	    Delta = g_Ram.ramGroupA.Position - StartPos;
 
 	    if (Delta > ((REV_MAX + 1) / 2))
 		Delta -= (REV_MAX + 1);

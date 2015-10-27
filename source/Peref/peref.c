@@ -22,6 +22,8 @@
 
 TPeref	g_Peref;
 
+__inline void peref_74HC595CsSet(Byte Lev) {CS_RELE = !Lev;}
+
 Bool RtcStart    = False;
 
 //---------------------------------------------------
@@ -34,10 +36,10 @@ void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновлени
 
     Peref_SinObserverInitFloat(&p->InDigSignal.sigOpen, Prd18kHZ);
     Peref_SinObserverInitFloat(&p->InDigSignal.sigClose, Prd18kHZ);
-    Peref_SinObserverInitFloat(&p->InDigSignal.sigStop, Prd18kHZ);
+    Peref_SinObserverInitFloat(&p->InDigSignal.sigStopOpen, Prd18kHZ);
     Peref_SinObserverInitFloat(&p->InDigSignal.sigMU, Prd18kHZ);
     Peref_SinObserverInitFloat(&p->InDigSignal.sigResetAlarm, Prd18kHZ);
-    Peref_SinObserverInitFloat(&p->InDigSignal.sigReadyTU, Prd18kHZ);
+    Peref_SinObserverInitFloat(&p->InDigSignal.sigStopClose, Prd18kHZ);
     Peref_SinObserverInitFloat(&p->InDigSignal.sigDU, Prd18kHZ);
 
     //--------токи и напряжения------------------------------------------------------------------------
@@ -69,9 +71,11 @@ void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновлени
     ADT75_Init(&p->TSens);
     MCP4276_Init(&p->Dac);
     DS3231_Init(&p->Rtc);
+    DisplDrvInit(&p->Display);
     p->Rtc.Data = (char *) &p->RtcData;
-
-    p->Peref_StertDelayTimeout = (1 * Prd10HZ);
+    //-------Драйвер сдвигового регистра для ТС------
+    p->ShiftReg.CsFunc = &peref_74HC595CsSet;
+    Peref_74HC595Init(&p->ShiftReg);
 
 }
 //---------------------------------------------------
@@ -83,37 +87,37 @@ void Peref_18kHzCalc(TPeref *p) // 18 кГц
     // забираем отмасштабированный сигнал с АЦП на вход фильтра 1-ого порядка
     p->UfltrOpen.Input 		= p->InDigSignalObserver.UOpenOut;
     p->UfltrClose.Input 	= p->InDigSignalObserver.UCloseOut;
-    p->UfltrStop.Input 		= p->InDigSignalObserver.UStopOut;
+    p->UfltrStopOpen.Input 	= p->InDigSignalObserver.UStopOpenOut;
     p->UfltrMu.Input 		= p->InDigSignalObserver.UMuOut;
-    p->UfltrResetAlarm.Input 	= p->InDigSignalObserver.UResetAlarmOut;
-    p->UfltrReadyTU.Input 	= p->InDigSignalObserver.UReadyTuOut;
+    p->UfltrResetAlarm.Input= p->InDigSignalObserver.UResetAlarmOut;
+    p->UfltrStopClose.Input = p->InDigSignalObserver.UStopCloseOut;
     p->UfltrDU.Input 		= p->InDigSignalObserver.UDuOut;
 
     //фильтруем входной сигнал ТУ
     peref_ApFilter1Calc(&p->UfltrOpen);
     peref_ApFilter1Calc(&p->UfltrClose);
-    peref_ApFilter1Calc(&p->UfltrStop);
+    peref_ApFilter1Calc(&p->UfltrStopOpen);
     peref_ApFilter1Calc(&p->UfltrMu);
     peref_ApFilter1Calc(&p->UfltrResetAlarm);
-    peref_ApFilter1Calc(&p->UfltrReadyTU);
+    peref_ApFilter1Calc(&p->UfltrStopClose);
     peref_ApFilter1Calc(&p->UfltrDU);
 
     //передаём фильтрованный сигнал на обработку RMS
     p->InDigSignal.sigOpen.Input = p->UfltrOpen.Output;
     p->InDigSignal.sigClose.Input = p->UfltrClose.Output;
-    p->InDigSignal.sigStop.Input = p->UfltrStop.Output;
+    p->InDigSignal.sigStopOpen.Input = p->UfltrStopOpen.Output;
     p->InDigSignal.sigMU.Input = p->UfltrMu.Output;
     p->InDigSignal.sigResetAlarm.Input = p->UfltrResetAlarm.Output;
-    p->InDigSignal.sigReadyTU.Input = p->UfltrReadyTU.Output;
+    p->InDigSignal.sigStopClose.Input = p->UfltrStopClose.Output;
     p->InDigSignal.sigDU.Input = p->UfltrDU.Output;
 
     //функция расчёта RMS для сигналов ТУ
     Peref_SinObserverUpdateFloat(&p->InDigSignal.sigOpen);
     Peref_SinObserverUpdateFloat(&p->InDigSignal.sigClose);
-    Peref_SinObserverUpdateFloat(&p->InDigSignal.sigStop);
+    Peref_SinObserverUpdateFloat(&p->InDigSignal.sigStopOpen);
     Peref_SinObserverUpdateFloat(&p->InDigSignal.sigMU);
     Peref_SinObserverUpdateFloat(&p->InDigSignal.sigResetAlarm);
-    Peref_SinObserverUpdateFloat(&p->InDigSignal.sigReadyTU);
+    Peref_SinObserverUpdateFloat(&p->InDigSignal.sigStopClose);
     Peref_SinObserverUpdateFloat(&p->InDigSignal.sigDU);
     ///////////////////////////////////////////////////////////////////////////////////
 
@@ -180,28 +184,28 @@ void Peref_50HzCalc(TPeref *p)	// 50 Гц
     peref_ApFilter3Calc(&p->IV3fltr);
     peref_ApFilter3Calc(&p->IW3fltr);
 
-    p->U3fltrOpen.Input 	= p->InDigSignal.sigOpen.Output;
-    p->U3fltrClose.Input 	= p->InDigSignal.sigClose.Output;
-    p->U3fltrStop.Input 	= p->InDigSignal.sigStop.Output;
-    p->U3fltrMu.Input 		= p->InDigSignal.sigMU.Output;
+    p->U3fltrOpen.Input 		= p->InDigSignal.sigOpen.Output;
+    p->U3fltrClose.Input 		= p->InDigSignal.sigClose.Output;
+    p->U3fltrStopOpen.Input 	= p->InDigSignal.sigStopOpen.Output;
+    p->U3fltrMu.Input 			= p->InDigSignal.sigMU.Output;
     p->U3fltrResetAlarm.Input 	= p->InDigSignal.sigResetAlarm.Output;
-    p->U3fltrReadyTU.Input 	= p->InDigSignal.sigReadyTU.Output;
-    p->U3fltrDU.Input 		= p->InDigSignal.sigDU.Output;
+    p->U3fltrStopClose.Input 	= p->InDigSignal.sigStopClose.Output;
+    p->U3fltrDU.Input 			= p->InDigSignal.sigDU.Output;
 
     peref_ApFilter3Calc(&p->U3fltrOpen);
     peref_ApFilter3Calc(&p->U3fltrClose);
-    peref_ApFilter3Calc(&p->U3fltrStop);
+    peref_ApFilter3Calc(&p->U3fltrStopOpen);
     peref_ApFilter3Calc(&p->U3fltrMu);
     peref_ApFilter3Calc(&p->U3fltrDU);
-    peref_ApFilter3Calc(&p->U3fltrReadyTU);
+    peref_ApFilter3Calc(&p->U3fltrStopClose);
     peref_ApFilter3Calc(&p->U3fltrResetAlarm);
 
     g_Comm.digitInterface.dinOpen.inputDIN = p->U3fltrOpen.Output;
     g_Comm.digitInterface.dinClose.inputDIN = p->U3fltrClose.Output;
-    g_Comm.digitInterface.dinStop.inputDIN = p->U3fltrStop.Output;
+    g_Comm.digitInterface.dinStopOpen.inputDIN = p->U3fltrStopOpen.Output;
     g_Comm.digitInterface.dinMu.inputDIN = p->U3fltrMu.Output;
     g_Comm.digitInterface.dinDu.inputDIN = p->U3fltrDU.Output;
-    g_Comm.digitInterface.dinPredReady.inputDIN = p->U3fltrReadyTU.Output;
+    g_Comm.digitInterface.dinStopClose.inputDIN = p->U3fltrStopClose.Output;
     g_Comm.digitInterface.dinResetAlarm.inputDIN = p->U3fltrResetAlarm.Output;
 
     peref_ApFilter1Calc(&p->Phifltr);
@@ -226,24 +230,24 @@ void Peref_10HzCalc(TPeref *p)	// 10 Гц
 
   if (g_Ram.ramGroupB.InputType==it24)
   {
-		g_Peref.InDigSignalObserver.parSensors.p_UOpen_Mpy		= &g_Ram.ramGroupB.UOpen_Mpy24;
-		g_Peref.InDigSignalObserver.parSensors.p_UClose_Mpy		= &g_Ram.ramGroupB.p_UClose_Mpy24;
-		g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy24;
-		g_Peref.InDigSignalObserver.parSensors.p_UMu_Mpy		= &g_Ram.ramGroupB.p_UMu_Mpy24;
-		g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy24;
-		g_Peref.InDigSignalObserver.parSensors.p_UResetAlarm_Mpy	= &g_Ram.ramGroupB.p_UResetAlarm_Mpy24;
-		g_Peref.InDigSignalObserver.parSensors.p_UReadyTu_Mpy		= &g_Ram.ramGroupB.p_UReadyTu_Mpy24;
-		g_Peref.InDigSignalObserver.parSensors.p_UDu_Mpy		= &g_Ram.ramGroupB.p_UDu_Mpy24;
+		g_Peref.InDigSignalObserver.parSensors.p_UOpen_Mpy			= &g_Ram.ramGroupC.p_UOpen_Mpy24;
+		g_Peref.InDigSignalObserver.parSensors.p_UClose_Mpy			= &g_Ram.ramGroupC.p_UClose_Mpy24;
+		g_Peref.InDigSignalObserver.parSensors.p_UStopOpen_Mpy		= &g_Ram.ramGroupC.p_UStopOpen_Mpy24;
+		g_Peref.InDigSignalObserver.parSensors.p_UStopClose_Mpy		= &g_Ram.ramGroupC.p_UStopClose_Mpy24;
+		g_Peref.InDigSignalObserver.parSensors.p_UMu_Mpy			= &g_Ram.ramGroupC.p_UMu_Mpy24;
+		g_Peref.InDigSignalObserver.parSensors.p_UDu_Mpy			= &g_Ram.ramGroupC.p_UDu_Mpy24;
+		g_Peref.InDigSignalObserver.parSensors.p_UResetAlarm_Mpy	= &g_Ram.ramGroupC.p_UResetAlarm_Mpy24;
+
 	} else
 	{
-		g_Peref.InDigSignalObserver.parSensors.p_UOpen_Mpy		= &g_Ram.ramGroupB.UOpen_Mpy220;
-		g_Peref.InDigSignalObserver.parSensors.p_UClose_Mpy		= &g_Ram.ramGroupB.p_UClose_Mpy220;
-		g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy220;
-		g_Peref.InDigSignalObserver.parSensors.p_UMu_Mpy		= &g_Ram.ramGroupB.p_UMu_Mpy220;
-		g_Peref.InDigSignalObserver.parSensors.p_UStop_Mpy		= &g_Ram.ramGroupB.p_UStop_Mpy220;
-		g_Peref.InDigSignalObserver.parSensors.p_UResetAlarm_Mpy	= &g_Ram.ramGroupB.p_UResetAlarm_Mpy220;
-		g_Peref.InDigSignalObserver.parSensors.p_UReadyTu_Mpy		= &g_Ram.ramGroupB.p_UReadyTu_Mpy220;
-		g_Peref.InDigSignalObserver.parSensors.p_UDu_Mpy		= &g_Ram.ramGroupB.p_UDu_Mpy220;
+		g_Peref.InDigSignalObserver.parSensors.p_UOpen_Mpy			= &g_Ram.ramGroupC.p_UOpen_Mpy220;
+		g_Peref.InDigSignalObserver.parSensors.p_UClose_Mpy			= &g_Ram.ramGroupC.p_UClose_Mpy220;
+		g_Peref.InDigSignalObserver.parSensors.p_UStopOpen_Mpy		= &g_Ram.ramGroupC.p_UStopOpen_Mpy220;
+		g_Peref.InDigSignalObserver.parSensors.p_UStopClose_Mpy		= &g_Ram.ramGroupC.p_UStopClose_Mpy220;
+		g_Peref.InDigSignalObserver.parSensors.p_UMu_Mpy			= &g_Ram.ramGroupC.p_UMu_Mpy220;
+		g_Peref.InDigSignalObserver.parSensors.p_UDu_Mpy			= &g_Ram.ramGroupC.p_UDu_Mpy220;
+		g_Peref.InDigSignalObserver.parSensors.p_UResetAlarm_Mpy	= &g_Ram.ramGroupC.p_UResetAlarm_Mpy220;
+
 	}
 
  // if (p->Peref_StertDelayTimeout--) return; ???

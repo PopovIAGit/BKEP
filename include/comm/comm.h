@@ -67,6 +67,8 @@ typedef struct {
 	TShn				Shn;
 	TBluetoothPort		Bluetooth;		// Bluetooth
 	TBKPData			BkpData;		// структура обмена данными с БКП
+
+	Uns 				btn_reset_alarmFlag; // флаг отжатия кнопки сброс аварий, для избежания множественной отправки команд
 } TComm;
 //--------------------------------------------------------
 
@@ -74,7 +76,7 @@ void Comm_Init(TComm *);
 void Comm_Update(TComm *);
 void Comm_50HzCalc(TComm *);
 void UpdateTUTS_Test(TComm *p);
-Uns DigitCmdModeUpdate (Uns *);
+//Uns DigitCmdModeUpdate (Uns *);
 void TekModbusParamsUpdate(void);
 
 extern TComm	g_Comm;

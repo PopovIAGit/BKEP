@@ -23,28 +23,29 @@ void Core_ProtectionI2TUpdate(TAlarmI2T *p)
 	register unsigned BitMask;
 
 		BitMask = (1U << p->Cfg.bit.Num);	// Единицу типа Unsigned сдвигаем влево на номер бита в регистре аварий. Получаем маску аварии.
+
 		if (!p->Cfg.bit.Enable)	// Если "разрешение работы"=0, то есть "выкл", то
 		{
 			*p->Output &= ~BitMask;	// Умножаем "выход" на инвентированную маску, то есть, снимаем АВАРИЮ
 			p->Timer = 0;
-			return;		// Выходим из функции
+			return;
 		}
 
 		if (!(*p->Output & BitMask))	// Если аварии нет (*p->Output & BitMask дает "0")
 		{
-			if (*p->InputCurrentMid > p->minHighCurrent )	// если ток превысил величину, при которой время-токовая защита срабатывает моментально
-			{	// выставляем аварию немедленно
-				*p->Output |= BitMask;
+		/*	if (*p->InputCurrentMid > p->minHighCurrent )	// если ток превысил величину, при которой время-токовая защита срабатывает моментально
+			{
+				*p->Output |= BitMask;	// выставляем аварию немедленно
 				p->Timer = 0;
 			}
-			else
+			else*/
 			if (*p->InputCurrentMid < p->maxLowCurrent)	// если ток ниже величины, при которой время-токовая защита не ведется
-			{	// отключаем накопление
-				p->Timer = 0;
+			{
+				p->Timer = 0;// отключаем накопление
 			}
 			else
 			{
-				p->Timeout =  I2T_CONV( *p->InputCurrentMid, *p->NomCurrent, _IQ15(37.5), _IQ15(1.15), _IQ15(50));
+				p->Timeout =  I2T_CONV( *p->InputCurrentMid, *p->NomCurrent, _IQ15(50), _IQ15(1.4), _IQ15(60));
 				if (++p->Timer >= (p->Timeout * p->Scale)) //  таймер  достиг времени срабатывания аварии
 				{
 					*p->Output |= BitMask;	// выставляем АВАРИЮ

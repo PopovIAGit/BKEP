@@ -30,14 +30,13 @@ void Peref_SensObserverInit(TSensObserver *p)
 
 void Peref_SensTuObserverInit(TSensTuObserver *p)
 {
-	p->parSensors.p_UOpen_Offset		= &g_Ram.ramGroupB.p_UOpen_Offset;
-	p->parSensors.p_UClose_Offset		= &g_Ram.ramGroupB.p_UClose_Offset;
-	p->parSensors.p_UStop_Offset		= &g_Ram.ramGroupB.p_UStop_Offset;
-	p->parSensors.p_UStop_Offset		= &g_Ram.ramGroupB.p_UStop_Offset;
-	p->parSensors.p_UMu_Offset		= &g_Ram.ramGroupB.p_UMu_Offset;
-	p->parSensors.p_UResetAlarm_Offset	= &g_Ram.ramGroupB.p_UResetAlarm_Offset;
-	p->parSensors.p_UReadyTu_Offset		= &g_Ram.ramGroupB.p_UReadyTu_Offset;
-	p->parSensors.p_UDu_Offset		= &g_Ram.ramGroupB.p_UDu_Offset;
+	p->parSensors.p_UOpen_Offset		= &g_Ram.ramGroupC.p_UOpen_Offset;
+	p->parSensors.p_UClose_Offset		= &g_Ram.ramGroupC.p_UClose_Offset;
+	p->parSensors.p_UStopOpen_Offset	= &g_Ram.ramGroupC.p_UStopOpen_Offset;
+	p->parSensors.p_UStopClose_Offset	= &g_Ram.ramGroupC.p_UStopClose_Offset;
+	p->parSensors.p_UMu_Offset			= &g_Ram.ramGroupC.p_UMu_Offset;
+	p->parSensors.p_UDu_Offset			= &g_Ram.ramGroupC.p_UDu_Offset;
+	p->parSensors.p_UResetAlarm_Offset	= &g_Ram.ramGroupC.p_UResetAlarm_Offset;
 /*
 	if (REG_TU_TYPE==0)
 	{
@@ -89,20 +88,22 @@ void Peref_SensTuObserverUpdate(TSensTuObserver *p) // 18000 Гц
     // забираем сигнал с АЦП на вход фильтра
     p->UOpenInp 	= TU_SIG_OPEN;
     p->UCloseInp 	= TU_SIG_CLOSE;
-    p->UStopInp 	= TU_SIG_STOP;
+    p->UStopOpenInp = TU_SIG_STOP_OPEN;
+    p->UStopCloseInp= TU_SIG_STOP_CLOSE;
     p->UMuInp 		= TU_SIG_MU;
-    p->UResetAlarmInp = TU_SIG_RESETALARM;
-    p->UReadyTuInp 	= TU_SIG_READYTU;
     p->UDuInp 		= TU_SIG_DU;
+    p->UResetAlarmInp = TU_SIG_RESET_ALARM;
 
     // Преобразование напряжений
-    p->UOpenOut 	= ADC_CONV(p->UOpenInp, 	*p->parSensors.p_UOpen_Mpy, 		*p->parSensors.p_UOpen_Offset);
-    p->UCloseOut 	= ADC_CONV(p->UCloseInp, 	*p->parSensors.p_UClose_Mpy, 		*p->parSensors.p_UClose_Offset);
-    p->UStopOut 	= ADC_CONV(p->UStopInp,  	*p->parSensors.p_UStop_Mpy, 		*p->parSensors.p_UStop_Offset);
-    p->UMuOut 		= ADC_CONV(p->UMuInp,    	*p->parSensors.p_UMu_Mpy, 		*p->parSensors.p_UMu_Offset);
-    p->UResetAlarmOut 	= ADC_CONV(p->UResetAlarmInp, 	*p->parSensors.p_UResetAlarm_Mpy, 	*p->parSensors.p_UResetAlarm_Offset);
-    p->UReadyTuOut 	= ADC_CONV(p->UReadyTuInp, 	*p->parSensors.p_UReadyTu_Mpy,	 	*p->parSensors.p_UReadyTu_Offset);
-    p->UDuOut 		= ADC_CONV(p->UDuInp, 		*p->parSensors.p_UDu_Mpy, 		*p->parSensors.p_UDu_Offset);
+    p->UOpenOut 		= ADC_CONV(p->UOpenInp, 			*p->parSensors.p_UOpen_Mpy, 		*p->parSensors.p_UOpen_Offset);
+    p->UCloseOut 		= ADC_CONV(p->UCloseInp, 			*p->parSensors.p_UClose_Mpy, 		*p->parSensors.p_UClose_Offset);
+    p->UStopOpenOut 	= ADC_CONV(p->UStopOpenInp,  		*p->parSensors.p_UStopOpen_Mpy, 	*p->parSensors.p_UStopOpen_Offset);
+    p->UStopCloseOut	= ADC_CONV(p->UStopCloseInp, 		*p->parSensors.p_UStopClose_Mpy,	*p->parSensors.p_UStopClose_Offset);
+    p->UMuOut 			= ADC_CONV(p->UMuInp,    			*p->parSensors.p_UMu_Mpy, 			*p->parSensors.p_UMu_Offset);
+    p->UDuOut 			= ADC_CONV(p->UDuInp, 				*p->parSensors.p_UDu_Mpy, 			*p->parSensors.p_UDu_Offset);
+    p->UResetAlarmOut 	= ADC_CONV(p->UResetAlarmInp, 		*p->parSensors.p_UResetAlarm_Mpy, 	*p->parSensors.p_UResetAlarm_Offset);
+
+
 
 }
 

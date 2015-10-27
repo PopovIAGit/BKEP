@@ -125,9 +125,9 @@ typedef Bool  		bool;
 
 #define ToPtr(p)			 (Ptr)(p)
 #define ToIntPtr(p)		 (Int *)(p)
-#define ToInt(p)			*(Int *)(p)
+#define ToInt(p)		*(Int *)(p)
 #define ToUnsPtr(p)		 (Uns *)(p)
-#define ToUns(p)			*(Uns *)(p)
+#define ToUns(p)		*(Uns *)(p)
 #define ToLongPtr(p)	 (LgInt *)(p)
 #define ToLong(p)		*(LgInt *)(p)
 #define ToULongPtr(p)	 (LgUns *)(p)

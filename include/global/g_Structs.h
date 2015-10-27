@@ -140,7 +140,7 @@ typedef union _TNetReg {
 		Uns OvR:1;			// 3     Превышение напряжения в фазе R
 		Uns OvS:1;			// 4     Превышение напряжения в фазе S
 		Uns OvT:1;			// 5     Превышение напряжения в фазе T
-		Uns PhOrd:1;			// 6     Неверное чередование фаз сети
+		Uns Rsvd2:1;		// 6
 		Uns VSk:1;			// 7     Асимметрия напряжения входной сети
 		Uns BvR:1;			// 8     Обрыв фазы R входной сети
 		Uns BvS:1;			// 9     Обрыв фазы S входной сети
@@ -148,8 +148,7 @@ typedef union _TNetReg {
 		Uns OvR_max:1;			// 11    Превышение напряжения в фазе R на 47%
 		Uns OvS_max:1;			// 12    Превышение напряжения в фазе S на 47%
 		Uns OvT_max:1;			// 13    Превышение напряжения в фазе T на 47%
-		Uns BreakRST:1;			// 14    Обрыв входного напряжения выключение вводного автомата
-		Uns Rsvd:1;			// 15 Резерв
+		Uns Rsvd:2;			// 14-15 Резерв
 	} bit;
 } TNetReg;
 
@@ -182,7 +181,7 @@ typedef union _TLoadReg {
 #define DEV_ERR_MASK		0x009F
 #define DEV_TMP_MASK		0x0060
 #define DEV_RSC_MASK		0x0800
-//#define DEV_EVLOG_MASK		0x0400
+//#define DEV_EVLOG_MASK	0x0400
 #define DEV_EVLOG_MASK		0x0421
 typedef union _TDeviceReg {
 	Uns all;
@@ -190,13 +189,13 @@ typedef union _TDeviceReg {
 		Uns PosSens:1;		// 0     Сбой датчика положения
 		Uns Memory1:1;		// 1     Сбой памяти 1
 		Uns Memory2:1;		// 2     Сбой памяти 2
-		Uns Rtc:1;		// 3     Сбой часов реального времени
+		Uns Rtc:1;			// 3     Сбой часов реального времени
 		Uns TSens:1;		// 4     Сбой датчика температуры
 		Uns Th_BCP:1;		// 5     Перегрев блока БКП
 		Uns Tl_BCP:1;		// 6     Переохлождение блока БКП
 		Uns Th_BCD:1;		// 7     Перегрев блока БКД
 		Uns Tl_BCD:1;		// 8     Переохлождение блока БКД
-		Uns Dac:1;		// 9     Сбой ЦАП
+		Uns Dac:1;			// 9     Сбой ЦАП
 		Uns LowPower:1;		// 10     Выключение БКД
 		Uns NoBCP_Connect:1;	// 11
 		Uns Rsvd:4;       	// 12-15 Резерв
@@ -320,7 +319,7 @@ typedef enum {
 } TIndicMode;
 
 // Состояние светодиодов блока
-typedef union _TLedsReg {	// МОИ
+/*typedef union _TLedsReg {	// МОИ
 	Uns all;
 	struct {
 		Uns Opened:1;     	// 0     Открыто
@@ -333,7 +332,7 @@ typedef union _TLedsReg {	// МОИ
 		Uns DspOn:1;		// 7	 DSP_ON
 		Uns Rsvd:8;      	// 6-15  Резерв
 	} bit;
-} TLedsReg;
+} TLedsReg;*/
 
 // Тип задвижки клин/шибер
 typedef enum {

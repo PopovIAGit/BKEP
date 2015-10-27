@@ -68,6 +68,35 @@
 #define Th_BCD_bit			7
 #define Tl_BCD_bit			8
 
+//---------------------Коды аварий для дисплея---------------------------
+#define NoMove_CODE			1
+#define PhOrd_CODE			2
+#define NoCalib_CODE		3
+#define Overway_CODE		4
+#define Mufta_CODE			5
+#define MuDuDef_CODE		6
+
+#define Uv_CODE				11
+#define Ov_CODE				12
+#define VSk_CODE			13
+#define Bv_CODE				14
+#define Ov_max_CODE			15
+
+#define PhlU_CODE			21
+#define I2t_CODE			22
+#define ShCU_CODE			23
+
+#define PosSens_CODE		31
+#define Memory1_CODE		32
+#define Rtc_CODE			33
+#define TSens_CODE			34
+#define Th_BCP_CODE			35
+#define Tl_BCP_CODE			36
+#define Th_BCD_CODE			37
+#define Tl_BCD_CODE			38
+#define NoBCP_Connect_CODE	39
+
+
 //--------------------- Макросы --------------------------------------------
 #define PRT_CFG_SET(CanBeReseted, Level, Bit, Hyst) \
 	((CanBeReseted<<1)|(Level<<3)|(Bit<<4)|(Hyst<<8))
@@ -118,9 +147,9 @@ typedef struct {
 		Uns					registerBrCurr;		// Регистр аварий обрыва фаз двигателя
 		Uns					registerBrVolt;		// Регистр аварий обрыва фаз питания
 		Uns 				MuffFlag;			// Флаг муфты
-		Uns				NoMoveFlag;
+		Uns					NoMoveFlag;
 		Bool				ShcReset;			// Флаг по которому сбрасывается КЗ
-		Uns				FaultDelay;			// Пауза после инициализации для включения защит
+		Uns					FaultDelay;			// Пауза после инициализации для включения защит
 
 }TCoreProtections;
 

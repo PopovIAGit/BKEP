@@ -156,7 +156,7 @@ __inline void TeleControl(TCoreVlvDrvCtrl *p)
 
 	if (!(p->ActiveControls & CMD_SRC_DIGITAL))
 	{
-		*p->Tu.State &= ~(TU_STOP|TU_CLOSE|TU_OPEN);
+		*p->Tu.State &= ~(TU_STOP_OPEN|TU_STOP_CLOSE|TU_CLOSE|TU_OPEN);
 		p->Tu.Ready = True;
 		return;
 	}
@@ -172,14 +172,14 @@ __inline void TeleControl(TCoreVlvDrvCtrl *p)
 			p->Tu.Ready = True;
 	}
 
-	if (*p->Tu.State & TU_STOP) TuControl = vcwStop;
+	if (*p->Tu.State & (TU_STOP_OPEN | TU_STOP_CLOSE)) TuControl = vcwStop;
 
 	if (TuControl != vcwNone)
 	{
 		*p->ControlWord = TuControl;
 		p->EvLog.Source = CMD_SRC_DIGITAL;
 	}
-	*p->Tu.State &= ~(TU_STOP|TU_CLOSE|TU_OPEN);
+	*p->Tu.State &= ~(TU_STOP_OPEN|TU_STOP_CLOSE|TU_CLOSE|TU_OPEN);
 }
 
 __inline void UnitControl(TCoreVlvDrvCtrl *p)

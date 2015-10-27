@@ -27,10 +27,10 @@ void LedTurnOnOff(pLedParams ledParams, Uns led)
 //--------------------------------------------------------
 void Peref_LedsInit(pLeds p, Uns freq)
 {
- 	p->ledCntr.blinkPRD 	= 1;
+ 	p->ledCntr.blinkPRD 		= 1;
 
- 	p->ledOpening.blinkPRD 		= Prd10HZ;
- 	p->ledClosing.blinkPRD 		= Prd10HZ;
+ 	p->ledMpo.blinkPRD 			= Prd10HZ;
+ 	p->ledMpz.blinkPRD 			= Prd10HZ;
 	p->ledOpen.blinkPRD 		= Prd10HZ;
 	p->ledClose.blinkPRD 		= Prd10HZ;
 	p->ledFault.blinkPRD 		= Prd10HZ;
@@ -43,8 +43,8 @@ void Peref_LedsInit(pLeds p, Uns freq)
 	p->ledConnect.isBlink 		= 1;
 	p->ledBluetooth.isBlink		= 0;
 
-	p->ledOpening.timeOfBlink 		= freq/p->ledOpening.blinkPRD;			//состояние открыто
-	p->ledClosing.timeOfBlink 		= freq/p->ledClosing.blinkPRD;			//состояние открыто
+	p->ledMpo.timeOfBlink 		= freq/p->ledMpo.blinkPRD;			//состояние открыто
+	p->ledMpz.timeOfBlink 		= freq/p->ledMpz.blinkPRD;			//состояние открыто
 
 	p->ledMuDu.timeOfBlink 		= freq/p->ledMuDu.blinkPRD;			//состояние открыто
 
@@ -59,7 +59,6 @@ void Peref_LedsInit(pLeds p, Uns freq)
 	p->ledConnect.timeOfBlink	= 30;
 
 	p->pStatus = &g_Core.Status.all;
-	//p->pStatus = &g_Core.TestStatus.all;
 
 }
 //--------------------------------------------------------
@@ -68,7 +67,7 @@ void Peref_LedsUpdate(pLeds p)
 
 	Uns BlinkConnect=0;
 
-	if (g_Comm.Bluetooth.State<7) return;
+//	if (g_Comm.Bluetooth.State<7) return;
 
 	g_Ram.ramGroupH.BkpIndication = 0;
 
@@ -93,11 +92,6 @@ void Peref_LedsUpdate(pLeds p)
 
 	// ------Авария----------------------------------------
 	//------------------------------------------------------------------
-
-	//p->ledOpen.isBlink  = (*p->pStatus & STATUS_OPENING) ? 1: 0;// Статус - "открывается"? Да - Led "моргает". Нет - Led не "моргает"
-	//p->ledClose.isBlink = (*p->pStatus & STATUS_CLOSING) ? 1: 0;// Статус - "закрывается"? Да - Led "моргает". Нет - Led не "моргает"
-
-	//------------------------------------------------------------------
 	if (*p->pStatus & STATUS_OPENED)						// Если статус - "открыто"
 	{
 		LedTurnOnOff(&p->ledOpen, p->leds.bit.Open);		// Зажигаем светодиод
@@ -109,11 +103,11 @@ void Peref_LedsUpdate(pLeds p)
 	//------------------------------------------------------------------
 	if (*p->pStatus & STATUS_OPENING)						// Если статус - "открыто/открывается"
 	{
-		LedTurnOnOff(&p->ledOpening, p->leds.bit.Opening);	// Зажигаем светодиод
-		p->leds.bit.Opening = p->ledOpening.status;
+		LedTurnOnOff(&p->ledMpo, p->leds.bit.Mpo);	// Зажигаем светодиод
+		p->leds.bit.Mpo = p->ledMpo.status;
 	}
 	else 													// Если статус не "открыто/открывается"
-		p->leds.all |= LED_OPENING_MASK;					// Гасим светодиод
+		p->leds.all |= LED_MPO_MASK;					// Гасим светодиод
 
 	// ------Закрыто----------------------------------------
 	if (*p->pStatus & STATUS_CLOSED)						// Если статус - "закрыто/закрывается"
@@ -127,11 +121,11 @@ void Peref_LedsUpdate(pLeds p)
 	// ------Закрывается----------------------------------------
 	if (*p->pStatus & STATUS_CLOSING)						// Если статус - "закрывается"
 	{
-		LedTurnOnOff(&p->ledClosing, p->leds.bit.Closing);	// Зажигаем светодиод
-		p->leds.bit.Closing = p->ledClosing.status;
+		LedTurnOnOff(&p->ledMpz, p->leds.bit.Mpz);	// Зажигаем светодиод
+		p->leds.bit.Mpz = p->ledMpz.status;
 	}
-	else 													// Если статус не "закрыто/закрывается"
-		p->leds.all |= LED_CLOSING_MASK;					// Гасим светодиод
+	else 												// Если статус не "закрывается"
+		p->leds.all |= LED_MPZ_MASK;					// Гасим светодиод
 
 	// ------Муфта----------------------------------------
 	if (*p->pStatus & STATUS_MUFTA)							// Если авария "Муфта"
@@ -171,16 +165,15 @@ void Peref_LedsUpdate(pLeds p)
 	    p->leds.bit.MuDu = 1;
 	}
 
+	LED_MUFTA	=  p->leds.bit.Mufta;		//DELAY_US(1);
+	LED_DEFECT	=  p->leds.bit.Defect;		//DELAY_US(1);
+	LED_FAULT	=  p->leds.bit.Fault;		//DELAY_US(1);
 
-	LED_MUFTA	= p->leds.bit.Mufta;	DELAY_US(1);
-	LED_DEFECT	= p->leds.bit.Defect;	DELAY_US(1);
-	LED_FAULT	= p->leds.bit.Fault;	DELAY_US(1);
+	LED_MPZ = p->leds.bit.Mpz;				//DELAY_US(1);
+	LED_MPO = p->leds.bit.Mpo;				//DELAY_US(1);
+	LED_MUDU	= !p->leds.bit.MuDu;		//DELAY_US(1);
 
-	LED_CLOSING = p->leds.bit.Closing;	DELAY_US(1);
-	LED_OPENING = p->leds.bit.Opening;	DELAY_US(1);
-	LED_MUDU	= !p->leds.bit.MuDu;		DELAY_US(1);
-
-	if (/*(!(*p->pStatus & STATUS_OPENING)) && (!(*p->pStatus & STATUS_CLOSING)) && */(!(*p->pStatus & STATUS_CLOSED)) && (!(*p->pStatus & STATUS_OPENED)))
+	if ((!(*p->pStatus & STATUS_CLOSED)) && (!(*p->pStatus & STATUS_OPENED)))
 	{
 		GpioDataRegs.GPADAT.all &=~ 0x2400000;
 		//LED_OPEN = 0;
@@ -190,8 +183,8 @@ void Peref_LedsUpdate(pLeds p)
 		p->leds.bit.Close = 0;
 		p->leds.bit.Open = 0;
 	} else {
-		LED_OPEN	= p->leds.bit.Open;		DELAY_US(1);
-		LED_CLOSE 	= p->leds.bit.Close;	DELAY_US(1);
+		LED_OPEN	= p->leds.bit.Open;		//DELAY_US(1);
+		LED_CLOSE 	= p->leds.bit.Close;	//DELAY_US(1);
 	}
 
 	g_Ram.ramGroupH.BkpIndication = (~p->leds.all) & 0x00FF;

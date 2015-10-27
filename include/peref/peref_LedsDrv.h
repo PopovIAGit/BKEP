@@ -14,18 +14,14 @@
 
 // Лампочка
 
-
-
-
-
-#define LED_CLOSING_MASK	BIT0
+#define LED_MPZ_MASK		BIT0
 #define LED_CONNECT_MASK	BIT1	// Индикатор "МУ/ДУ". 0-МУ, 1-ДУ
 #define LED_CLOSE_MASK		BIT2	// Индикатор "ОТКРЫТО/ОТКРЫВАЕТСЯ". 1 - "ЗАКРЫТО", 1,0,1,0 - "ЗАКРЫВАЕТСЯ"
 #define LED_FAULT_MASK		BIT3	// Индикатор "АВАРИЯ". 1 - авария на блоке, 0 - нет аварий
 #define LED_DEFECT_MASK		BIT4	// Индикатор "Режим программирования". 0 - режим прогр. выкл., 1 - режим прогр. вкл.
 #define LED_MUFTA_MASK		BIT5
 #define LED_OPEN_MASK		BIT6	// Индикатор "ОТКРЫТО/ОТКРЫВАЕТСЯ". 1 - "ОТКРЫТО", 1,0,1,0 - "ОТКРЫВАЕТСЯ"
-#define LED_OPENING_MASK	BIT7
+#define LED_MPO_MASK		BIT7
 #define LED_MUDU_MASK		BIT8
 #define LED_BLUETOOTH_MASK	BIT9	// Индикатор "ОТКРЫТО/ОТКРЫВАЕТСЯ". 1 - "ОТКРЫТО", 1,0,1,0 - "ОТКРЫВАЕТСЯ"
 			   
@@ -46,14 +42,14 @@ typedef struct
 typedef union {
 	Uns all;
   	struct {
-		Uns Closing:1;		// 0	Светодиод "Закрывается"
-		Uns MuDu:1;		// 8	Светодиод "Му/Ду"
+		Uns Mpz:1;			// 0	Светодиод "МПЗ"
+		Uns MuDu:1;			// 8	Светодиод "Му/Ду"
 		Uns Close:1;		// 2	Светодиод "Закрыто"
 		Uns Fault:1;		// 3	Светодиод "Авария"
 		Uns Defect:1;		// 4    Светодиод "Неисправность"
 		Uns Mufta:1;		// 5	Светодиод "Муфта"
 		Uns Open:1;			// 6	Светодиод "Открыто"
-		Uns Opening:1;		// 7	Светодиод "Открывается"
+		Uns Mpo:1;			// 7	Светодиод "МПО"
 		Uns	Connect:1;		// 1 	Светодиод "Сеть"
 		Uns Bluetooth:1;	// 9	Светодиод "Работа Bluetooth"
      	Uns rsvd:6; 		// 10-15  Резерв
@@ -70,8 +66,8 @@ typedef struct
 	TLedParams 	ledBluetooth;	// Светодиод "МУ/ДУ"
 	TLedParams	ledConnect;		// Светодиод "Спящий режим"
 	TLedParams	ledMufta;
-	TLedParams	ledOpening;
-	TLedParams	ledClosing;
+	TLedParams	ledMpo;
+	TLedParams	ledMpz;
 	TLedParams	ledMuDu;
 	TLedReg		leds;
 	Uns 		*pStatus;		// Указатель на статус ядра

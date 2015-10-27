@@ -8,7 +8,6 @@
 #include "stat.h"
 
 TRam			g_Ram;
-
 extern void InterruptInit  (void);
 extern void InterruptUpdate(void);
 
@@ -28,7 +27,7 @@ void main(void)
 	Peref_Init(&g_Peref);
 	Stat_Init(&g_Stat);
 
-	MonitorInit();
+//	MonitorInit();
 
 	StartCpuTimer0();
 
@@ -39,16 +38,16 @@ void main(void)
 
 	while(1)
 	{
-
 		Comm_Update(&g_Comm);
 		ImUpdate(&g_Stat.Im);
-
 	}
 }
+
 
 interrupt void CpuTimer0IsrHandler(void)	//	18 000
 {
     InterruptUpdate();
+
     PieCtrlRegs.PIEACK.bit.ACK1 = 1;
 }
 

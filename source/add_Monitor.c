@@ -81,9 +81,9 @@ void MonitorUpdate(void)
 	 	case 2: DlogCh1 = (Uns)g_Peref.sensObserver.IUinp;
 	 		 	DlogCh2 = (Uns)(g_Peref.sensObserver.IUout); break;
 	 	case 3: DlogCh1 = AdcRegs.ADCRESULT10;
-	 		 		 	DlogCh2 = (Uns)(g_Peref.U3fltrStop.Output); break;
+	 		 		 	DlogCh2 = (Uns)(g_Peref.U3fltrStopOpen.Output); break;
 	 	case 4: DlogCh1 = AdcRegs.ADCRESULT10;
-	 		 		 	DlogCh2 = (Uns)(g_Peref.U3fltrStop.Output); break;
+	 		 		 	DlogCh2 = (Uns)(g_Peref.U3fltrStopClose.Output); break;
 
 		default: return;
 	}

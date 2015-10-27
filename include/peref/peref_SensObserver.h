@@ -43,16 +43,16 @@ typedef struct {
 	Uns				*p_UOpen_Offset;		// Сдвиг для напряжения сигнала Open
 	Uns				*p_UClose_Mpy;			// Мультипликатор для напряжения сигнала Close
 	Uns				*p_UClose_Offset;		// Сдвиг для напряжения сигнала Close
-	Uns				*p_UStop_Mpy;			// Мультипликатор для напряжения сигнала Stop
-	Uns				*p_UStop_Offset;		// Сдвиг для напряжения сигнала Stop
+	Uns				*p_UStopOpen_Mpy;		// Мультипликатор для напряжения сигнала StopOpen
+	Uns				*p_UStopOpen_Offset;	// Сдвиг для напряжения сигнала StopOpen
+	Uns				*p_UStopClose_Mpy;		// Мультипликатор для напряжения сигнала StopClose
+	Uns				*p_UStopClose_Offset;	// Сдвиг для напряжения сигнала StopClose
 	Uns				*p_UMu_Mpy;				// Мультипликатор для напряжения сигнала MU
 	Uns				*p_UMu_Offset;			// Сдвиг для напряжения сигнала MU
-	Uns				*p_UResetAlarm_Mpy;		// Мультипликатор для напряжения сигнала ResetAlarm
-	Uns				*p_UResetAlarm_Offset;	// Сдвиг для напряжения сигнала ResetAlarm
-	Uns				*p_UReadyTu_Mpy;		// Мультипликатор для напряжения сигнала ReadyTU
-	Uns				*p_UReadyTu_Offset;		// Сдвиг для напряжения сигнала ReadyTu
 	Uns				*p_UDu_Mpy;				// Мультипликатор для напряжения сигнала DU
 	Uns				*p_UDu_Offset;			// Сдвиг для напряжения сигнала DU
+	Uns				*p_UResetAlarm_Mpy;		// Мультипликатор для напряжения сигнала ResetAlarm
+	Uns				*p_UResetAlarm_Offset;	// Сдвиг для напряжения сигнала ResetAlarm
 } TDigSinalParams;
 
 // Режим подстройки оффсетов
@@ -87,19 +87,19 @@ typedef struct {
 
 	float32				UOpenInp;		// Вход: напряжение
 	float32 			UCloseInp;		// Вход: напряжение
-	float32 			UStopInp;		// Вход: напряжение
+	float32 			UStopOpenInp;	// Вход: напряжение
+	float32 			UStopCloseInp;	// Вход: напряжение
 	float32 			UMuInp;			// Вход: напряжение
-	float32 			UResetAlarmInp;	// Вход: напряжение
-	float32 			UReadyTuInp;	// Вход: напряжение
 	float32 			UDuInp;			// Вход: напряжение
+	float32 			UResetAlarmInp;	// Вход: напряжение
 
 	float32				UOpenOut;		// Вход: напряжение
 	float32 			UCloseOut;		// Вход: напряжение
-	float32 			UStopOut;		// Вход: напряжение
+	float32 			UStopOpenOut;	// Вход: напряжение
+	float32 			UStopCloseOut;	// Вход: напряжение
 	float32 			UMuOut;			// Вход: напряжение
-	float32 			UResetAlarmOut;	// Вход: напряжение
-	float32 			UReadyTuOut;	// Вход: напряжение
 	float32 			UDuOut;			// Вход: напряжение
+	float32 			UResetAlarmOut;	// Вход: напряжение
 
 } TSensTuObserver;
 

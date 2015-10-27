@@ -37,9 +37,10 @@
 #define POS_ERR		10
 
 // Состояния входов ТУ
-#define TU_OPEN		0x1
-#define TU_CLOSE	0x2
-#define TU_STOP		0x4
+#define TU_OPEN			0x1
+#define TU_CLOSE		0x2
+#define TU_STOP_OPEN	0x4
+#define TU_STOP_CLOSE	0x8
 
 #define VLV_CLB_FLAG    0x03
 //--------------------- Макросы --------------------------------------------
