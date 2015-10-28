@@ -32,9 +32,9 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	//---------ЗАЩИТЫ ПО НАПРЯЖЕНИЮ---------------------------------------
 	//---------Пониженное напряжение (авария)---------------------------------------
 
-	p->underVoltageR.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,UvR_bit,20);
-	p->underVoltageS.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,UvS_bit,20);
-	p->underVoltageT.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL,UvT_bit,20);
+	p->underVoltageR.Cfg.all 		= PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_LESS_LEVEL,UvR_bit,20);
+	p->underVoltageS.Cfg.all 		= PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_LESS_LEVEL,UvS_bit,20);
+	p->underVoltageT.Cfg.all 		= PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_LESS_LEVEL,UvT_bit,20);
 
 	p->underVoltageR.Input 			= (Int *)&g_Ram.ramGroupA.Ur;
 	p->underVoltageS.Input 			= (Int *)&g_Ram.ramGroupA.Us;
@@ -91,9 +91,9 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underDefVoltageT.Scale 		= PROTECT_SCALE;
 
 	//---------Повышенное напряжение (авария)------------------------------------------
-	p->overVoltageR.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,OvR_bit,20);
-	p->overVoltageS.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,OvS_bit,20);
-	p->overVoltageT.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,OvT_bit,20);
+	p->overVoltageR.Cfg.all 		= PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_GREATER_LEVEL,OvR_bit,20);
+	p->overVoltageS.Cfg.all 		= PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_GREATER_LEVEL,OvS_bit,20);
+	p->overVoltageT.Cfg.all 		= PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_GREATER_LEVEL,OvT_bit,20);
 
 	p->overVoltageR.Input 			= (Int *)&g_Ram.ramGroupA.Ur;
 	p->overVoltageS.Input 			= (Int *)&g_Ram.ramGroupA.Us;
@@ -149,9 +149,9 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overDefVoltageT.Scale 		= PROTECT_SCALE;
 
 	//---------Повышенное напряжение на 47% (АВАРИЯ) ------------------------------------------
-	p->overMax_VoltageR.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,OvR_max_bit,20);
-	p->overMax_VoltageS.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,OvS_max_bit,20);
-	p->overMax_VoltageT.Cfg.all 		= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,OvT_max_bit,20);
+	p->overMax_VoltageR.Cfg.all 		= PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_GREATER_LEVEL,OvR_max_bit,20);
+	p->overMax_VoltageS.Cfg.all 		= PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_GREATER_LEVEL,OvS_max_bit,20);
+	p->overMax_VoltageT.Cfg.all 		= PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_GREATER_LEVEL,OvT_max_bit,20);
 
 	p->overMax_VoltageR.Input 		= (Int *)&g_Ram.ramGroupA.Ur;
 	p->overMax_VoltageS.Input 		= (Int *)&g_Ram.ramGroupA.Us;
@@ -311,7 +311,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underColdBCD.Scale			= PROTECT_SCALE;
 
 	//------Перегрев блока БКП----------------------------------------------
-	p->overHeatBCP.Cfg.all			= PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL,Th_BCP_bit,1);
+	p->overHeatBCP.Cfg.all			= PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_GREATER_LEVEL,Th_BCP_bit,1);
 	p->overHeatBCP.Input			= &g_Ram.ramGroupA.TemperBKP;
 	p->overHeatBCP.Output			= &p->outFaults.Dev.all;
 	p->overHeatBCP.EnableLevel		= &g_Ram.ramGroupC.TemperHigh;
@@ -484,18 +484,18 @@ void EngPhOrdPrt(TCoreProtections *p)
 void Core_ProtectionsReset(TCoreProtections *p)
 {
 	g_Core.MotorControl.OverWayFlag = 0;		// Сбросили отсусвие уплотнения
-	p->MuffFlag = 0;							// отчистили статус от аварии муфты и неисправености
-	p->outFaults.Proc.bit.Mufta = 0;
+//	p->MuffFlag = 0;							// отчистили статус от аварии муфты и неисправености
+//	p->outFaults.Proc.bit.Mufta = 0;
 	g_Core.Status.bit.Defect = 0;
 	g_Core.Status.bit.Fault = 0;
 	g_Core.Status.bit.Mufta = 0;
 	p->NoMoveFlag=0;
 
-	p->outDefects.Proc.bit.Mufta=0;
-	p->outFaults.Proc.bit.Mufta=0;
+//	p->outDefects.Proc.bit.Mufta=0;
+//	p->outFaults.Proc.bit.Mufta=0;
 
-	p->outDefects.Proc.bit.NoMove=0;
-	p->outFaults.Proc.bit.NoMove=0;
+//	p->outDefects.Proc.bit.NoMove=0;
+//	p->outFaults.Proc.bit.NoMove=0;
 
 	p->outDefects.Load.bit.ISkew = 0;
 	p->outDefects.Load.bit.PhlU = 0;
@@ -504,8 +504,8 @@ void Core_ProtectionsReset(TCoreProtections *p)
 	p->registerBrCurr = 0;
 
 	p->outDefects.Proc.bit.Overway = 0;
-	p->outDefects.Proc.bit.NoMove = 0;
-	p->outFaults.Proc.bit.NoMove = 0;
+//	p->outDefects.Proc.bit.NoMove = 0;
+//	p->outFaults.Proc.bit.NoMove = 0;
 }
 
 // Сброс всех защит

@@ -15,13 +15,13 @@ Byte testLeds=0;
 #define INSIDE_FRAME	3
 
 #define BOF				0xC0
-#define XBOF				0xFF
+#define XBOF			0xFF
 #define EOF				0xC1
-#define CE					0x7D
-#define TRANS				0x20
+#define CE				0x7D
+#define TRANS			0x20
 
-#define INIT_FCS			0xFFFF
-#define GOOD_FCS			0x0000
+#define INIT_FCS		0xFFFF
+#define GOOD_FCS		0x0000
 #define GENER_FCS		0xA001
 
 #define FCS_CALC(crc, c)	((crc >> 8) ^ fcsTable[(crc ^ c) & 0xFF])
@@ -170,6 +170,8 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 
 	bPort->TxPacket.Data[4] = g_Ram.ramGroupH.BkpIndication;// индикация светодиодов
 	bPort->TxPacket.Data[5] = g_Core.Temper.OnOffTEN;		// управление теном
+	bPort->TxPacket.Data[6] = g_Ram.ramGroupA.PositionPr;	// положение в %
+	bPort->TxPacket.Data[7] = g_Peref.Display.data;			// код аварий
 
 	if(!bPort->RxPacket.Flag) return;
 	bPort->RxPacket.Flag = 0;

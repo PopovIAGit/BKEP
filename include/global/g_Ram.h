@@ -381,17 +381,16 @@ typedef struct _TRamGroupH
 	Uns             Password1;           // H6. 316 Основной пароль
 	Uns             Password2;           // H7. 317 Заводской пароль
 	Uns             ScFaults;            // H8. 318 Аварии КЗ
-	Uns				Rsvd6;				 // H98. 408
+	Uns				Rsvd6;				 // H98. 319
 	Uns             CycleCnt;            // H10. 320 Счетчик циклов
-	Uns             Rsvd10;              // H10. 320 Счетчик циклов
-	Uns             Rsvd11;              // H10. 320 Счетчик циклов
+	Uns             Rsvd11;              // H10. 321 Счетчик циклов
 	Uns				CmdButton;			 // H12. 322 Команда с ручек управления
 	Uns				Rsvd1[3];			 // H13-15. 323-325 Резерв
 	Uns				TransCurr;			 // H16. 326 Ток перехода
 	TCubArray		TqCurr;				 // H17-36. 327-346 Ток поверхности
 	TCubArray		TqAngUI;			 // H37-56. 347-366 Углы нагрузки
 	TCubArray		TqAngSf;			 // H57-76. 367-386 Углы СИФУ
-	Uns				Rsvd7;				 // H98. 408
+	Uns				Rsvd7;				 // H98. 387
 	Uns             TuState;             // H78. 388 Команды ТУ (открыть закрыть стопО СтопЗ)
   	Uns             Ur;                  // H79. 389 Напряжение фазы R
   	Uns             Us;                  // H80. 390 Напряжение фазы S
