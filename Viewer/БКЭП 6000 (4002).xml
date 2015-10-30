@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Table DeviceId="6000" DeviceName="БКЭП" FirmwareVersion="4002">
   <Group Name="Группа A" Type="Show" Description="Индикация">
-    <Parameter Index="A1" Name="Статус работы">
+    <Parameter Index="A0" Name="Статус работы">
       <Address>500</Address>
       <Configuration>
         <Type>Public</Type>
