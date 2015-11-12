@@ -33,6 +33,31 @@ Uns Comm_LocalButtonUpdate(TCommMPU *p)
 {
 	Uns result;
 
+	if (g_Ram.ramGroupC.HallBlock.bit.StateCalib==1 && (g_Peref.Position.CancelFlag))
+	{
+		if (p->inputBCP_Data->bit.Open)
+		{
+			if (++p->btn1Param.timer > p->btn1Param.timeout*10)
+			{
+				p->btn1Param.timer = 0;
+				if (g_Ram.ramGroupA.Faults.Proc.bit.NoOpen==1) g_Ram.ramGroupD.TaskOpen = trTask; //задать
+				else g_Ram.ramGroupD.TaskOpen = trReset; //сбросить
+			}
+		}
+		if (p->inputBCP_Data->bit.Close)
+		{
+			if (++p->btn2Param.timer > p->btn2Param.timeout*10)
+			{
+				p->btn2Param.timer = 0;
+				if (g_Ram.ramGroupA.Faults.Proc.bit.NoClose==1) g_Ram.ramGroupD.TaskClose = trTask;//задать
+				else g_Ram.ramGroupD.TaskClose = trReset; //сбросить
+			}
+		}
+
+		result = 0;
+		return result;
+	}
+
 	if (!p->inputBCP_Data->all
 			|| ((p->inputBCP_Data->all & hmClose)
 					&& (p->inputBCP_Data->all & hmOpen)))

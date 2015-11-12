@@ -47,7 +47,8 @@ typedef union _THallBlock {
 		Uns Close:1;      // 1     Закрыть
 		Uns StopMU:1;     // 2     Стоп/МУ
 		Uns StopDU:1;     // 3     Стоп/ДУ
-		Uns Rsvd:12;      // 4-15  Резерв
+		Uns StateCalib:1; // 4     Флаг режима калибровки
+		Uns Rsvd:11;      // 5-15  Резерв
 	} bit;
 } THallBlock;
 

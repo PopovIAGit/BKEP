@@ -78,6 +78,7 @@ TPeriodicalFunction Task2kHz[] =          //Ќе более 8-х задач
 	PrdElemInit(FM25V10_Update,							&Eeprom1),		//на 2 к√ц
 	PrdElemInit(FM25V10_Update,							&Eeprom2),		//на 2 к√ц
 
+
 };
 // ================================ 200 √ц ==================================
 
@@ -90,7 +91,7 @@ TPeriodicalFunction Task200Hz[] =       	//не более  20-ти задач
 	PrdElemInit(LogCmdControl,							&g_Stat),
 	PrdElemInit(LogParamMbExec,							&g_Stat),
 	PrdElemInit(LogParamControl,						&g_Stat),
-	PrdElemInit(ImTimer,				                &g_Stat.Im),// на 200√ц
+	PrdElemInit(ImTimer,				                &g_Stat.Im),// на 200√
 	PrdElemInit(DisplDrvUpdate,             			&g_Peref.Display),
 };
 

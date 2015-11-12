@@ -69,7 +69,7 @@ void Peref_LedsUpdate(pLeds p)
 
 //	if (g_Comm.Bluetooth.State<7) return;
 
-	g_Ram.ramGroupH.BkpIndication = 0;
+	g_Ram.ramGroupH.BkpIndication.all = 0;
 
 	if (g_Comm.mbAsu.Serial.RsState==0) BlinkConnect++;
 	if (g_Comm.mbBkp.Frame.ConnFlag==1) BlinkConnect++;
@@ -165,13 +165,13 @@ void Peref_LedsUpdate(pLeds p)
 	    p->leds.bit.MuDu = 1;
 	}
 
-	LED_MUFTA	=  p->leds.bit.Mufta;		//DELAY_US(1);
-	LED_DEFECT	=  p->leds.bit.Defect;		//DELAY_US(1);
-	LED_FAULT	=  p->leds.bit.Fault;		//DELAY_US(1);
+	LED_MUFTA	=  p->leds.bit.Mufta;		asm(" RPT #9 || NOP");
+	LED_DEFECT	=  p->leds.bit.Defect;		asm(" RPT #9 || NOP");
+	LED_FAULT	=  p->leds.bit.Fault;		asm(" RPT #9 || NOP");
 
-	LED_MPZ = p->leds.bit.Mpz;				//DELAY_US(1);
-	LED_MPO = p->leds.bit.Mpo;				//DELAY_US(1);
-	LED_MUDU	= !p->leds.bit.MuDu;		//DELAY_US(1);
+	LED_MPZ = p->leds.bit.Mpz;				asm(" RPT #9 || NOP");
+	LED_MPO = p->leds.bit.Mpo;				asm(" RPT #9 || NOP");
+	LED_MUDU	= !p->leds.bit.MuDu;		asm(" RPT #9 || NOP");
 
 	if ((!(*p->pStatus & STATUS_CLOSED)) && (!(*p->pStatus & STATUS_OPENED)))
 	{
@@ -183,12 +183,20 @@ void Peref_LedsUpdate(pLeds p)
 		p->leds.bit.Close = 0;
 		p->leds.bit.Open = 0;
 	} else {
-		LED_OPEN	= p->leds.bit.Open;		//DELAY_US(1);
-		LED_CLOSE 	= p->leds.bit.Close;	//DELAY_US(1);
+		LED_OPEN	= p->leds.bit.Open;		asm(" RPT #9 || NOP");
+		LED_CLOSE 	= p->leds.bit.Close;	asm(" RPT #9 || NOP");
 	}
 
-	g_Ram.ramGroupH.BkpIndication = (~p->leds.all) & 0x00FF;
+	//g_Ram.ramGroupH.BkpIndication = (~p->leds.all) & 0x00FF;
 
+	g_Ram.ramGroupH.BkpIndication.bit.MuDu  = ~p->leds.bit.MuDu;
+	g_Ram.ramGroupH.BkpIndication.bit.Open  = ~p->leds.bit.Open;
+	g_Ram.ramGroupH.BkpIndication.bit.Mpo   = ~p->leds.bit.Mpo;
+	g_Ram.ramGroupH.BkpIndication.bit.Fault = ~p->leds.bit.Fault;
+	g_Ram.ramGroupH.BkpIndication.bit.Close = ~p->leds.bit.Close;
+	g_Ram.ramGroupH.BkpIndication.bit.Mpz   = ~p->leds.bit.Mpz;
+	g_Ram.ramGroupH.BkpIndication.bit.Defect= ~p->leds.bit.Defect;
+	g_Ram.ramGroupH.BkpIndication.bit.Mufta = ~p->leds.bit.Mufta;
 
 }
 //--------------------------------------------------------

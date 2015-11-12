@@ -436,7 +436,7 @@ typedef struct _TRamGroupH
 	TContactorGroup ContGroup;			 // H126. 436 Управление контакторами
 	TBurCmd 		LogControlWord;		 // H127. 437 Команды БУР
 	Uns				LogReset;			 // H128. 438 Сброс журналов
-	Uns 			BkpIndication;		 // H129. 439 Индикация на БКП
+	TLedRegBKP 		BkpIndication;		 // H129. 439 Индикация на БКП
 	//-------------------------------
 	Uns 			Rsvd9[59];			 // H130-189. 440-499 Резерв
 } TRamGroupH;

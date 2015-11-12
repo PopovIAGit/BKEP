@@ -56,6 +56,21 @@ typedef union {
   } bit;
 } TLedReg;
 
+typedef union {
+	Uns all;
+  	struct {
+		Uns MuDu:1;			// 0	Светодиод "Му/Ду"
+		Uns Open:1;			// 1	Светодиод "Открыто"
+		Uns Mpo:1;			// 2	Светодиод "МПО"
+		Uns Fault:1;		// 3	Светодиод "Авария"
+		Uns Close:1;		// 4	Светодиод "Закрыто"
+		Uns Mpz:1;			// 5	Светодиод "МПЗ"
+		Uns Defect:1;		// 6    Светодиод "Неисправность"
+		Uns Mufta:1;		// 7	Светодиод "Муфта"
+     	Uns rsvd:8; 		// 8-15  Резерв
+  } bit;
+} TLedRegBKP;
+
 typedef struct
 {
 	TLedParams 	ledCntr;		// Светодиод на тыльной стороне платы
