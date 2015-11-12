@@ -165,31 +165,36 @@ void Peref_LedsUpdate(pLeds p)
 	    p->leds.bit.MuDu = 1;
 	}
 
-	LED_MUFTA	=  p->leds.bit.Mufta;		//DELAY_US(1);
-	LED_DEFECT	=  p->leds.bit.Defect;		//DELAY_US(1);
-	LED_FAULT	=  p->leds.bit.Fault;		//DELAY_US(1);
 
-	LED_MPZ = p->leds.bit.Mpz;				//DELAY_US(1);
-	LED_MPO = p->leds.bit.Mpo;				//DELAY_US(1);
-	LED_MUDU	= !p->leds.bit.MuDu;		//DELAY_US(1);
-
-	if ((!(*p->pStatus & STATUS_CLOSED)) && (!(*p->pStatus & STATUS_OPENED)))
+	if (g_Ram.ramGroupG.Mode)
 	{
-		GpioDataRegs.GPADAT.all &=~ 0x2400000;
-		//LED_OPEN = 0;
-		//DELAY_US(1);
-		//LED_CLOSE = 0;
-		//DELAY_US(1);
-		p->leds.bit.Close = 0;
-		p->leds.bit.Open = 0;
-	} else {
-		LED_OPEN	= p->leds.bit.Open;		//DELAY_US(1);
-		LED_CLOSE 	= p->leds.bit.Close;	//DELAY_US(1);
+		p->leds.all =  g_Ram.ramGroupG.LedsReg.all;
 	}
 
-	g_Ram.ramGroupH.BkpIndication = (~p->leds.all) & 0x00FF;
+		LED_MUFTA	=  p->leds.bit.Mufta;		//DELAY_US(1);
+		asm(" RPT #9 || NOP");
+		LED_DEFECT	=  p->leds.bit.Defect;		//DELAY_US(1);
+		LED_FAULT	=  p->leds.bit.Fault;		//DELAY_US(1);
 
+		LED_MPZ 	= p->leds.bit.Mpz;				//DELAY_US(1);
+		LED_MPO 	= p->leds.bit.Mpo;				//DELAY_US(1);
+		LED_MUDU	= !p->leds.bit.MuDu;		//DELAY_US(1);
 
+		if ((!(*p->pStatus & STATUS_CLOSED)) && (!(*p->pStatus & STATUS_OPENED)))
+		{
+			GpioDataRegs.GPADAT.all &=~ 0x2400000;
+			//LED_OPEN = 0;
+			//DELAY_US(1);
+			//LED_CLOSE = 0;
+			//DELAY_US(1);
+			p->leds.bit.Close = 0;
+			p->leds.bit.Open = 0;
+		} else {
+			LED_OPEN	= p->leds.bit.Open;		//DELAY_US(1);
+			LED_CLOSE 	= p->leds.bit.Close;	//DELAY_US(1);
+		}
+
+		g_Ram.ramGroupH.BkpIndication = (~p->leds.all) & 0x00FF;
 }
 //--------------------------------------------------------
 

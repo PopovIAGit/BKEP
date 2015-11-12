@@ -261,7 +261,7 @@ typedef struct _TRamGroupC
 	Uns             BvLevel;   			// C68. 158 Уровень обрыва входных фаз
 	Uns				BvLevelMove;		// C69. 159 Уровень обрыва питающих фаз в движении
 	Uns             BvTime;    			// C70. 160 Время обрыва входных фаз
-	Uns				Rsvd10;				// C71  161 Тут были уровни и задержка для старого КЗ
+	Uns				Rsvd14;				// C71  161 резерв
 	TPrtMode        Phl;           		// C72. 162 Защита от обрыва фаз нагрузки
 	Uns             PhlLevel;      		// C73. 163 Уровень обрыва фаз
 	Uns             PhlTime;       		// C74. 164 Время определения обрыва фаз
@@ -276,9 +276,7 @@ typedef struct _TRamGroupC
 	TPrtMode        CalibIndic;         // C91. 181 Индикация калибровки
 	TPrtMode        ErrIndic;           // C92. 182 Индикация аварий устройства
 	TPrtMode        TemperTrack;        // C93. 183 Защита от перегрева/переохлаждения блока
-	Int             TemperHigh;         // C94. 184 Уровень перегрева блока
-	Int				TemperHighDef;		// C95. 185
-	Int             TemperLow;          // C96. 186 Уровень переохлаждения блока
+	Int				Rsvd13[3];			// C94 - 96. Резерв
 	Int             TenOnValue;         // C97. 187 Уровень включения ТЕНа
 	Int             TenOffValue;        // C98. 188 Уровень выключения ТЕНа
 	Uns 			Rsvd11[4];			// С99-102.  189-192 резерв
@@ -361,11 +359,8 @@ typedef struct _TRamGroupG
 	Int			   DacValue;			// G3. 283 Значение ЦАП
 	Uns			   DisplShow;			// G4. 284 Старт дисплея
 	Uns			   TestCamera;			// G5. 285 Тест с камеры
-	Uns			   ThyrGroup;			// G6. 286 Выбор группы тиристоров
-	Uns            SifuEnable;          // G7. 287 Разрешение работы СИФУ
-	Uns			   Rsvd2[10];			// G8-17. 288-297-Резерв
-	Uns			   ThyrOpenAngle;		// G18. 298 Тестовый угол открытия
-	Uns			   DiscrInTest;			// G19. 299 Тест дискретных входов
+	Uns			   Rsvd2[13];			// G6-18. 286-298-Резерв
+	Uns			   DiscrInTest;			// G19. 299 Тест дискретных входов	// НЕ РЕАЛИЗОВАННО
 	Uns			   DiscrOutTest;		// G20. 300 Тест дискретных выходов
 	Bool		   IsDiscrTestActive;	// G21. 301 Активен ли тест ТС/ТУ
 	Uns 		   Rsvd[8];			    // G22-29. 302-309 Резерв
@@ -381,9 +376,9 @@ typedef struct _TRamGroupH
 	Uns             Password1;           // H6. 316 Основной пароль
 	Uns             Password2;           // H7. 317 Заводской пароль
 	Uns             ScFaults;            // H8. 318 Аварии КЗ
-	Uns				Rsvd6;				 // H98. 319
+	Uns				MuffFault;			 // H9. 319 Запись аварии МУФТА
 	Uns             CycleCnt;            // H10. 320 Счетчик циклов
-	Uns             Rsvd11;              // H10. 321 Счетчик циклов
+	Uns             TemperBCPFault;      // H11. 321 запись аварии ТЕМПЕРАТУРА БКП 110
 	Uns				CmdButton;			 // H12. 322 Команда с ручек управления
 	Uns				Rsvd1[3];			 // H13-15. 323-325 Резерв
 	Uns				TransCurr;			 // H16. 326 Ток перехода
@@ -600,6 +595,8 @@ typedef struct TRam
 #define REG_CYCLE_CNT		GetAdr(ramGroupH.CycleCnt)
 #define REG_SET_DEFAULTS	GetAdr(ramGroupC.SetDefaults)
 #define REG_SHC_FAULT		GetAdr(ramGroupH.ScFaults)
+#define REG_MUFF_FAULT		GetAdr(ramGroupH.MuffFault)
+#define REG_TEMP_BCP_FAULT	GetAdr(ramGroupH.TemperBCPFault)
 /*
 #define REG_TASK_TIME		GetAdr(ramGroupD.TASK_TIME)
 #define REG_TASK_DATE		GetAdr(ramGroupD.TASK_DATE)

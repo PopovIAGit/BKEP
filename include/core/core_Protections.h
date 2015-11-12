@@ -156,12 +156,13 @@ typedef struct {
 //------------------- Глобальные переменные --------------------------------
 //------------------- Протатипы функций ------------------------------------
 
-void Core_ProtectionsInit(TCoreProtections *);		// Инициализация модуля защит
-void Core_ProtectionsUpdate(TCoreProtections *);	// Реакция системы на срабатывание защит
-void Core_ProtectionsReset(TCoreProtections *);		// Сброс защит при повторном пуске
-void Core_ProtectionsClear(TCoreProtections *);		// Сброс всех защит
-void Core_ProtectionsEnable(TCoreProtections *);	// Включение/Выключение защит
-void Core_DevProc_FaultIndic(TCoreProtections *);	// Индикация ошибок устройства и технологического процесса
-void EngPhOrdPrt(TCoreProtections *);				// неверное чередование фаз двигателя
+void Core_ProtectionsInit(TCoreProtections *);			// Инициализация модуля защит
+void Core_Protections18kHzUpdate(TCoreProtections *);	// Реакция системы на срабатывание защит
+void Core_Protections50HZUpdate(TCoreProtections *);	// Реакция системы на срабатывание защит 50 хз
+void Core_ProtectionsReset(TCoreProtections *);			// Сброс защит при повторном пуске
+void Core_ProtectionsClear(TCoreProtections *);			// Сброс всех защит
+void Core_ProtectionsEnable(TCoreProtections *);		// Включение/Выключение защит
+void Core_DevProc_FaultIndic(TCoreProtections *);		// Индикация ошибок устройства и технологического процесса
+void EngPhOrdPrt(TCoreProtections *);					// неверное чередование фаз двигателя
 
 #endif

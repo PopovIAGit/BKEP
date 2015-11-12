@@ -22,6 +22,13 @@ void Core_DisplayFaultsInit(TCoreDislpayFaults *p)
 
 void Core_DisplayFaultsUpdate(TCoreDislpayFaults *p)
 {
+
+	if(g_Ram.ramGroupG.Mode)
+	{
+		g_Peref.Display.data = g_Ram.ramGroupG.DisplShow;
+		return;
+	}
+
 	// если нет не одной аварии гасим дисплей
 	if (!g_Ram.ramGroupA.Faults.Dev.all && !g_Ram.ramGroupA.Faults.Proc.all && !g_Ram.ramGroupA.Faults.Net.all && !g_Ram.ramGroupA.Faults.Load.all)
 	{
