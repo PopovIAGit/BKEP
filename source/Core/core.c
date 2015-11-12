@@ -309,6 +309,26 @@ void Core_ControlMode(TCore *p) // 50 Ãö
 {
     p->Status.bit.Mufta = p->Protections.outFaults.Proc.bit.Mufta;
 
+    if(p->Status.bit.Stop)
+    {
+    	if(!InRange(g_Peref.sensObserver.IUout,-0.5, 0.5))
+    	{
+    		if(g_Peref.sensObserver.IUout > 0) g_Ram.ramGroupC.IU_Offset++;
+    		if(g_Peref.sensObserver.IUout < 0) g_Ram.ramGroupC.IU_Offset--;
+    	}
+    	if(!InRange(g_Peref.sensObserver.IVout,-0.5, 0.5))
+    	{
+    		if(g_Peref.sensObserver.IVout > 0) g_Ram.ramGroupC.IV_Offset++;
+    		if(g_Peref.sensObserver.IVout < 0) g_Ram.ramGroupC.IV_Offset--;
+    	}
+    	if(!InRange(g_Peref.sensObserver.IWout,-0.5, 0.5))
+    	{
+    		if(g_Peref.sensObserver.IWout > 0) g_Ram.ramGroupC.IW_Offset++;
+    		if(g_Peref.sensObserver.IWout < 0) g_Ram.ramGroupC.IW_Offset--;
+    	}
+
+    }
+
     switch(p->MotorControl.WorkMode)
     {
     case wmStop:		StopMode();	break;

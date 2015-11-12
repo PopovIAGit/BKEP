@@ -156,8 +156,8 @@ void g_Ram_Update(TRam *p)
 	    p->ramGroupH.ISkewValue = 0;
 	}
 
-    //p->ramGroupA.Speed = g_Peref.Position.speedRPM;
-    p->ramGroupA.Speed = LVS_flag;
+    p->ramGroupA.Speed = g_Peref.Position.speedRPM;
+  //  p->ramGroupA.Speed = LVS_flag;
     p->ramGroupA.CycleCnt = p->ramGroupH.CycleCnt;
 
     p->ramGroupA.Position 		= p->ramGroupH.Position;

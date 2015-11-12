@@ -24,7 +24,6 @@ typedef void (*TCsFunc)(Byte);
 typedef union _TShiftReg {
 	Uns all;
 	struct {
-
 		Uns D_Out1:1;			// 1-1
 		Uns D_Out2:1;			// 1-2
      	Uns D_Out3:1;    		// 2-1
@@ -41,7 +40,6 @@ typedef union _TShiftReg {
      	Uns D_Out14:1;			// 7 2
      	Uns D_Out15:1;			// 8 1
 		Uns D_Out16:1;			// 8 2
-
 	} bit;
 } TShiftReg;
 
@@ -53,7 +51,6 @@ typedef struct TPeref_74hc595 {
 	TShiftReg  	ShiftReg;				// Текущий считанный байт
 	Uns			Data;
 	Uns			EmptyData;				// Отключение неиспользуемых реле в третьей микросхеме в каскаде
-
 	TCsFunc CsFunc;						// Функция chip select'а
 
 } TPeref_74hc595;

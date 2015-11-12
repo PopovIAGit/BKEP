@@ -63,7 +63,7 @@ TPeriodicalFunction Task18kHz[] =
 	PrdElemInit(Peref_SensTuObserverUpdate,				&g_Peref.InDigSignalObserver),
 	PrdElemInit(Peref_18kHzCalc,						&g_Peref),
 	PrdElemInit(SciMasterConnBetweenBlockCommTimer,		&g_Comm.mbBkp),	//на 18к√ц
-	PrdElemInit(Core_ProtectionsUpdate,					&g_Core.Protections),
+	PrdElemInit(Core_Protections18kHzUpdate,			&g_Core.Protections),
 };
 
 //—юда вставл€ем функции дл€ соответствующей группы
@@ -140,6 +140,8 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(Comm_50HzCalc,					&g_Comm),
 	PrdElemInit(GetCurrentCmd,					&g_Stat),
 	PrdElemInit(Core_MenuDisplay,				&g_Core.menu),
+	PrdElemInit(Core_Protections50HZUpdate,		&g_Core.Protections),
+
 };
 
 // ================================ 10 √ц ==================================

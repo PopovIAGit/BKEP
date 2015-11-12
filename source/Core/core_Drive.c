@@ -106,7 +106,7 @@
 					g_Ram.ramGroupC.GearRatio = GearRatioDef[g_Ram.ramGroupC.DriveType - 1];
 					g_Ram.ramGroupC.Inom = InomDef[g_Ram.ramGroupC.DriveType - 1];
 					g_Ram.ramGroupC.MaxTorque = MomMaxDef[g_Ram.ramGroupC.DriveType - 1];
-					WriteToEeprom(144, &g_Ram.ramGroupC.MaxTorque, 3);
+					WriteToEeprom(REG_MAX_TRQE, &g_Ram.ramGroupC.MaxTorque, 3);
 				}
 			}
 		}

@@ -198,6 +198,21 @@ void Peref_LedsUpdate(pLeds p)
 	g_Ram.ramGroupH.BkpIndication.bit.Defect= ~p->leds.bit.Defect;
 	g_Ram.ramGroupH.BkpIndication.bit.Mufta = ~p->leds.bit.Mufta;
 
+		if ((!(*p->pStatus & STATUS_CLOSED)) && (!(*p->pStatus & STATUS_OPENED)))
+		{
+			GpioDataRegs.GPADAT.all &=~ 0x2400000;
+			//LED_OPEN = 0;
+			//DELAY_US(1);
+			//LED_CLOSE = 0;
+			//DELAY_US(1);
+			p->leds.bit.Close = 0;
+			p->leds.bit.Open = 0;
+		} else {
+			LED_OPEN	= p->leds.bit.Open;		//DELAY_US(1);
+			LED_CLOSE 	= p->leds.bit.Close;	//DELAY_US(1);
+		}
+
+		g_Ram.ramGroupH.BkpIndication = (~p->leds.all) & 0x00FF;
 }
 //--------------------------------------------------------
 
