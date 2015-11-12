@@ -21,6 +21,7 @@
 #define ADC_to_R1(inpADC1)	_IQ15int(_IQ15mpy(koef_B1, _IQ15(inpADC1) ) + koef_C1)	// Для случая 2 датчика
 
 TPeref	g_Peref;
+Uns LocalPoss = 0;
 
 __inline void peref_74HC595CsSet(Byte Lev) {CS_RELE = !Lev;}
 
@@ -254,7 +255,7 @@ void Peref_10HzCalc(TPeref *p)	// 10 Гц
 //-------- логика ЦАП -------------------------------------------------
     if (g_Ram.ramGroupG.Mode)
 	p->Dac.Data = g_Ram.ramGroupG.DacValue;
-    else if (g_Ram.ramGroupH.CalibState != csCalib) p->Dac.Data = 0;
+    else if (g_Ram.ramGroupH.CalibState != csCalib) { p->Dac.Data = g_Ram.ramGroupC.Dac_Offset + (Uint16) (0.001 * (g_Ram.ramGroupC.Dac_Mpy - g_Ram.ramGroupC.Dac_Offset) * LocalPoss); }// p->Dac.Data = 0;
     else
 	{
 	    PosPr = g_Ram.ramGroupA.PositionPr;
