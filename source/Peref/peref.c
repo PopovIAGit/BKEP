@@ -87,7 +87,63 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
 
     // TU
     // забираем отмасштабированный сигнал с ј÷ѕ на вход фильтра 1-ого пор€дка
-    p->UfltrOpen.Input 		= p->InDigSignalObserver.UOpenOut;
+    switch(p->NumCalcTU_18kHz)
+    {
+    case 0:
+    	p->UfltrOpen.Input 		= p->InDigSignalObserver.UOpenOut;
+    	peref_ApFilter1Calc(&p->UfltrOpen);
+    	p->InDigSignal.sigOpen.Input = p->UfltrOpen.Output;
+    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigOpen);
+    	p->NumCalcTU_18kHz=1;
+    	break;
+    case 1:
+    	p->UfltrClose.Input 	= p->InDigSignalObserver.UCloseOut;
+    	peref_ApFilter1Calc(&p->UfltrClose);
+    	p->InDigSignal.sigClose.Input = p->UfltrClose.Output;
+    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigClose);
+    	p->NumCalcTU_18kHz=2;
+    	break;
+    case 2:
+    	p->UfltrStopOpen.Input 	= p->InDigSignalObserver.UStopOpenOut;
+    	peref_ApFilter1Calc(&p->UfltrStopOpen);
+    	p->InDigSignal.sigStopOpen.Input = p->UfltrStopOpen.Output;
+    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigStopOpen);
+    	p->NumCalcTU_18kHz=3;
+    	break;
+    case 3:
+    	p->UfltrMu.Input 		= p->InDigSignalObserver.UMuOut;
+        peref_ApFilter1Calc(&p->UfltrMu);
+        p->InDigSignal.sigMU.Input = p->UfltrMu.Output;
+        Peref_SinObserverUpdateFloat(&p->InDigSignal.sigMU);
+		p->NumCalcTU_18kHz=4;
+		break;
+    case 4:
+    	p->UfltrResetAlarm.Input= p->InDigSignalObserver.UResetAlarmOut;
+    	peref_ApFilter1Calc(&p->UfltrResetAlarm);
+    	p->InDigSignal.sigResetAlarm.Input = p->UfltrResetAlarm.Output;
+    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigResetAlarm);
+		p->NumCalcTU_18kHz=5;
+		break;
+    case 5:
+    	p->UfltrStopClose.Input = p->InDigSignalObserver.UStopCloseOut;
+    	peref_ApFilter1Calc(&p->UfltrStopClose);
+    	p->InDigSignal.sigStopClose.Input = p->UfltrStopClose.Output;
+    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigStopClose);
+		p->NumCalcTU_18kHz=6;
+		break;
+    case 6:
+    	p->UfltrDU.Input 		= p->InDigSignalObserver.UDuOut;
+    	peref_ApFilter1Calc(&p->UfltrDU);
+    	p->InDigSignal.sigDU.Input = p->UfltrDU.Output;
+    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigDU);
+		p->NumCalcTU_18kHz=0;
+		break;
+
+    	default: p->NumCalcTU_18kHz=0; break;
+    }
+
+	/*
+	p->UfltrOpen.Input 		= p->InDigSignalObserver.UOpenOut;
     p->UfltrClose.Input 	= p->InDigSignalObserver.UCloseOut;
     p->UfltrStopOpen.Input 	= p->InDigSignalObserver.UStopOpenOut;
     p->UfltrMu.Input 		= p->InDigSignalObserver.UMuOut;
@@ -122,7 +178,7 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
     Peref_SinObserverUpdateFloat(&p->InDigSignal.sigStopClose);
     Peref_SinObserverUpdateFloat(&p->InDigSignal.sigDU);
     ///////////////////////////////////////////////////////////////////////////////////
-
+*/
     //RST UVW
     //----------------------------------------------------------------------------
     //---отмасштабированные данные с ацп на вход фильтра 1-ого пор€дка
@@ -247,7 +303,54 @@ void Peref_50HzCalc(TPeref *p)	// 50 √ц
     }
 
 
-    p->U3fltrOpen.Input 		= p->InDigSignal.sigOpen.Output;
+    switch(p->NumCalcTU_50Hz){
+    	case 0:
+    		p->U3fltrOpen.Input 		= p->InDigSignal.sigOpen.Output;
+    		peref_ApFilter3Calc(&p->U3fltrOpen);
+    		g_Comm.digitInterface.dinOpen.inputDIN = p->U3fltrOpen.Output;
+    		p->NumCalcTU_50Hz=1;
+    		break;
+    	case 1:
+			p->U3fltrClose.Input 		= p->InDigSignal.sigClose.Output;
+			peref_ApFilter3Calc(&p->U3fltrClose);
+			g_Comm.digitInterface.dinClose.inputDIN = p->U3fltrClose.Output;
+			p->NumCalcTU_50Hz=2;
+		break;
+    	case 2:
+			p->U3fltrStopOpen.Input 	= p->InDigSignal.sigStopOpen.Output;
+			peref_ApFilter3Calc(&p->U3fltrStopOpen);
+			g_Comm.digitInterface.dinStopOpen.inputDIN = p->U3fltrStopOpen.Output;
+			p->NumCalcTU_50Hz=3;
+		break;
+    	case 3:
+			p->U3fltrMu.Input 			= p->InDigSignal.sigMU.Output;
+			peref_ApFilter3Calc(&p->U3fltrMu);
+			g_Comm.digitInterface.dinMu.inputDIN = p->U3fltrMu.Output;
+			p->NumCalcTU_50Hz=4;
+		break;
+    	case 4:
+			p->U3fltrResetAlarm.Input 	= p->InDigSignal.sigResetAlarm.Output;
+			peref_ApFilter3Calc(&p->U3fltrDU);
+			g_Comm.digitInterface.dinDu.inputDIN = p->U3fltrDU.Output;
+			p->NumCalcTU_50Hz=5;
+		break;
+    	case 5:
+			p->U3fltrStopClose.Input 	= p->InDigSignal.sigStopClose.Output;
+			peref_ApFilter3Calc(&p->U3fltrStopClose);
+			g_Comm.digitInterface.dinStopClose.inputDIN = p->U3fltrStopClose.Output;
+			p->NumCalcTU_50Hz=6;
+		break;
+    	case 6:
+			p->U3fltrDU.Input 			= p->InDigSignal.sigDU.Output;
+			peref_ApFilter3Calc(&p->U3fltrResetAlarm);
+			g_Comm.digitInterface.dinResetAlarm.inputDIN = p->U3fltrResetAlarm.Output;
+			p->NumCalcTU_50Hz=0;
+		break;
+    	default: p->NumCalcTU_50Hz; break;
+
+    }
+
+    /*p->U3fltrOpen.Input 		= p->InDigSignal.sigOpen.Output;
     p->U3fltrClose.Input 		= p->InDigSignal.sigClose.Output;
     p->U3fltrStopOpen.Input 	= p->InDigSignal.sigStopOpen.Output;
     p->U3fltrMu.Input 			= p->InDigSignal.sigMU.Output;
@@ -270,7 +373,7 @@ void Peref_50HzCalc(TPeref *p)	// 50 √ц
     g_Comm.digitInterface.dinDu.inputDIN = p->U3fltrDU.Output;
     g_Comm.digitInterface.dinStopClose.inputDIN = p->U3fltrStopClose.Output;
     g_Comm.digitInterface.dinResetAlarm.inputDIN = p->U3fltrResetAlarm.Output;
-
+	*/
     peref_ApFilter1Calc(&p->Phifltr);
     if (!g_Core.Status.bit.Stop)
 	p->AngleUI = _IQtoIQ16(p->Phifltr.Output);

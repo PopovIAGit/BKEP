@@ -92,12 +92,15 @@ void InterruptUpdate(void)  //Функция обработки прерываний
 		Task10Hz[tskCnt10Hz].CpuTime = (Uint16)(-CpuTimer1Regs.TIM.all);
 		if (Task10Hz[tskCnt10Hz].CpuTime + CpuTime18kHz > CpuMaxTime) g_Ram.ramGroupH.BadTask_10Hz |= 1<<tskCnt10Hz;
         tskCnt10Hz++;
-    	if (g_Ram.ramGroupH.TaskList == 0) g_Ram.ramGroupH.CpuTime = Task18kHz[g_Ram.ramGroupH.TaskNumber].CpuTime;
-    	else if (g_Ram.ramGroupH.TaskList == 1) g_Ram.ramGroupH.CpuTime = Task2kHz[g_Ram.ramGroupH.TaskNumber].CpuTime;
-    	else if (g_Ram.ramGroupH.TaskList == 2) g_Ram.ramGroupH.CpuTime = Task200Hz[g_Ram.ramGroupH.TaskNumber].CpuTime;
-    	else if (g_Ram.ramGroupH.TaskList == 3) g_Ram.ramGroupH.CpuTime = Task50Hz[g_Ram.ramGroupH.TaskNumber].CpuTime;
-    	else if (g_Ram.ramGroupH.TaskList == 4) g_Ram.ramGroupH.CpuTime = Task10Hz[g_Ram.ramGroupH.TaskNumber].CpuTime;
+
+        if (g_Ram.ramGroupH.TaskList == 0) g_Ram.ramGroupH.CpuTime = Task18kHz[g_Ram.ramGroupH.TaskNumber].CpuTime;
+		else if (g_Ram.ramGroupH.TaskList == 1) g_Ram.ramGroupH.CpuTime = Task2kHz[g_Ram.ramGroupH.TaskNumber].CpuTime;
+		else if (g_Ram.ramGroupH.TaskList == 2) g_Ram.ramGroupH.CpuTime = Task200Hz[g_Ram.ramGroupH.TaskNumber].CpuTime;
+		else if (g_Ram.ramGroupH.TaskList == 3) g_Ram.ramGroupH.CpuTime = Task50Hz[g_Ram.ramGroupH.TaskNumber].CpuTime;
+		else if (g_Ram.ramGroupH.TaskList == 4) g_Ram.ramGroupH.CpuTime = Task10Hz[g_Ram.ramGroupH.TaskNumber].CpuTime;
     }
+
+
 
     if (count18kHz == 9)
     {
