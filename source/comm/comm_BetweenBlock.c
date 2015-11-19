@@ -196,8 +196,8 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 	BkpEncPostion      |= (Uns)bPort->RxPacket.Data[1] << 0;
 	g_Ram.ramGroupH.Position 		= BkpEncPostion;
 	g_Ram.ramGroupC.HallBlock.all   = bPort->RxPacket.Data[5];
-	//g_Ram.ramGroupA.TemperBKP       = (int16)bPort->RxPacket.Data[6];
-	g_Ram.ramGroupH.BKP_Temper      = (int16)bPort->RxPacket.Data[6];
+	g_Ram.ramGroupA.TemperBKP       = (int16)bPort->RxPacket.Data[6];
+	g_Ram.ramGroupH.BKP_Temper      = (int16)bPort->RxPacket.Data[6];//???
 	if (g_Ram.ramGroupH.BKP_Temper > 128) g_Ram.ramGroupH.BKP_Temper -= 255;
 	g_Core.Status.bit.Ten 			= bPort->RxPacket.Data[7];
 	g_Ram.ramGroupA.RevErrValue		= BkpEncErr;

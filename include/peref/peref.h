@@ -102,6 +102,9 @@ typedef struct {
 	TPerefDisplay		Display;
 	TPeref_74hc595 		ShiftReg;
 	Uns 				TU_Offset_Calib_timer;
+	//-----------------------------
+	Uns 				NumCalcTU_18kHz;
+	Uns 				NumCalcTU_50Hz;
 } TPeref;
 
 //------------------- Протатипы функций ------------------------------------
