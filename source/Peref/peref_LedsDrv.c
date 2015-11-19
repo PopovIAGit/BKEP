@@ -212,7 +212,7 @@ void Peref_LedsUpdate(pLeds p)
 			LED_CLOSE 	= p->leds.bit.Close;	//DELAY_US(1);
 		}
 
-		g_Ram.ramGroupH.BkpIndication = (~p->leds.all) & 0x00FF;
+		//g_Ram.ramGroupH.BkpIndication = (~p->leds.all) & 0x00FF;
 }
 //--------------------------------------------------------
 
