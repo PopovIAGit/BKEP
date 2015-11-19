@@ -75,6 +75,7 @@ typedef struct {
 void Comm_Init(TComm *);
 void Comm_Update(TComm *);
 void Comm_50HzCalc(TComm *);
+void Comm_CommandUpdate(TComm *p);
 void UpdateTUTS_Test(TComm *p);
 //Uns DigitCmdModeUpdate (Uns *);
 void TekModbusParamsUpdate(void);

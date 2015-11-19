@@ -17,7 +17,7 @@ TComm	g_Comm;
 Uint16 ASU_Data[10];
 Uint16 SHN_Data[10];
 
-void CommandUpdate(TComm *p);
+
 //Uns DigitCmdModeUpdate (Uns *Output);
 static char ReadRegs(TMbPort *Port, Uint16 *Data, Uint16 Addr, Uint16 Count);
 //---------------------------------------------------
@@ -227,18 +227,18 @@ void Comm_50HzCalc(TComm *p)
 		p->btn_reset_alarmFlag = 0;
 	}
 
-	CommandUpdate(&g_Comm);
+	//CommandUpdate(&g_Comm);
 }
 
 //-----------обработка источников команд -----------------------------
-void CommandUpdate(TComm *p)
+void Comm_CommandUpdate(TComm *p)
 {
 	static Byte clrReset=0;
 
 	p->outputCmdReg = 0;
 
 	//здесь не только обработка ТС но и вывод ТС
-	Comm_TuTsUpdate(&p->digitInterface); // Телеуправление, телесигнализация
+//	Comm_TuTsUpdate(&p->digitInterface); // Телеуправление, телесигнализация
 
 	//если телеуправление разрешено
 	p->digitInput.input = p->digitInterface.Inputs.all;
