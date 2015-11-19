@@ -335,6 +335,8 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->FaultDelay = (Uns) (Prd10HZ * 2);
 	p->registerBrCurr = 0;
 	p->registerBrVolt = 0;
+	p->MpoMpzErrorTimer = 0;
+
 }
 
 // Функция включения/выключения защит

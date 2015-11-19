@@ -155,7 +155,7 @@ void Peref_LedsUpdate(pLeds p)
 		p->leds.all |= LED_DEFECT_MASK;				// Гасим светодиод
 
 	// ------Му/Ду----------------------------------------
-	if (*p->pStatus & STATUS_MU_DU)// Если неисправность
+	if (*p->pStatus & STATUS_MU_DU)// Если му\ду
 	{
 		LedTurnOnOff(&p->ledMuDu, p->leds.bit.MuDu);
 		p->leds.bit.MuDu = p->ledMuDu.status;
@@ -164,6 +164,9 @@ void Peref_LedsUpdate(pLeds p)
 	{
 	    p->leds.bit.MuDu = 1;
 	}
+
+
+	if(g_Ram.ramGroupG.Mode)	p->leds.all = ~g_Ram.ramGroupG.LedsReg.all;
 
 	LED_MUFTA	=  p->leds.bit.Mufta;		asm(" RPT #9 || NOP");
 	LED_DEFECT	=  p->leds.bit.Defect;		asm(" RPT #9 || NOP");
@@ -198,21 +201,6 @@ void Peref_LedsUpdate(pLeds p)
 	g_Ram.ramGroupH.BkpIndication.bit.Defect= ~p->leds.bit.Defect;
 	g_Ram.ramGroupH.BkpIndication.bit.Mufta = ~p->leds.bit.Mufta;
 
-		if ((!(*p->pStatus & STATUS_CLOSED)) && (!(*p->pStatus & STATUS_OPENED)))
-		{
-			GpioDataRegs.GPADAT.all &=~ 0x2400000;
-			//LED_OPEN = 0;
-			//DELAY_US(1);
-			//LED_CLOSE = 0;
-			//DELAY_US(1);
-			p->leds.bit.Close = 0;
-			p->leds.bit.Open = 0;
-		} else {
-			LED_OPEN	= p->leds.bit.Open;		//DELAY_US(1);
-			LED_CLOSE 	= p->leds.bit.Close;	//DELAY_US(1);
-		}
-
-		//g_Ram.ramGroupH.BkpIndication = (~p->leds.all) & 0x00FF;
 }
 //--------------------------------------------------------
 

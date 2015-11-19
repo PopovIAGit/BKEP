@@ -96,6 +96,8 @@
 #define Tl_BCD_CODE			38
 #define NoBCP_Connect_CODE	39
 
+#define MpoMpzError_CODE	41
+
 
 //--------------------- Макросы --------------------------------------------
 #define PRT_CFG_SET(CanBeReseted, Level, Bit, Hyst) \
@@ -150,6 +152,7 @@ typedef struct {
 		Uns					NoMoveFlag;
 		Bool				ShcReset;			// Флаг по которому сбрасывается КЗ
 		Uns					FaultDelay;			// Пауза после инициализации для включения защит
+		Uns					MpoMpzErrorTimer;
 
 }TCoreProtections;
 

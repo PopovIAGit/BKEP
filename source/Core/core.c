@@ -114,6 +114,7 @@ void Core_DefineCtrlParams(TCore *p) // 50 hz
 
 	// пересчитываем задание на момент
 	p->MotorControl.TorqueSetPr = (Uns)(((LgUns)p->MotorControl.TorqueSet * 100)/p->TorqObs.TorqueMax);
+
 }
 
 // Остановка по калибровке
@@ -309,6 +310,18 @@ void Core_ControlMode(TCore *p) // 50 Гц
 {
     p->Status.bit.Mufta = p->Protections.outFaults.Proc.bit.Mufta;
 
+	// выставляем состояние замкнутости контакторов МПО МПЗ
+
+    if(p->Status.bit.Stop == 1 && (CONTACTOR_1_STATUS || CONTACTOR_2_STATUS) && p->Protections.MpoMpzErrorTimer++ >= (2 * Prd50HZ))
+    {
+    	p->Protections.outFaults.Dev.bit.MpoMpzError = 1;
+
+    }
+    else if (p->Status.bit.Stop == 0)
+    {
+    	p->Protections.MpoMpzErrorTimer = 0;
+    }
+
     if(p->Status.bit.Stop)
     {
     	if(!InRange(g_Peref.sensObserver.IUout,-0.5, 0.5))
@@ -360,8 +373,8 @@ static void MoveMode(void)
 {
 	g_Ram.ramGroupA.Torque = g_Core.TorqObs.Indication; // отображаем текущий момент
 
-	if (CONTACTOR_1_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
-	if (CONTACTOR_2_STATUS && g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
+	if (CONTACTOR_2_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
+	if (CONTACTOR_1_STATUS && g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
 
 	if(g_Core.TorqObs.Indication < g_Core.MotorControl.TorqueSet)
 		g_Core.MotorControl.MufTimer = 0;
@@ -634,10 +647,10 @@ void Core_MuDuControl(TCore *p)
 				{
 					if(!g_Ram.ramGroupA.StateTu.bit.Mu && !g_Ram.ramGroupA.StateTu.bit.Du)
 					{
-						if(p->MuDuDefTimer > (2 * Prd10HZ))
+						if(p->MuDuDefTimer++ > (2 * Prd10HZ))
 						{
 							p->VlvDrvCtrl.MuDuInput = 0;
-							p->Protections.outDefects.Proc.bit.MuDuDef = 1;
+							p->Protections.outFaults.Proc.bit.MuDuDef = 1;
 							p->MuDuDefTimer = 0;
 						}
 					}
@@ -655,7 +668,7 @@ void Core_MuDuControl(TCore *p)
 					}
 					if(g_Ram.ramGroupA.StateTu.bit.Mu && g_Ram.ramGroupA.StateTu.bit.Du)
 					{
-						if(p->MuDuDefTimer > (2 * Prd10HZ))
+						if(p->MuDuDefTimer++ > (2 * Prd10HZ))
 						{
 							p->VlvDrvCtrl.MuDuInput = 0;
 							p->Protections.outDefects.Proc.bit.MuDuDef = 1;

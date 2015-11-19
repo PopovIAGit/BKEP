@@ -23,6 +23,7 @@
 TPeref	g_Peref;
 Uns LocalPoss = 0;
 
+
 __inline void peref_74HC595CsSet(Byte Lev) {CS_RELE = !Lev;}
 
 Bool RtcStart    = False;
@@ -64,7 +65,7 @@ void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновлени
     p->Umid = 0;
     p->Imid = 0;
     p->AngleUI = 0;
-
+    p->TU_Offset_Calib_timer = 0;
     Peref_CalibInit(&p->Position);
     ContactorInit(&p->ContactorControl);
     // ----—игнализаци€ лампочками-----------------------
@@ -168,6 +169,8 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
 //---------------------------------------------------
 void Peref_50HzCalc(TPeref *p)	// 50 √ц
 {
+
+	Uns Tu_Offset_adr = 0;
     //фильтруем TU RST UVW фильтром 3-его пор€дка
 
     p->UR3fltr.Input = p->sinObserver.UR.Output;
@@ -184,6 +187,65 @@ void Peref_50HzCalc(TPeref *p)	// 50 √ц
     peref_ApFilter3Calc(&p->IU3fltr);
     peref_ApFilter3Calc(&p->IV3fltr);
     peref_ApFilter3Calc(&p->IW3fltr);
+
+    if(g_Ram.ramGroupC.DriveType < 15 && g_Ram.ramGroupC.DriveType != 0) CUR_SENSOR_GAIN = 0;
+    if(g_Ram.ramGroupC.DriveType < 5 && g_Ram.ramGroupC.DriveType != 0) CUR_SENSOR_GAIN = 1;
+
+
+
+    // корректировка оффсетов дл “” 220/24
+
+    if (p->TU_Offset_Calib_timer <= TU_OFFSET_CALIB_TIME && g_Ram.ramGroupC.TuOffsetCalib == 1)
+	{
+    	p->TU_Offset_Calib_timer++;
+
+		if (!InRange(g_Peref.InDigSignal.sigOpen.Output, -0.1, 0.1))
+		{
+			if (g_Peref.InDigSignal.sigOpen.Input > 0)				g_Ram.ramGroupC.p_UOpen_Offset++;
+			if (g_Peref.InDigSignal.sigOpen.Input < 0)				g_Ram.ramGroupC.p_UOpen_Offset--;
+		}
+		if (!InRange(g_Peref.InDigSignal.sigClose.Output, -0.1, 0.1))
+		{
+			if (g_Peref.InDigSignal.sigClose.Input > 0)				g_Ram.ramGroupC.p_UClose_Offset++;
+			if (g_Peref.InDigSignal.sigClose.Input < 0)				g_Ram.ramGroupC.p_UClose_Offset--;
+		}
+		if (!InRange(g_Peref.InDigSignal.sigStopOpen.Output, -0.1, 0.1))
+		{
+			if (g_Peref.InDigSignal.sigStopOpen.Input > 0)			g_Ram.ramGroupC.p_UStopOpen_Offset++;
+			if (g_Peref.InDigSignal.sigStopOpen.Input < 0)			g_Ram.ramGroupC.p_UStopOpen_Offset--;
+		}
+		if (!InRange(g_Peref.InDigSignal.sigStopClose.Output, -0.1, 0.1))
+		{
+			if (g_Peref.InDigSignal.sigStopClose.Input > 0)			g_Ram.ramGroupC.p_UStopClose_Offset++;
+			if (g_Peref.InDigSignal.sigStopClose.Input < 0)			g_Ram.ramGroupC.p_UStopClose_Offset--;
+		}
+		if (!InRange(g_Peref.InDigSignal.sigMU.Output, -0.1, 0.1))
+		{
+			if (g_Peref.InDigSignal.sigMU.Input > 0)				g_Ram.ramGroupC.p_UMu_Offset++;
+			if (g_Peref.InDigSignal.sigMU.Input < 0)				g_Ram.ramGroupC.p_UMu_Offset--;
+		}
+		if (!InRange(g_Peref.InDigSignal.sigDU.Output, -0.1, 0.1))
+		{
+			if (g_Peref.InDigSignal.sigDU.Input > 0)				g_Ram.ramGroupC.p_UDu_Offset++;
+			if (g_Peref.InDigSignal.sigDU.Input < 0)				g_Ram.ramGroupC.p_UDu_Offset--;
+		}
+		if (!InRange(g_Peref.InDigSignal.sigResetAlarm.Output, -0.1, 0.1))
+		{
+			if (g_Peref.InDigSignal.sigResetAlarm.Input > 0)		g_Ram.ramGroupC.p_UResetAlarm_Offset++;
+			if (g_Peref.InDigSignal.sigResetAlarm.Input < 0)		g_Ram.ramGroupC.p_UResetAlarm_Offset--;
+		}
+	}
+    else if(p->TU_Offset_Calib_timer >= TU_OFFSET_CALIB_TIME && g_Ram.ramGroupC.TuOffsetCalib == 1)
+    {
+    	p->TU_Offset_Calib_timer = 0;
+    	g_Ram.ramGroupC.TuOffsetCalib = 0;
+    	Tu_Offset_adr = GetAdr(ramGroupC.p_UOpen_Mpy220);
+    	if(IsMemParReady())
+    	{
+    		WriteToEeprom(Tu_Offset_adr, &g_Ram.ramGroupC.p_UOpen_Mpy220, 21);
+    	}
+    }
+
 
     p->U3fltrOpen.Input 		= p->InDigSignal.sigOpen.Output;
     p->U3fltrClose.Input 		= p->InDigSignal.sigClose.Output;
@@ -255,7 +317,7 @@ void Peref_10HzCalc(TPeref *p)	// 10 √ц
 //-------- логика ÷јѕ -------------------------------------------------
     if (g_Ram.ramGroupG.Mode)
 	p->Dac.Data = g_Ram.ramGroupG.DacValue;
-    else if (g_Ram.ramGroupH.CalibState != csCalib) { p->Dac.Data = g_Ram.ramGroupC.Dac_Offset + (Uint16) (0.001 * (g_Ram.ramGroupC.Dac_Mpy - g_Ram.ramGroupC.Dac_Offset) * LocalPoss); }// p->Dac.Data = 0;
+    else if (g_Ram.ramGroupH.CalibState != csCalib) p->Dac.Data = 0;//{ p->Dac.Data = g_Ram.ramGroupC.Dac_Offset + (Uint16) (0.001 * (g_Ram.ramGroupC.Dac_Mpy - g_Ram.ramGroupC.Dac_Offset) * LocalPoss); }// p->Dac.Data = 0;
     else
 	{
 	    PosPr = g_Ram.ramGroupA.PositionPr;

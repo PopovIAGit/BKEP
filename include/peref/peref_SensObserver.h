@@ -17,8 +17,9 @@
 #include "config.h"
 //--------------------- Константы-------------------------------------------
 //--------------------- Макросы --------------------------------------------
-//#define ADC_CONV(Value, Gain, Offset) 	(((LgInt)(Value - Offset) * Gain) >> 13)
+//#define ADC_CONV(Value, Gain, Offset) 	(((LgInt)(Value - Offset) * Gain) >> 13)  #define ADC_CONV(Value, Gain, Offset) 		(0.00001 * (int16)((Value) - (Offset)) * (Gain))
 #define ADC_CONV(Value, Gain, Offset) 		(0.00001 * (int16)((Value) - (Offset)) * (Gain))
+#define ADC_TU_CONV(Value, Gain, Offset) 	(0.00001 * (LgInt)((Value) - (Offset)) * (Gain))
 //#define ADC_CONV(Value, Gain, Offset) 	((LgInt)(Value - Offset) * Gain)
 //-------------------- Структуры ------------------------------------------
 // Параметры датчиков

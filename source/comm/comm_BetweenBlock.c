@@ -178,7 +178,11 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 	bPort->TxPacket.Data[5] |= ((g_Ram.ramGroupA.Faults.Proc.bit.NoClose==0)<<4)&0x10;
 
 	if (g_Ram.ramGroupA.PositionPr==9999) bPort->TxPacket.Data[6] = 99;
-	else bPort->TxPacket.Data[6] = g_Ram.ramGroupA.PositionPr;	// положение в %
+	else
+	{
+		if(g_Ram.ramGroupA.PositionPr <0 ) bPort->TxPacket.Data[6] = 0;
+		else bPort->TxPacket.Data[6] = g_Ram.ramGroupA.PositionPr*0.1;	// положение в %
+	}
 	if (g_Peref.Display.data>=999) bPort->TxPacket.Data[7] = 99;
 	else bPort->TxPacket.Data[7] = g_Peref.Display.data;		// код аварий
 

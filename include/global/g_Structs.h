@@ -198,7 +198,8 @@ typedef union _TDeviceReg {
 		Uns Dac:1;			// 9     Сбой ЦАП
 		Uns LowPower:1;		// 10     Выключение БКД
 		Uns NoBCP_Connect:1;	// 11
-		Uns Rsvd:4;       	// 12-15 Резерв
+		Uns MpoMpzError:1;	// 12
+		Uns Rsvd:3;       	// 13-15 Резерв
   } bit;
 } TDeviceReg;
 

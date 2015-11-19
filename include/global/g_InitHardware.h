@@ -91,6 +91,8 @@ extern "C" {
 #define TU_SIG_RESET_ALARM	AdcRegs.ADCRESULT14
 #define TU_SIG_RZVD			AdcRegs.ADCRESULT15
 
+#define CUR_SENSOR_GAIN GpioDataRegs.GPCDAT.bit.GPIO69  //0 - большие тока. 1 - малые токи
+
 //--- FRAM --------------------------------------------
 #define SC_EEPROM1 			GpioDataRegs.GPCDAT.bit.GPIO79
 #define SC_EEPROM2 			GpioDataRegs.GPCDAT.bit.GPIO78

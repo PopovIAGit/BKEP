@@ -33,7 +33,7 @@ Uns Comm_LocalButtonUpdate(TCommMPU *p)
 {
 	Uns result;
 
-	if (g_Ram.ramGroupC.HallBlock.bit.StateCalib==1 && (g_Peref.Position.CancelFlag))
+	if (g_Ram.ramGroupC.HallBlock.bit.StateCalib==1 && (!g_Peref.Position.CancelFlag))
 	{
 		if (p->inputBCP_Data->bit.Open)
 		{
@@ -72,7 +72,7 @@ Uns Comm_LocalButtonUpdate(TCommMPU *p)
 	}
 	else
 	{
-		if (!(p->inputBCP_Data->bit.StopDU && p->inputBCP_Data->bit.StopMU))
+		if (!(p->inputBCP_Data->bit.StopDU || p->inputBCP_Data->bit.StopMU))
 		{
 			if (p->inputBCP_Data->bit.Open)
 			{
@@ -91,7 +91,7 @@ Uns Comm_LocalButtonUpdate(TCommMPU *p)
 				}
 			}
 		}
-		else if (p->inputBCP_Data->bit.StopDU && p->inputBCP_Data->bit.StopMU)
+		else if (p->inputBCP_Data->bit.StopDU || p->inputBCP_Data->bit.StopMU)
 		{
 			if (++p->btn3Param.timer > p->btn3Param.timeout)
 			{

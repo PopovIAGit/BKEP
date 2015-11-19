@@ -211,5 +211,11 @@ void Core_DisplayFaultsUpdate(TCoreDislpayFaults *p)
 			p->DisplFaultUnion.Dev.bit.NoBCP_Connect = 0;
 			p->DisplFault = NoBCP_Connect_CODE;
 		}
+		else if (p->DisplFaultUnion.Dev.bit.MpoMpzError)
+		{
+			p->DisplFaulstTimer = DISPL_FAULT_TIME;
+			p->DisplFaultUnion.Dev.bit.NoBCP_Connect = 0;
+			p->DisplFault = MpoMpzError_CODE;
+		}
 
 }

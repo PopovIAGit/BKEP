@@ -96,7 +96,7 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//50 Гц
 	p->Outputs.bit.Defect  = g_Ram.ramGroupA.Status.bit.Defect;	    	// 4	Дефект
 	p->Outputs.bit.Opening = g_Ram.ramGroupA.Status.bit.Opening;		// 5	Открывается
 	p->Outputs.bit.Closing = g_Ram.ramGroupA.Status.bit.Closing;		// 6	Закрывается
-	p->Outputs.bit.MUDU    = g_Ram.ramGroupA.Status.bit.MuDu;			// 7	МУ/ДУ
+	p->Outputs.bit.MUDU    = !g_Ram.ramGroupA.Status.bit.MuDu;			// 7	МУ/ДУ
 	// ----------------------ИНВЕРСИЯ ТЕЛЕСИГНАЛИЗАЦИИ-------------------------------
 
 	//инверсия ТС
@@ -161,12 +161,12 @@ void DIN_Update_On (TDIN *p, Uns *Type,Uns bit)
 	if (*p->outputReg & bit)	// Если бит активен
 	{
 
-		if (p->inputDIN < disableLevel)//p->disableLevel
+		if (p->inputDIN <= disableLevel)//p->disableLevel
 			*p->outputReg &= ~bit;
 	}
 	else					// Иначе (бит не активен)
 	{
-		if (p->inputDIN > enableLevel )// если уровень сигнала первысил порог
+		if (p->inputDIN >= enableLevel )// если уровень сигнала первысил порог
 		{	
 			if (p->timer++ >= p->timeOut)	
 			{

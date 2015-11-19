@@ -1,0 +1,24 @@
+[Creator]
+Version=1
+[General]
+DeviceName=BKEP_Tomzel
+SoftVersion=4.002
+Description=Блок контроля электропривода. Производство АО "Томзэл"
+Photo=0
+Manual=0
+PDU=1
+Regulators=0
+[EvLog]
+AddressStart=0
+NumberRecords=0
+NumberParameters=0
+[DataLog]
+Ch1_StartAddress=0
+Ch2_StartAddress=0
+BufferSize=0
+AddressSetScreen=0
+AddressSetPeriod=0
+AddressRefreshBuffer=0
+NumberOfScreens=0
+[Profibus]
+NumberOfConfiguratons=0
