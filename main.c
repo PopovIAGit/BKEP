@@ -27,7 +27,7 @@ void main(void)
 	Peref_Init(&g_Peref);
 	Stat_Init(&g_Stat);
 
-	MonitorInit();
+//	MonitorInit();
 
 	StartCpuTimer0();
 
