@@ -79,10 +79,10 @@ typedef struct
 {
 	TSinPhaseObserverFloat	sigOpen;
 	TSinPhaseObserverFloat	sigClose;
-	TSinPhaseObserverFloat	sigStop;
+	TSinPhaseObserverFloat	sigStopOpen;
 	TSinPhaseObserverFloat	sigMU;
 	TSinPhaseObserverFloat	sigResetAlarm;
-	TSinPhaseObserverFloat	sigReadyTU;
+	TSinPhaseObserverFloat	sigStopClose;
 	TSinPhaseObserverFloat	sigDU;
 }TSinSignalObserver;
 

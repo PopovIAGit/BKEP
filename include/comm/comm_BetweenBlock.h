@@ -138,6 +138,8 @@ typedef struct _TBKPData {
 	TBkpHallReg BkpHallReg;
 	Int       	BkpTemper;
 	Uns      	BkpOffTen;
+	Uns 		BkpFaultData;		// код аварий
+	Uns			BkpCalibPosition;	// положение в процентах
 } TBKPData,*TBKPDataHandle;
 
 

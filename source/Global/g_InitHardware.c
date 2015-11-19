@@ -225,22 +225,13 @@ void InitGpio(void)
 										 // GPBQSEL2 is reserved on F2808/06/01 devices
 	GpioCtrlRegs.GPBPUD.all   = 0x0;	 // All group B pullups enabled
 	GpioCtrlRegs.GPBMUX1.all  = 0x0;	 // All GPIO
-	//GpioCtrlRegs.GPBMUX2.all  = 0x0;	 // All GPIO
+  //GpioCtrlRegs.GPBMUX2.all  = 0x0;	 // All GPIO
 	GpioCtrlRegs.GPBDIR.all   = 0x0;	 // All inputs
 
-	//входы
+	//входы DIR - направление 1 - выход 0 - вход. DAT - начальное состояние
 
-	GpioCtrlRegs.GPBDIR.bit.GPIO40	= 0;	//STATE_TU24
-	GpioDataRegs.GPBDAT.bit.GPIO40	= 0;
-
-	GpioCtrlRegs.GPBDIR.bit.GPIO41	= 0;	//KEY_1
-	GpioDataRegs.GPBDAT.bit.GPIO41	= 0;
-
-	GpioCtrlRegs.GPBDIR.bit.GPIO42	= 0;	//KEY_2
-	GpioDataRegs.GPBDAT.bit.GPIO42	= 0;
-
-	GpioCtrlRegs.GPBDIR.bit.GPIO43	= 0;	//KEY_3
-	GpioDataRegs.GPBDAT.bit.GPIO43	= 0;
+	GpioCtrlRegs.GPADIR.bit.GPIO13	= 0;	//MOD_FAULT
+	GpioDataRegs.GPADAT.bit.GPIO13	= 0;
 
 	GpioCtrlRegs.GPBDIR.bit.GPIO44	= 0;	//CONTACTOR_1
 	GpioDataRegs.GPBDAT.bit.GPIO44	= 0;
@@ -252,28 +243,50 @@ void InitGpio(void)
 	GpioCtrlRegs.GPBDIR.bit.GPIO46	= 0;	//кнопка акривации bluetooth
 	GpioDataRegs.GPBDAT.bit.GPIO46	= 0;
 
-	GpioCtrlRegs.GPBDIR.bit.GPIO39	= 0;	//MOD_FAULT - ???
-	GpioDataRegs.GPBDAT.bit.GPIO39	= 0;
+	GpioCtrlRegs.GPBPUD.bit.GPIO47	= 1;
+	GpioCtrlRegs.GPBDIR.bit.GPIO47	= 0;	//кнопка сброс аварий
+	GpioDataRegs.GPBDAT.bit.GPIO47	= 0;
 
 	//выходы
 
-	GpioCtrlRegs.GPBDIR.bit.GPIO48	= 1;	//RESET_FAULT
-	GpioDataRegs.GPBDAT.bit.GPIO48	= 0;
+	GpioCtrlRegs.GPADIR.bit.GPIO0	= 1;	//ENB_RELE
+	GpioDataRegs.GPADAT.bit.GPIO0	= 0;
 
-	GpioCtrlRegs.GPAMUX2.bit.GPIO29 = 0;
-	GpioCtrlRegs.GPAPUD.bit.GPIO29	= 1;
+	GpioCtrlRegs.GPADIR.bit.GPIO1	= 1;	//BCD_A
+	GpioDataRegs.GPADAT.bit.GPIO1	= 1;
 
-	GpioCtrlRegs.GPADIR.bit.GPIO29	= 1;	// WORK_DSP_LED
-	GpioDataRegs.GPADAT.bit.GPIO29	= 1;
+	GpioCtrlRegs.GPADIR.bit.GPIO2	= 1;	//BCD_B
+	GpioDataRegs.GPADAT.bit.GPIO2	= 1;
 
-	GpioCtrlRegs.GPADIR.bit.GPIO3	= 1;	// ENC_ADDR0
-	GpioDataRegs.GPADAT.bit.GPIO3	= 0;
+	GpioCtrlRegs.GPADIR.bit.GPIO3	= 1;	//BCD_C
+	GpioDataRegs.GPADAT.bit.GPIO3	= 1;
 
-	GpioCtrlRegs.GPADIR.bit.GPIO4	= 1;	// ENC_ADDR1
-	GpioDataRegs.GPADAT.bit.GPIO4	= 0;
+	GpioCtrlRegs.GPADIR.bit.GPIO4	= 1;	//BCD_D
+	GpioDataRegs.GPADAT.bit.GPIO4	= 1;
 
-	GpioCtrlRegs.GPADIR.bit.GPIO5	= 1;	// ENC_ADDR2
-	GpioDataRegs.GPADAT.bit.GPIO5	= 0;
+	GpioCtrlRegs.GPADIR.bit.GPIO5	= 1;	//BCD_FIX
+	GpioDataRegs.GPADAT.bit.GPIO5	= 1;
+
+	GpioCtrlRegs.GPADIR.bit.GPIO6	= 1;	//DP /// НЕТУ!!!
+	GpioDataRegs.GPADAT.bit.GPIO6	= 1;
+
+	GpioCtrlRegs.GPADIR.bit.GPIO7	= 1;	//DIG1
+	GpioDataRegs.GPADAT.bit.GPIO7	= 1;
+
+	GpioCtrlRegs.GPADIR.bit.GPIO8	= 1;	//DIG2
+	GpioDataRegs.GPADAT.bit.GPIO8	= 1;
+
+	GpioCtrlRegs.GPADIR.bit.GPIO9	= 1;	//CS_RELE
+	GpioDataRegs.GPADAT.bit.GPIO9	= 1;
+
+	GpioCtrlRegs.GPADIR.bit.GPIO10	= 1;	//R1_KONT - управление контактором ЗАКРЫТЬ
+	GpioDataRegs.GPADAT.bit.GPIO10	= 1;
+
+	GpioCtrlRegs.GPADIR.bit.GPIO11	= 1;	//R2_KONT - управление контактором ОТКРЫТЬ
+	GpioDataRegs.GPADAT.bit.GPIO11	= 1;
+
+	GpioCtrlRegs.GPADIR.bit.GPIO12	= 1;	//ON_TY - 24/220
+	GpioDataRegs.GPADAT.bit.GPIO12	= 1;
 
 	GpioCtrlRegs.GPAPUD.bit.GPIO22	= 1;
 	GpioCtrlRegs.GPADIR.bit.GPIO22	= 1;	//LED0
@@ -287,10 +300,6 @@ void InitGpio(void)
 	GpioCtrlRegs.GPADIR.bit.GPIO24	= 1;	//LED2
 	GpioDataRegs.GPADAT.bit.GPIO24	= 1;
 
-	GpioCtrlRegs.GPBPUD.bit.GPIO34	= 1;
-	GpioCtrlRegs.GPBDIR.bit.GPIO34	= 1;	//LED3
-	GpioDataRegs.GPBDAT.bit.GPIO34	= 1;
-
 	GpioCtrlRegs.GPAPUD.bit.GPIO25	= 1;
 	GpioCtrlRegs.GPADIR.bit.GPIO25	= 1;	//LED4
 	GpioDataRegs.GPADAT.bit.GPIO25	= 1;
@@ -299,21 +308,22 @@ void InitGpio(void)
 	GpioCtrlRegs.GPADIR.bit.GPIO26	= 1;	//LED5
 	GpioDataRegs.GPADAT.bit.GPIO26	= 1;
 
-	GpioCtrlRegs.GPCPUD.bit.GPIO66	= 1;
-	GpioCtrlRegs.GPCDIR.bit.GPIO66	= 1;	//LED7
-	GpioDataRegs.GPCDAT.bit.GPIO66	= 1;
-
-	GpioCtrlRegs.GPCPUD.bit.GPIO65	= 1;
-	GpioCtrlRegs.GPCDIR.bit.GPIO65	= 1;	//LED8
-	GpioDataRegs.GPCDAT.bit.GPIO65	= 1;
-
-	GpioCtrlRegs.GPCPUD.bit.GPIO64	= 1;
-	GpioCtrlRegs.GPCDIR.bit.GPIO64	= 1;	//LED9
-	GpioDataRegs.GPCDAT.bit.GPIO64	= 1;
-
 	GpioCtrlRegs.GPAPUD.bit.GPIO27	= 1;
-	GpioCtrlRegs.GPADIR.bit.GPIO27	= 1;	//ENABLE_BLUETOOTH
+	GpioCtrlRegs.GPADIR.bit.GPIO27	= 1;	//ENABLE_BLUETOOTH LED6
 	GpioDataRegs.GPADAT.bit.GPIO27	= 1;
+
+	GpioCtrlRegs.GPAMUX2.bit.GPIO29 = 0;	//???
+	GpioCtrlRegs.GPAPUD.bit.GPIO29	= 1;
+
+	GpioCtrlRegs.GPADIR.bit.GPIO29	= 1;	// WORK_DSP_LED
+	GpioDataRegs.GPADAT.bit.GPIO29	= 1;
+
+	GpioCtrlRegs.GPBPUD.bit.GPIO34	= 1;
+	GpioCtrlRegs.GPBDIR.bit.GPIO34	= 1;	//LED3
+	GpioDataRegs.GPBDAT.bit.GPIO34	= 1;
+
+	GpioCtrlRegs.GPBDIR.bit.GPIO48	= 1;	//RESET_FAULT
+	GpioDataRegs.GPBDAT.bit.GPIO48	= 0;
 
 	GpioCtrlRegs.GPBDIR.bit.GPIO50	= 1;	//RS485_DIR_SHN - УПП
 	GpioDataRegs.GPBDAT.bit.GPIO50	= 0;
@@ -327,50 +337,26 @@ void InitGpio(void)
 	GpioCtrlRegs.GPBDIR.bit.GPIO53	= 1;	//RS485_DIR_BT	- Bluetooth
 	GpioDataRegs.GPBDAT.bit.GPIO53	= 0;
 
-	GpioCtrlRegs.GPCDIR.bit.GPIO79	= 1;	//SC_EEPROM1
-	GpioDataRegs.GPCDAT.bit.GPIO79	= 0;
+	GpioCtrlRegs.GPCPUD.bit.GPIO64	= 1;
+	GpioCtrlRegs.GPCDIR.bit.GPIO64	= 1;	//LED9
+	GpioDataRegs.GPCDAT.bit.GPIO64	= 1;
+
+	GpioCtrlRegs.GPCPUD.bit.GPIO65	= 1;
+	GpioCtrlRegs.GPCDIR.bit.GPIO65	= 1;	//LED8
+	GpioDataRegs.GPCDAT.bit.GPIO65	= 1;
+
+	GpioCtrlRegs.GPCPUD.bit.GPIO66	= 1;
+	GpioCtrlRegs.GPCDIR.bit.GPIO66	= 1;	//LED7
+	GpioDataRegs.GPCDAT.bit.GPIO66	= 1;
+
+	GpioCtrlRegs.GPCDIR.bit.GPIO69	= 1;	//ON_DEV
+	GpioDataRegs.GPCDAT.bit.GPIO69	= 0;
 
 	GpioCtrlRegs.GPCDIR.bit.GPIO78	= 1;	//SC_EEPROM2
 	GpioDataRegs.GPCDAT.bit.GPIO78	= 0;
 
-	GpioCtrlRegs.GPADIR.bit.GPIO12	= 1;	//ON_TY - ???
-	GpioDataRegs.GPADAT.bit.GPIO12	= 1;
-
-	GpioCtrlRegs.GPADIR.bit.GPIO0	= 1;	//TS_1
-	GpioDataRegs.GPADAT.bit.GPIO0	= 1;
-
-	GpioCtrlRegs.GPADIR.bit.GPIO1	= 1;	//TS_2
-	GpioDataRegs.GPADAT.bit.GPIO1	= 1;
-
-	GpioCtrlRegs.GPADIR.bit.GPIO2	= 1;	//TS_3
-	GpioDataRegs.GPADAT.bit.GPIO2	= 1;
-
-	GpioCtrlRegs.GPADIR.bit.GPIO3	= 1;	//TS_4
-	GpioDataRegs.GPADAT.bit.GPIO3	= 1;
-
-	GpioCtrlRegs.GPADIR.bit.GPIO4	= 1;	//TS_5
-	GpioDataRegs.GPADAT.bit.GPIO4	= 1;
-
-	GpioCtrlRegs.GPADIR.bit.GPIO5	= 1;	//TS_6
-	GpioDataRegs.GPADAT.bit.GPIO5	= 1;
-
-	GpioCtrlRegs.GPADIR.bit.GPIO6	= 1;	//TS_7
-	GpioDataRegs.GPADAT.bit.GPIO6	= 1;
-
-	GpioCtrlRegs.GPADIR.bit.GPIO7	= 1;	//TS_8
-	GpioDataRegs.GPADAT.bit.GPIO7	= 1;
-
-	GpioCtrlRegs.GPADIR.bit.GPIO8	= 1;	//TS_9
-	GpioDataRegs.GPADAT.bit.GPIO8	= 1;
-
-	GpioCtrlRegs.GPADIR.bit.GPIO9	= 1;	//TS_10
-	GpioDataRegs.GPADAT.bit.GPIO9	= 1;
-
-	GpioCtrlRegs.GPADIR.bit.GPIO10	= 1;	//TS_11 - управление контактором ЗАКРЫТЬ
-	GpioDataRegs.GPADAT.bit.GPIO10	= 1;
-
-	GpioCtrlRegs.GPADIR.bit.GPIO11	= 1;	//TS_12 - управление контактором ОТКРЫТЬ
-	GpioDataRegs.GPADAT.bit.GPIO11	= 1;
+	GpioCtrlRegs.GPCDIR.bit.GPIO79	= 1;	//SC_EEPROM1
+	GpioDataRegs.GPCDAT.bit.GPIO79	= 0;
 
 	EDIS;
 }

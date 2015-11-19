@@ -15,13 +15,13 @@ Byte testLeds=0;
 #define INSIDE_FRAME	3
 
 #define BOF				0xC0
-#define XBOF				0xFF
+#define XBOF			0xFF
 #define EOF				0xC1
-#define CE					0x7D
-#define TRANS				0x20
+#define CE				0x7D
+#define TRANS			0x20
 
-#define INIT_FCS			0xFFFF
-#define GOOD_FCS			0x0000
+#define INIT_FCS		0xFFFF
+#define GOOD_FCS		0x0000
 #define GENER_FCS		0xA001
 
 #define FCS_CALC(crc, c)	((crc >> 8) ^ fcsTable[(crc ^ c) & 0xFF])
@@ -168,13 +168,28 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 
 	SciMasterConnBetweenBlockUpdate(bPort);
 
-	bPort->TxPacket.Data[4] = g_Ram.ramGroupH.BkpIndication;// индикация светодиодов
-	bPort->TxPacket.Data[5] = g_Core.Temper.OnOffTEN;		// управление теном
+	bPort->TxPacket.Data[4] = g_Ram.ramGroupH.BkpIndication.all;	// индикация светодиодов
+	//bPort->TxPacket.Data[5] = g_Core.Temper.OnOffTEN;			// управление теном
+	bPort->TxPacket.Data[5] = 0;
+	bPort->TxPacket.Data[5] = (g_Core.Temper.OnOffTEN==1)&0x01;
+	bPort->TxPacket.Data[5] |= ((g_Ram.ramGroupA.PositionPr==9999)<<1)&0x02;
+	bPort->TxPacket.Data[5] |= ((g_Peref.Display.data==999)<<2)&0x04;
+	bPort->TxPacket.Data[5] |= ((g_Ram.ramGroupA.Faults.Proc.bit.NoOpen==0)<<3)&0x08;
+	bPort->TxPacket.Data[5] |= ((g_Ram.ramGroupA.Faults.Proc.bit.NoClose==0)<<4)&0x10;
+
+	if (g_Ram.ramGroupA.PositionPr==9999) bPort->TxPacket.Data[6] = 99;
+	else
+	{
+		if(g_Ram.ramGroupA.PositionPr <0 ) bPort->TxPacket.Data[6] = 0;
+		else bPort->TxPacket.Data[6] = g_Ram.ramGroupA.PositionPr*0.1;	// положение в %
+	}
+	if (g_Peref.Display.data>=999) bPort->TxPacket.Data[7] = 99;
+	else bPort->TxPacket.Data[7] = g_Peref.Display.data;		// код аварий
 
 	if(!bPort->RxPacket.Flag) return;
 	bPort->RxPacket.Flag = 0;
 
-	g_Ram.ramGroupA.VersionPOBkp     = bPort->RxPacket.Data[0];
+	g_Ram.ramGroupA.VersionPOBkp     = bPort->RxPacket.Data[0] + 5000;
 	BkpEncErr  			= (Uns)bPort->RxPacket.Data[4] << 8;
 	BkpEncErr 		   |= (Uns)bPort->RxPacket.Data[3] << 0;
 	BkpEncPostion      	= (Uns)bPort->RxPacket.Data[2] << 8;

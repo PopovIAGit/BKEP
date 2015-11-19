@@ -19,9 +19,8 @@
 #include "peref_ApFilter3.h"  		// PIA 04.04.14
 #include "peref_SensObserver.h" 	// PIA 07.04.14
 #include "peref_SinObserver.h"		// PIA 08.04.14
-#include "peref_Calibs.h"		// PIA 14.04.14
+#include "peref_Calibs.h"			// PIA 14.04.14
 #include "peref_ContactorControl.h"	// PIA 17.04.14
-//#include "peref_DisplayDrv.h"
 #include "peref_LedsDrv.h"
 #include "peref_Clock.h"
 //#include "peref_TempObserver.h"
@@ -29,11 +28,15 @@
 //#include "peref_EncoderDrv.h"
 #include "peref_ADT75Drv.h"
 #include "peref_DacMCP4276Drv.h"
-#include  "peref_RtcDS3231Drv.h"
+#include "peref_RtcDS3231Drv.h"
+#include "peref_DisplDrv.h"			// PIA 13.10.15
+#include "peref_74HC595.h"
 //
 #ifdef __cplusplus
 extern "C" {
 #endif
+//-----------------define------------------------
+#define TU_OFFSET_CALIB_TIME  (15.0 * Prd50HZ)
 
 //-------------------- Структуры -------------------------------------------
 // Структура для работы с фильтрами переферии
@@ -55,19 +58,19 @@ typedef struct {
 	//--- Фильтры U для Телеуправления -----------------
 	APFILTER1  			UfltrOpen;
 	APFILTER1  			UfltrClose;
-	APFILTER1  			UfltrStop;
+	APFILTER1  			UfltrStopOpen;
+	APFILTER1  			UfltrStopClose;
 	APFILTER1  			UfltrMu;
-	APFILTER1  			UfltrResetAlarm;
-	APFILTER1  			UfltrReadyTU;
 	APFILTER1  			UfltrDU;
+	APFILTER1  			UfltrResetAlarm;
 	//-------------------------------
 	//--- Фильтры U для Телеуправления -----------------
 	APFILTER3  			U3fltrOpen;
 	APFILTER3  			U3fltrClose;
-	APFILTER3  			U3fltrStop;
+	APFILTER3  			U3fltrStopOpen;
 	APFILTER3  			U3fltrMu;
 	APFILTER3  			U3fltrResetAlarm;
-	APFILTER3  			U3fltrReadyTU;
+	APFILTER3  			U3fltrStopClose;
 	APFILTER3  			U3fltrDU;
 	// ------------------------------
 	TSensObserver		sensObserver;		// Масштабирование сигналов с датчиков
@@ -96,9 +99,9 @@ typedef struct {
 	Uns					TaktTuSensUpdate;
 	TSinSignalObserver  InDigSignal;			// Вычисление RMS
 	//-----------------------------
-	Uns Peref_StertDelayTimeout;
-
-
+	TPerefDisplay		Display;
+	TPeref_74hc595 		ShiftReg;
+	Uns 				TU_Offset_Calib_timer;
 } TPeref;
 
 //------------------- Протатипы функций ------------------------------------

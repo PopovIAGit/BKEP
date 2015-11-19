@@ -48,6 +48,7 @@ void Core_Init(TCore *p)
 	Core_TorqueInit(&p->TorqObs);			// Расчет моментов
 	//Core_CommandsInit(&p->commands);		// Получение команд, настройка калибровки
 	Core_ProtectionsInit(&p->Protections);	// Защиты
+	Core_DisplayFaultsInit(&p->DisplayFaults);
 
 	p->Status.bit.Stop = 1;					// При включение выставляем стоп
 }
@@ -113,6 +114,7 @@ void Core_DefineCtrlParams(TCore *p) // 50 hz
 
 	// пересчитываем задание на момент
 	p->MotorControl.TorqueSetPr = (Uns)(((LgUns)p->MotorControl.TorqueSet * 100)/p->TorqObs.TorqueMax);
+
 }
 
 // Остановка по калибровке
@@ -308,6 +310,38 @@ void Core_ControlMode(TCore *p) // 50 Гц
 {
     p->Status.bit.Mufta = p->Protections.outFaults.Proc.bit.Mufta;
 
+	// выставляем состояние замкнутости контакторов МПО МПЗ
+
+    if(p->Status.bit.Stop == 1 && (CONTACTOR_1_STATUS || CONTACTOR_2_STATUS) && p->Protections.MpoMpzErrorTimer++ >= (2 * Prd50HZ))
+    {
+    	p->Protections.outFaults.Dev.bit.MpoMpzError = 1;
+
+    }
+    else if (p->Status.bit.Stop == 0)
+    {
+    	p->Protections.MpoMpzErrorTimer = 0;
+    }
+
+    if(p->Status.bit.Stop)
+    {
+    	if(!InRange(g_Peref.sensObserver.IUout,-0.5, 0.5))
+    	{
+    		if(g_Peref.sensObserver.IUout > 0) g_Ram.ramGroupC.IU_Offset++;
+    		if(g_Peref.sensObserver.IUout < 0) g_Ram.ramGroupC.IU_Offset--;
+    	}
+    	if(!InRange(g_Peref.sensObserver.IVout,-0.5, 0.5))
+    	{
+    		if(g_Peref.sensObserver.IVout > 0) g_Ram.ramGroupC.IV_Offset++;
+    		if(g_Peref.sensObserver.IVout < 0) g_Ram.ramGroupC.IV_Offset--;
+    	}
+    	if(!InRange(g_Peref.sensObserver.IWout,-0.5, 0.5))
+    	{
+    		if(g_Peref.sensObserver.IWout > 0) g_Ram.ramGroupC.IW_Offset++;
+    		if(g_Peref.sensObserver.IWout < 0) g_Ram.ramGroupC.IW_Offset--;
+    	}
+
+    }
+
     switch(p->MotorControl.WorkMode)
     {
     case wmStop:		StopMode();	break;
@@ -339,8 +373,8 @@ static void MoveMode(void)
 {
 	g_Ram.ramGroupA.Torque = g_Core.TorqObs.Indication; // отображаем текущий момент
 
-	if (CONTACTOR_1_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
-	if (CONTACTOR_2_STATUS && g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
+	if (CONTACTOR_2_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
+	if (CONTACTOR_1_STATUS && g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
 
 	if(g_Core.TorqObs.Indication < g_Core.MotorControl.TorqueSet)
 		g_Core.MotorControl.MufTimer = 0;
@@ -561,8 +595,6 @@ void Core_LowPowerControl(TCore *p)
 		p->Protections.outFaults.Load.bit.ShCW = 0;
 	}
 
-
-
 	// 3 sec -----------------------------------------------------------------------
 	if (g_Ram.ramGroupB.Sec3Mode)
 	{
@@ -611,25 +643,38 @@ void Core_MuDuControl(TCore *p)
 			break;
 		case mdSelect:
 			{
-				if(!g_Ram.ramGroupA.StateTu.bit.Mu && !g_Ram.ramGroupA.StateTu.bit.Du)
+				if(g_Ram.ramGroupA.Status.bit.Stop == 1)
 				{
-					p->VlvDrvCtrl.MuDuInput = 0;
-					p->Protections.outDefects.Proc.bit.MuDuDef = 1;
-				}
-				if(g_Ram.ramGroupA.StateTu.bit.Mu && !g_Ram.ramGroupA.StateTu.bit.Du)
-				{
-					p->VlvDrvCtrl.MuDuInput = 1;
-					p->Protections.outDefects.Proc.bit.MuDuDef = 0;
-				}
-				if(!g_Ram.ramGroupA.StateTu.bit.Mu && g_Ram.ramGroupA.StateTu.bit.Du)
-				{
-					p->VlvDrvCtrl.MuDuInput = 0;
-					p->Protections.outDefects.Proc.bit.MuDuDef = 0;
-				}
-				if(g_Ram.ramGroupA.StateTu.bit.Mu && g_Ram.ramGroupA.StateTu.bit.Du)
-				{
-					p->VlvDrvCtrl.MuDuInput = 0;
-					p->Protections.outDefects.Proc.bit.MuDuDef = 1;
+					if(!g_Ram.ramGroupA.StateTu.bit.Mu && !g_Ram.ramGroupA.StateTu.bit.Du)
+					{
+						if(p->MuDuDefTimer++ > (2 * Prd10HZ))
+						{
+							p->VlvDrvCtrl.MuDuInput = 0;
+							p->Protections.outFaults.Proc.bit.MuDuDef = 1;
+							p->MuDuDefTimer = 0;
+						}
+					}
+					if(g_Ram.ramGroupA.StateTu.bit.Mu && !g_Ram.ramGroupA.StateTu.bit.Du)
+					{
+						p->VlvDrvCtrl.MuDuInput = 1;
+						p->Protections.outDefects.Proc.bit.MuDuDef = 0;
+						p->MuDuDefTimer = 0;
+					}
+					if(!g_Ram.ramGroupA.StateTu.bit.Mu && g_Ram.ramGroupA.StateTu.bit.Du)
+					{
+						p->VlvDrvCtrl.MuDuInput = 0;
+						p->Protections.outDefects.Proc.bit.MuDuDef = 0;
+						p->MuDuDefTimer = 0;
+					}
+					if(g_Ram.ramGroupA.StateTu.bit.Mu && g_Ram.ramGroupA.StateTu.bit.Du)
+					{
+						if(p->MuDuDefTimer++ > (2 * Prd10HZ))
+						{
+							p->VlvDrvCtrl.MuDuInput = 0;
+							p->Protections.outDefects.Proc.bit.MuDuDef = 1;
+							p->MuDuDefTimer = 0;
+						}
+					}
 				}
 			}
 			break;
@@ -649,10 +694,20 @@ void Core_MuDuControl(TCore *p)
 
 void Core_OnOff_TEN(TCoreTemper *t)
 {
-	//t->CurrTemper = g_Ram.ramGroupA.TemperBKP + g_Ram.ramGroupC.CorrTemper;
-	g_Ram.ramGroupA.TemperBKP = g_Ram.ramGroupH.BKP_Temper + g_Ram.ramGroupC.CorrTemper;
+	g_Ram.ramGroupA.TemperBKP = g_Ram.ramGroupH.BKP_Temper
+			+ g_Ram.ramGroupC.CorrTemper;
 	if (g_Ram.ramGroupA.TemperBKP >= g_Ram.ramGroupC.TenOffValue)
-		t->OnOffTEN=TEN_OFF;
+		t->OnOffTEN = TEN_OFF;
 	else if (g_Ram.ramGroupA.TemperBKP <= g_Ram.ramGroupC.TenOnValue)
-		t->OnOffTEN=TEN_ON;
+		t->OnOffTEN = TEN_ON;
 }
+
+
+
+
+
+
+
+
+
+

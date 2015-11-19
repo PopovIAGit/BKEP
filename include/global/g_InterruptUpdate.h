@@ -63,8 +63,8 @@ TPeriodicalFunction Task18kHz[] =
 	PrdElemInit(Peref_SensTuObserverUpdate,				&g_Peref.InDigSignalObserver),
 	PrdElemInit(Peref_18kHzCalc,						&g_Peref),
 	PrdElemInit(SciMasterConnBetweenBlockCommTimer,		&g_Comm.mbBkp),	//на 18к√ц
-	//PrdElemInit(MonitorUpdate,							NULL),
-	PrdElemInit(Core_ProtectionsUpdate,					&g_Core.Protections),
+	PrdElemInit(Core_Protections18kHzUpdate,			&g_Core.Protections),
+	PrdElemInit(MonitorUpdate,							Null),
 };
 
 //—юда вставл€ем функции дл€ соответствующей группы
@@ -78,6 +78,8 @@ TPeriodicalFunction Task2kHz[] =          //Ќе более 8-х задач
 	PrdElemInit(SerialCommTimings,						&g_Comm.mbBt),	//на 2 к√ц
 	PrdElemInit(FM25V10_Update,							&Eeprom1),		//на 2 к√ц
 	PrdElemInit(FM25V10_Update,							&Eeprom2),		//на 2 к√ц
+
+
 };
 // ================================ 200 √ц ==================================
 
@@ -90,7 +92,8 @@ TPeriodicalFunction Task200Hz[] =       	//не более  20-ти задач
 	PrdElemInit(LogCmdControl,							&g_Stat),
 	PrdElemInit(LogParamMbExec,							&g_Stat),
 	PrdElemInit(LogParamControl,						&g_Stat),
-	PrdElemInit(ImTimer,				                &g_Stat.Im),// на 200√ц
+	PrdElemInit(ImTimer,				                &g_Stat.Im),// на 200√
+	PrdElemInit(DisplDrvUpdate,             			&g_Peref.Display),
 };
 
 // ================================ 50 √ц ==================================
@@ -127,9 +130,7 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakVoltR),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakVoltS),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakVoltT),
-	//PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.voltSkew),
 	PrdElemInit(Core_ProtectionI2TUpdate,		&g_Core.Protections.I2t),
-	//PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.currSkew),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakCurrU),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakCurrV),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakCurrW),
@@ -140,13 +141,15 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(Comm_50HzCalc,					&g_Comm),
 	PrdElemInit(GetCurrentCmd,					&g_Stat),
 	PrdElemInit(Core_MenuDisplay,				&g_Core.menu),
+	PrdElemInit(Core_Protections50HZUpdate,		&g_Core.Protections),
+
 };
 
 // ================================ 10 √ц ==================================
 
 TPeriodicalFunction Task10Hz[] =        //не более  200-т задач
 {
-	PrdElemInit(Peref_Calibration, 			&g_Peref.Position),
+    PrdElemInit(Peref_Calibration, 			&g_Peref.Position),
 	PrdElemInit(CalcClbCycle, 				&g_Peref.Position),
 	PrdElemInit(g_Ram_Update,				&g_Ram),
 	PrdElemInit(Peref_SpeedCalc,			&g_Peref.Position),
@@ -160,6 +163,7 @@ TPeriodicalFunction Task10Hz[] =        //не более  200-т задач
 	PrdElemInit(Core_DevProc_FaultIndic,	&g_Core.Protections),
 	PrdElemInit(Core_OnOff_TEN,             &g_Core.Temper),
 	PrdElemInit(TekModbusParamsUpdate,		NULL),				//на 10 √ц
+	PrdElemInit(Core_DisplayFaultsUpdate,			&g_Core.DisplayFaults),				//на 10 √ц
 
 };
 //------------ онец файла-----------------------------------------------

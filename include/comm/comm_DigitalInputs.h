@@ -36,11 +36,11 @@ typedef struct
 	Uns					output;			// Выход: 
 	TDigitalInputBit	inpOpen;		// Открыть
 	TDigitalInputBit	inpClose;		// Закрыть
-	TDigitalInputBit	inpStop;		// Стоп
-	TDigitalInputBit	inpMu;			//
-	TDigitalInputBit	inpResetAlarm;	//
-	TDigitalInputBit	inpReadyTu;		//
-	TDigitalInputBit	inpDu;			//
+	TDigitalInputBit	inpStopOpen;	// Стоп Открытия
+	TDigitalInputBit	inpMu;			// МУ
+	TDigitalInputBit	inpResetAlarm;	// Сброс защит
+	TDigitalInputBit	inpStopClose;	// Стоп Закрытия
+	TDigitalInputBit	inpDu;			// ДУ
 	Uns 				timeDelay;		// Величина "срабатывания" сигнала
 	Uns					deltOn;			// Инкремент 
 	Uns 				deltOff;		// Декремент

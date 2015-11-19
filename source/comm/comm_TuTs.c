@@ -19,66 +19,65 @@ void Comm_TuTsInit (TDigitalInterface *p)
 	p->TypeLogicSignal		    	 = (Uns *)&g_Ram.ramGroupB.TuInvert.all;
 
 	// Íåîáõîäèìî âçÿòü enableLevel è disableLevel èç g_Ram
-	p->dinStop.outputReg 			 = &p->Inputs.all;
-	p->dinStop.enableLevel220 		 = (Int *)&g_Ram.ramGroupB.LevelOnStop220;
-	p->dinStop.disableLevel220 		 = (Int *)&g_Ram.ramGroupB.LevelOffStop220;
-	p->dinStop.enableLevel24 		 = (Int *)&g_Ram.ramGroupB.LevelOnStop24;
-	p->dinStop.disableLevel24 		 = (Int *)&g_Ram.ramGroupB.LevelOffStop24;
-	p->dinStop.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd50HZ;
-	p->dinStop.timer 				 = 0;
+	p->dinStopOpen.outputReg 			 = &p->Inputs.all;
+	p->dinStopOpen.enableLevel220 		 = (Int *)&g_Ram.ramGroupC.LevelOn220;
+	p->dinStopOpen.disableLevel220 		 = (Int *)&g_Ram.ramGroupC.LevelOff220;
+	p->dinStopOpen.enableLevel24 		 = (Int *)&g_Ram.ramGroupC.LevelOn24;
+	p->dinStopOpen.disableLevel24 		 = (Int *)&g_Ram.ramGroupC.LevelOff24;
+	p->dinStopOpen.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd50HZ;
+	p->dinStopOpen.timer 				 = 0;
 
 	p->dinOpen.outputReg        	 = &p->Inputs.all;
-	p->dinOpen.enableLevel220   	 = (Int *)&g_Ram.ramGroupB.LevelOnOpen220;
-	p->dinOpen.disableLevel220  	 = (Int *)&g_Ram.ramGroupB.LevelOffOpen220;
-	p->dinOpen.enableLevel24    	 = (Int *)&g_Ram.ramGroupB.LevelOnOpen24;
-	p->dinOpen.disableLevel24   	 = (Int *)&g_Ram.ramGroupB.LevelOffOpen24;
+	p->dinOpen.enableLevel220   	 = (Int *)&g_Ram.ramGroupC.LevelOn220;
+	p->dinOpen.disableLevel220  	 = (Int *)&g_Ram.ramGroupC.LevelOff220;
+	p->dinOpen.enableLevel24    	 = (Int *)&g_Ram.ramGroupC.LevelOn24;
+	p->dinOpen.disableLevel24   	 = (Int *)&g_Ram.ramGroupC.LevelOff24;
 	p->dinOpen.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd50HZ;
 	p->dinOpen.timer 				 = 0;
 
 	p->dinClose.outputReg 			 = &p->Inputs.all;
-	p->dinClose.enableLevel220  	 = (Int *)&g_Ram.ramGroupB.LevelOnClose220;
-	p->dinClose.disableLevel220 	 = (Int *)&g_Ram.ramGroupB.LevelOffClose220;
-	p->dinClose.enableLevel24   	 = (Int *)&g_Ram.ramGroupB.LevelOnClose24;
-	p->dinClose.disableLevel24  	 = (Int *)&g_Ram.ramGroupB.LevelOffClose24;
+	p->dinClose.enableLevel220  	 = (Int *)&g_Ram.ramGroupC.LevelOn220;
+	p->dinClose.disableLevel220 	 = (Int *)&g_Ram.ramGroupC.LevelOff220;
+	p->dinClose.enableLevel24   	 = (Int *)&g_Ram.ramGroupC.LevelOn24;
+	p->dinClose.disableLevel24  	 = (Int *)&g_Ram.ramGroupC.LevelOff24;
 	p->dinClose.timeOut 			 = g_Ram.ramGroupB.TuTime * Prd50HZ;
 	p->dinClose.timer 				 = 0;
 
 	p->dinMu.outputReg 				 = &p->Inputs.all;
-	p->dinMu.enableLevel220  		 = (Int *)&g_Ram.ramGroupB.LevelOnMU220;
-	p->dinMu.disableLevel220 		 = (Int *)&g_Ram.ramGroupB.LevelOffMU220;
-	p->dinMu.enableLevel24   		 = (Int *)&g_Ram.ramGroupB.LevelOnMU24;
-	p->dinMu.disableLevel24  		 = (Int *)&g_Ram.ramGroupB.LevelOffMU24;
+	p->dinMu.enableLevel220  		 = (Int *)&g_Ram.ramGroupC.LevelOn220;
+	p->dinMu.disableLevel220 		 = (Int *)&g_Ram.ramGroupC.LevelOff220;
+	p->dinMu.enableLevel24   		 = (Int *)&g_Ram.ramGroupC.LevelOn24;
+	p->dinMu.disableLevel24  		 = (Int *)&g_Ram.ramGroupC.LevelOff24;
 	p->dinMu.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd50HZ;
 	p->dinMu.timer 					 = 0;
 
 	p->dinResetAlarm.outputReg 		 = &p->Inputs.all;
-	p->dinResetAlarm.enableLevel220  = (Int *)&g_Ram.ramGroupB.LevelOnResetAlarm220;
-	p->dinResetAlarm.disableLevel220 = (Int *)&g_Ram.ramGroupB.LevelOffResetAlarm220;
-	p->dinResetAlarm.enableLevel24   = (Int *)&g_Ram.ramGroupB.LevelOnResetAlarm24;
-	p->dinResetAlarm.disableLevel24  = (Int *)&g_Ram.ramGroupB.LevelOffResetAlarm24;
+	p->dinResetAlarm.enableLevel220  = (Int *)&g_Ram.ramGroupC.LevelOn220;
+	p->dinResetAlarm.disableLevel220 = (Int *)&g_Ram.ramGroupC.LevelOff220;
+	p->dinResetAlarm.enableLevel24   = (Int *)&g_Ram.ramGroupC.LevelOn24;
+	p->dinResetAlarm.disableLevel24  = (Int *)&g_Ram.ramGroupC.LevelOff24;
 	p->dinResetAlarm.timeOut 		 = g_Ram.ramGroupB.TuTime * Prd50HZ;
 	p->dinResetAlarm.timer 			 = 0;
 
-	p->dinPredReady.outputReg 		 = &p->Inputs.all;
-	p->dinPredReady.enableLevel220   = (Int *)&g_Ram.ramGroupB.LevelOnReadyTU220;
-	p->dinPredReady.disableLevel220  = (Int *)&g_Ram.ramGroupB.LevelOffReadyTU220;
-	p->dinPredReady.enableLevel24    = (Int *)&g_Ram.ramGroupB.LevelOnReadyTU24;
-	p->dinPredReady.disableLevel24   = (Int *)&g_Ram.ramGroupB.LevelOffReadyTU24;
-	p->dinPredReady.timeOut 		 = g_Ram.ramGroupB.TuTime * Prd50HZ;
-	p->dinPredReady.timer 			 = 0;
+	p->dinStopClose.outputReg 		 = &p->Inputs.all;
+	p->dinStopClose.enableLevel220   = (Int *)&g_Ram.ramGroupC.LevelOn220;
+	p->dinStopClose.disableLevel220  = (Int *)&g_Ram.ramGroupC.LevelOff220;
+	p->dinStopClose.enableLevel24    = (Int *)&g_Ram.ramGroupC.LevelOn24;
+	p->dinStopClose.disableLevel24   = (Int *)&g_Ram.ramGroupC.LevelOff24;
+	p->dinStopClose.timeOut 		 = g_Ram.ramGroupB.TuTime * Prd50HZ;
+	p->dinStopClose.timer 			 = 0;
 
 	p->dinDu.outputReg 				 = &p->Inputs.all;
-	p->dinDu.enableLevel220  		 = (Int *)&g_Ram.ramGroupB.LevelOnDU220;
-	p->dinDu.disableLevel220 		 = (Int *)&g_Ram.ramGroupB.LevelOffDU220;
-	p->dinDu.enableLevel24   		 = (Int *)&g_Ram.ramGroupB.LevelOnDU24;
-	p->dinDu.disableLevel24  		 = (Int *)&g_Ram.ramGroupB.LevelOffDU24;
+	p->dinDu.enableLevel220  		 = (Int *)&g_Ram.ramGroupC.LevelOn220;
+	p->dinDu.disableLevel220 		 = (Int *)&g_Ram.ramGroupC.LevelOff220;
+	p->dinDu.enableLevel24   		 = (Int *)&g_Ram.ramGroupC.LevelOn24;
+	p->dinDu.disableLevel24  		 = (Int *)&g_Ram.ramGroupC.LevelOff24;
 	p->dinDu.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd50HZ;
 	p->dinDu.timer 					 = 0;
 }
 
 void Comm_TuTsUpdate (TDigitalInterface *p)	//50 Ãö
 {
-	Uns  ts_all=0;
 
 	// ---------------------- ÒÅËÅÑÈÃÍÀËÈÇÀÖÈß-------------------------------
 	if (!(g_Ram.ramGroupA.Status.bit.Opened || g_Ram.ramGroupA.Status.bit.Closed))
@@ -97,25 +96,20 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//50 Ãö
 	p->Outputs.bit.Defect  = g_Ram.ramGroupA.Status.bit.Defect;	    	// 4	Äåôåêò
 	p->Outputs.bit.Opening = g_Ram.ramGroupA.Status.bit.Opening;		// 5	Îòêðûâàåòñÿ
 	p->Outputs.bit.Closing = g_Ram.ramGroupA.Status.bit.Closing;		// 6	Çàêðûâàåòñÿ
-	p->Outputs.bit.MUDU    = g_Ram.ramGroupA.Status.bit.MuDu;			// 7	ÌÓ/ÄÓ
+	p->Outputs.bit.MUDU    = !g_Ram.ramGroupA.Status.bit.MuDu;			// 7	ÌÓ/ÄÓ
 	// ----------------------ÈÍÂÅÐÑÈß ÒÅËÅÑÈÃÍÀËÈÇÀÖÈÈ-------------------------------
 
 	//èíâåðñèÿ ÒÑ
 	g_Ram.ramGroupA.StateTs.all = p->Outputs.all ^ g_Ram.ramGroupB.TsInvert.all;
-	ts_all = p->Outputs.all ^ g_Ram.ramGroupB.TsInvert.all;
+
+	if(g_Ram.ramGroupG.Mode)
+	{
+		g_Ram.ramGroupA.StateTs.all = g_Ram.ramGroupG.OutputReg.all;
+	}
+
+	Peref_74HC595Update(&g_Peref.ShiftReg, g_Ram.ramGroupA.StateTs);
 
 	// ----------------------ÂÛÂÎÄ ÒÅËÅÑÈÃÍÀËÈÇÀÖÈÈ----------------------------------
-	TS_1 = !((ts_all>>0) & 0x01); DELAY_US(1);
-	TS_2 = !((ts_all>>1) & 0x01); DELAY_US(1);
-	TS_3 = !((ts_all>>2) & 0x01); DELAY_US(1);
-	TS_4 = !((ts_all>>3) & 0x01); DELAY_US(1);
-	TS_5 = !((ts_all>>4) & 0x01); DELAY_US(1);
-	TS_6 = !((ts_all>>5) & 0x01); DELAY_US(1);
-	TS_7 = !((ts_all>>6) & 0x01); DELAY_US(1);
-	TS_8 = !((ts_all>>7) & 0x01); DELAY_US(1);
-	TS_9 = !((ts_all>>8) & 0x01); DELAY_US(1);
-	TS_10= !((ts_all>>9) & 0x01); DELAY_US(1);
-
 	//â ãðóïïó H äîáàâèòü
 	//g_Ram.ramGroupH.ADC_OPEN=g_Peref.AdcOpen;
 	//g_Ram.ramGroupH.ADC_CLOSE=g_Peref.AdcClose;
@@ -130,8 +124,8 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//50 Ãö
 	if (!(*p->TypeLogicSignal&CLOSE_BIT)) DIN_Update_On(&p->dinClose, p->TypeVoltSignal, CLOSE_BIT);
 	else DIN_Update_Off(&p->dinClose, p->TypeVoltSignal, CLOSE_BIT);
 
-	if (!(*p->TypeLogicSignal&STOP_BIT)) DIN_Update_On(&p->dinStop, p->TypeVoltSignal, STOP_BIT);
-	else DIN_Update_Off(&p->dinStop, p->TypeVoltSignal, STOP_BIT);
+	if (!(*p->TypeLogicSignal&STOP_OPEN_BIT)) DIN_Update_On(&p->dinStopOpen, p->TypeVoltSignal, STOP_OPEN_BIT);
+	else DIN_Update_Off(&p->dinStopOpen, p->TypeVoltSignal, STOP_OPEN_BIT);
 
 	if (!(*p->TypeLogicSignal&MU_BIT)) DIN_Update_On(&p->dinMu, p->TypeVoltSignal, MU_BIT);
 	else DIN_Update_Off(&p->dinMu, p->TypeVoltSignal, MU_BIT);
@@ -139,8 +133,8 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//50 Ãö
 	if (!(*p->TypeLogicSignal&RESETALARM_BIT)) DIN_Update_On(&p->dinResetAlarm, p->TypeVoltSignal, RESETALARM_BIT);
 	else DIN_Update_Off(&p->dinResetAlarm, p->TypeVoltSignal, RESETALARM_BIT);
 
-	if (!(*p->TypeLogicSignal&READYTU_BIT)) DIN_Update_On(&p->dinPredReady, p->TypeVoltSignal, READYTU_BIT);
-	else DIN_Update_Off(&p->dinPredReady, p->TypeVoltSignal, READYTU_BIT);
+	if (!(*p->TypeLogicSignal&STOP_CLOSE_BIT)) DIN_Update_On(&p->dinStopClose, p->TypeVoltSignal, STOP_CLOSE_BIT);
+	else DIN_Update_Off(&p->dinStopClose, p->TypeVoltSignal, STOP_CLOSE_BIT);
 
 	if (!(*p->TypeLogicSignal&DU_BIT)) DIN_Update_On(&p->dinDu, p->TypeVoltSignal, DU_BIT);
 	else DIN_Update_Off(&p->dinDu, p->TypeVoltSignal, DU_BIT);
@@ -167,12 +161,12 @@ void DIN_Update_On (TDIN *p, Uns *Type,Uns bit)
 	if (*p->outputReg & bit)	// Åñëè áèò àêòèâåí
 	{
 
-		if (p->inputDIN < disableLevel)//p->disableLevel
+		if (p->inputDIN <= disableLevel)//p->disableLevel
 			*p->outputReg &= ~bit;
 	}
 	else					// Èíà÷å (áèò íå àêòèâåí)
 	{
-		if (p->inputDIN > enableLevel )// åñëè óðîâåíü ñèãíàëà ïåðâûñèë ïîðîã
+		if (p->inputDIN >= enableLevel )// åñëè óðîâåíü ñèãíàëà ïåðâûñèë ïîðîã
 		{	
 			if (p->timer++ >= p->timeOut)	
 			{

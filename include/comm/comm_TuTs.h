@@ -19,19 +19,20 @@ extern "C" {
 
 #define DIN_OPEN_BIT		0
 #define DIN_CLOSE_BIT		1
-#define DIN_STOP_BIT		2
-#define DIN_MU_BIT		 	3
-#define DIN_RESETALARM_BIT 	4
-#define DIN_READYTU_BIT 	5
-#define DIN_DU_BIT 			6
+#define DIN_STOP_OPEN_BIT	2
+#define DIN_STOP_CLOSE_BIT 	3
+#define DIN_MU_BIT		 	4
+#define DIN_DU_BIT 			5
+#define DIN_RESETALARM_BIT 	6
 
 #define OPEN_BIT			BIT0
 #define CLOSE_BIT			BIT1
-#define STOP_BIT			BIT2
-#define MU_BIT		 		BIT3
-#define RESETALARM_BIT 		BIT4
-#define READYTU_BIT 		BIT5
-#define DU_BIT 				BIT6
+#define STOP_OPEN_BIT		BIT2
+#define STOP_CLOSE_BIT 		BIT3
+#define MU_BIT		 		BIT4
+#define DU_BIT 				BIT5
+#define RESETALARM_BIT 		BIT6
+
 
 #define DOUT_OPEN_BIT		0
 #define DOUT_CLOSE_BIT		1
@@ -63,13 +64,13 @@ typedef struct {
 typedef union _TInputReg {
   Uns all;
 	struct {
-		Uns Open:1;			// 0	Стоп
+		Uns Open:1;			// 0	открыть
 		Uns Close:1;		// 1	Закрыть
-		Uns Stop:1;			// 2	Открыть
-		Uns Mu:1;			// 3	Резерв
-		Uns ResetAlarm:1;	// 4	Резерв
-		Uns ReadyTu:1;		// 5	Резерв
-		Uns Du:1;			// 6	Резерв
+		Uns StopOpen:1;		// 2	СтопОткрытия
+		Uns StopClose:1;	// 5	СтопЗакрытия
+		Uns Mu:1;			// 3	Му
+		Uns Du:1;			// 6	Ду
+		Uns ResetAlarm:1;	// 4	СбросЗащит
 		Uns NoUse:9;		// 7-15	Не используются
 	} bit;
 } TInputReg;
@@ -95,11 +96,11 @@ typedef struct TDigitalInterface
 {
 	TInputReg		Inputs;			// Состояние дискретных входов
 	TOutputReg		Outputs;		// Состояние дискретных выходов
-	TDIN			dinStop;		// Дискретный вход "стоп"
+	TDIN			dinStopOpen;	// Дискретный вход "стоп открытия"
 	TDIN			dinClose;		// Дискретный вход "закрыть"
 	TDIN			dinOpen;		// Дискретный вход "открыть"
 	TDIN			dinResetAlarm;	// Дискретный вход "сброс аварий"
-	TDIN			dinPredReady;	// Дискретный вход "пред продготовка ТУ"
+	TDIN			dinStopClose;	// Дискретный вход "стоп закрытия"
 	TDIN			dinMu;			// Дискретный вход "МУ"
 	TDIN			dinDu;			// Дискретный вход "ДУ"
 	Uns				*TypeVoltSignal;	// 24 / 220

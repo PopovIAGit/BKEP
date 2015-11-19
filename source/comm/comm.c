@@ -18,7 +18,7 @@ Uint16 ASU_Data[10];
 Uint16 SHN_Data[10];
 
 void CommandUpdate(TComm *p);
-Uns DigitCmdModeUpdate (Uns *Output);
+//Uns DigitCmdModeUpdate (Uns *Output);
 static char ReadRegs(TMbPort *Port, Uint16 *Data, Uint16 Addr, Uint16 Count);
 //---------------------------------------------------
 void Comm_Init(TComm *p)
@@ -59,6 +59,7 @@ void Comm_Init(TComm *p)
 
 	p->Shn.SHN_ReadFlag = 0;
 	p->Shn.SHN_Mode = 1;
+	p->btn_reset_alarmFlag = 0;
 }
 
 //---------------------------------------------------
@@ -213,6 +214,19 @@ void Comm_50HzCalc(TComm *p)
 		g_Ram.ramGroupH.CmdButton = KEY_NONE;
 	}
 
+	//Кнопка сброса аварий на лицевой панели
+	if ((BTN_RESET_ALARM == 0) && (p->btn_reset_alarmFlag == 0))
+	{
+		g_Ram.ramGroupD.PrtReset = 1;
+		p->btn_reset_alarmFlag = 1;
+		g_Peref.Display.data = 999;
+
+	}
+	else if (BTN_RESET_ALARM == 1 && p->btn_reset_alarmFlag == 1)
+	{
+		p->btn_reset_alarmFlag = 0;
+	}
+
 	CommandUpdate(&g_Comm);
 }
 
@@ -231,22 +245,23 @@ void CommandUpdate(TComm *p)
 	DigitalInpUpdate(&p->digitInput); // Вызов функции обработки цифрового сигнала, защита от помех
 	g_Ram.ramGroupA.StateTu.all = p->digitInput.output;
 
-	if (!(p->digitInput.output & 0x20))
+	if (!(p->digitInput.output & 0x20)) // Если не выставлен ТУ дистанции то игнорируем конмады кроме стопа.
 	{
-		p->outputCmdReg = (p->digitInput.output & 0x4);
+		p->outputCmdReg = (p->digitInput.output & 0xC);
 	}
 	else
 	{
-		p->outputCmdReg = (p->digitInput.output & 0x7);
+		p->outputCmdReg = (p->digitInput.output & 0xF);
 	}
 
 	g_Ram.ramGroupH.TuState = p->outputCmdReg;
 
-	if ((p->digitInput.output&0x10)>>4==1)
+	if ((p->digitInput.output & 0x10) >> 4 == 1)
 	{
 		if (clrReset==0) g_Ram.ramGroupD.PrtReset = 1;
 		clrReset=1;
-	} else if ((p->digitInput.output&0x010)>>4==0)
+	}
+	else if ((p->digitInput.output & 0x010) >> 4 == 0)
 	{
 		clrReset=0;
 	}
@@ -258,6 +273,7 @@ void CommandUpdate(TComm *p)
 }
 //---------------------------------------------------
 // Функция обработки режима работы команд дискретного интерфейса (режим - импульсный, потенциальный)
+/*
 Uns DigitCmdModeUpdate (Uns *Output)
 {
 	static Uns prevOutput;
@@ -279,11 +295,12 @@ Uns DigitCmdModeUpdate (Uns *Output)
 			else														// Если сигнал ушел
 			{
 				if ((*Output)&0x03)										// Но на предыдущей итерации были команды на движение
-					result |= DIN_STOP_BIT;    							// Считаем, что пришла команда стоп
+					result |= DIN_STOP_OPEN_BIT;    					// Считаем, что пришла команда стоп
 				else 													// Иначе (Сигнал не изменился)
 					result &= ~(0x01<<i);								// Никаких команд не подаем
 			}
-		}else
+		}
+		else
 		{
 			if ((((*Output)>>i)&0x01) != (((prevOutput)>>i)&0x01))		// Если сигнал изменился
 				result |= (0x01<<i);//*Output;							// Что нажали - туда и едем
@@ -322,8 +339,8 @@ Uns DigitCmdModeUpdate (Uns *Output)
 	}
 
 	prevOutput = *Output;						// Запоминаем предыдущие значение сигнала с ТУ
-	return result;*/
-}
+	return result;
+}*/
 //---------------------------------------------------
 
 void TekModbusParamsUpdate(void) //??? необходимы проверки
@@ -352,7 +369,7 @@ void TekModbusParamsUpdate(void) //??? необходимы проверки
 	tek->DefReg.bit.Bv = (g_Ram.ramGroupA.Faults.Net.bit.BvR || g_Ram.ramGroupA.Faults.Net.bit.BvS || g_Ram.ramGroupA.Faults.Net.bit.BvT);
 	tek->DefReg.bit.Th = g_Ram.ramGroupA.Faults.Dev.bit.Th_BCP;
 	tek->DefReg.bit.Tl = g_Ram.ramGroupA.Faults.Dev.bit.Tl_BCP;
-	tek->DefReg.bit.PhOrdU = g_Ram.ramGroupA.Faults.Net.bit.PhOrd;
+	tek->DefReg.bit.PhOrdU = 0;//g_Ram.ramGroupA.Faults.Net.bit.PhOrd;
 	tek->DefReg.bit.PhOrdDrv = g_Ram.ramGroupA.Faults.Proc.bit.PhOrd;
 	tek->DefReg.bit.DevDef 	 = ((g_Ram.ramGroupA.Faults.Dev.all & TEK_DEVICE_FAULT_MASK) != 0); //маску переделать
 
@@ -454,7 +471,7 @@ void TekModbusParamsUpdate(void) //??? необходимы проверки
 
 	tek->TsTu.bit.InOpen 	 = g_Comm.digitInterface.Inputs.bit.Open;
 	tek->TsTu.bit.InClose	 = g_Comm.digitInterface.Inputs.bit.Close;
-	tek->TsTu.bit.InStop 	 = g_Comm.digitInterface.Inputs.bit.Stop;
+	tek->TsTu.bit.InStop 	 = g_Comm.digitInterface.Inputs.bit.StopOpen || g_Comm.digitInterface.Inputs.bit.StopClose;
 	tek->TsTu.bit.InMu 		 = g_Comm.digitInterface.Inputs.bit.Mu;
 	tek->TsTu.bit.InDu 		 = g_Comm.digitInterface.Inputs.bit.Du;
 

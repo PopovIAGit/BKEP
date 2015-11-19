@@ -133,7 +133,7 @@ void BluetoothActivation(TBluetoothHandle bPort)
 			GpioDataRegs.GPADAT.bit.GPIO27=1;
 		}
 	}*/
-	if (BUTTON_BLUE==0 && bPort->ModeProtocol!=0){
+	if (BUTTON_BLUE==1 && bPort->ModeProtocol!=0){
 		if (bPort->ButtActivTimer>3){
 			bPort->Enabled=false;
 			RS485_DIR_BT = 1;
@@ -149,7 +149,7 @@ void BluetoothActivation(TBluetoothHandle bPort)
 		}
 	}
 
-	if (BUTTON_BLUE==1 && bPort->ModeProtocol==0){
+	if (BUTTON_BLUE==0 && bPort->ModeProtocol==0){
 		bPort->ButtActivTimer++;
 		if (bPort->ButtActivTimer>2)//300мс
 		{
@@ -161,7 +161,7 @@ void BluetoothActivation(TBluetoothHandle bPort)
 			}
 		}
 	}
-	if (BUTTON_BLUE==0 && bPort->ModeProtocol==0){
+	if (BUTTON_BLUE==1 && bPort->ModeProtocol==0){
 		if (bPort->ButtActivTimer>0) bPort->ButtActivTimer--;
 		if (bPort->Function ==1 ) bPort->Function = 3;
 		if (bPort->Function ==2 ) bPort->Function = 4;
@@ -194,7 +194,7 @@ void BluetoothActivation(TBluetoothHandle bPort)
 	{
 		if (bPort->Connect==true)
 		{
-			if (BUTTON_BLUE==1 && bPort->ModeProtocol!=0)//
+			if (BUTTON_BLUE==0 && bPort->ModeProtocol!=0)//
 			{
 				bPort->ButtActivTimer++;
 				if (bPort->ButtActivTimer>3)//300мс
@@ -203,7 +203,7 @@ void BluetoothActivation(TBluetoothHandle bPort)
 				}
 			}
 		} else {
-			if (BUTTON_BLUE==1 && bPort->ModeProtocol!=0)//
+			if (BUTTON_BLUE==0 && bPort->ModeProtocol!=0)//
 			{
 				bPort->ButtActivTimer++;
 				if (bPort->ButtActivTimer>3)//300мс
@@ -226,7 +226,6 @@ void BluetoothActivation(TBluetoothHandle bPort)
 			if (bPort->ModeProtocol == 1) bPort->Mode = BT_DATA_MODE;
 		}
 	}
-
 
 	if (bPort->TimerActive.Counter<(bPort->TimerActive.Timeout-300) && bPort->Connect==true)
 	{
