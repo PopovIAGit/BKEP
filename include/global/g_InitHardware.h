@@ -93,6 +93,10 @@ extern "C" {
 
 #define CUR_SENSOR_GAIN GpioDataRegs.GPCDAT.bit.GPIO69  //0 - большие тока. 1 - малые токи
 
+//------------ТС----------------------------------------
+
+#define ENB_RELE 			GpioDataRegs.GPADAT.bit.GPIO0
+
 //--- FRAM --------------------------------------------
 #define SC_EEPROM1 			GpioDataRegs.GPCDAT.bit.GPIO79
 #define SC_EEPROM2 			GpioDataRegs.GPCDAT.bit.GPIO78

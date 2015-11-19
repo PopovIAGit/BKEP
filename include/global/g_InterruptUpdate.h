@@ -64,7 +64,7 @@ TPeriodicalFunction Task18kHz[] =
 	PrdElemInit(Peref_18kHzCalc,						&g_Peref),
 	PrdElemInit(SciMasterConnBetweenBlockCommTimer,		&g_Comm.mbBkp),	//на 18к√ц
 	PrdElemInit(Core_Protections18kHzUpdate,			&g_Core.Protections),
-	PrdElemInit(MonitorUpdate,							Null),
+//	PrdElemInit(MonitorUpdate,							Null),
 };
 
 //—юда вставл€ем функции дл€ соответствующей группы
