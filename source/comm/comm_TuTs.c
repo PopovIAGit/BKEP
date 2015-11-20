@@ -107,7 +107,7 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//50 Ãö
 		g_Ram.ramGroupA.StateTs.all = g_Ram.ramGroupG.OutputReg.all;
 	}
 
-	Peref_74HC595Update(&g_Peref.ShiftReg, g_Ram.ramGroupA.StateTs);
+	//Peref_74HC595Update(&g_Peref.ShiftReg, g_Ram.ramGroupA.StateTs);
 
 	// ----------------------ÂÛÂÎÄ ÒÅËÅÑÈÃÍÀËÈÇÀÖÈÈ----------------------------------
 	//â ãğóïïó H äîáàâèòü
