@@ -250,7 +250,7 @@ void InitGpio(void)
 	//выходы
 
 	GpioCtrlRegs.GPADIR.bit.GPIO0	= 1;	//ENB_RELE
-	GpioDataRegs.GPADAT.bit.GPIO0	= 0;
+	GpioDataRegs.GPADAT.bit.GPIO0	= 1;
 
 	GpioCtrlRegs.GPADIR.bit.GPIO1	= 1;	//BCD_A
 	GpioDataRegs.GPADAT.bit.GPIO1	= 1;

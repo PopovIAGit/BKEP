@@ -78,6 +78,8 @@ void Comm_TuTsInit (TDigitalInterface *p)
 
 void Comm_TuTsUpdate (TDigitalInterface *p)	//50 Гц
 {
+	static TOutputReg OutputRegTmp;
+	static Uns TuEnbReleTimer;
 
 	// ---------------------- ТЕЛЕСИГНАЛИЗАЦИЯ-------------------------------
 	if (!(g_Ram.ramGroupA.Status.bit.Opened || g_Ram.ramGroupA.Status.bit.Closed))
@@ -100,14 +102,24 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//50 Гц
 	// ----------------------ИНВЕРСИЯ ТЕЛЕСИГНАЛИЗАЦИИ-------------------------------
 
 	//инверсия ТС
-	g_Ram.ramGroupA.StateTs.all = p->Outputs.all ^ g_Ram.ramGroupB.TsInvert.all;
+	//g_Ram.ramGroupA.StateTs.all = p->Outputs.all ^ g_Ram.ramGroupB.TsInvert.all;
+		OutputRegTmp.all = p->Outputs.all ^ g_Ram.ramGroupB.TsInvert.all;
 
-	if(g_Ram.ramGroupG.Mode)
-	{
-		g_Ram.ramGroupA.StateTs.all = g_Ram.ramGroupG.OutputReg.all;
-	}
+			if(g_Ram.ramGroupG.Mode)
+			{
+				OutputRegTmp.all = g_Ram.ramGroupG.OutputReg.all;
+			}
 
-	//Peref_74HC595Update(&g_Peref.ShiftReg, g_Ram.ramGroupA.StateTs);
+		if (OutputRegTmp.all != g_Ram.ramGroupA.StateTs.all)
+		{
+			ENB_RELE = 0;
+			g_Ram.ramGroupA.StateTs.all = OutputRegTmp.all;
+			Peref_74HC595Update(&g_Peref.ShiftReg, g_Ram.ramGroupA.StateTs);
+			TuEnbReleTimer = (0.3 * Prd50HZ);
+		}
+
+		if(TuEnbReleTimer > 0) TuEnbReleTimer--;
+		else if(TuEnbReleTimer == 0 && ENB_RELE == 0) ENB_RELE = 1;
 
 	// ----------------------ВЫВОД ТЕЛЕСИГНАЛИЗАЦИИ----------------------------------
 	//в группу H добавить

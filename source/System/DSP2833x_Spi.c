@@ -80,6 +80,7 @@ Uns SPI_send(Byte Id, Uns Data)
 	return 0;
 }
 
+
 void SPI_transmit(Byte Id, Uns Data)
 {
 	SpiRegs[Id]->SPITXBUF = Data << (0xF - (SpiRegs[Id]->SPICCR.all & 0xF));
