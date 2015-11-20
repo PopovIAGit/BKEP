@@ -432,7 +432,7 @@ void Core_DevProc_FaultIndic(TCoreProtections *p)
 	{
 		p->outDefects.Dev.bit.Memory1 = Eeprom1.Error;
 		p->outDefects.Dev.bit.Memory2 = Eeprom2.Error;
-		p->outDefects.Dev.bit.PosSens = 0;	//??? добавить при наличии драйвера
+		//p->outFaults.Dev.bit.PosSens = 0;	//??? добавить при наличии драйвера
 		p->outDefects.Dev.bit.Rtc = (Uns) g_Peref.Rtc.Error;
 		p->outDefects.Dev.bit.TSens = (Uns) g_Peref.TSens.Error;
 		p->outDefects.Dev.bit.Dac = (Uns) g_Peref.Dac.Error;
