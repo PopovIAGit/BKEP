@@ -256,12 +256,12 @@ void Comm_CommandUpdate(TComm *p)
 
 	g_Ram.ramGroupH.TuState = p->outputCmdReg;
 
-	if ((p->digitInput.output & 0x10) >> 4 == 1)
+	if ((p->digitInput.output & 0x40) >> 6 == 1)
 	{
 		if (clrReset==0) g_Ram.ramGroupD.PrtReset = 1;
 		clrReset=1;
 	}
-	else if ((p->digitInput.output & 0x010) >> 4 == 0)
+	else if ((p->digitInput.output & 0x040) >> 6 == 0)
 	{
 		clrReset=0;
 	}

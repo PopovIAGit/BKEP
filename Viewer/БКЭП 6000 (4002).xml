@@ -154,6 +154,7 @@
           <Field BitValue="10" Description="Сбой ЦАП" SpecialDescription="ev48" />
           <Field BitValue="11" Description="Выключение БКЭП" SpecialDescription="ev49" />
           <Field BitValue="12" Description="Нет связи с БКП" SpecialDescription="ev50" />
+          <Field BitValue="13" Description="Сбой МПО/МПЗ" />
         </Fields>
       </ValueDescription>
       <Info>
