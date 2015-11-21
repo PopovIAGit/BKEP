@@ -95,13 +95,13 @@ void Peref_SensTuObserverUpdate(TSensTuObserver *p) // 18000 Гц
     p->UResetAlarmInp = TU_SIG_RESET_ALARM;
 
     // Преобразование напряжений
-    p->UOpenOut 		= ADC_CONV(p->UOpenInp, 			*p->parSensors.p_UOpen_Mpy, 		*p->parSensors.p_UOpen_Offset);
-    p->UCloseOut 		= ADC_CONV(p->UCloseInp, 			*p->parSensors.p_UClose_Mpy, 		*p->parSensors.p_UClose_Offset);
-    p->UStopOpenOut 	= ADC_CONV(p->UStopOpenInp,  		*p->parSensors.p_UStopOpen_Mpy, 	*p->parSensors.p_UStopOpen_Offset);
-    p->UStopCloseOut	= ADC_CONV(p->UStopCloseInp, 		*p->parSensors.p_UStopClose_Mpy,	*p->parSensors.p_UStopClose_Offset);
-    p->UMuOut 			= ADC_CONV(p->UMuInp,    			*p->parSensors.p_UMu_Mpy, 			*p->parSensors.p_UMu_Offset);
-    p->UDuOut 			= ADC_CONV(p->UDuInp, 				*p->parSensors.p_UDu_Mpy, 			*p->parSensors.p_UDu_Offset);
-    p->UResetAlarmOut 	= ADC_CONV(p->UResetAlarmInp, 		*p->parSensors.p_UResetAlarm_Mpy, 	*p->parSensors.p_UResetAlarm_Offset);
+    p->UOpenOut 		= ADC_TU_CONV(p->UOpenInp, 				*p->parSensors.p_UOpen_Mpy, 		*p->parSensors.p_UOpen_Offset);
+    p->UCloseOut 		= ADC_TU_CONV(p->UCloseInp, 			*p->parSensors.p_UClose_Mpy, 		*p->parSensors.p_UClose_Offset);
+    p->UStopOpenOut 	= ADC_TU_CONV(p->UStopOpenInp,  		*p->parSensors.p_UStopOpen_Mpy, 	*p->parSensors.p_UStopOpen_Offset);
+    p->UStopCloseOut	= ADC_TU_CONV(p->UStopCloseInp, 		*p->parSensors.p_UStopClose_Mpy,	*p->parSensors.p_UStopClose_Offset);
+    p->UMuOut 			= ADC_TU_CONV(p->UMuInp,    			*p->parSensors.p_UMu_Mpy, 			*p->parSensors.p_UMu_Offset);
+    p->UDuOut 			= ADC_TU_CONV(p->UDuInp, 				*p->parSensors.p_UDu_Mpy, 			*p->parSensors.p_UDu_Offset);
+    p->UResetAlarmOut 	= ADC_TU_CONV(p->UResetAlarmInp, 		*p->parSensors.p_UResetAlarm_Mpy, 	*p->parSensors.p_UResetAlarm_Offset);
 
 
 

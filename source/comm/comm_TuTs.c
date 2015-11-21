@@ -24,7 +24,7 @@ void Comm_TuTsInit (TDigitalInterface *p)
 	p->dinStopOpen.disableLevel220 		 = (Int *)&g_Ram.ramGroupC.LevelOff220;
 	p->dinStopOpen.enableLevel24 		 = (Int *)&g_Ram.ramGroupC.LevelOn24;
 	p->dinStopOpen.disableLevel24 		 = (Int *)&g_Ram.ramGroupC.LevelOff24;
-	p->dinStopOpen.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd50HZ;
+	p->dinStopOpen.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd50HZ/10;
 	p->dinStopOpen.timer 				 = 0;
 
 	p->dinOpen.outputReg        	 = &p->Inputs.all;
@@ -32,7 +32,7 @@ void Comm_TuTsInit (TDigitalInterface *p)
 	p->dinOpen.disableLevel220  	 = (Int *)&g_Ram.ramGroupC.LevelOff220;
 	p->dinOpen.enableLevel24    	 = (Int *)&g_Ram.ramGroupC.LevelOn24;
 	p->dinOpen.disableLevel24   	 = (Int *)&g_Ram.ramGroupC.LevelOff24;
-	p->dinOpen.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd50HZ;
+	p->dinOpen.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd50HZ/10;
 	p->dinOpen.timer 				 = 0;
 
 	p->dinClose.outputReg 			 = &p->Inputs.all;
@@ -40,7 +40,7 @@ void Comm_TuTsInit (TDigitalInterface *p)
 	p->dinClose.disableLevel220 	 = (Int *)&g_Ram.ramGroupC.LevelOff220;
 	p->dinClose.enableLevel24   	 = (Int *)&g_Ram.ramGroupC.LevelOn24;
 	p->dinClose.disableLevel24  	 = (Int *)&g_Ram.ramGroupC.LevelOff24;
-	p->dinClose.timeOut 			 = g_Ram.ramGroupB.TuTime * Prd50HZ;
+	p->dinClose.timeOut 			 = g_Ram.ramGroupB.TuTime * Prd50HZ/10;
 	p->dinClose.timer 				 = 0;
 
 	p->dinMu.outputReg 				 = &p->Inputs.all;
@@ -48,7 +48,7 @@ void Comm_TuTsInit (TDigitalInterface *p)
 	p->dinMu.disableLevel220 		 = (Int *)&g_Ram.ramGroupC.LevelOff220;
 	p->dinMu.enableLevel24   		 = (Int *)&g_Ram.ramGroupC.LevelOn24;
 	p->dinMu.disableLevel24  		 = (Int *)&g_Ram.ramGroupC.LevelOff24;
-	p->dinMu.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd50HZ;
+	p->dinMu.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd50HZ/10;
 	p->dinMu.timer 					 = 0;
 
 	p->dinResetAlarm.outputReg 		 = &p->Inputs.all;
@@ -56,7 +56,7 @@ void Comm_TuTsInit (TDigitalInterface *p)
 	p->dinResetAlarm.disableLevel220 = (Int *)&g_Ram.ramGroupC.LevelOff220;
 	p->dinResetAlarm.enableLevel24   = (Int *)&g_Ram.ramGroupC.LevelOn24;
 	p->dinResetAlarm.disableLevel24  = (Int *)&g_Ram.ramGroupC.LevelOff24;
-	p->dinResetAlarm.timeOut 		 = g_Ram.ramGroupB.TuTime * Prd50HZ;
+	p->dinResetAlarm.timeOut 		 = g_Ram.ramGroupB.TuTime * Prd50HZ/10;
 	p->dinResetAlarm.timer 			 = 0;
 
 	p->dinStopClose.outputReg 		 = &p->Inputs.all;
@@ -64,7 +64,7 @@ void Comm_TuTsInit (TDigitalInterface *p)
 	p->dinStopClose.disableLevel220  = (Int *)&g_Ram.ramGroupC.LevelOff220;
 	p->dinStopClose.enableLevel24    = (Int *)&g_Ram.ramGroupC.LevelOn24;
 	p->dinStopClose.disableLevel24   = (Int *)&g_Ram.ramGroupC.LevelOff24;
-	p->dinStopClose.timeOut 		 = g_Ram.ramGroupB.TuTime * Prd50HZ;
+	p->dinStopClose.timeOut 		 = g_Ram.ramGroupB.TuTime * Prd50HZ/10;
 	p->dinStopClose.timer 			 = 0;
 
 	p->dinDu.outputReg 				 = &p->Inputs.all;
@@ -72,7 +72,7 @@ void Comm_TuTsInit (TDigitalInterface *p)
 	p->dinDu.disableLevel220 		 = (Int *)&g_Ram.ramGroupC.LevelOff220;
 	p->dinDu.enableLevel24   		 = (Int *)&g_Ram.ramGroupC.LevelOn24;
 	p->dinDu.disableLevel24  		 = (Int *)&g_Ram.ramGroupC.LevelOff24;
-	p->dinDu.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd50HZ;
+	p->dinDu.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd50HZ/10;
 	p->dinDu.timer 					 = 0;
 }
 
