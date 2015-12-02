@@ -24,7 +24,7 @@ void Comm_TuTsInit (TDigitalInterface *p)
 	p->dinStopOpen.disableLevel220 		 = (Int *)&g_Ram.ramGroupC.LevelOff220;
 	p->dinStopOpen.enableLevel24 		 = (Int *)&g_Ram.ramGroupC.LevelOn24;
 	p->dinStopOpen.disableLevel24 		 = (Int *)&g_Ram.ramGroupC.LevelOff24;
-	p->dinStopOpen.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd50HZ/10;
+	p->dinStopOpen.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd200HZ/10;
 	p->dinStopOpen.timer 				 = 0;
 
 	p->dinOpen.outputReg        	 = &p->Inputs.all;
@@ -32,7 +32,7 @@ void Comm_TuTsInit (TDigitalInterface *p)
 	p->dinOpen.disableLevel220  	 = (Int *)&g_Ram.ramGroupC.LevelOff220;
 	p->dinOpen.enableLevel24    	 = (Int *)&g_Ram.ramGroupC.LevelOn24;
 	p->dinOpen.disableLevel24   	 = (Int *)&g_Ram.ramGroupC.LevelOff24;
-	p->dinOpen.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd50HZ/10;
+	p->dinOpen.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd200HZ/10;
 	p->dinOpen.timer 				 = 0;
 
 	p->dinClose.outputReg 			 = &p->Inputs.all;
@@ -40,7 +40,7 @@ void Comm_TuTsInit (TDigitalInterface *p)
 	p->dinClose.disableLevel220 	 = (Int *)&g_Ram.ramGroupC.LevelOff220;
 	p->dinClose.enableLevel24   	 = (Int *)&g_Ram.ramGroupC.LevelOn24;
 	p->dinClose.disableLevel24  	 = (Int *)&g_Ram.ramGroupC.LevelOff24;
-	p->dinClose.timeOut 			 = g_Ram.ramGroupB.TuTime * Prd50HZ/10;
+	p->dinClose.timeOut 			 = g_Ram.ramGroupB.TuTime * Prd200HZ/10;
 	p->dinClose.timer 				 = 0;
 
 	p->dinMu.outputReg 				 = &p->Inputs.all;
@@ -48,7 +48,7 @@ void Comm_TuTsInit (TDigitalInterface *p)
 	p->dinMu.disableLevel220 		 = (Int *)&g_Ram.ramGroupC.LevelOff220;
 	p->dinMu.enableLevel24   		 = (Int *)&g_Ram.ramGroupC.LevelOn24;
 	p->dinMu.disableLevel24  		 = (Int *)&g_Ram.ramGroupC.LevelOff24;
-	p->dinMu.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd50HZ/10;
+	p->dinMu.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd200HZ/10;
 	p->dinMu.timer 					 = 0;
 
 	p->dinResetAlarm.outputReg 		 = &p->Inputs.all;
@@ -56,7 +56,7 @@ void Comm_TuTsInit (TDigitalInterface *p)
 	p->dinResetAlarm.disableLevel220 = (Int *)&g_Ram.ramGroupC.LevelOff220;
 	p->dinResetAlarm.enableLevel24   = (Int *)&g_Ram.ramGroupC.LevelOn24;
 	p->dinResetAlarm.disableLevel24  = (Int *)&g_Ram.ramGroupC.LevelOff24;
-	p->dinResetAlarm.timeOut 		 = g_Ram.ramGroupB.TuTime * Prd50HZ/10;
+	p->dinResetAlarm.timeOut 		 = g_Ram.ramGroupB.TuTime * Prd200HZ/10;
 	p->dinResetAlarm.timer 			 = 0;
 
 	p->dinStopClose.outputReg 		 = &p->Inputs.all;
@@ -64,7 +64,7 @@ void Comm_TuTsInit (TDigitalInterface *p)
 	p->dinStopClose.disableLevel220  = (Int *)&g_Ram.ramGroupC.LevelOff220;
 	p->dinStopClose.enableLevel24    = (Int *)&g_Ram.ramGroupC.LevelOn24;
 	p->dinStopClose.disableLevel24   = (Int *)&g_Ram.ramGroupC.LevelOff24;
-	p->dinStopClose.timeOut 		 = g_Ram.ramGroupB.TuTime * Prd50HZ/10;
+	p->dinStopClose.timeOut 		 = g_Ram.ramGroupB.TuTime * Prd200HZ/10;
 	p->dinStopClose.timer 			 = 0;
 
 	p->dinDu.outputReg 				 = &p->Inputs.all;
@@ -72,7 +72,7 @@ void Comm_TuTsInit (TDigitalInterface *p)
 	p->dinDu.disableLevel220 		 = (Int *)&g_Ram.ramGroupC.LevelOff220;
 	p->dinDu.enableLevel24   		 = (Int *)&g_Ram.ramGroupC.LevelOn24;
 	p->dinDu.disableLevel24  		 = (Int *)&g_Ram.ramGroupC.LevelOff24;
-	p->dinDu.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd50HZ/10;
+	p->dinDu.timeOut 				 = g_Ram.ramGroupB.TuTime * Prd200HZ/10;
 	p->dinDu.timer 					 = 0;
 }
 
@@ -89,16 +89,25 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//50 Гц
 	}
 	else
 	{
-		p->Outputs.bit.Opened  = g_Ram.ramGroupA.Status.bit.Opened;	    // 0	Открыто
-		p->Outputs.bit.Closed  = g_Ram.ramGroupA.Status.bit.Closed;	    // 1	Закрыто
+		p->Outputs.bit.Opened  = !g_Ram.ramGroupA.Status.bit.Opened;	    // 0	Открыто
+		p->Outputs.bit.Closed  = !g_Ram.ramGroupA.Status.bit.Closed;	    // 1	Закрыто
 	}
 
 	p->Outputs.bit.Mufta   = g_Ram.ramGroupA.Status.bit.Mufta;	    	// 2	Муфта
 	p->Outputs.bit.Fault   = g_Ram.ramGroupA.Status.bit.Fault;	    	// 3	Авария
 	p->Outputs.bit.Defect  = g_Ram.ramGroupA.Status.bit.Defect;	    	// 4	Дефект
+	if(g_Core.Protections.outFaults.Proc.bit.MuDuDef)
+	{
+		p->Outputs.bit.MUDU    = 0;			// 7	МУ/ДУ
+	}
+	else
+	{
+		p->Outputs.bit.MUDU    = !g_Ram.ramGroupA.Status.bit.MuDu;			// 7	МУ/ДУ
+	}
+
 	p->Outputs.bit.Opening = g_Ram.ramGroupA.Status.bit.Opening;		// 5	Открывается
 	p->Outputs.bit.Closing = g_Ram.ramGroupA.Status.bit.Closing;		// 6	Закрывается
-	p->Outputs.bit.MUDU    = !g_Ram.ramGroupA.Status.bit.MuDu;			// 7	МУ/ДУ
+
 	// ----------------------ИНВЕРСИЯ ТЕЛЕСИГНАЛИЗАЦИИ-------------------------------
 
 	//инверсия ТС
@@ -115,7 +124,8 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//50 Гц
 			ENB_RELE = 0;
 			g_Ram.ramGroupA.StateTs.all = OutputRegTmp.all;
 			Peref_74HC595Update(&g_Peref.ShiftReg, g_Ram.ramGroupA.StateTs);
-			TuEnbReleTimer = (0.3 * Prd50HZ);
+			//TuEnbReleTimer = (0.3 * Prd50HZ);
+			TuEnbReleTimer = (0.3 * Prd200HZ);
 		}
 
 		if(TuEnbReleTimer > 0) TuEnbReleTimer--;
@@ -187,7 +197,13 @@ void DIN_Update_On (TDIN *p, Uns *Type,Uns bit)
 			}
 		}
 		else
-			p->timer = 0;
+		{
+			if (p->timer>2)
+			{
+				p->timer -= 2;
+			}
+		}
+			//p->timer = 0;
 	}
 }
 //-----------------------------------------------------
@@ -219,7 +235,9 @@ void DIN_Update_Off (TDIN *p, Uns *Type,Uns bit)
 			}
 		}
 		else
-			p->timer = 0;
+			{
+				if (p->timer>2) p->timer -= 2;
+			}
 	}
 	else					// Иначе (бит не активен)
 	{

@@ -174,6 +174,11 @@ void Peref_LedsUpdate(pLeds p)
 
 	LED_MPZ = p->leds.bit.Mpz;				asm(" RPT #9 || NOP");
 	LED_MPO = p->leds.bit.Mpo;				asm(" RPT #9 || NOP");
+	if(g_Core.Protections.outFaults.Proc.bit.MuDuDef)
+	{
+		p->leds.bit.MuDu = 0;
+	}
+
 	LED_MUDU	= !p->leds.bit.MuDu;		asm(" RPT #9 || NOP");
 
 	if ((!(*p->pStatus & STATUS_CLOSED)) && (!(*p->pStatus & STATUS_OPENED)))
@@ -191,8 +196,14 @@ void Peref_LedsUpdate(pLeds p)
 	}
 
 	//g_Ram.ramGroupH.BkpIndication = (~p->leds.all) & 0x00FF;
+	if(g_Core.Protections.outFaults.Proc.bit.MuDuDef)
+		{
+		g_Ram.ramGroupH.BkpIndication.bit.MuDu = 0;
+		}
+	else
+		g_Ram.ramGroupH.BkpIndication.bit.MuDu  = ~p->leds.bit.MuDu;
 
-	g_Ram.ramGroupH.BkpIndication.bit.MuDu  = ~p->leds.bit.MuDu;
+	//g_Ram.ramGroupH.BkpIndication.bit.MuDu  = ~p->leds.bit.MuDu;
 	g_Ram.ramGroupH.BkpIndication.bit.Open  = ~p->leds.bit.Open;
 	g_Ram.ramGroupH.BkpIndication.bit.Mpo   = ~p->leds.bit.Mpo;
 	g_Ram.ramGroupH.BkpIndication.bit.Fault = ~p->leds.bit.Fault;

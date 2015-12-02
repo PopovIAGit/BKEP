@@ -371,15 +371,63 @@ static void StopMode(void)
 
 static void MoveMode(void)
 {
-	g_Ram.ramGroupA.Torque = g_Core.TorqObs.Indication; // отображаем текущий момент
+	if (g_Ram.ramGroupC.DriveType == 1)
+	{
+		if (g_Ram.ramGroupA.Faults.Net.bit.UvR
+				|| g_Ram.ramGroupA.Faults.Net.bit.UvS
+				|| g_Ram.ramGroupA.Faults.Net.bit.UvT
+				|| g_Ram.ramGroupA.Faults.Net.bit.OvR
+				|| g_Ram.ramGroupA.Faults.Net.bit.OvS
+				|| g_Ram.ramGroupA.Faults.Net.bit.OvT
+				|| g_Ram.ramGroupA.Faults.Load.bit.PhlU
+				|| g_Ram.ramGroupA.Faults.Load.bit.PhlU
+				|| g_Ram.ramGroupA.Faults.Load.bit.PhlV
+				|| g_Ram.ramGroupA.Faults.Load.bit.PhlW)
+		{
+			g_Ram.ramGroupA.Torque = g_Core.MotorControl.TorqueSet - 1;
+		}
+		else
+		{
+			g_Ram.ramGroupA.Torque = g_Core.TorqObs.Indication; // отображаем текущий момент
+		}
+	}
+	else
+		g_Ram.ramGroupA.Torque = g_Core.TorqObs.Indication; // отображаем текущий момент
 
-	if (CONTACTOR_2_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
+
+
 	if (CONTACTOR_1_STATUS && g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
+	if (CONTACTOR_2_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
 
-	if(g_Core.TorqObs.Indication < g_Core.MotorControl.TorqueSet)
+	g_Core.Protections.MuffFlag = g_Core.Protections.MuffFlag200Hz;
+
+	/*if(g_Ram.ramGroupA.Torque < g_Core.MotorControl.TorqueSet)
+	{
+		//g_Core.MotorControl.MufTimer = 0;
+		if (g_Core.MotorControl.MufTimer) g_Core.MotorControl.MufTimer--;
+	}
+	else if (++g_Core.MotorControl.MufTimer >= ((Prd50HZ*0.1) * g_Ram.ramGroupB.MuffTimer))
+		g_Core.Protections.MuffFlag = 1;	//  1 выставл€ем муфту если в течении секунды момент больше заданного
+*/
+}
+
+void Protections_MuffFlag(void)
+{
+	if(g_Core.MotorControl.WorkMode != wmMove)
+	{
 		g_Core.MotorControl.MufTimer = 0;
-	else if (++g_Core.MotorControl.MufTimer >= (5 * g_Ram.ramGroupB.MuffTimer))
-		g_Core.Protections.MuffFlag = 1;	// выставл€ем муфту если в течении секунды момент больше заданного
+		return;
+	}
+
+
+	if(g_Ram.ramGroupA.Torque < g_Core.MotorControl.TorqueSet)
+	{
+		//g_Core.MotorControl.MufTimer = 0;
+		if (g_Core.MotorControl.MufTimer) g_Core.MotorControl.MufTimer--;
+	}
+	else if (g_Core.MotorControl.MufTimer >= ((Prd200HZ*0.4) * g_Ram.ramGroupB.MuffTimer)){
+		g_Core.Protections.MuffFlag200Hz = 1;	//  1 выставл€ем муфту если в течении секунды момент больше заданного
+	} else g_Core.MotorControl.MufTimer+=4;
 
 }
 

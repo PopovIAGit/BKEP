@@ -159,7 +159,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 
 	p->overMax_VoltageR.Input = (Int *) &g_Ram.ramGroupA.Ur;
 	p->overMax_VoltageS.Input = (Int *) &g_Ram.ramGroupA.Us;
-	p->overMax_VoltageT.Input = (Int *) &g_Ram.ramGroupH.Ut;
+	p->overMax_VoltageT.Input = (Int *) &g_Ram.ramGroupA.Ut;
 
 	p->overMax_VoltageR.Output = (Uns *) &p->outFaults.Net.all;
 	p->overMax_VoltageS.Output = (Uns *) &p->outFaults.Net.all;
@@ -523,6 +523,8 @@ void Core_ProtectionsClear(TCoreProtections *p)
 	Uns MuffAddr, TH_BCP_addr;
 
 	g_Core.MotorControl.OverWayFlag = 0;		// Сбросили отсусвие уплотнения
+
+	g_Core.Protections.MuffFlag200Hz = 0;
 
 	if (g_Ram.ramGroupH.MuffFault == 1 && IsMemParReady())
 	{

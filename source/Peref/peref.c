@@ -214,11 +214,14 @@ void Peref_18kHzCalc(TPeref *p) // 18 êÃö
 
     Peref_PhaseOrderUpdate(&p->phaseOrder);
 
+
+
+
     if (!p->sinObserver.IV.CurAngle)
 	{
 	    p->Phifltr.Input = p->sinObserver.US.CurAngle;
-	    g_Ram.ramGroupA.AngleUI =  p->sinObserver.US.CurAngle;
 	}
+
     //-------------------------------------------------------------
 }
 
@@ -245,9 +248,7 @@ void Peref_50HzCalc(TPeref *p)	// 50 Ãö
     peref_ApFilter3Calc(&p->IW3fltr);
 
     if(g_Ram.ramGroupC.DriveType < 15 && g_Ram.ramGroupC.DriveType != 0) CUR_SENSOR_GAIN = 0;
-    if(g_Ram.ramGroupC.DriveType < 5 && g_Ram.ramGroupC.DriveType != 0) CUR_SENSOR_GAIN = 1;
-
-
+    if(g_Ram.ramGroupC.DriveType< 5 && g_Ram.ramGroupC.DriveType != 0) CUR_SENSOR_GAIN = 1;
 
     // êîððåêòèðîâêà îôôñåòîâ äë ÒÓ 220/24
 
@@ -303,7 +304,7 @@ void Peref_50HzCalc(TPeref *p)	// 50 Ãö
     }
 
 
-    switch(p->NumCalcTU_50Hz){
+    /*switch(p->NumCalcTU_50Hz){
     	case 0:
     		p->U3fltrOpen.Input 		= p->InDigSignal.sigOpen.Output;
     		peref_ApFilter3Calc(&p->U3fltrOpen);
@@ -344,11 +345,22 @@ void Peref_50HzCalc(TPeref *p)	// 50 Ãö
 			p->U3fltrDU.Input 			= p->InDigSignal.sigDU.Output;
 			peref_ApFilter3Calc(&p->U3fltrResetAlarm);
 			g_Comm.digitInterface.dinResetAlarm.inputDIN = p->U3fltrResetAlarm.Output;
-			p->NumCalcTU_50Hz=0;
+			p->NumCalcTU_50Hz=7;
 		break;
-    	default: p->NumCalcTU_50Hz; break;
+    	case 7: p->NumCalcTU_50Hz=8; break;
+    	case 8: p->NumCalcTU_50Hz=9; break;
+    	case 9: p->NumCalcTU_50Hz=0; break;
 
-    }
+    	default: p->NumCalcTU_50Hz=0; break;
+
+    }*/
+        		g_Comm.digitInterface.dinOpen.inputDIN = p->InDigSignal.sigOpen.Output;
+    			g_Comm.digitInterface.dinClose.inputDIN = p->InDigSignal.sigClose.Output;
+    			g_Comm.digitInterface.dinStopOpen.inputDIN = p->InDigSignal.sigStopOpen.Output;
+    			g_Comm.digitInterface.dinMu.inputDIN = p->InDigSignal.sigMU.Output;
+    			g_Comm.digitInterface.dinDu.inputDIN = p->InDigSignal.sigDU.Output;
+    			g_Comm.digitInterface.dinStopClose.inputDIN = p->InDigSignal.sigStopClose.Output;
+    			g_Comm.digitInterface.dinResetAlarm.inputDIN = p->InDigSignal.sigResetAlarm.Output;
 
     /*p->U3fltrOpen.Input 		= p->InDigSignal.sigOpen.Output;
     p->U3fltrClose.Input 		= p->InDigSignal.sigClose.Output;
