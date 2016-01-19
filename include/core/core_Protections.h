@@ -94,10 +94,10 @@
 #define Tl_BCP_CODE			36
 #define Th_BCD_CODE			37
 #define Tl_BCD_CODE			38
-#define NoBCP_Connect_CODE	39
+#define NoBCP_Connect_CODE	31
 
 #define MpoMpzError_CODE	41
-
+#define BlueNoLaunch_CODE	42
 
 //--------------------- Макросы --------------------------------------------
 #define PRT_CFG_SET(CanBeReseted, Level, Bit, Hyst) \
@@ -149,6 +149,7 @@ typedef struct {
 		Uns					registerBrCurr;		// Регистр аварий обрыва фаз двигателя
 		Uns					registerBrVolt;		// Регистр аварий обрыва фаз питания
 		Uns 				MuffFlag;			// Флаг муфты
+		Uns 				MuffFlag200Hz;		// Флаг муфты определеяемый на 200 Гц
 		Uns					NoMoveFlag;
 		Bool				ShcReset;			// Флаг по которому сбрасывается КЗ
 		Uns					FaultDelay;			// Пауза после инициализации для включения защит

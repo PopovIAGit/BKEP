@@ -388,9 +388,7 @@ typedef struct _TRamGroupH
 	TCubArray		TqAngSf;			 // H57-76. 367-386 Углы СИФУ
 	Uns				Rsvd7;				 // H98. 387
 	Uns             TuState;             // H78. 388 Команды ТУ (открыть закрыть стопО СтопЗ)
-  	Uns             Ur;                  // H79. 389 Напряжение фазы R
-  	Uns             Us;                  // H80. 390 Напряжение фазы S
-  	Uns             Ut;                  // H81. 391 Напряжение фазы T
+  	Uns             Rsvd3[3];            // H79. 389 резерв
 	Uns             Umid;             	 // H82. 392 Среднее напряжение
 	Uns             VSkValue;          	 // H83. 393 Асиметрия фаз питающей сети
 	Uns				Rsvd8;				 // H98. 408
@@ -426,8 +424,7 @@ typedef struct _TRamGroupH
 	Uns				LogEvCount;			 // H120. 430 Количество записанных ячеек журнала событий
 	Uns				LogCmdCount;		 // H121. 431 Количество записанных ячеек журнала команд
 	Uns				LogParamCount;		 // H122. 432 Количество записанных ячеек журнала изменения параметров
-	Uns             Torque;           	 // H123. 433 Момент
-	Int             Speed;				 // H124. 434 Скорость
+	Uns             Rsvd6[2];            // H123. 433 резерв
 	Uns				Seconds;			 // H125. 435 Секунды
 	TContactorGroup ContGroup;			 // H126. 436 Управление контакторами
 	TBurCmd 		LogControlWord;		 // H127. 437 Команды БУР

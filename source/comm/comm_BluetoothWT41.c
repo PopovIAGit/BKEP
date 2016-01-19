@@ -265,6 +265,12 @@ void PredStateTimerEnabled(TBluetoothHandle bPort)
 void BluetoothWTUpdate(TBluetoothHandle bPort)
 {
 
+	if (bPort->State<7 && bPort->AssuredLaunchTimer>30)
+	{
+		bPort->AssuredLaunchTimer = 0;
+		bPort->State=0;
+		g_Core.Protections.outDefects.Dev.bit.BlueNoLaunch = 0;
+	}
 	switch (bPort->State)
 	{
 		// Иницилизация драйвера
@@ -332,6 +338,7 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 		// Режим ожидания соединения
 		case 7:	bPort->BlinkConnect = false;
 				bPort->PredState=0;
+				g_Core.Protections.outDefects.Dev.bit.BlueNoLaunch = 0;
 				if (bPort->Status == BT_RECEIVE_COMPLETE)
 				{
 					if (CheckString(bPort, "RI"))
@@ -719,6 +726,7 @@ void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 
 void BluetoothTimer(TBluetoothHandle bPort)
 {
+	if (bPort->AssuredLaunchTimer<100) bPort->AssuredLaunchTimer++;
 	if (bPort->Timer > 0) bPort->Timer--;
 }
 

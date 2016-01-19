@@ -162,8 +162,8 @@ void g_Ram_Update(TRam *p)
 
     p->ramGroupA.Position 		= p->ramGroupH.Position;
     p->ramGroupH.FullStep 		= g_Peref.Position.FullStep;
-    p->ramGroupA.StateTu.all 	= g_Comm.digitInterface.Inputs.all;
-    p->ramGroupA.StateTs.all 	= g_Comm.digitInterface.Outputs.all;
+    //p->ramGroupA.StateTu.all 	= g_Comm.digitInterface.Inputs.all;
+    //p->ramGroupA.StateTs.all 	= g_Comm.digitInterface.Outputs.all;
     p->ramGroupH.ReverseType 	= rvtNone;
 
     p->ramGroupB.MOD_FAULT = GpioDataRegs.GPBDAT.bit.GPIO39;
@@ -269,7 +269,7 @@ void RefreshParams(Uns addr)
 			peref_ApFilter3Init(&g_Peref.U3fltrMu, 		  (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
 			peref_ApFilter3Init(&g_Peref.U3fltrResetAlarm,(Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
 			peref_ApFilter3Init(&g_Peref.U3fltrStopClose, (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
-			peref_ApFilter3Init(&g_Peref.U3fltrDU, 		  (Uns)Prd50HZ, g_Ram.ramGroupC.RmsTf);
+			peref_ApFilter3Init(&g_Peref.U3fltrDU, 		  (Uns)Prd50HZ,  g_Ram.ramGroupC.RmsTf);
 
 	} else if (addr == REG_TU_TYPE) {
 
