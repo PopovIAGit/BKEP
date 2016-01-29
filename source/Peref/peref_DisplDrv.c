@@ -90,6 +90,5 @@ void DisplDrvUpdate(TPerefDisplay *p)
 		asm(" RPT #9 || NOP");
 		BCD_FIX = 0;
 	}
-
 }
 

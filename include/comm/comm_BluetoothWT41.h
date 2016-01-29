@@ -72,6 +72,7 @@ typedef struct _TBluetoothPort
 	Byte Mode;
 	Uns StrIndex;
 	Uns Timer;
+	Uns AssuredLaunchTimer;
 	Uns Period;
 	Uns Stop;		//флаг того что в посылке будет вторая половина не посылаемая
 	Bool IsConnected;

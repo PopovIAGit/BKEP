@@ -19,13 +19,16 @@ Byte LogEvBufCurIndex = 0;
 Byte LogEvBufSeconds = 0;
 Bool ReadLogFlag = False;
 
-Uns  PrevLogAddr[3] = {0,0,0};
-Uns  PrevLogCount[3] = {0,0,0};
+//ma LogSIM 4 БЫЛО 3
+Uns  PrevLogAddr[4] = {0,0,0,0};
+Uns  PrevLogCount[4] = {0,0,0,0};
 
 void InitInfoModule(TInfoModule *);
 void InitLogEvent(pTLogEvent);
 void InitLogCmd(pTLogCmd);
 void InitLogParam(pTLogParam);
+//ma LogSIM
+void InitLogSim(pTLogSim);
 void InitTables(void);
 
 //---------------------------------------------------
@@ -41,13 +44,19 @@ void Stat_Init(TStat *s)
 
 	InitLogCmd(&s->LogCmd);
 	InitLogParam(&s->LogParam);
+	//ma LogSIM
+	InitLogSim(&s->LogSim);
+
 
 	PrevLogAddr[PREV_LEV_INDEX]   = g_Ram.ramGroupH.LogEvAddr;
 	PrevLogAddr[PREV_LCMD_INDEX]  = g_Ram.ramGroupH.LogCmdAddr;
 	PrevLogAddr[PREV_LPAR_INDEX]  = g_Ram.ramGroupH.LogParamAddr;
+	PrevLogAddr[PREV_LSIM_INDEX]  = g_Ram.ramGroupH.LogSimAddr;
+
 	PrevLogCount[PREV_LEV_INDEX]  = g_Ram.ramGroupH.LogEvCount;
 	PrevLogCount[PREV_LCMD_INDEX] = g_Ram.ramGroupH.LogCmdCount;
 	PrevLogCount[PREV_LPAR_INDEX] = g_Ram.ramGroupH.LogParamCount;
+	PrevLogCount[PREV_LSIM_INDEX] = g_Ram.ramGroupH.LogSimCount;
 
 	memset(&s->LogParam.MbBuffer[0], 0, MB_PARAM_BUF_COUNT);//???
 	memset(&s->Im.ImReadBuf[0], 0, (IM_READ_BUF_SIZE * 2));//???
@@ -136,6 +145,19 @@ void InitTables(void)
 	ImParamLogAddrsTable[3] = NEW_PARAM_ADDR;
 	ImParamLogAddrsTable[4] = NEW_PARAM_VALUE_ADDR;
 
+	ImSimLogAddrsTable[0] = GetAdr(ramGroupB.DevTime);
+	ImSimLogAddrsTable[1] = GetAdr(ramGroupB.DevDate);
+	ImSimLogAddrsTable[2] = GetAdr(ramGroupH.Seconds);
+	ImSimLogAddrsTable[3]  = WORD_0_SIMID;  //что за адрес и зачем именно такой
+	ImSimLogAddrsTable[4]  = WORD_1_SIMID;
+	ImSimLogAddrsTable[5]  = WORD_2_SIMID;
+	ImSimLogAddrsTable[6]  = WORD_3_SIMID;
+	ImSimLogAddrsTable[7]  = WORD_4_SIMID;
+	ImSimLogAddrsTable[8]  = WORD_5_SIMID;
+	ImSimLogAddrsTable[9]  = WORD_6_SIMID;
+	ImSimLogAddrsTable[10] = WORD_7_SIMID;
+	ImSimLogAddrsTable[11] = WORD_8_SIMID;
+	ImSimLogAddrsTable[12] = WORD_9_SIMID;
 }
 //---------------------------------------------------
 
@@ -237,6 +259,20 @@ void InitLogParam(TLogParam *lp)
 	memset(&lp->MbBuffer[0],	0, sizeof(MB_PARAM_BUF_COUNT));			// Буфер параметров Модбас
 }
 //---------------------------------------------------
+//ma LogSim
+void InitLogSim(TLogSim *ls)
+{
+	ls->Enable 		= false;							// Флаг разрешения работы журнала
+	ls->ExecFlag 	= false;							// Флаг формирования буфера журнала
+	ls->WriteFlag 	= false;							// Флаг разрешения записи журнала
+	ls->Time		= &g_Ram.ramGroupB.DevTime.all;		// Указатель на время
+	ls->Date		= &g_Ram.ramGroupB.DevDate.all;		// Указатель на дату
+	ls->Seconds		= &g_Ram.ramGroupH.Seconds;			// Указатель на секунды								// Регистр команд
+	memset(&ls->NewSimID[0],	0, sizeof(ls->NewSimID)); 	// Буфер журнала
+	memset(&ls->Data[0],	    0, sizeof(LOG_SIM_BUF_DATA_COUNT));	// Буфер журнала команд
+
+}
+//---------------------------------------------------
 // Обновление журнала
 void Stat_Update(TStat *p)	// 50 Гц
 {
@@ -315,9 +351,11 @@ void DataBufferPre(TStat *s)
 		g_Ram.ramGroupH.LogEvAddr 	  = 0;
 		g_Ram.ramGroupH.LogCmdAddr    = 0;
 		g_Ram.ramGroupH.LogParamAddr  = 0;
+		g_Ram.ramGroupH.LogSimAddr  = 0; //ma LogSIM
 		g_Ram.ramGroupH.LogEvCount    = 0;
 		g_Ram.ramGroupH.LogCmdCount   = 0;
 		g_Ram.ramGroupH.LogParamCount = 0;
+		g_Ram.ramGroupH.LogSimCount = 0; //ma LogSIM
 	}
 
 	if ((++PreTimer >= 200) && !s->LogEvent.EventFlag)						// Запись по секунде
@@ -585,5 +623,49 @@ void LogParamControl(TStat *s)
 		}
 	}
 }
+
+//ma LogSIM
+//---------------------------------------------------------------------------------
+void LogSimControl(TStat *s)
+{
+	static Uns Timer = 600;//(Uns)LOG_START_TOUT;
+	Uns Addr;
+
+	if (Timer > 0)	Timer--;
+
+	s->LogSim.Enable = !Timer;
+
+//--------------------------------------------------------------------------------
+	LogSimUpdate(&s->LogSim);															// Вызываем функцию формирования журнала
+//--------------------------------------------------------------------------------
+	if (IsMemParReady())
+	{
+		if (g_Ram.ramGroupH.LogSimAddr != PrevLogAddr[PREV_LSIM_INDEX])							// Проверяем условаие готовности ПЗУ
+		{																				// Проверяем изменение адреса текущей ячейки
+			WritePar(GetAdr(ramGroupH.LogSimAddr), &g_Ram.ramGroupH.LogSimAddr, 1);				// Записываем новый адрес в ПЗУ
+			PrevLogAddr[PREV_LSIM_INDEX] = g_Ram.ramGroupH.LogSimAddr; 							// Обновляем предыдущий адрес ячейки журнала
+		}
+	//--------------------------------------------------------------------------------
+		else if (s->LogSim.WriteFlag)													// Проверяем готовность памяти
+		{																				// Проверяем наличие флага разрешения записи журнала
+			Addr = LOG_SIM_START_ADDR + g_Ram.ramGroupH.LogSimAddr * LOG_SIM_DATA_CNT;		// Формируем начальный адрес записи в ПЗУ
+			WritePar(Addr, s->LogSim.Data, LOG_SIM_DATA_CNT);							// Отправляем драйверу для записи
+			s->LogSim.WriteFlag = false; 												// Сбрасываем флаг разрешения записи
+
+			if (g_Ram.ramGroupH.LogSimCount < LOG_SIM_CNT)										// Если не превышено максимальное число записей
+				g_Ram.ramGroupH.LogSimCount++;													// Инкрементируем число записей журанала изменения параметров
+
+			if (++g_Ram.ramGroupH.LogSimAddr >= LOG_SIM_CNT)									// Инкрементируем адрес ячейки журнала
+				g_Ram.ramGroupH.LogSimAddr = 0;													// Если он вышел за границы (превышено количество допустимых записей), обнуляем
+		}
+	//--------------------------------------------------------------------------------
+		else if (g_Ram.ramGroupH.LogSimCount != PrevLogCount[PREV_LSIM_INDEX])
+		{
+			WritePar(GetAdr(ramGroupH.LogSimCount), &g_Ram.ramGroupH.LogSimCount, 1);
+			PrevLogCount[PREV_LSIM_INDEX] = g_Ram.ramGroupH.LogSimCount;
+		}
+	}
+}
+
 
 //---------Конец файла------------------------------------

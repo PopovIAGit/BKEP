@@ -15,6 +15,8 @@ Int Temper90  = 90;
 Int TemperM10 = -10;
 Int TemperM40 = -40;
 
+Uns tmpTime=0;
+
 void Core_ProtectionsInit(TCoreProtections *p)
 {
 	//---------ЗАЩИТЫ ПРОЦЕССА--------------------------------------------------------
@@ -159,7 +161,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 
 	p->overMax_VoltageR.Input = (Int *) &g_Ram.ramGroupA.Ur;
 	p->overMax_VoltageS.Input = (Int *) &g_Ram.ramGroupA.Us;
-	p->overMax_VoltageT.Input = (Int *) &g_Ram.ramGroupH.Ut;
+	p->overMax_VoltageT.Input = (Int *) &g_Ram.ramGroupA.Ut;
 
 	p->overMax_VoltageR.Output = (Uns *) &p->outFaults.Net.all;
 	p->overMax_VoltageS.Output = (Uns *) &p->outFaults.Net.all;
@@ -354,7 +356,7 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 		p->NoMove.Cfg.bit.Enable = ((g_Core.MotorControl.WorkMode & wmMove) != 0);
 		break;
 	case 2:  // Защиты по наряжению
-		Enable = (g_Ram.ramGroupC.Uv != pmOff) && (!p->outDefects.Dev.bit.LowPower);						// Понижеие напряжения
+		Enable = (g_Ram.ramGroupC.Uv != pmOff) && (!p->outDefects.Dev.bit.LowPower) && (!p->outFaults.Net.bit.BvR)&& (!p->outFaults.Net.bit.BvS)&& (!p->outFaults.Net.bit.BvT);						// Понижеие напряжения
 		p->underVoltageR.Cfg.bit.Enable = Enable;
 		p->underVoltageS.Cfg.bit.Enable = Enable;
 		p->underVoltageT.Cfg.bit.Enable = Enable;
@@ -437,10 +439,10 @@ void Core_DevProc_FaultIndic(TCoreProtections *p)
 		p->outDefects.Dev.bit.TSens = (Uns) g_Peref.TSens.Error;
 		p->outDefects.Dev.bit.Dac = (Uns) g_Peref.Dac.Error;
 
-		if (g_Comm.Bluetooth.ModeProtocol != 2)
-			p->outDefects.Dev.bit.NoBCP_Connect = !g_Comm.mbBkp.Frame.ConnFlag;
-		else
-			p->outDefects.Dev.bit.NoBCP_Connect = 0;
+
+		if (g_Comm.Bluetooth.ModeProtocol != 2 && tmpTime++>20 && p->outFaults.Dev.bit.NoBCP_Connect == 0)
+			p->outFaults.Dev.bit.NoBCP_Connect = !g_Comm.mbBkp.Frame.ConnFlag;
+
 
 		//p->outDefects.Dev.bit.NoBCP_Connect = !g_Comm.mbBkp.Frame.ConnFlag;
 	}
@@ -503,7 +505,7 @@ void Core_ProtectionsReset(TCoreProtections *p)
 //	p->outDefects.Proc.bit.Mufta=0;
 //	p->outFaults.Proc.bit.Mufta=0;
 
-//	p->outDefects.Proc.bit.NoMove=0;
+	p->outDefects.Proc.bit.NoMove=0;
 //	p->outFaults.Proc.bit.NoMove=0;
 
 	p->outDefects.Load.bit.ISkew = 0;
@@ -522,7 +524,10 @@ void Core_ProtectionsClear(TCoreProtections *p)
 {
 	Uns MuffAddr, TH_BCP_addr;
 
+	tmpTime=0;
 	g_Core.MotorControl.OverWayFlag = 0;		// Сбросили отсусвие уплотнения
+
+	g_Core.Protections.MuffFlag200Hz = 0;
 
 	if (g_Ram.ramGroupH.MuffFault == 1 && IsMemParReady())
 	{
@@ -540,6 +545,7 @@ void Core_ProtectionsClear(TCoreProtections *p)
 
 	g_Core.Status.bit.Fault = 0;
 	g_Core.Status.bit.Defect = 0;
+	p->outFaults.Dev.bit.NoBCP_Connect = 0;
 
 	p->outFaults.Dev.all = 0;					// сбросили все аварии
 	p->outFaults.Net.all = 0;
@@ -552,6 +558,7 @@ void Core_ProtectionsClear(TCoreProtections *p)
 	p->registerBrCurr = 0;
 	p->registerBrVolt = 0;
 	p->outDefects.Proc.all = 0;
+
 
 	/* ??? сброс ошибок памяти энкодера и ДТ
 	 Encoder.Error  = False;
@@ -685,6 +692,7 @@ void Core_Protections18kHzUpdate(TCoreProtections *p)
 
 	if (p->outDefects.Dev.all || p->outDefects.Load.all || p->outDefects.Net.all || p->outDefects.Proc.all)
 	{
+		if(!p->outDefects.Dev.bit.LowPower)
 		g_Core.Status.bit.Defect = 1;
 	}
 	else
@@ -707,10 +715,10 @@ void Core_Protections18kHzUpdate(TCoreProtections *p)
 			else if (g_Core.MotorControl.RequestDir < 0)
 				MuffEnable = !g_Core.Status.bit.Closed;
 
-			p->outFaults.Proc.bit.NoMove = MuffEnable;
+			p->outDefects.Proc.bit.NoMove = MuffEnable;
 
-			Core_ValveDriveStop(&g_Core.VlvDrvCtrl);
-			g_Core.VlvDrvCtrl.EvLog.Value = CMD_DEFSTOP;
+			//Core_ValveDriveStop(&g_Core.VlvDrvCtrl);
+			//g_Core.VlvDrvCtrl.EvLog.Value = CMD_DEFSTOP;
 		}
 		if (g_Core.Status.bit.Fault)
 		{

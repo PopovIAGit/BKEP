@@ -89,6 +89,7 @@ typedef struct {
 	TRamLogBuff  		LogEventBuffer[LOG_EV_BUF_CELL_COUNT];	// Ѕуфер параметров, которое записываютс€ до наступлени€ событи€
 	TLogCmd				LogCmd;									// Ёкземпл€р структуры журнала команд
 	TLogParam 			LogParam;								// Ёкземпл€р структуры журнала изменени€ параметров
+	TLogSim 			LogSim;								// Ёкземпл€р структуры журнала SIM
 } TStat;
 
 void Stat_Init(TStat *);
@@ -102,6 +103,9 @@ void LogEvControl(TStat *);
 void LogCmdControl(TStat *);
 void LogParamMbExec(TStat *);
 void LogParamControl(TStat *);
+//ma LogSim
+void LogSimControl(TStat *);
+
 void GetCurrentCmd(TStat *);
 
 //Bool ReadWriteClearFlash(pAT25DF041A, Byte, Uns, Uns *, Uns);

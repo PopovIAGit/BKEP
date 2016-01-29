@@ -64,7 +64,7 @@ TPeriodicalFunction Task18kHz[] =
 	PrdElemInit(Peref_18kHzCalc,						&g_Peref),
 	PrdElemInit(SciMasterConnBetweenBlockCommTimer,		&g_Comm.mbBkp),	//на 18к√ц
 	PrdElemInit(Core_Protections18kHzUpdate,			&g_Core.Protections),
-//	PrdElemInit(MonitorUpdate,							Null),
+	//PrdElemInit(MonitorUpdate,							Null),
 };
 
 //—юда вставл€ем функции дл€ соответствующей группы
@@ -92,8 +92,12 @@ TPeriodicalFunction Task200Hz[] =       	//не более  20-ти задач
 	PrdElemInit(LogCmdControl,							&g_Stat),
 	PrdElemInit(LogParamMbExec,							&g_Stat),
 	PrdElemInit(LogParamControl,						&g_Stat),
+	PrdElemInit(LogSimControl,						&g_Stat), //ma LogSim
 	PrdElemInit(ImTimer,				                &g_Stat.Im),// на 200√
 	PrdElemInit(DisplDrvUpdate,             			&g_Peref.Display),
+	PrdElemInit(Comm_TuTsUpdate,				&g_Comm.digitInterface),
+	PrdElemInit(Protections_MuffFlag,						NULL),
+
 };
 
 // ================================ 50 √ц ==================================
@@ -142,7 +146,7 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(GetCurrentCmd,					&g_Stat),
 	PrdElemInit(Core_MenuDisplay,				&g_Core.menu),
 	PrdElemInit(Core_Protections50HZUpdate,		&g_Core.Protections),
-	PrdElemInit(Comm_TuTsUpdate,				&g_Comm.digitInterface),
+	//PrdElemInit(Comm_TuTsUpdate,				&g_Comm.digitInterface),
 	PrdElemInit(Comm_CommandUpdate,				&g_Comm),
 
 };

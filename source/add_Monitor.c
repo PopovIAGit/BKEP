@@ -76,8 +76,8 @@ void MonitorUpdate(void)
 	{
 	 	case 0: DlogCh1 = (Uns)(g_Peref.InDigSignalObserver.UMuInp);
 		        DlogCh2 = (Int)(g_Peref.InDigSignalObserver.UMuOut); break;
-	 	case 1: DlogCh1 = AdcRegs.ADCRESULT13;
-	 			DlogCh2 = (Int)(g_Peref.InDigSignalObserver.UDuOut); break;
+	 	case 1: DlogCh1 = AdcRegs.ADCRESULT1;
+	 			DlogCh2 = AdcRegs.ADCRESULT4; break;
 	 	case 2: DlogCh1 = (Uns)g_Peref.sensObserver.URinp;
 	 		 	DlogCh2 = (Int)(g_Peref.sensObserver.URout); break;
 	 	case 3: DlogCh1 = AdcRegs.ADCRESULT10;

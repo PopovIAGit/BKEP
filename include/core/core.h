@@ -138,6 +138,8 @@ void Core_OnOff_TEN(TCoreTemper *);			// функия управления теном на БКП
 
 void Core_ProtectionsBreakRST(TCoreProtections *);
 
+void Protections_MuffFlag(void);
+
 extern TCore g_Core;
 extern volatile Uns setTorque;
 #endif // CORE_

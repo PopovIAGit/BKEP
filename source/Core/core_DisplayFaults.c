@@ -33,6 +33,12 @@ void Core_DisplayFaultsUpdate(TCoreDislpayFaults *p)
 	if (!g_Ram.ramGroupA.Faults.Dev.all && !g_Ram.ramGroupA.Faults.Proc.all && !g_Ram.ramGroupA.Faults.Net.all && !g_Ram.ramGroupA.Faults.Load.all)
 	{
 		g_Peref.Display.data = 999;
+		p->DisplFaultUnion.Proc.all = 0;
+		p->DisplFaultUnion.Load.all = 0;
+		p->DisplFaultUnion.Net.all = 0;
+		p->DisplFaultUnion.Load.all = 0;
+		p->DisplFault = 999;
+		p->DisplFaulstTimer = 0;
 		return;
 	}
 //--------------------- если показали все коды и время обнулено то готовы к приему нового пакета данных
@@ -216,6 +222,11 @@ void Core_DisplayFaultsUpdate(TCoreDislpayFaults *p)
 			p->DisplFaulstTimer = DISPL_FAULT_TIME;
 			p->DisplFaultUnion.Dev.bit.NoBCP_Connect = 0;
 			p->DisplFault = MpoMpzError_CODE;
+		}else if (p->DisplFaultUnion.Dev.bit.BlueNoLaunch)
+		{
+			p->DisplFaulstTimer = DISPL_FAULT_TIME;
+			p->DisplFaultUnion.Dev.bit.BlueNoLaunch = 0;
+			p->DisplFault = BlueNoLaunch_CODE;
 		}
 
 }

@@ -126,3 +126,38 @@ void LogParamUpdate(TLogParam *p)
 		p->ExecFlag = false;				// Сбрасываем флаг формирования журнала
 	}
 }
+
+//ma LogSIM
+void LogSimUpdate(TLogSim *p)
+{
+	register Uns *pBuf = p->Data;
+
+	if (!p->Enable)									// Проверяем выключение журнала
+	{
+		p->ExecFlag = false;						// Сбрасываем флаги и выходим из функции
+		p->WriteFlag = false;
+
+		return;
+	}
+
+	if (p->ExecFlag)						// По флагу формируем журнал
+	{
+		*pBuf++ = *p->Time;
+		*pBuf++ = *p->Date;
+		*pBuf++ = (Uns)(*p->Seconds);
+		*pBuf++ = p->NewSimID[0];				// Новое значение параметра SIM
+		*pBuf++ = p->NewSimID[1];				// Новое значение параметра SIM
+		*pBuf++ = p->NewSimID[2];				// Новое значение параметра SIM
+		*pBuf++ = p->NewSimID[3];				// Новое значение параметра SIM
+		*pBuf++ = p->NewSimID[4];				// Новое значение параметра SIM
+		*pBuf++ = p->NewSimID[5];				// Новое значение параметра SIM
+		*pBuf++ = p->NewSimID[6];				// Новое значение параметра SIM
+		*pBuf++ = p->NewSimID[7];				// Новое значение параметра SIM
+		*pBuf++ = p->NewSimID[8];				// Новое значение параметра SIM
+		*pBuf++ = p->NewSimID[9];				// Новое значение параметра SIM
+
+											// Журнал сформирован
+		p->WriteFlag = true;				// Выставляем флаг разрешения записи журнала в ПЗУ
+		p->ExecFlag = false;				// Сбрасываем флаг формирования журнала
+	}
+}

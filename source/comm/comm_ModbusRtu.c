@@ -152,6 +152,7 @@ __inline void UpdateNewFrame(TMbPort *hPort)
 	}
 
 	if (Frame->RxLength==12 && hPort->Params.HardWareType==MCBSP_TYPE) Frame->RxLength=11;//приём команды 16 для msbsp
+	if (Frame->RxLength==30 && hPort->Params.HardWareType==MCBSP_TYPE) Frame->RxLength=29;
 	//CRC = CalcFrameCrc(Frame->Buf, Frame->RxLength);
 
 	if (CalcFrameCrc(Frame->Buf, Frame->RxLength) != GOOD_CRC)
@@ -246,6 +247,12 @@ __inline void SlaveIndication(TMbPort *hPort)
 	Byte Slave, Func;
 	
 	Slave = hPort->Frame.Buf[0];
+
+	if (hPort->Params.HardWareType==MCBSP_TYPE && hPort->Frame.Buf[0]==127 && hPort->Frame.Buf[2]==255 && hPort->Frame.Buf[3]==65 && hPort->Frame.Buf[5]==10 && hPort->Frame.Buf[6]==20)
+	{
+		Slave = hPort->Params.Slave;
+	}
+
 	if ((Slave != 0) && (Slave != hPort->Params.Slave))
 	{
 		if (hPort->Params.HardWareType==UART_TYPE) SCI_rx_enable(hPort->Params.ChannelID);

@@ -231,6 +231,7 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 		else if (CHECK_IM_MB_ADDR(Addr))	{Res = 5;}
 		else if (CHECK_IM_MB_DATA_ADDR(Addr))	{Res = 6;}
 		else if (Addr==65125)	{Res = 6;}
+		else if (Addr==65345)	{Res = 7;}
 		else {Res = 0;}
 
 		if (!Res) {return EX_ILLEGAL_DATA_ADDRESS;}
@@ -293,6 +294,19 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 						//return WriteRegsTek(Port, (Uint16 *)&RamTek, (Uint16 *)&Ram, (Addr - TEK_MB_START_ADDR), Count);
 						//return WriteDataRegsTek(Packet->Addr, Packet->Data, Packet->Count);
 						//if (!Port->Frame.Exception) SerialCommRefresh();
+					case 7:
+						//функция записи в журнал id bluetooth устройства которое подключилось к блоку
+						//записать в структуру и выставить флаг
+						//WriteLogConnectSimID(Packet->Data, Packet->Count);
+
+						/*for(i=0; i<Packet->Count; i++)
+						{
+							g_Stat.LogSim.NewSimID[i] = Packet->Data[i];
+						}
+						g_Stat.LogSim.ExecFlag = true;
+*/
+						return 0;
+						//return WriteData(Packet->Addr, Packet->Data, Packet->Count);
 					default: return EX_ILLEGAL_FUNCTION;
 				}
 			default: return EX_ILLEGAL_FUNCTION;
