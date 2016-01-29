@@ -381,7 +381,8 @@ typedef struct _TRamGroupH
 	Uns             CycleCnt;            // H10. 320 Счетчик циклов
 	Uns             TemperBCPFault;      // H11. 321 запись аварии ТЕМПЕРАТУРА БКП 110
 	Uns				CmdButton;			 // H12. 322 Команда с ручек управления
-	Uns				Rsvd1[3];			 // H13-15. 323-325 Резерв
+	Uns				BkpType;			 // H13. тип БКП для выставления соответсвующего типа привода
+	Uns				Rsvd1[2];			 // H14-15. 323-325 Резерв
 	Uns				TransCurr;			 // H16. 326 Ток перехода
 	TCubArray		TqCurr;				 // H17-36. 327-346 Ток поверхности
 	TCubArray		TqAngUI;			 // H37-56. 347-366 Углы нагрузки
