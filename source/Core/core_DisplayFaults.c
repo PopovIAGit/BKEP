@@ -228,5 +228,18 @@ void Core_DisplayFaultsUpdate(TCoreDislpayFaults *p)
 			p->DisplFaultUnion.Dev.bit.BlueNoLaunch = 0;
 			p->DisplFault = BlueNoLaunch_CODE;
 		}
+		else if (p->DisplFaultUnion.Dev.bit.BlueNoLaunch)
+		{
+			p->DisplFaulstTimer = DISPL_FAULT_TIME;
+			p->DisplFaultUnion.Dev.bit.BlueNoLaunch = 0;
+			p->DisplFault = BlueNoLaunch_CODE;
+		}
+		else if (p->DisplFaultUnion.Dev.bit.BCP_ErrorType)
+		{
+			p->DisplFaulstTimer = DISPL_FAULT_TIME;
+			p->DisplFaultUnion.Dev.bit.BCP_ErrorType = 0;
+			p->DisplFault = BCP_ErrorType_CODE;
+		}
+
 
 }

@@ -645,6 +645,21 @@ void Core_Protections50HZUpdate(TCoreProtections *p)
 		}
 	}
 
+
+	//-------- Îøèáêà ÒÈÏ ÁÊÏ ------------------------
+
+		if (g_Ram.ramGroupA.Faults.Dev.bit.NoBCP_Connect == 0)
+		{
+			if (g_Ram.ramGroupH.BkpType == 7 && g_Ram.ramGroupC.DriveType == dt50000_F48)
+			{
+				p->outDefects.Dev.bit.BCP_ErrorType = 0;
+			}
+			else if(g_Ram.ramGroupH.BkpType == 7 && g_Ram.ramGroupC.DriveType != dt50000_F48)
+			{
+				p->outDefects.Dev.bit.BCP_ErrorType = 1;
+			}
+		}
+	//----------------------------------------
 }
 
 void Core_Protections18kHzUpdate(TCoreProtections *p)

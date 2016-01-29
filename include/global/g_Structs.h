@@ -197,10 +197,11 @@ typedef union _TDeviceReg {
 		Uns Tl_BCD:1;		// 8     Переохлождение блока БКД
 		Uns Dac:1;			// 9     Сбой ЦАП
 		Uns LowPower:1;		// 10     Выключение БКД
-		Uns NoBCP_Connect:1;// 11
-		Uns MpoMpzError:1;	// 12
-		Uns BlueNoLaunch:1;	// 13
-		Uns Rsvd:2;       	// 14-15 Резерв
+		Uns NoBCP_Connect:1;// 11   нет связи с БКП
+		Uns MpoMpzError:1;	// 12   Ошибка МПО МПЗ
+		Uns BlueNoLaunch:1;	// 13	не запустился БКЭП
+		Uns BCP_ErrorType:1;// 14	не верный тип БКП
+		Uns Rsvd:1;       	// 15 Резерв
   } bit;
 } TDeviceReg;
 
@@ -276,7 +277,9 @@ typedef enum {
 	dt10000_D12 = 10,
 	dt10000_D10 = 11,
 	dt15000_D10 = 12,
-	dt20000_F40 = 13
+	dt20000_F40 = 13,
+	dt35000_F48 = 14,
+	dt50000_F48 = 15
 }TDriveType;
 /*
 // Управление работой защит
