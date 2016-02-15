@@ -314,7 +314,7 @@ void Core_ControlMode(TCore *p) // 50 Ãö
 
     if(p->Status.bit.Stop == 1 && (CONTACTOR_1_STATUS || CONTACTOR_2_STATUS) && p->Protections.MpoMpzErrorTimer++ >= (2 * Prd50HZ))
     {
-    	p->Protections.outFaults.Dev.bit.MpoMpzError = 1;
+    	p->Protections.outFaults.Dev.bit.MpoMpzError = 0;
 
     }
     else if (p->Status.bit.Stop == 0)

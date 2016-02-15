@@ -267,8 +267,9 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 
 	if (bPort->State<7 && bPort->AssuredLaunchTimer>30)
 	{
+		bPort->AssuredLaunchTimer = 0;
 		bPort->State=0;
-		g_Core.Protections.outDefects.Dev.bit.BlueNoLaunch = 1;
+		g_Core.Protections.outDefects.Dev.bit.BlueNoLaunch = 0;
 	}
 	switch (bPort->State)
 	{
@@ -725,7 +726,7 @@ void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 
 void BluetoothTimer(TBluetoothHandle bPort)
 {
-	bPort->AssuredLaunchTimer++;
+	if (bPort->AssuredLaunchTimer<100) bPort->AssuredLaunchTimer++;
 	if (bPort->Timer > 0) bPort->Timer--;
 }
 

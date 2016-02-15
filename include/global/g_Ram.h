@@ -381,7 +381,8 @@ typedef struct _TRamGroupH
 	Uns             CycleCnt;            // H10. 320 Счетчик циклов
 	Uns             TemperBCPFault;      // H11. 321 запись аварии ТЕМПЕРАТУРА БКП 110
 	Uns				CmdButton;			 // H12. 322 Команда с ручек управления
-	Uns				Rsvd1[3];			 // H13-15. 323-325 Резерв
+	Uns				BkpType;			 // H13. тип БКП для выставления соответсвующего типа привода
+	Uns				Rsvd1[2];			 // H14-15. 323-325 Резерв
 	Uns				TransCurr;			 // H16. 326 Ток перехода
 	TCubArray		TqCurr;				 // H17-36. 327-346 Ток поверхности
 	TCubArray		TqAngUI;			 // H37-56. 347-366 Углы нагрузки
@@ -421,10 +422,11 @@ typedef struct _TRamGroupH
 	Uns 			LogEvAddr;			 // H117. 427 Текущий адрес журнала событий
 	Uns 			LogCmdAddr;			 // H118. 428 Текущий адрес журнала команд
 	Uns 			LogParamAddr;		 // H119. 429 Текущий адрес журнала изменения параметров
-	Uns				LogEvCount;			 // H120. 430 Количество записанных ячеек журнала событий
-	Uns				LogCmdCount;		 // H121. 431 Количество записанных ячеек журнала команд
-	Uns				LogParamCount;		 // H122. 432 Количество записанных ячеек журнала изменения параметров
-	Uns             Rsvd6[2];            // H123. 433 резерв
+	Uns 			LogSimAddr;		     // H120. 430 Текущий адрес журнала SIM
+	Uns				LogEvCount;			 // H121. 431 Количество записанных ячеек журнала событий
+	Uns				LogCmdCount;		 // H122. 432 Количество записанных ячеек журнала команд
+	Uns				LogParamCount;		 // H123. 433 Количество записанных ячеек журнала изменения параметров
+	Uns				LogSimCount;		 // H124. 434 Количество записанных ячеек журнала SIM
 	Uns				Seconds;			 // H125. 435 Секунды
 	TContactorGroup ContGroup;			 // H126. 436 Управление контакторами
 	TBurCmd 		LogControlWord;		 // H127. 437 Команды БУР

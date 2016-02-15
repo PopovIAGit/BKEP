@@ -7,6 +7,7 @@ Uns ImEvLogMainAddrsTable[20];
 Uns ImEvLogBufAddrsTable[12];
 Uns ImCmdLogAddrsTable[5];
 Uns ImParamLogAddrsTable[5];
+Uns ImSimLogAddrsTable[13];
 
 /*Uns ImEvLogMainAddrsTable[]	= {
 								GetAdr(ramGroupB.DevTime),
@@ -151,13 +152,16 @@ void ReceiveFunc(TInfoModule *p)
 							p->FuncState = imCmdLogAddr;
 						else if (p->RdBuffer[1] == IM_LOGPARAMS_TYPE)
 							p->FuncState = imParLogAddr;
+						else if (p->RdBuffer[1] == IM_LOGSIM_TYPE)
+							p->FuncState = imSimLogAddr;
 						p->CorrectCount=0;
 					}
 					break;
 					
 		// Logs Data
-		case 0x05:	if (p->Index == 4)
+		case 0x05:	if (p->Index == 4 || p->Index == 5)
 					{
+						p->Index = 4;
 						IsFuncReceived = true;
 						p->FuncState = imLogDownload;
 
@@ -219,6 +223,9 @@ void DownloadFunc(TInfoModule *p)
 			case imParamLogInfo:		p->CanSendData = FuncThree(p, IM_LOGPARAMS_TYPE);
 			break;
 
+			case imSimLogInfo:		    p->CanSendData = FuncThree(p, IM_LOGSIM_TYPE);
+			break;
+
 			case imEvLogMainAddr:		p->CanSendData = FuncFour(p, IM_LOGEV_TYPE, 1);
 			break;
 
@@ -229,6 +236,9 @@ void DownloadFunc(TInfoModule *p)
 			break;
 
 			case imParLogAddr:			p->CanSendData = FuncFour(p, IM_LOGPARAMS_TYPE, 1);
+			break;
+
+			case imSimLogAddr:			p->CanSendData = FuncFour(p, IM_LOGSIM_TYPE, 1);
 			break;
 
 			case imLogDownload:
@@ -355,7 +365,10 @@ __inline Bool FuncOne(TInfoModule *p)
 	p->WrBuffer[CurrentIndex++] = IM_LOGS_CNT;
 	p->WrBuffer[CurrentIndex++] = IM_LOGEV_TYPE;
 	p->WrBuffer[CurrentIndex++] = IM_LOGCMD_TYPE;
-	p->WrBuffer[CurrentIndex] 	= IM_LOGPARAMS_TYPE;
+	p->WrBuffer[CurrentIndex++] 	= IM_LOGPARAMS_TYPE;
+	//ma LogSim p->WrBuffer[CurrentIndex++] 	= IM_LOGPARAMS_TYPE;
+	p->WrBuffer[CurrentIndex] 	= IM_LOGSIM_TYPE;
+
 
 	// Количество полей
 	p->WrBuffer[StartIndex]		= CurrentIndex - StartIndex;
@@ -379,10 +392,21 @@ __inline Bool FuncTwo(TInfoModule *p)
 	p->WrBuffer[CurrentIndex++] = IM_LOGCMD_REC_CNT >> 8;
 	p->WrBuffer[CurrentIndex++] = IM_LOGCMD_REC_CNT & 0xFF;
 
+	/* ma LogSIM p->WrBuffer[CurrentIndex++] = IM_LOGPAR_REC_ADDR >> 8;
+	p->WrBuffer[CurrentIndex++] = IM_LOGPAR_REC_ADDR & 0xFF;
+	p->WrBuffer[CurrentIndex++] = IM_LOGPAR_REC_CNT >> 8;
+	p->WrBuffer[CurrentIndex]	= IM_LOGPAR_REC_CNT & 0xFF;*/
+
+	//ma LogSIM
 	p->WrBuffer[CurrentIndex++] = IM_LOGPAR_REC_ADDR >> 8;
 	p->WrBuffer[CurrentIndex++] = IM_LOGPAR_REC_ADDR & 0xFF;
 	p->WrBuffer[CurrentIndex++] = IM_LOGPAR_REC_CNT >> 8;
-	p->WrBuffer[CurrentIndex]	= IM_LOGPAR_REC_CNT & 0xFF;
+	p->WrBuffer[CurrentIndex++]	= IM_LOGPAR_REC_CNT & 0xFF;
+
+	p->WrBuffer[CurrentIndex++] = IM_LOGSIM_REC_ADDR >> 8;
+	p->WrBuffer[CurrentIndex++] = IM_LOGSIM_REC_ADDR & 0xFF;
+	p->WrBuffer[CurrentIndex++] = IM_LOGSIM_REC_CNT >> 8;
+	p->WrBuffer[CurrentIndex]	= IM_LOGSIM_REC_CNT & 0xFF;
 
 	p->WrBuffer[StartIndex]		= CurrentIndex - StartIndex;
 	p->Index = CurrentIndex;
@@ -427,6 +451,12 @@ __inline Bool FuncThree(TInfoModule *p, Byte LogType)
 			p->WrBuffer[CurrentIndex] = LOG_PARAM_DATA_CNT;
 		
 		break;
+		//ma LogSIM
+		case IM_LOGSIM_TYPE:
+			p->WrBuffer[CurrentIndex++] = 1;
+			p->WrBuffer[CurrentIndex] = LOG_SIM_DATA_CNT;
+
+		break;
 	}
 
 	p->WrBuffer[StartIndex] = CurrentIndex - StartIndex;
@@ -467,6 +497,12 @@ __inline Bool FuncFour(TInfoModule *p, Byte LogType, Byte CellNum)
 								size = sizeof(ImParamLogAddrsTable);		
 		break;
 
+		//ma logSimConnect
+		case IM_LOGSIM_TYPE:
+								table = (Uns *)&ImSimLogAddrsTable;
+								size = sizeof(ImSimLogAddrsTable);
+			break;
+
 	}
 
 	for (index = 0; index < size; index++)
@@ -494,6 +530,8 @@ __inline Bool FuncFive(TInfoModule *p, Byte LogType, Uns RecordNum)
 	Uns CellIndex = 0;	Uns ImIndex = 0; Uns i;
 
 	ImBufferReader(p, LogType, RecordNum);
+	//ImBufferReaderTest(p, LogType, RecordNum);
+
 
 	if (p->IsBufReady)
 	{
@@ -572,6 +610,24 @@ __inline Bool FuncFive(TInfoModule *p, Byte LogType, Uns RecordNum)
 				}
 
 			break;
+
+			//ma LogSIM
+			case IM_LOGSIM_TYPE:
+
+				if (!(CurrentLogRec & 0x01))
+				{	ImIndex = 0;	}
+				else
+				{	ImIndex = IM_LOGSIM_CELL_DATA_CNT;	}
+
+				for (i = 0; i < IM_LOGSIM_CELL_DATA_CNT; i++)
+				{
+					p->WrBuffer[CurrentIndex++] = p->ImReadBuf[ImIndex + i] >> 8;
+					p->WrBuffer[CurrentIndex++] = p->ImReadBuf[ImIndex + i] & 0xFF;
+				}
+
+			break;
+
+
 		}
 
 		CurrentIndex--;								// В циклах лишнее инкрементирование
@@ -733,6 +789,155 @@ void ImBufferReader(TInfoModule *im, Byte LogType, Uns RecordNum)
 					Addr = LOG_PARAM_START_ADDR + RecordNum * LOG_PARAM_DATA_CNT;
 					ReadPar(Addr, ImBuf, LOG_PARAM_DATA_CNT);
 
+				break;
+
+				//ma LogSIM
+				case IM_LOGSIM_TYPE:
+
+					if (!(RecordNum & 0x01))
+					{	ImBuf = &im->ImReadBuf[0];	}
+					else
+					{	ImBuf = &im->ImReadBuf[LOG_SIM_DATA_CNT];	}
+
+					Addr = LOG_SIM_START_ADDR + RecordNum * LOG_SIM_DATA_CNT;
+					ReadPar(Addr, ImBuf, LOG_SIM_DATA_CNT);
+
+				break;
+			}
+		}
+	}
+}
+
+//----------------------------------------------------------------------
+// TEST
+// TEST
+void ImBufferReaderTest(TInfoModule *im, Byte LogType, Uns RecordNum)
+{
+	static Uns PrevRecNum = -1U;
+	static Bool EvLogMainCellRead = false;
+	static Bool EvLogBufCellRead = false;
+	Uns	*ImBuf, Addr;
+	Uns i=0;
+
+	if (!im->CanReadNextRec)
+		return;
+
+	im->IsReadRecBusy = false;//!(IsMemParReady() && IsMemLogReady());
+
+	if (!im->IsReadRecBusy)
+	{
+		if ((LogType == IM_LOGEV_TYPE) && EvLogBufCellRead)
+		{
+			if (PrevRecNum == RecordNum)
+			{
+				EvLogBufCellRead = false;
+				im->CanReadNextRec = false;
+				im->IsBufReady = true;
+
+				return;
+			}
+		}
+		else if ((LogType != IM_LOGEV_TYPE) && (PrevRecNum == RecordNum))
+		{
+			im->CanReadNextRec = false;
+			im->IsBufReady = true;
+		}
+		else
+		{
+			PrevRecNum = RecordNum;
+
+			switch (LogType)
+			{
+				case IM_LOGEV_TYPE:
+
+				if (!EvLogMainCellRead)
+				{
+					if (!(RecordNum & 0x01))
+						{	ImBuf = &im->ImReadBuf[0];
+						for(i=0; i<LOG_EV_DATA_CNT; i++) im->ImReadBuf[i]=1+i;
+						}
+					else
+						{	ImBuf = &im->ImReadBuf[IM_READ_BUF_SIZE];
+							for(i=0; i<LOG_EV_DATA_CNT; i++) im->ImReadBuf[i+IM_READ_BUF_SIZE]=1+i;
+						}
+
+					Addr = LOG_EV_START_ADDR + RecordNum * LOG_EV_DATA_CNT * LOG_EV_DATA_CELL;
+					//ReadPar(Addr, ImBuf, LOG_EV_DATA_CNT);
+					//for(i=0; i<LOG_EV_DATA_CNT; i++) im->ImReadBuf[i]=1+i;
+
+					EvLogMainCellRead = true;
+				}
+				else
+				{
+					Addr = LOG_EV_BUF_START_ADDR + RecordNum * LOG_EV_BUF_DATA_CNT * LOG_EV_BUF_DATA_CELL;
+
+					if (!(RecordNum & 0x01))
+						{	ImBuf = &im->ImReadBuf[LOG_EV_DATA_CNT];
+						for(i=0; i<(LOG_EV_BUF_DATA_CNT * LOG_EV_BUF_DATA_CELL); i++) im->ImReadBuf[LOG_EV_DATA_CNT]=10+i;
+						}
+					else
+						{	ImBuf = &im->ImReadBuf[LOG_EV_DATA_CNT + IM_READ_BUF_SIZE];
+						for(i=0; i<(LOG_EV_BUF_DATA_CNT * LOG_EV_BUF_DATA_CELL); i++) im->ImReadBuf[LOG_EV_DATA_CNT+IM_READ_BUF_SIZE]=10+i;}
+
+					//ReadLog(Addr, ImBuf, (LOG_EV_BUF_DATA_CNT * LOG_EV_BUF_DATA_CELL));
+
+					EvLogMainCellRead = false;
+					EvLogBufCellRead = true;
+				}
+
+				break;
+
+				case IM_LOGCMD_TYPE:
+
+					if (!(RecordNum & 0x01))
+					{	ImBuf = &im->ImReadBuf[0];
+						for(i=0; i<LOG_CMD_DATA_CNT; i++) im->ImReadBuf[i]=20+i;
+					}
+					else
+					{	ImBuf = &im->ImReadBuf[LOG_CMD_DATA_CNT];
+						for(i=0; i<LOG_CMD_DATA_CNT; i++) im->ImReadBuf[LOG_CMD_DATA_CNT+i]=20+i;
+					}
+
+					//Addr = LOG_CMD_START_ADDR + RecordNum * LOG_CMD_DATA_CNT;
+					//ReadPar(Addr, ImBuf, LOG_CMD_DATA_CNT);
+
+					//for(i=0; i<LOG_CMD_DATA_CNT; i++) im->ImReadBuf[i]=20+i;
+
+				break;
+
+				case IM_LOGPARAMS_TYPE:
+
+					if (!(RecordNum & 0x01))
+					{	ImBuf = &im->ImReadBuf[0];
+						for(i=0; i<LOG_PARAM_DATA_CNT; i++) im->ImReadBuf[i]=30+i;
+					}
+					else
+					{	ImBuf = &im->ImReadBuf[LOG_PARAM_DATA_CNT];
+						for(i=0; i<LOG_PARAM_DATA_CNT; i++) im->ImReadBuf[LOG_PARAM_DATA_CNT+i]=30+i;
+					}
+
+					//Addr = LOG_PARAM_START_ADDR + RecordNum * LOG_PARAM_DATA_CNT;
+					//ReadPar(Addr, ImBuf, LOG_PARAM_DATA_CNT);
+
+					//for(i=0; i<LOG_PARAM_DATA_CNT; i++) im->ImReadBuf[i]=30+i;
+
+				break;
+
+				//ma LogSIM
+				case IM_LOGSIM_TYPE:
+
+					if (!(RecordNum & 0x01))
+					{	ImBuf = &im->ImReadBuf[0];
+						for(i=0; i<LOG_SIM_DATA_CNT; i++) im->ImReadBuf[i]=40+i;
+					}
+					else
+					{	ImBuf = &im->ImReadBuf[LOG_SIM_DATA_CNT];
+						for(i=0; i<LOG_SIM_DATA_CNT; i++) im->ImReadBuf[LOG_SIM_DATA_CNT+i]=40+i;
+					}
+
+					//Addr = LOG_SIM_START_ADDR + RecordNum * LOG_SIM_DATA_CNT;
+					//ReadPar(Addr, ImBuf, LOG_SIM_DATA_CNT);
+					//for(i=0; i<LOG_SIM_DATA_CNT; i++) im->ImReadBuf[i]=40+i;
 				break;
 			}
 		}

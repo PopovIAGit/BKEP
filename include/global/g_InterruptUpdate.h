@@ -92,6 +92,7 @@ TPeriodicalFunction Task200Hz[] =       	//не более  20-ти задач
 	PrdElemInit(LogCmdControl,							&g_Stat),
 	PrdElemInit(LogParamMbExec,							&g_Stat),
 	PrdElemInit(LogParamControl,						&g_Stat),
+	PrdElemInit(LogSimControl,						&g_Stat), //ma LogSim
 	PrdElemInit(ImTimer,				                &g_Stat.Im),// на 200Г
 	PrdElemInit(DisplDrvUpdate,             			&g_Peref.Display),
 	PrdElemInit(Comm_TuTsUpdate,				&g_Comm.digitInterface),

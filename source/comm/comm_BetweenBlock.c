@@ -189,6 +189,7 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 	if(!bPort->RxPacket.Flag) return;
 	bPort->RxPacket.Flag = 0;
 
+
 	g_Ram.ramGroupA.VersionPOBkp     = bPort->RxPacket.Data[0] + 5000;
 	BkpEncErr  			= (Uns)bPort->RxPacket.Data[4] << 8;
 	BkpEncErr 		   |= (Uns)bPort->RxPacket.Data[3] << 0;
@@ -196,10 +197,11 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 	BkpEncPostion      |= (Uns)bPort->RxPacket.Data[1] << 0;
 	g_Ram.ramGroupH.Position 		= BkpEncPostion;
 	g_Ram.ramGroupC.HallBlock.all   = bPort->RxPacket.Data[5]&0x1F;
-	g_Ram.ramGroupA.TemperBKP       = (int16)bPort->RxPacket.Data[6];
+	//g_Ram.ramGroupA.TemperBKP       = (int16)bPort->RxPacket.Data[6];
 	g_Ram.ramGroupH.BKP_Temper      = (int16)bPort->RxPacket.Data[6];//???
 	if (g_Ram.ramGroupH.BKP_Temper > 128) g_Ram.ramGroupH.BKP_Temper -= 255;
-	g_Core.Status.bit.Ten 			= bPort->RxPacket.Data[7];
+	g_Core.Status.bit.Ten 			= bPort->RxPacket.Data[7] & 0xF;
+	g_Ram.ramGroupH.BkpType			= (bPort->RxPacket.Data[7]>>4) & 0xF;
 	g_Ram.ramGroupA.RevErrValue		= BkpEncErr;
 
 	g_Core.Protections.outFaults.Dev.bit.PosSens = (bPort->RxPacket.Data[5]>>5)&0x01;

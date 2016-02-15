@@ -10,6 +10,8 @@
 #define IM_LOGEV_TYPE			1
 #define IM_LOGCMD_TYPE			2
 #define IM_LOGPARAMS_TYPE		3
+//ma LogSim
+#define IM_LOGSIM_TYPE		4
 
 #define IM_RD_BUFFER_SIZE			10
 #define IM_WR_BUFFER_SIZE			200
@@ -30,12 +32,15 @@ typedef enum
 	imEvLogInfo = 4,
 	imCmdLogInfo = 5,
 	imParamLogInfo = 6,
-	imEvLogMainAddr = 7,
-	imEvLogBufAddr = 8,
-	imCmdLogAddr = 9,
-	imParLogAddr = 10,
-	imLogDownload = 11,
-	imParamDownload = 12
+	imSimLogInfo = 7,
+	imEvLogMainAddr = 8,
+	imEvLogBufAddr = 9,
+	imCmdLogAddr = 10,
+	imParLogAddr = 11,
+	imSimLogAddr = 12,
+	imLogDownload = 13,
+	imParamDownload = 14
+
 } TIMFuncState;
 
 typedef enum
@@ -93,6 +98,7 @@ void ImUpdate(pTInfoModule);
 void ImReset(pTInfoModule);
 // ¬нешн€€ функци€ чтени€ журналов в буфер
 void ImBufferReader(pTInfoModule, Byte LogType, Uns RecordNum);
+void ImBufferReaderTest(pTInfoModule, Byte LogType, Uns RecordNum);
 // ¬нешн€€ функци€ таймера
 void ImTimer(pTInfoModule);
 void ImTimerIndex(pTInfoModule);

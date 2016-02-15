@@ -366,7 +366,7 @@ __inline void WriteRegsIndication(TMbPort *hPort)
 		hPort->Packet.Exception = EX_ILLEGAL_DATA_VALUE;
 		return;
 	}
-	if (Buf[6] != (hPort->Packet.Count << 1))
+	if (Buf[6] != (hPort->Packet.Count << 1)) //что за проверка???  Блиииять надоели эти сраные куски кода!!!
 	{
 		hPort->Packet.Exception = EX_ILLEGAL_DATA_VALUE;
 		return;
