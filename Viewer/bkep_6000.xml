@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Table DeviceId="6000" DeviceName="БКЭП" FirmwareVersion="4002">
+<Table DeviceId="6000" DeviceName="БКЭП" FirmwareVersion="4004">
   <Group Name="Группа A" Type="Show" Description="Индикация">
     <Parameter Index="A0" Name="Статус работы">
       <Address>500</Address>
@@ -154,6 +154,7 @@
           <Field BitValue="10" Description="Сбой ЦАП" SpecialDescription="ev48" />
           <Field BitValue="11" Description="Выключение БКЭП" SpecialDescription="ev49" />
           <Field BitValue="12" Description="Нет связи с БКП" SpecialDescription="ev50" />
+          <Field BitValue="13" Description="Сбой МПО/МПЗ" />
         </Fields>
       </ValueDescription>
       <Info>
@@ -568,6 +569,22 @@
         <Description />
       </Info>
     </Parameter>
+    <Parameter Index="A27" Name="Падение напряжения">
+      <Address>527</Address>
+      <Configuration>
+        <Type>None</Type>
+        <Appointment>Regular</Appointment>
+      </Configuration>
+      <ValueDescription>
+        <Minimum>0</Minimum>
+        <Maximum>65535</Maximum>
+        <Default>0</Default>
+        <Type>Uns</Type>
+      </ValueDescription>
+      <Info>
+        <Description />
+      </Info>
+    </Parameter>
   </Group>
   <Group Name="Группа B" Type="User" Description="Пользовательские параметры">
     <Parameter Index="B0" Name="Момент закрытия">
@@ -579,7 +596,7 @@
       </Configuration>
       <ValueDescription>
         <Minimum>0</Minimum>
-        <Maximum>35000</Maximum>
+        <Maximum>60000</Maximum>
         <Default>2000</Default>
         <Type>Uns</Type>
         <Unit>Н•м</Unit>
@@ -597,7 +614,7 @@
       </Configuration>
       <ValueDescription>
         <Minimum>0</Minimum>
-        <Maximum>35000</Maximum>
+        <Maximum>60000</Maximum>
         <Default>2000</Default>
         <Type>Uns</Type>
         <Unit>Н•м</Unit>
@@ -615,7 +632,7 @@
       </Configuration>
       <ValueDescription>
         <Minimum>0</Minimum>
-        <Maximum>35000</Maximum>
+        <Maximum>60000</Maximum>
         <Default>2000</Default>
         <Type>Uns</Type>
         <Unit>Н•м</Unit>
@@ -633,7 +650,7 @@
       </Configuration>
       <ValueDescription>
         <Minimum>0</Minimum>
-        <Maximum>35000</Maximum>
+        <Maximum>60000</Maximum>
         <Default>4000</Default>
         <Type>Uns</Type>
         <Unit>Н•м</Unit>
@@ -651,7 +668,7 @@
       </Configuration>
       <ValueDescription>
         <Minimum>0</Minimum>
-        <Maximum>35000</Maximum>
+        <Maximum>60000</Maximum>
         <Default>2000</Default>
         <Type>Uns</Type>
         <Unit>Н•м</Unit>
@@ -669,7 +686,7 @@
       </Configuration>
       <ValueDescription>
         <Minimum>0</Minimum>
-        <Maximum>35000</Maximum>
+        <Maximum>60000</Maximum>
         <Default>4000</Default>
         <Type>Uns</Type>
         <Unit>Н•м</Unit>
@@ -1288,6 +1305,38 @@
         <Description />
       </Info>
     </Parameter>
+    <Parameter Index="B37" Name="Сечение проводника">
+      <Address>77</Address>
+      <Configuration>
+        <Type>None</Type>
+        <Appointment>Regular</Appointment>
+      </Configuration>
+      <ValueDescription>
+        <Minimum>0</Minimum>
+        <Maximum>65535</Maximum>
+        <Default>0</Default>
+        <Type>Uns</Type>
+      </ValueDescription>
+      <Info>
+        <Description />
+      </Info>
+    </Parameter>
+    <Parameter Index="B38" Name="Длина проводника">
+      <Address>78</Address>
+      <Configuration>
+        <Type>None</Type>
+        <Appointment>Regular</Appointment>
+      </Configuration>
+      <ValueDescription>
+        <Minimum>0</Minimum>
+        <Maximum>65535</Maximum>
+        <Default>0</Default>
+        <Type>Uns</Type>
+      </ValueDescription>
+      <Info>
+        <Description />
+      </Info>
+    </Parameter>
   </Group>
   <Group Name="Группа C" Type="Factory" Description="Заводские параметры">
     <Parameter Index="C0" Name="Код доступа">
@@ -1316,24 +1365,26 @@
       </Configuration>
       <ValueDescription>
         <Minimum>0</Minimum>
-        <Maximum>13</Maximum>
+        <Maximum>15</Maximum>
         <Default>0</Default>
         <Type>Enum</Type>
         <Fields>
           <Field BitValue="0" Description="Не определен" />
-          <Field BitValue="1" Description="ЭПЦ-100 А.25" />
-          <Field BitValue="2" Description="ЭПЦ-100 А.50" />
-          <Field BitValue="3" Description="ЭПЦ-400 Б.20" />
-          <Field BitValue="4" Description="ЭПЦ-400 Б.40" />
-          <Field BitValue="5" Description="ЭПЦ-800 В.40" />
-          <Field BitValue="6" Description="ЭПЦ-1000 В.20" />
-          <Field BitValue="7" Description="ЭПЦ-4000 Г.9" />
-          <Field BitValue="8" Description="ЭПЦ-4000 Г.18" />
-          <Field BitValue="9" Description="ЭПЦ-10000 Д.6" />
-          <Field BitValue="10" Description="ЭПЦ-10000 Д.12" />
-          <Field BitValue="11" Description="ЭПЦ-10000 Д.10" />
-          <Field BitValue="12" Description="ЭПЦ-15000 Д.10" />
-          <Field BitValue="13" Description="ЭПЦ-20000 Ф.40" />
+          <Field BitValue="1" Description="ЭПЦР-100 А.25" />
+          <Field BitValue="2" Description="ЭПЦР-100 А.50" />
+          <Field BitValue="3" Description="ЭПЦР-400 Б.20" />
+          <Field BitValue="4" Description="ЭПЦР-400 Б.40" />
+          <Field BitValue="5" Description="ЭПЦР-800 В.40" />
+          <Field BitValue="6" Description="ЭПЦР-1000 В.20" />
+          <Field BitValue="7" Description="ЭПЦР-4000 Г.9" />
+          <Field BitValue="8" Description="ЭПЦР-4000 Г.18" />
+          <Field BitValue="9" Description="ЭПЦР-10000 Д.6" />
+          <Field BitValue="10" Description="ЭПЦР-10000 Д.12" />
+          <Field BitValue="11" Description="ЭПЦР-10000 Д.10" />
+          <Field BitValue="12" Description="ЭПЦР-15000 Д.10" />
+          <Field BitValue="13" Description="ЭПЦР-20000 F.40" />
+          <Field BitValue="14" Description="ЭПЦР-35000 F.48" />
+          <Field BitValue="15" Description="ЭПЦР-50000 F.48" />
         </Fields>
       </ValueDescription>
       <Info>
@@ -1385,7 +1436,7 @@
       </Configuration>
       <ValueDescription>
         <Minimum>0</Minimum>
-        <Maximum>3500</Maximum>
+        <Maximum>6000</Maximum>
         <Default>10</Default>
         <Type>Uns</Type>
         <Unit>кН•м</Unit>
@@ -1404,7 +1455,7 @@
       </Configuration>
       <ValueDescription>
         <Minimum>0</Minimum>
-        <Maximum>800</Maximum>
+        <Maximum>1200</Maximum>
         <Default>10</Default>
         <Type>Uns</Type>
         <Unit>A</Unit>
