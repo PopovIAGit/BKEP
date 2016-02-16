@@ -12,7 +12,7 @@
 
 Byte RxState = 0;
 //для драйвера Bluetooth
-char StrDev[] = {"SET BT NAME BKD 000000\r\n"};
+char StrDev[] = {"SET BT NAME BKEP 000000\r\n"};
 Uns TestCount=0;
 
 //void InitChanelBt(TBluetoothHandle);
@@ -60,6 +60,7 @@ void InitChanelBt(TBluetoothHandle bPort)
 
 	bPort->IsConnected 	= false;
 	bPort->Error		= false;
+	bPort->WaitDelayAfterConnect = 0;
 
 	bPort->EnableRx 	= EnableBtRx;
 	bPort->EnableTx 	= EnableBtTx;
@@ -355,6 +356,7 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 				ClearValues(bPort);
 				bPort->State=9;
 				bPort->StrIndex=0;
+				if (bPort->ModeProtocol==2) bPort->WaitDelayAfterConnect = 40;
 				break;
 		case 9:
 			    if (bPort->Mode == BT_COMMAND_MODE)			// Работаем в режиме данных,
@@ -452,7 +454,14 @@ void SendCommandTwo(TBluetoothHandle bPort, char *ComStr, char *AddStr)
 
 void BluetoothRxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 {
+	Uns Data;
+
 	// Обработчик прерывания зависит от текущего режима Bluetooth
+	if (bPort->WaitDelayAfterConnect>2)
+	{
+		Data = ReceiveBtByte();
+		return;
+	}
 	if 		(bPort->Mode == BT_COMMAND_MODE)	RxCommandMode(bPort);
 	else if (bPort->Mode == BT_DATA_MODE)		RxDataMode(bPort, hPort);
 }
@@ -726,6 +735,8 @@ void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 
 void BluetoothTimer(TBluetoothHandle bPort)
 {
+	if (bPort->WaitDelayAfterConnect >0) bPort->WaitDelayAfterConnect--;
+	if (bPort->WaitDelayAfterConnect >40) bPort->WaitDelayAfterConnect = 0;
 	if (bPort->AssuredLaunchTimer<100) bPort->AssuredLaunchTimer++;
 	if (bPort->Timer > 0) bPort->Timer--;
 }

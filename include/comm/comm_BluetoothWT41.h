@@ -77,6 +77,7 @@ typedef struct _TBluetoothPort
 	Uns Stop;		//флаг того что в посылке будет вторая половина не посылаемая
 	Bool IsConnected;
 	Bool Error;
+	Uns WaitDelayAfterConnect; //задержка на прием данных после соединения
 
 	Bool        Enabled;		//состояние канала bluetooth
 	TTimerList  TimerActive;	//

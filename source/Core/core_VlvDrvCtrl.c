@@ -150,7 +150,7 @@ __inline void TeleControl(TCoreVlvDrvCtrl *p)
 	TValveCmd TuControl = vcwNone;
 	Bool Ready;
 
-	p->Tu.Enable = !p->Status->bit.MuDu;
+	p->Tu.Enable = !p->Status->bit.MuDu & !g_Ram.ramGroupA.Faults.Proc.bit.NoCalib;
 
 	if (!p->Tu.Enable) return;
 

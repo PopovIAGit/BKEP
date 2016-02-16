@@ -127,12 +127,15 @@ void SciMasterConnBetweenBlockUpdate(TMbBBHandle Port)
 				Port->Stat.RxErrCount++;
 				if(Port->Frame.RetryCounter < Port->Params.RetryCount)
 					Port->Frame.RetryCounter++;
-				else Port->Frame.ConnFlag = 0;
+				else {Port->Frame.ConnFlag = 0;
+					if (Port->Frame.ConnFlagCount>0) Port->Frame.ConnFlagCount--;
+				}
 				Port->TxPacket.Flag = 1;
 			}
 			else
 			{
-				Port->Frame.ConnFlag = 0;
+				//Port->Frame.ConnFlag = 0;
+				if (Port->Frame.ConnFlagCount>0) Port->Frame.ConnFlagCount--;
 			}
 			return;
 		}
@@ -278,7 +281,8 @@ static void async_unwrap_eof(TMbBBHandle Port, char byte)
 			else
 			{
 				TIMER_RESET(&Port->Frame.TimerConn);
-				Port->Frame.ConnFlag = 1;
+				//Port->Frame.ConnFlag = 1;
+				Port->Frame.ConnFlagCount=30;
 				Port->Frame.RetryCounter = 0;
 				Port->Frame.MsgCount++;
 				Port->RxPacket.Flag = 1;

@@ -441,7 +441,8 @@ void Core_DevProc_FaultIndic(TCoreProtections *p)
 
 
 		if (g_Comm.Bluetooth.ModeProtocol != 2 && tmpTime++>20 && p->outFaults.Dev.bit.NoBCP_Connect == 0)
-			p->outFaults.Dev.bit.NoBCP_Connect = !g_Comm.mbBkp.Frame.ConnFlag;
+			p->outFaults.Dev.bit.NoBCP_Connect = (g_Comm.mbBkp.Frame.ConnFlagCount==0);
+		    //p->outFaults.Dev.bit.NoBCP_Connect = !g_Comm.mbBkp.Frame.ConnFlag;
 
 
 		//p->outDefects.Dev.bit.NoBCP_Connect = !g_Comm.mbBkp.Frame.ConnFlag;
@@ -647,16 +648,12 @@ void Core_Protections50HZUpdate(TCoreProtections *p)
 
 
 	//-------- Ошибка ТИП БКП ------------------------
-
+//TODO привязать к посадочным местам и дописать
 		if (g_Ram.ramGroupA.Faults.Dev.bit.NoBCP_Connect == 0)
 		{
-			if (g_Ram.ramGroupH.BkpType == 7 && g_Ram.ramGroupC.DriveType == dt50000_F48)
+			if(g_Ram.ramGroupH.BkpType == 7 && g_Ram.ramGroupC.DriveType < dt35000_F48)
 			{
-				p->outDefects.Dev.bit.BCP_ErrorType = 0;
-			}
-			else if(g_Ram.ramGroupH.BkpType == 7 && g_Ram.ramGroupC.DriveType != dt50000_F48)
-			{
-				p->outDefects.Dev.bit.BCP_ErrorType = 1;
+				p->outFaults.Dev.bit.BCP_ErrorType = 1;
 			}
 		}
 	//----------------------------------------

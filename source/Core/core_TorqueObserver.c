@@ -12,10 +12,10 @@
 
 // фиксированные точки для снятия момента
 Int VoltArray[CUB_COUNT1] = {160, 190,  220,  250};
-//Int CurrArray[CUB_COUNT2] = {40, 80, 120, 160, 200};
-Int CurrArray[CUB_COUNT2] = {400, 800, 1200, 1600, 2000};
-Int AnUIArray[CUB_COUNT2] = { 50,  55,   65,   69,   73};//для эпц100а50
-//Int AnUIArray[CUB_COUNT2] = { 25,  35,   50,   65,   80};
+//Int CurrArray[CUB_COUNT2] = {400, 800, 1200, 1600, 2000};
+Int CurrArray[CUB_COUNT2] = {400,600, 800, 1200, 1600}; // для эпц 50000
+//Int AnUIArray[CUB_COUNT2] = { 50,  55,   65,   69,   73};//для эпц100а50
+Int AnUIArray[CUB_COUNT2] = { 25,  35,   50,   65,   80};
 
 
 void CubInit(TCubStr *p, TCubConfig *Cfg)	//инициализация куба
@@ -111,8 +111,20 @@ void CubCalc(TCubStr *p)
 // Инициализация
 void Core_TorqueInit(TTorqObs *p)
 {
-	// первая поверхность U и I - большие токи
-	p->TqCurr.X_Value = (Int *)&g_Ram.ramGroupH.Umid;
+	if (g_Ram.ramGroupC.DriveType == dt35000_F48)
+	{
+		// первая поверхность U и I - большие токи
+		Int VoltTmp = 0;
+		Float Volt = 0;
+		if (Volt != 0)
+		{
+			Volt = g_Ram.ramGroupB.VoltCorr / 10;
+		}
+
+		VoltTmp = g_Ram.ramGroupA.VoltageDown * Volt;
+	}
+
+	p->TqCurr.X_Value = (Int *)&g_Ram.ramGroupH.Umid;// - VoltTmp;
 	p->TqCurr.X_Array = VoltArray;
 	p->TqCurr.Y_Value = (Int *)&g_Ram.ramGroupH.Imidpr;
 	p->TqCurr.Y_Array = CurrArray;
@@ -156,12 +168,34 @@ void Core_TorqueCalc(TTorqObs *p)
 
 		p->Trqfltr.Input = (Float)Cub->Output; // фильтруем значение момента
 		peref_ApFilter3Calc(&p->Trqfltr);
-		p->Tmp =(Uns)(p->Trqfltr.Output) + Add;
+		p->Tmp =((Uns)(p->Trqfltr.Output)) + Add;
 
 		if (p->Tmp < TORQ_MIN_PR) p->Tmp = TORQ_MIN_PR;	// проверяем на вхождение в зону от
 		if (p->Tmp > TORQ_MAX_PR) p->Tmp = TORQ_MAX_PR;   // 10 до 110 %
 
 		//PU0ToValue(Tmp, p->TorqueMax);// переводим проценты в Нм относительно максимального М
 		p->Indication = (Uns)(((LgUns)p->Tmp * p->TorqueMax) / 100);
+}
+
+void Core_VoltageDown(void)
+{
+	Float Ro 		= 53.1; 	//   /10
+	Float Xl 		= 0.08;		//   /100
+	Float Cur 		= g_Ram.ramGroupH.Imid / 10;
+	Float CosFi 	= cos(((double)g_Ram.ramGroupA.AngleUI*3.14)/180);
+	Float SinFi 	= sin(((double)g_Ram.ramGroupA.AngleUI*3.14)/180);
+	Float Length 	= g_Ram.ramGroupB.ConductorLength;
+	Float Section 	= g_Ram.ramGroupB.ConductorSection;
+	Float Volt 		= 0;
+	Float Ra 		= 0;
+
+	Length = Length/1000;
+	Section = Section/1000;
+	Ra =  1/(Ro * Section);
+	Volt = 1.732 * Cur * Length * ((Ra * CosFi) + (Xl* SinFi));
+	//Volt = ((Ra * CosFi) + (Xl* SinFi))*100;
+	//Volt = CosFi*100;
+	g_Ram.ramGroupA.VoltageDown = Volt;
+
 }
 

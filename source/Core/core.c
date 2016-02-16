@@ -566,6 +566,10 @@ static void ShnControlMode(void)
 		g_Comm.SHN_Regs.Control.bit.EnableOp = 1;
 		break;
 	case 8:
+		//if(!g_Comm.SHN_Regs.Status.bit.SwichedOn) return;
+		g_Comm.SHN_Regs.Control.bit.EnableOp = 1;
+		break;
+	case 9:
 		//if(!g_Comm.SHN_Regs.Status.bit.OperationEnabled) return;
 		g_Core.MotorControl.WorkMode = wmMove;
 		g_Core.MotorControl.ShnControlStep = 0;
@@ -738,6 +742,7 @@ void Core_MuDuControl(TCore *p)
 		}
 		g_Ram.ramGroupD.PrtReset = 0;
 	}
+
 }
 
 void Core_OnOff_TEN(TCoreTemper *t)

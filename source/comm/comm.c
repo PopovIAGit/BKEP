@@ -53,11 +53,12 @@ void Comm_Init(TComm *p)
 
 	SerialCommInit(&g_Comm.mbAsu);
 	SerialCommInit(&g_Comm.mbShn);
+	g_Comm.mbShn.Frame.TimerPost.Timeout=100;
 	Comm_LocalControlInit(&g_Comm.localControl);
 
 	// настройка работы шнайдера
 
-	p->Shn.SHN_ReadFlag = 0;
+	p->Shn.SHN_ReadFlag = 1;
 	p->Shn.SHN_Mode = 1;
 	p->btn_reset_alarmFlag = 0;
 }

@@ -52,6 +52,7 @@ typedef struct _TScPacket {
 typedef struct _TScFrame {
 	unsigned int ConnFlag;
 	unsigned int RetryCounter;
+	unsigned int ConnFlagCount;//
 	unsigned int TimerPre;
 	unsigned int TimerPost;
 	unsigned int TimerConn;

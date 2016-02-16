@@ -97,7 +97,7 @@ TPeriodicalFunction Task200Hz[] =       	//не более  20-ти задач
 	PrdElemInit(DisplDrvUpdate,             			&g_Peref.Display),
 	PrdElemInit(Comm_TuTsUpdate,				&g_Comm.digitInterface),
 	PrdElemInit(Protections_MuffFlag,						NULL),
-
+	PrdElemInit(Core_VoltageDown,								NULL),
 };
 
 // ================================ 50 √ц ==================================

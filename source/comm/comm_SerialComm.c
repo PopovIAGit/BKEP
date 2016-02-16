@@ -98,6 +98,7 @@ void InitChanelAsuModbus(TMbHandle hPort)
 //---------------------------------------------------
 void InitChanelShnModbus(TMbHandle hPort)
 {
+	//TODO УПП связь init
 	hPort->Params.ChannelID   = SHN_SCI_ID;
 	hPort->Params.Mode     = MB_MASTER;
 	hPort->Params.Slave    = 1;//g_Ram.ramGroupB.RS_STATION;
@@ -116,10 +117,10 @@ void InitChanelShnModbus(TMbHandle hPort)
 
 	hPort->Params.RetryCount  = 5;
 		hPort->Params.Scale       = MB_SCALE;
-		hPort->Params.ConnTimeout = 400;
+		hPort->Params.ConnTimeout = 40;//400;
 		hPort->Params.RxDelay     = 10;
-		hPort->Params.TxDelay     = 200;
-		hPort->Params.AckTimeout  = 2000;//1000;
+		hPort->Params.TxDelay     = 10;//200;
+		hPort->Params.AckTimeout  = 1;//2000;//1000;
 		hPort->Params.TrEnable    = &ShnMbSetTr;
 		hPort->Frame.TimerPre.Timeout = 1;
 
@@ -299,12 +300,12 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 						//записать в структуру и выставить флаг
 						//WriteLogConnectSimID(Packet->Data, Packet->Count);
 
-						/*for(i=0; i<Packet->Count; i++)
+						for(i=0; i<Packet->Count; i++)
 						{
 							g_Stat.LogSim.NewSimID[i] = Packet->Data[i];
 						}
 						g_Stat.LogSim.ExecFlag = true;
-*/
+
 						return 0;
 						//return WriteData(Packet->Addr, Packet->Data, Packet->Count);
 					default: return EX_ILLEGAL_FUNCTION;

@@ -116,13 +116,20 @@ void ReadDcrFull(TCoreMenu *p, Uns Addr)	// â ChangeCoordinate()
 void Core_MenuReadDcr(TCoreMenu *p, struct MENU_DCR *Dcr, Uns Addr) // â ReadDcrFull()
 {
 	Uns Kmm = *p->MinMaxGain;
+	Uns tmp =0;
 
 	PFUNC_blkRead((Ptr)&p->Params[Addr].Dcr, (Ptr)Dcr, sizeof(struct MENU_DCR));
 	
 	if ((Dcr->Config.Val.Type == MT_DEC) && (Dcr->Config.Val.MinMax))
 	{
+
 		Dcr->Min = Dcr->Min * Kmm;
-		Dcr->Max = Dcr->Max * Kmm;
+
+		tmp = Dcr->Max*(Kmm/100);///100 * Kmm;
+		if (tmp>1200) Dcr->Max = 60000;
+		else Dcr->Max = Dcr->Max * Kmm;
+
+		//Dcr->Max = Dcr->Max * Kmm;
 		Dcr->Def = Dcr->Def * Kmm;
 	}
 }

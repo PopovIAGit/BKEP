@@ -84,4 +84,5 @@ void CubRefresh(TCubStr *, TCubArray *Array);
 void CubCalc(TCubStr *);
 void Core_TorqueInit(TTorqObs *);
 void Core_TorqueCalc(TTorqObs *);
+void Core_VoltageDown(void);
 #endif

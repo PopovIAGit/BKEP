@@ -95,7 +95,7 @@
 #define Th_BCD_CODE			37
 #define Tl_BCD_CODE			38
 #define NoBCP_Connect_CODE	31
-#define BCP_ErrorType_CODE	39
+#define BCP_ErrorType_CODE	40
 
 #define MpoMpzError_CODE	41
 #define BlueNoLaunch_CODE	42
