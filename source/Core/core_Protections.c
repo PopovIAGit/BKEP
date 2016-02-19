@@ -212,15 +212,6 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->breakVoltS.Scale = PROTECT_SCALE;
 	p->breakVoltT.Scale = PROTECT_SCALE;
 
-	//---------Ассиметрия напряжений (неисправность)-----------------------------------
-	p->voltSkew.Cfg.all = PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL, VSk_bit, 20);
-	p->voltSkew.Input = (Int *) &g_Ram.ramGroupH.VSkValue;
-	p->voltSkew.Output = (Uns *) &p->outDefects.Net.all;
-	p->voltSkew.EnableLevel = (Int *) &g_Ram.ramGroupC.VSkLevel;
-	p->voltSkew.DisableLevel = (Int *) &g_Ram.ramGroupC.VSkLevel;
-	p->voltSkew.Timeout = &g_Ram.ramGroupC.VSkTime;
-	p->voltSkew.Scale = PROTECT_SCALE;
-
 	//---------ЗАЩИТЫ ПО ТОКУ---------------------------------------------
 	//---------Обрыв фаз по току (U V W неисправность)---------------------------------
 	p->breakCurrU.Cfg.all = PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL, PhlU_bit, HYST_OFF);
@@ -262,15 +253,6 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->I2t.Output = (Uns *) &p->outFaults.Load.all;
 	p->I2t.Scale = PROTECT_SCALE;
 	Core_ProtectionI2TInit(&p->I2t);
-
-	//--------Ассиметрия токов (неисправность)----------------------------------------------
-	p->voltSkew.Cfg.all = PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL, ISkew_bit, HYST_OFF);
-	p->voltSkew.Input = (Int *) &g_Ram.ramGroupH.ISkewValue;
-	p->voltSkew.Output = (Uns *) &p->outDefects.Load.all;
-	p->voltSkew.EnableLevel = (Int *) &g_Ram.ramGroupC.ISkewLevel;
-	p->voltSkew.DisableLevel = (Int *) &g_Ram.ramGroupC.ISkewLevel;
-	p->voltSkew.Timeout = &g_Ram.ramGroupC.ISkewTime;
-	p->voltSkew.Scale = PROTECT_SCALE;
 
 	//------Короткое замыкание----------------------------------------------
 	p->ShC_U.Cfg.bit.Num = ShCU_bit;
@@ -380,7 +362,6 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 		p->breakVoltS.Cfg.bit.Enable = Enable;
 		p->breakVoltT.Cfg.bit.Enable = Enable;
 
-		p->voltSkew.Cfg.bit.Enable = (g_Ram.ramGroupC.VSk != pmOff);						//Небаланс напряжений
 		break;
 	case 3:  // Защиты по току
 		Enable = (g_Ram.ramGroupC.Phl != pmOff) && (!g_Core.Status.bit.Stop);					// Обрыв выходных фаз (двиг.)
@@ -393,8 +374,6 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 		p->ShC_U.Cfg.bit.Enable = Enable;
 		p->ShC_V.Cfg.bit.Enable = Enable;
 		p->ShC_W.Cfg.bit.Enable = Enable;
-
-		p->currSkew.Cfg.bit.Enable = (g_Ram.ramGroupC.ISkew != pmOff) && (!g_Core.Status.bit.Stop);					// Небаланс токов
 
 		p->I2t.Cfg.bit.Enable = (g_Ram.ramGroupC.I2t != pmOff) && (!g_Core.Status.bit.Stop);		// ВТЗ
 		break;
