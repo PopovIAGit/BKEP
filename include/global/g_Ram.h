@@ -222,7 +222,7 @@ typedef struct _TRamGroupC
 	Uns             PhOrdZone;      	// C12. 102 Расстояние чередования фаз двигателя
 	Uns             MuffZone;           // C13. 103 Расстояние сброса муфты
 	Uns			    PosSensPow;			// C14. 104 Тип датчика положения
-	Uns			    DisplResTout;		// C15. 105 Время сброса индикатора
+	Uns			    reserv105;			// C15. 105 Резерв
 	Uns             SetDefaults;        // C16. 106 Задание параметров по умолчанию
 	Uns             Rsvd7[2];          	// C17-18. 107-108 резерв
 	Uns             BrakePause;         // C19. 109 Пауза перед торможением
