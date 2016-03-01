@@ -159,6 +159,7 @@ __inline void ReadRegsConfirmation(TMbPort *hPort)
 		return;
 	}
 	DataUnPack(&Buf[3], hPort->Packet.Data, hPort->Packet.Count);
+
 }
 
 //-------------------------------------------------------------------------------

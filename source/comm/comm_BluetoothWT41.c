@@ -87,9 +87,10 @@ void InitChanelBt(TBluetoothHandle bPort)
 	if (DevProdYear > 99)
 		DevProdYear = 0;
 
-	DecToStr(DevFactNum, &StrDev[21], 0, 3, False, False);
-	DecToStr(DevProdYear, &StrDev[17], 0, 1, False, False);
+	DecToStr(DevFactNum, &StrDev[22], 0, 3, False, False);
+	DecToStr(DevProdYear, &StrDev[18], 0, 1, False, False);
 	//DevName = &StrDev[0];
+	//{"SET BT NAME BKE 000000\r\n"};
 
 	bPort->DeviceNameString = &StrDev[0];
 	bPort->DeviceAuthCodeString = BT_AUTH_CODE_STRING;
@@ -116,7 +117,7 @@ void InitChanelBt(TBluetoothHandle bPort)
 	InitTimer(&bPort->TimerActive, bPort->TimerActive.Timeout);
 
 	StartTimer(&bPort->TimerActive);
-	RS485_DIR_BT = 0;
+	RS485_DIR_BT = 0; //квл
 	//GpioDataRegs.GPADAT.bit.GPIO27=0;
 
 	bPort->TimerBlink.Counter=0;
@@ -137,7 +138,9 @@ void BluetoothActivation(TBluetoothHandle bPort)
 	if (BUTTON_BLUE==1 && bPort->ModeProtocol!=0){
 		if (bPort->ButtActivTimer>3){
 			bPort->Enabled=false;
-			RS485_DIR_BT = 1;
+			RS485_DIR_BT = 1;//выкл
+			g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_MPU;
+			g_Core.VlvDrvCtrl.EvLog.Value = CMD_OFF_BLT;
 			StopTimer(&bPort->TimerActive);
 			GpioDataRegs.GPADAT.bit.GPIO27=1;
 			bPort->ModeProtocol = 0;
@@ -173,7 +176,9 @@ void BluetoothActivation(TBluetoothHandle bPort)
 		InitTimer(&bPort->TimerActive, bPort->TimerActive.Timeout);
 		StartTimer(&bPort->TimerActive);
 		bPort->Enabled=true;
-		RS485_DIR_BT = 0;
+		RS485_DIR_BT = 0;//вкл
+		g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_MPU;
+		g_Core.VlvDrvCtrl.EvLog.Value = CMD_ON_BLT;
 		GpioDataRegs.GPADAT.bit.GPIO27=0;
 		bPort->ButtActivTimer=0;
 		bPort->ModeProtocol = 1; //Modbus
@@ -230,16 +235,21 @@ void BluetoothActivation(TBluetoothHandle bPort)
 
 	if (bPort->TimerActive.Counter<(bPort->TimerActive.Timeout-300) && bPort->Connect==true)
 	{
+		//TODO на время отладки отключаю
 		bPort->Connect=false;
 		StartTimer(&bPort->TimerActive);
+		/*p->EvLog.Source = CMD_SRC_MPU;
+		p->EvLog.Source = CMD_SRC_MPU;*/
 	}
 
 	if (!TimerPending(&bPort->TimerActive))
 	{
 		bPort->Enabled=false;
-		RS485_DIR_BT = 1;
+		RS485_DIR_BT = 1;//выкл
 		StopTimer(&bPort->TimerActive);
 		GpioDataRegs.GPADAT.bit.GPIO27=1;
+		g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_BLOCK;
+		g_Core.VlvDrvCtrl.EvLog.Value = CMD_OFF_BLT;
 		bPort->ModeProtocol = 0;
 		bPort->State = 7;
 	}

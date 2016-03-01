@@ -154,8 +154,8 @@ typedef struct _TRamGroupA
 	Uns             VersionPO;       	// 24. 524 Версия ПО
 	Uns             VersionPOBkp;      	// 25. 525 Версия ПО БКП
 	Uns				VoltageDown;		// 27. 527 Падение напряжения
-	Uns				RevErrValue;		// 26. 526 Колво сбоев датчика положения
-	Uns 			Rsvd[12];			// 28-39. 528-539 Резерв
+	Uns				RevErrValue;		// 28. 526 Колво сбоев датчика положения
+	Uns 			Rsvd[10];			// 29-39. 528-539 Резерв
 } TRamGroupA;
 
 // Группа B (Адрес = 40, Количество = 100) - Параметры пользователя
@@ -458,6 +458,20 @@ typedef struct _TRamGroupE
 	Uns 		   Rsvd[14];			// 16-29.Резерв
 } TRamGroupE;
 
+//---------------------------------------------------------------------------
+
+// ПАРАМЕТРЫ УСТРОЙСТВА ПЛАВНОГО ПУСКА
+// Группа A (Адрес = 540, Количество = 20) - Диагностика - просмотр
+typedef struct _TRamGroupATS
+{
+	Uns             		Control1;           // 0.
+	Uns	            		Control2;			// 1.
+	TATS48_StatusReg        State1;     	    // 2.
+	TATS48_ExStatusReg      State2;		    	// 3.
+	TATS48_Ex2StatusReg     State3;        		// 4.
+	Uns						Speed;				// 5
+	Uns 					Rsvd[14];			// 6-20. Резерв
+} TRamGroupATS;
 
 typedef struct _TRamLogBuff
 {
@@ -513,6 +527,7 @@ typedef struct TRam
   TRamGroupG		ramGroupG;			//адреса 280-309
   TRamGroupH		ramGroupH;			//адреса 310-
   TRamGroupA		ramGroupA;			// ПАРАМЕТРЫ НАСТРОЙКИ
+  TRamGroupATS		ramGroupATS;		// ПАРАМЕТРЫ УПП-ATS48
   TRamGroupE		ramGroupE;
 } TRam;
 
@@ -598,6 +613,8 @@ typedef struct TRam
 #define REG_SHC_FAULT		GetAdr(ramGroupH.ScFaults)
 #define REG_MUFF_FAULT		GetAdr(ramGroupH.MuffFault)
 #define REG_TEMP_BCP_FAULT	GetAdr(ramGroupH.TemperBCPFault)
+
+#define REG_CONTROL_ATS48	GetAdr(ramGroupATS.Control1) //540
 /*
 #define REG_TASK_TIME		GetAdr(ramGroupD.TASK_TIME)
 #define REG_TASK_DATE		GetAdr(ramGroupD.TASK_DATE)

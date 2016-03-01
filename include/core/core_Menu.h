@@ -103,6 +103,7 @@ typedef struct TCoreMenu {
 	const struct MENU_GROUP  *SubGroups;// ”казатель на структуры подгрупп
 	const struct MENU_PARAM  *Params;   // ”казатель на структуры параметров
 	const struct MENU_STRING *Values;   // ”казатель на структуры строковых значений
+	const struct ADDR_PARAM_ATS48  *AtsParams;   // ”казатель на структуры адресов параметров упп
 	struct MENU_STRING        Rsvd;     // –езервна€ строка
 	
 	void (*StartDispl)(String Text, Byte Num);

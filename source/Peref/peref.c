@@ -247,7 +247,6 @@ void Peref_50HzCalc(TPeref *p)	// 50 Гц
     peref_ApFilter3Calc(&p->IV3fltr);
     peref_ApFilter3Calc(&p->IW3fltr);
 
-    //TODO сделать нормальное выставление в зависимости от типа привода
     if(g_Ram.ramGroupC.DriveType < 15 && g_Ram.ramGroupC.DriveType != 0) CUR_SENSOR_GAIN = 0;
     if(g_Ram.ramGroupC.DriveType< 5 && g_Ram.ramGroupC.DriveType != 0) CUR_SENSOR_GAIN = 1;
 
@@ -432,10 +431,18 @@ void Peref_10HzCalc(TPeref *p)	// 10 Гц
  // if (p->Peref_StertDelayTimeout--) return; ???
 //-------- логика ЦАП -------------------------------------------------
     if (g_Ram.ramGroupG.Mode)
-	p->Dac.Data = g_Ram.ramGroupG.DacValue;
-    else if (g_Ram.ramGroupH.CalibState != csCalib) p->Dac.Data = 0;//{ p->Dac.Data = g_Ram.ramGroupC.Dac_Offset + (Uint16) (0.001 * (g_Ram.ramGroupC.Dac_Mpy - g_Ram.ramGroupC.Dac_Offset) * LocalPoss); }// p->Dac.Data = 0;
+    {
+    	p->Dac.Data = g_Ram.ramGroupG.DacValue;
+    	ENABLE_DAC = 1;
+    }
+    else if (g_Ram.ramGroupH.CalibState != csCalib)
+    	{
+    		ENABLE_DAC = 0;
+    		p->Dac.Data = 0;
+    	}
     else
 	{
+    	ENABLE_DAC = 1;
 	    PosPr = g_Ram.ramGroupA.PositionPr;
 	    if (PosPr < 0)
 		PosPr = 0;

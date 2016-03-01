@@ -530,7 +530,7 @@ void Core_ProtectionsClear(TCoreProtections *p)
 
 	g_Core.Protections.MuffFlag200Hz = 0;
 
-	if (g_Ram.ramGroupH.MuffFault == 1 && IsMemParReady())
+	if (g_Ram.ramGroupH.MuffFault != 0 && IsMemParReady())
 	{
 		g_Ram.ramGroupH.MuffFault = 0;
 		MuffAddr = REG_MUFF_FAULT;

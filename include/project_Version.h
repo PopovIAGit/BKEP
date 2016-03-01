@@ -19,7 +19,7 @@ extern "C" {
 #define DEVICE_GROUP			4 			// Группа устройств
 #define VERSION					005			// Версия проекта
 #define MODULE_VERSION			30			// Версия модулей и спецификации
-#define SUBVERSION				02			// Подверсия проекта
+#define SUBVERSION				04			// Подверсия проекта
 
 #ifdef __cplusplus
 }

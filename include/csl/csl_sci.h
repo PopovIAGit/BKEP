@@ -30,7 +30,7 @@ extern "C" {
 #define SCI_RX_ERROR		0x1C
 
 #define SCI_BRR(Baud)		(Uint16)((Uint32)(150e6/14 / 800)  / (Baud) - 1)
-
+#define SCI_BRR20700(Baud)		(Uint16)((Uint32)(150e6/14 / 800)  / (Baud) - 1)
 //---------------------------------------------------------------------------
 #define SCI_DEFAULT_BAUD_RATES { \
 	24,48,96,192,384,576,1152 \
@@ -50,6 +50,8 @@ extern void SCI_rx_enable(Byte Id);
 extern void SCI_rx_disable(Byte Id);
 extern void SCI_tx_enable(Byte Id);
 extern void SCI_tx_disable(Byte Id);
+extern void SCI_stopBit2(Byte Id);
+extern void SCI_stopBit1(Byte Id);
 
 #ifdef __cplusplus
 }

@@ -16,8 +16,8 @@
 TFM25V10 Eeprom1;
 TFM25V10 Eeprom2;
 
-Uns LVS_flag  	 = 0;
-Uns ShnModeTimer = 0;
+//Uns LVS_flag  	 = 0;
+//Uns ShnModeTimer = 0;
 
 TCore	g_Core;
 
@@ -496,7 +496,8 @@ static void StartMode(void)
 
 static void ShnControlMode(void)
 {
-	ShnControlErrCheck();
+	//TODO переписать
+	/*ShnControlErrCheck();
 
 	if(g_Core.MotorControl.DinBreakTimer > 0) g_Core.MotorControl.DinBreakTimer--;
 
@@ -509,7 +510,8 @@ static void ShnControlMode(void)
 		//LVS_flag = 2;
 	//	if(g_Core.MotorControl.CalibStop)
 	//	{
-			g_Comm.SHN_Regs.Control.all 	= 0x200F;
+
+		    g_Comm.SHN_Regs.Control.all 	= 0x200F;
 			g_Comm.mbShn.Packet.Request 	= 16;
 			g_Comm.mbShn.Packet.Addr		= 400;
 			g_Comm.mbShn.Packet.Response 	= 0;
@@ -548,7 +550,6 @@ static void ShnControlMode(void)
 		g_Comm.SHN_Regs.Control.all = 0;
 		break;
 	case 4:
-		//if (!(SHN_Data[0]&BIT14)) return;
 		g_Comm.SHN_Regs.Control.all = 0;
 		g_Comm.SHN_Regs.Control.bit.ResetFaults = 1;
 		break;
@@ -580,9 +581,11 @@ static void ShnControlMode(void)
 	//g_Comm.Shn.SHN_Busy = 0;
 	g_Core.MotorControl.ShnControlStep++;
 	g_Core.MotorControl.ShnControlErrTimer = 0;
+	*/
 }
 
 // Функция для остановки работу если упп не отзывается
+//TODO переписать или удалить
 static void ShnControlErrCheck(void)
 {
 	g_Core.MotorControl.ShnControlErrTimer++;

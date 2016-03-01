@@ -101,10 +101,11 @@ typedef struct _TMbPacket {
 	Byte Response;             // Код функции ответа
 	Uns  SubRequest;           // Код подфункции запроса
 	Uns  Addr;                 // Начальный адрес данных
-	Uns  Data[210];            // Буфер данных
+	Uns  Data[10];             // Буфер данных
 	Uns  Count;                // Количество данных
 	Byte Exception;            // Код исключения
 	Bool Acknoledge;           // Флаг ожидания подтверждения
+	Byte ParamMode;			   // режим Modbus / Bluetooth
 } TMbPacket;
 
 // Структура кадра
@@ -122,10 +123,21 @@ typedef struct _TMbFrame {
 	Uns        RxLength;       // Длина принятого кадра
 	Uns        TxLength;       // Длина передаваемого кадра
 	Uns 	   AddCount;
-	//Uns		   TxBufLen;
 	Byte      *Data;           // Указатель в буфере данных кадара
 	Byte       Buf[256];       // Буфер данных кадра
 } TMbFrame;
+
+typedef union {
+	Uint16 all;
+	struct {
+		Uint16 Busy:1;		// 0 - занят идет выполнение последней соманды
+		Uint16 Ready:1;		// 1 - готов команда выполнена
+		Uint16 Wait:1;		// 2 - ожидание команды
+		Uint16 NoConnect:1; // 3 - нет связи
+		Uint16 Error:1;		// 4 - ошибка при выполнении команды
+		Uint16 Rsvd:11;		// 5-15
+	} bit;
+} TATS48_mbStatus;
 
 // Струкутра статистики работы
 typedef struct _TMbStat {
@@ -149,6 +161,7 @@ typedef struct _TMbStat {
 	Uns TxBytesCount;          // Отправление количество байт
 	Uns MAMsgIn;
 	Uns MAMsgOut;
+	TATS48_mbStatus Status;	   // статус выполнения команды
 } TMbStat;
 
 typedef struct _TSerialInterface

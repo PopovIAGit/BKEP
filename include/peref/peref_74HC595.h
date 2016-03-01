@@ -17,7 +17,7 @@
 //-------------------- Структуры -------------------------------------------
 
 // Структура параметров драйвера
-typedef void (*TCsFunc)(Byte);
+typedef void (*TCs_Func)(Byte);
 
 // Данная реализация расчитана на использование 2 микросхем из 3. 16 из 24
 
@@ -51,7 +51,7 @@ typedef struct TPeref_74hc595 {
 	TShiftReg  	ShiftReg;				// Текущий считанный байт
 	Uns			Data;
 	Uns			EmptyData;				// Отключение неиспользуемых реле в третьей микросхеме в каскаде
-	TCsFunc CsFunc;						// Функция chip select'а
+	TCs_Func    CsFunc;						// Функция chip select'а
 
 } TPeref_74hc595;
 

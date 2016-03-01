@@ -13,7 +13,7 @@
 //ma LogSim
 #define IM_LOGSIM_TYPE		4
 
-#define IM_RD_BUFFER_SIZE			10
+#define IM_RD_BUFFER_SIZE			40
 #define IM_WR_BUFFER_SIZE			200
 #define IM_DOWNLOAD_BUFFER_SIZE		IM_READ_BUF_SIZE
 
@@ -88,6 +88,8 @@ typedef struct
 
 	Uns ImReadBuf[(IM_READ_BUF_SIZE * 2)];			// Буфер информационного модуля
 
+	Int WaitAndroidCounter;
+	Int WaitTime;
 } TInfoModule, *pTInfoModule;
 
 // Внешная функция приема байт

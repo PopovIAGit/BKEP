@@ -63,7 +63,8 @@ typedef struct {
 	TMbPort  			mbAsu;			// ModBus - АСУ
 	TMbPort  			mbShn;			// ModBus - УПП
 	TMbPort  			mbBt;			// ModBus - Bluetooth
-	TATS48_Regs			SHN_Regs;		// Регистры для работы с софстартером шнайдер
+	//TATS48_Regs			SHN_Regs;		// Регистры для работы с софстартером шнайдер
+	TIOData_ATS48		ioATS48;		// входные выходные данные драйвера обмена данными с УПП
 	TShn				Shn;
 	TBluetoothPort		Bluetooth;		// Bluetooth
 	TBKPData			BkpData;		// структура обмена данными с БКП
@@ -79,9 +80,9 @@ void Comm_CommandUpdate(TComm *p);
 void UpdateTUTS_Test(TComm *p);
 //Uns DigitCmdModeUpdate (Uns *);
 void TekModbusParamsUpdate(void);
+void comm_ControlModbusUpdatealtistar48(TComm *p);
 
 extern TComm	g_Comm;
-extern Uint16 	SHN_Data[10];
 #ifdef __cplusplus
 }
 #endif // extern "C"

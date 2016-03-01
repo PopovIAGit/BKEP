@@ -57,7 +57,7 @@
 
 extern Uns ImEvLogMainAddrsTable[20];
 extern Uns ImEvLogBufAddrsTable[12];
-extern Uns ImCmdLogAddrsTable[5];
+extern Uns ImCmdLogAddrsTable[6];
 extern Uns ImParamLogAddrsTable[5];
 extern Uns ImSimLogAddrsTable[13];
 

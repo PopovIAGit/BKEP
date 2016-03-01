@@ -23,6 +23,8 @@
 #define CMD_DEFSTOP				0x0800	// Стоп при аварии(не является командой, добавлено для журнала)  : Добавил PIA 12.09.2012
 #define CDM_DISCROUT_TEST		0x1000	// Тест дискретных выходов
 #define CMD_DISCRIN_TEST		0x2000	// Тест дискретных входов
+#define CMD_ON_BLT				0x4000	// включение Bluetooth
+#define CMD_OFF_BLT				0x8000	// выключение Bluetooth
 
 // Источник команды управления
 #define CMD_SRC_BLOCK		0x0400	// Аналогвый интерфейс
@@ -31,7 +33,7 @@
 #define CMD_SRC_DIGITAL		0x2000	// Дискретный интерфейс
 #define CMD_SRC_SERIAL		0x4000	// Последовательный интерфейс
 #define CMD_SRC_ANALOG		0x8000	// Аналогвый интерфейс
-
+#define CMD_SRC_BLUETOOTH	0x200   // источник команды Bluetooth интерфейс
 // Константы для работы с положением
 #define POS_UNDEF	0x7FFFFFFF
 #define POS_ERR		10

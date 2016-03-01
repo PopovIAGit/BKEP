@@ -66,35 +66,13 @@ void InitChanelAsuModbus(TMbHandle hPort)
 
 
 	hPort->Params.HardWareType	= UART_TYPE;
+	hPort->Packet.ParamMode	= UART_TYPE;
 
 	hPort->Params.TrEnable(0);
 
 	//hPort->HardwareSetup = SerialCommInit;
 
 }
-//---------------------------------------------------
-/*void InitChanelBkpModbus(TMbHandle hPort)
-{
-	hPort->Params.ChannelID   = ASU_SCI_ID;
-	hPort->Params.Mode     = MB_MASTER;
-	hPort->Params.Slave    = 1;//g_Ram.ramGroupB.RS_STATION;
-	hPort->Params.BaudRate = BaudRates[3];//BaudRates[g_Ram.ramGroupB.RS_BAUD_RATE];
-	hPort->Params.UartBaud = BrrValues[3];//BrrValues[g_Ram.ramGroupB.RS_BAUD_RATE];
-	hPort->Params.Parity   = 0;//g_Ram.ramGroupB.RS_MODE;
-
-	hPort->Params.RetryCount  = 0;
-	hPort->Params.Scale       = MB_SCALE;
-//	hPort->Params.ConnTimeout = Serial->RsIndicTime * 100;
-	hPort->Params.ConnTimeout = 10;//  ИК
-	hPort->Params.RxDelay     = 10;
-//	hPort->Params.TxDelay     = Serial->RsWaitTime - 3;
-	hPort->Params.TxDelay     = 10;//  ИК
-	hPort->Params.AckTimeout  = 1000;
-	hPort->Params.TrEnable    = &BkpMbSetTr;
-	hPort->Frame.TimerPre.Timeout = 10; //  ИК
-
-	hPort->Params.HardWareType	= UART_TYPE;
-}*/
 //---------------------------------------------------
 void InitChanelShnModbus(TMbHandle hPort)
 {
@@ -106,25 +84,17 @@ void InitChanelShnModbus(TMbHandle hPort)
 	hPort->Params.UartBaud = BrrValues[3];//BrrValues[g_Ram.ramGroupB.RS_BAUD_RATE];
 	hPort->Params.Parity   = 0;//g_Ram.ramGroupB.RS_MODE;
 
-/*	hPort->Params.RetryCount  = 5;
+	hPort->Params.RetryCount  = 2;
 	hPort->Params.Scale       = MB_SCALE;
-	hPort->Params.ConnTimeout = 400;
+	hPort->Params.ConnTimeout = 40;//400;
 	hPort->Params.RxDelay     = 10;
-	hPort->Params.TxDelay     = 0;
-	hPort->Params.AckTimeout  = 2000;
+	hPort->Params.TxDelay     = 10;//200;
+	hPort->Params.AckTimeout  = 1;//2000;//1000;
 	hPort->Params.TrEnable    = &ShnMbSetTr;
-	hPort->Frame.TimerPre.Timeout = 10;*/
-
-	hPort->Params.RetryCount  = 5;
-		hPort->Params.Scale       = MB_SCALE;
-		hPort->Params.ConnTimeout = 40;//400;
-		hPort->Params.RxDelay     = 10;
-		hPort->Params.TxDelay     = 10;//200;
-		hPort->Params.AckTimeout  = 1;//2000;//1000;
-		hPort->Params.TrEnable    = &ShnMbSetTr;
-		hPort->Frame.TimerPre.Timeout = 1;
+	hPort->Frame.TimerPre.Timeout = 1;
 
 	hPort->Params.HardWareType	= UART_TYPE;
+	hPort->Packet.ParamMode	= UART_TYPE;
 }
 //---------------------------------------------------
 void InitChanelBtModbus(TMbHandle hPort)
@@ -158,6 +128,7 @@ void InitChanelBtModbus(TMbHandle hPort)
 	 * */
 
 	hPort->Params.HardWareType	= MCBSP_TYPE;
+	hPort->Packet.ParamMode	= MCBSP_TYPE;
 
 	//hPort->Params.TrEnable(0);
 
@@ -195,17 +166,6 @@ void ModBusUpdate(TMbHandle hPort)
 			}
 		}
 	}
-
-	/*if(IsMaster())
-	{
-		if (Packet->Response)
-		{
-			switch (Packet->Response)
-			{
-
-			}
-		}
-	}*/
 
 	hPort->Serial.RsState = Packet->Exception; //???MbConnect = !Packet->Exception;
 	
@@ -273,10 +233,15 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 				switch(Res)
 				{
 					case 1:
-						if (Addr>=REG_TASKCLOSE && Addr<=REG_RSRESET)
-							g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_SERIAL;
-						if (Addr == REG_SET_DEFAULTS)
-							g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_SERIAL;
+						if (Addr>=REG_TASKCLOSE && Addr<=REG_RSRESET){
+							if (Packet->ParamMode==UART_TYPE) g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_SERIAL;
+							else if (Packet->ParamMode==MCBSP_TYPE) g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_BLUETOOTH;
+						}
+						if (Addr == REG_SET_DEFAULTS){
+							if (Packet->ParamMode==UART_TYPE) g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_SERIAL;
+							else if (Packet->ParamMode==MCBSP_TYPE) g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_BLUETOOTH;
+							//g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_SERIAL;
+						}
 						return WriteData(Packet->Addr, Packet->Data, Packet->Count);
 						//if (!Port->Frame.Exception) SerialCommRefresh();
 					case 5:
@@ -299,7 +264,8 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 						//функция записи в журнал id bluetooth устройства которое подключилось к блоку
 						//записать в структуру и выставить флаг
 						//WriteLogConnectSimID(Packet->Data, Packet->Count);
-
+						Packet->Request = 0;
+						g_Stat.Im.RdBuffer[0]=0;
 						for(i=0; i<Packet->Count; i++)
 						{
 							g_Stat.LogSim.NewSimID[i] = Packet->Data[i];
@@ -349,6 +315,12 @@ __inline Byte WriteData(Uns Addr, Uns *Data, Uns Count)
 			g_Stat.LogParam.MbBuffer[g_Stat.LogParam.MbIndex] = i + Addr;			// Запомнили адрес параметра, инкрементировали индекс
 			g_Stat.LogParam.MbIndex++;
 		}
+		if (Addr==REG_TASK_TIME || Addr==REG_TASK_DATE)
+		{
+			g_Stat.LogParam.MbBuffer[g_Stat.LogParam.MbIndex] = i + Addr;			// Запомнили адрес параметра, инкрементировали индекс
+			g_Stat.LogParam.MbIndex++;
+		}
+
 		//MbTmpData[i] = Tmp;
 	}
 	// ИК
