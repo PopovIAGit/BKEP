@@ -189,13 +189,13 @@ typedef struct _TRamGroupB
 	Uns             RsStation;          // B25. 65 Адрес станции
 	TParityMode		RsMode;				// B26. 66 Режим связи
 	Uns				MuffTimer;			// B27. 67
-	Uns				KeyInvert;			// B28. 68 Маска кнопок управления
+	Uns				reserv68;			// B28. 68 Резерв
 	Uns				MOD_FAULT;			// B29. 69
 	Uns				RES_ERR;			// B30. 70
 	Uns 			Sec3Mode;			// B31. 71
 	Uns				NoMoveTime;		   	// B32. 72 Время отсутствия движения
 	Uns				OverwayZone;		// B33. 73 Макси
-	TInputReg		DigitalMode;		// B34. 74 режим потенциальный / импульсный
+	Uns				reserv74;			// B34. 74 Резерв
  	Uns             SleepTime;          // B35. 75 Дежурный режим
  	TStopMethod		StopMethod;			// B36. 76 Выбор типа торможения (Динамика, Противовключение)
  	Uns				ConductorSection;   // B37. 77 Сечение проводника
@@ -214,15 +214,15 @@ typedef struct _TRamGroupC
   	Uns             MaxTorque;          // C4. 94 Максимальный момент привода
 	Uns             Inom;               // C5. 95 Номинальный ток
   	Uns             GearRatio;          // C6. 96 Передаточное число редуктора
-	Uns             RevErrValue;       	// C7. 97 Количество сбоев датчика положения
-	Uns			    RevErrLevel;		// C8. 98 Уровень сбоя датчика положения
+  	Uns				reserv97;			// С7. 97 Резерв
+  	Uns				reserv98;			// С8. 98 Резерв
 	THallBlock      HallBlock;          // C9. 99 Состояние датчиков холла блока
 	Uns             SubVersionPO;	    // C10. 100 Подверсия ПО
-	Int             BlockToGearRatio;   // C11.  101 Коэффициент передачи блок-редуктор коэффициент скорости
-	Uns             PhOrdZone;      	// C12.  102 Расстояние чередования фаз двигателя
+	Uns				reserv101;			// С11. 101 Резерв
+	Uns             PhOrdZone;      	// C12. 102 Расстояние чередования фаз двигателя
 	Uns             MuffZone;           // C13. 103 Расстояние сброса муфты
 	Uns			    PosSensPow;			// C14. 104 Тип датчика положения
-	Uns			    DisplResTout;		// C15. 105 Время сброса индикатора
+	Uns			    reserv105;			// C15. 105 Резерв
 	Uns             SetDefaults;        // C16. 106 Задание параметров по умолчанию
 	Uns             Rsvd7[2];          	// C17-18. 107-108 резерв
 	Uns             BrakePause;         // C19. 109 Пауза перед торможением
@@ -258,9 +258,9 @@ typedef struct _TRamGroupC
 	Uns             UvLevel;   			// C61. 151 Уровень понижения напряжения
 	Uns             UvDTime;    		// C62. 152 Время понижения напряжения
 	Uns             UvTime;     		// C63. 153 Время превышения напряжения
-	TPrtMode        VSk;               	// C64. 154 Защита от асиметрии напряжения
-	Uns             VSkLevel;          	// C65. 155 Уровень асиметрии напряжения
-	Uns             VSkTime;           	// C66. 156 Время асиметрии напряжения
+  	Uns				reserv154;			// С64. 154 Резерв
+  	Uns				reserv155;			// С65. 155 Резерв
+  	Uns				reserv156;			// С66. 156 Резерв
 	TPrtMode        Bv;        			// C67. 157 Защита от обрыва входных фаз
 	Uns             BvLevel;   			// C68. 158 Уровень обрыва входных фаз
 	Uns				BvLevelMove;		// C69. 159 Уровень обрыва питающих фаз в движении
@@ -270,10 +270,7 @@ typedef struct _TRamGroupC
 	Uns             PhlLevel;      		// C73. 163 Уровень обрыва фаз
 	Uns             PhlTime;       		// C74. 164 Время определения обрыва фаз
 	TPrtMode        I2t;                // C75. 165 Время-токовая защита
-	Uns				Rsvd6[9];			// C76-84. 166-274 Резерв
-	TPrtMode        ISkew;              // C85. 175 Защита от асиметрии тока
-	Uns             ISkewLevel;         // C86. 176 Уровень асиметрии тока
-	Uns             ISkewTime;          // C87. 177 Время асиметрии тока
+	Uns				Rsvd6[12];			// C76-84. 166-274 Резерв
 	TPrtMode        ShC;        		// C88. 178 Защита от короткого замыкания
 	Uns				ShC_Up; 			// C89. 179 убрать
 	Uns				ShC_Down;			// C90. 180 уброать в H
@@ -287,12 +284,7 @@ typedef struct _TRamGroupC
 	TPrtMode        PhOrd;          	// C103. 193 Защита от неверного чередования фаз двигателя
 	Uns				PhOrdTime;			// C104. 194 Время чередования фаз двигателя
 	TPrtMode        MuDuDef;        	// C105. 195 Защита ошибки входов Му/Ду
-	Uns			    Rsvd12[3];			// C106-108. 196-198 Резерв
-	Int				Upor25;				// C109. 199 Значение для добавлени/убавления значения упора при 220в 25% от максМ
-	Int				Upor35;				// C110. 200 Значение для добавлени/убавления значения упора при 220в 35% от максМ
-	Int				Upor50;				// C111. 201 Значение для добавлени/убавления значения упора при 220в 50% от максМ
-	Int				Upor75;				//1 C112. 202 Значение для добавлени/убавления значения упора при 220в 75% от максМ
-	Int				Upor100;			// C113. 203 Значение для добавлени/убавления значения упора при 220в 100% от максМ
+	Uns			    Rsvd12[8];			// C106-108. 196-198 Резерв
 	Int				Corr40Trq;			// C114. 204 Параметр для корректировки индикации малых моментов (меньше 60%)
 	Int				Corr60Trq;			// C115. 205 Параметр для корректировки индикации больших моментов (больше 60%)
 	Int				Corr80Trq;			// C116. 206
@@ -343,7 +335,7 @@ typedef struct _TRamGroupD
 	TTaskReset     TaskOpen;            // D1. 261 Задание открыто
 	Uns            RevOpen;             // D2. 262 Обороты на открытие
 	Uns            RevClose;            // D3. 263 Обороты на закрытие
-	Uns            AutoCalib;           // D4. 264 Автоматическая калибровка
+	Uns			   reserv264;			// D4  264 резерв
 	Uns            CalibReset;          // D5. 265 Сброс калибровки
 	TValveCmd	   ControlWord;         // D6. 266 Команда управления
 	Uns			   PrtReset;      		// D7. 267 Сброс защит
@@ -395,7 +387,7 @@ typedef struct _TRamGroupH
 	Uns             TuState;             // H78. 388 Команды ТУ (открыть закрыть стопО СтопЗ)
   	Uns             Rsvd3[3];            // H79. 389 резерв
 	Uns             Umid;             	 // H82. 392 Среднее напряжение
-	Uns             VSkValue;          	 // H83. 393 Асиметрия фаз питающей сети
+	Uns             Reserv393;           // H83. 393
 	Uns				Rsvd8;				 // H98. 408
 	Uns             BKP_Temper;          // H85. 395 Температура БКП
 	Uns				Imidpr;			 	 // H86 396 Резерв
@@ -406,7 +398,7 @@ typedef struct _TRamGroupH
 	Uns             Imid;				 // H91. 401 Средний ток
   	LgUns           Position;            // H92-93. 402-403 Положение
 	LgUns  			FullStep;        	 // H94-95. 404-405 Полный ход
-  	Uns             ISkewValue;          // H96. 406 Асиметрия токов нагрузки
+  	Uns             reserv406;           // H96. 406 Резерв
 	TReverseType	ReverseType;         // H97. 407 Тип реверса
 	Uns				Rsvd4[4];				 // H98-101. 408-411
 	//-------------------------------

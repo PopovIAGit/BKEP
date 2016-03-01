@@ -1,9 +1,9 @@
 [Creator]
 Version=1
 [General]
-DeviceName=BKD_Tomzel
-SoftVersion=1.000
-Description=Блок управления электроприводами запорной, запорно-регулирующей арматуры и шаровых кранов. Производство ЗАО "Томзэл"
+DeviceName=BKEP_Tomzel
+SoftVersion=4.004
+Description=Блок контроля электропривода. Производство АО "Томзэл"
 Photo=0
 Manual=0
 PDU=1
