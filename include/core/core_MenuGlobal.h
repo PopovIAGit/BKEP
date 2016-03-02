@@ -83,6 +83,11 @@ struct MENU_PARAM{
 	struct MENU_DCR Dcr; // Описание параметра
 };
 
+// Структура адресов параметров УПП
+struct ADDR_PARAM_ATS48{
+	Uns  Addr;      // адрес параметра
+};
+
 // Структура строкового значения параметра
 struct MENU_STRING{
 	Char  Str[16];       // Строковое значение параметра

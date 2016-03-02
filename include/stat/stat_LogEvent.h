@@ -7,7 +7,7 @@
 #define LOG_EVENT_TYPE				0x01
 #define LOG_CMD_TYPE				0x02
 #define LOG_PARAMS_TYPE				0x03
-#define LOG_PARAMS_TYPE				0x04
+#define LOG_SIM_TYPE				0x04
 
 #define LOGS_CNT				4//ma LOgSim было 3									// Количество журналов устройства
 
@@ -34,8 +34,8 @@
 
 // 7500 полей
 #define LOG_CMD_START_ADDR		2000								// Начальный адрес журнала команд
-#define LOG_CMD_DATA_CNT		5									// Количество записываемых в память полей
-#define LOG_CMD_CNT				1000								// Емкость журнала команд (количество записей)
+#define LOG_CMD_DATA_CNT		6	//было 5 с появлением дискретных выходов добавилось								// Количество записываемых в память полей
+#define LOG_CMD_CNT				800								    // Емкость журнала команд (количество записей)
 
 // 2500 полей
 #define LOG_PARAM_START_ADDR	11000								// Начальный адрес журанала изменения параметров
@@ -50,7 +50,7 @@
 
 #define FAULTS_COUNT_DEF			4				// Количество регистров дефектов
 #define LOG_EV_BUF_DATA_COUNT		20				// Определяет емкость буфера журнала событий
-#define LOG_CMD_BUF_DATA_COUNT		5				// Определяет емкость буфера журнала команд
+#define LOG_CMD_BUF_DATA_COUNT		6				// Определяет емкость буфера журнала команд
 #define LOG_PARAM_BUF_DATA_COUNT	5				// Определяет емкость буфера журнала изменения параметров
 //ma LogSIM
 #define LOG_SIM_BUF_DATA_COUNT		13				// Определяет емкость буфера журнала SimID
@@ -99,6 +99,7 @@ typedef struct
 	Uns *StatusReg;							// Указатель на статусный регистр блока
 	Uns CmdReg;								// Регистр команд
 	Uns CmdRegPrev;							// Предыдущее значение регистра команд 
+	Uns *StatDigOut;							// регистр состояния дискретных выходов
 	Uns Data[LOG_CMD_BUF_DATA_COUNT];		// Буфер журнала команд
 } TLogCmd, *pTLogCmd;
 

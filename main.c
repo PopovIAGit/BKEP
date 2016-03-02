@@ -13,8 +13,10 @@ extern void InterruptUpdate(void);
 
 void main(void)
 {
+	//TODO доделать с утра
+	//TODO 2 длинна€ лини€ (моменты, сбои св€зи)
 	// —начала инициализируетс€ процессор
-	InitHardware();
+ 	InitHardware();
 	memset(&g_Core, 	0, sizeof(TCore));
 	memset(&g_Ram, 	    0, sizeof(TRam));
 	memset(&g_Comm, 	0, sizeof(TComm));
@@ -83,25 +85,23 @@ interrupt void ScicRxIsrHandler(void)
 	if (ScicRegs.SCIRXST.bit.BRKDT) SCI_reset(SCIC);
 	else ModBusRxIsr(&g_Comm.mbShn);
 
-	PieCtrlRegs.PIEACK.bit.ACK8 = 1;	//???
+	PieCtrlRegs.PIEACK.bit.ACK8  = 1;
 }
 //-------------------------------------------------------------
 interrupt void ScicTxIsrHandler(void)
 {
 	ModBusTxIsr(&g_Comm.mbShn);
-	PieCtrlRegs.PIEACK.bit.ACK8 = 1;	//???
+	PieCtrlRegs.PIEACK.bit.ACK8 = 1;
 }
 //-------------------------------------------------------------
 interrupt void McbspRxAHandler(void) // прерывание приема данных
 {
-
 	BluetoothRxHandler(&g_Comm.Bluetooth, &g_Comm.mbBt);
     PieCtrlRegs.PIEACK.all |= PIEACK_GROUP6;
 }
 //-------------------------------------------------------------
 interrupt void McbspTxAHandler(void) // прерывание передачи данных
 {
-
 	BluetoothTxHandler(&g_Comm.Bluetooth, &g_Comm.mbBt);
     PieCtrlRegs.PIEACK.all |= PIEACK_GROUP6;
 }

@@ -138,6 +138,7 @@ void InitTables(void)
 	ImCmdLogAddrsTable[2] = GetAdr(ramGroupH.Seconds);
 	ImCmdLogAddrsTable[3] = GetAdr(ramGroupH.LogControlWord);
 	ImCmdLogAddrsTable[4] = GetAdr(ramGroupA.Status);
+	ImCmdLogAddrsTable[5] = GetAdr(ramGroupA.StateTs);
 
 	ImParamLogAddrsTable[0] = GetAdr(ramGroupB.DevTime);
 	ImParamLogAddrsTable[1] = GetAdr(ramGroupB.DevDate);
@@ -236,6 +237,7 @@ void InitLogCmd(TLogCmd *lc)
 	lc->Date		= &g_Ram.ramGroupB.DevDate.all;		// Указатель на дату
 	lc->Seconds		= &g_Ram.ramGroupH.Seconds;			// Указатель на секунды
 	lc->StatusReg	= &g_Ram.ramGroupA.Status.all;		// Указатель на статусный регистр блока
+	lc->StatDigOut	= &g_Ram.ramGroupA.StateTs.all;		// Указатель на регистр дискретных выходов
 	lc->CmdReg		= 0;								// Регистр команд
 	lc->CmdRegPrev	= 0;								// Предыдущее значение регистра команд
 	memset(&lc->Data[0],	0, sizeof(LOG_CMD_BUF_DATA_COUNT));	// Буфер журнала команд
@@ -494,6 +496,8 @@ void GetCurrentCmd(TStat *s)
 		case CMD_DEFSTOP:		LogControlWord = bcmDefStop;	g_Core.VlvDrvCtrl.EvLog.Source = 0;	break;
 		case CDM_DISCROUT_TEST: LogControlWord = bcmDiscrOutTest;		break;
 		case CMD_DISCRIN_TEST: 	LogControlWord = bcmDiscrInTest; 		break;
+		case CMD_ON_BLT: 		LogControlWord = bcmBlueOn; 			break;
+		case CMD_OFF_BLT: 		LogControlWord = bcmBlueOff; 			break;
 		default: LogControlWord = bcmNone; break;
 	}
 
@@ -511,6 +515,7 @@ void GetCurrentCmd(TStat *s)
 		}
 		if (!g_Core.VlvDrvCtrl.EvLog.Source) g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_BLOCK;
 
+		//TODO чё такое
 		LogControlWord = LogControlWord | g_Core.VlvDrvCtrl.EvLog.Source;
 		g_Core.VlvDrvCtrl.EvLog.Source = 0;
 	}

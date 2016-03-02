@@ -12,14 +12,10 @@
 
 #include "comm_ModBusRtu.h"
 Uns testPreamble=0;
-Uns CountMess=0;
 extern Uns TestCount;
 static void SendMasterResponse(TMbPort *hPort);
 __inline void CrcPack(TMbPort *);
 
-Uns timerSend=0;
-Uns timer1send=0;
-Uns timer2send=9000;
 
 //-------------------------------------------------------------------------------
 __inline void BreakFrameEvent(TMbPort *hPort)
@@ -31,7 +27,6 @@ __inline void BreakFrameEvent(TMbPort *hPort)
 //-------------------------------------------------------------------------------
 __inline void NewFrameEvent(TMbPort *hPort)
 {
-	timerSend=0;
 	hPort->Frame.NewMessage = true;
 	hPort->Frame.RxLength   = hPort->Frame.Data - hPort->Frame.Buf;
 	hPort->Frame.Data       = hPort->Frame.Buf;
@@ -60,12 +55,7 @@ __inline void PreambleEvent(TMbPort *hPort)
 		//McBsp_transmit(hPort->Params.ChannelID, *hPort->Frame.Data++, 0);
 		//DataSend = ((*hPort->Frame.Data++)&0x00FF)|((*hPort->Frame.Data++<<8)&0xFF00);
 		//McBsp_transmit(hPort->Params.ChannelID, DataSend, 0);
-
-
 	}
-
-	if (timerSend>timer1send) timer1send=timerSend;
-	if (timerSend<timer2send) timer2send=timerSend;
 }
 
 //-------------------------------------------------------------------------------
@@ -76,10 +66,9 @@ __inline void PostambleEvent(TMbPort *hPort)
 	hPort->Frame.Data = hPort->Frame.Buf;
 	hPort->Params.TrEnable(0);
 	TestCount=0;
-	//GpioDataRegs.GPADAT.bit.GPIO30=1;???
 
 	if (hPort->Params.HardWareType==UART_TYPE){
-		for(i=0; i<15000; i++){}
+		//for(i=0; i<1000; i++){}
 		SCI_tx_disable(hPort->Params.ChannelID);
 		SCI_rx_enable(hPort->Params.ChannelID);
 	}
@@ -91,16 +80,18 @@ __inline void PostambleEvent(TMbPort *hPort)
 		McBsp_rx_enable(hPort->Params.ChannelID);
 	}
 
-	hPort->Params.TrEnable(0);
+	if (hPort->Params.Mode==MB_SLAVE) hPort->Params.TrEnable(0);
+	else if (hPort->Params.Mode==MB_MASTER)
+	{
+		StartTimer(&hPort->Frame.TimerAck);
+	}
 	testPreamble=0;
 }
 
 //-------------------------------------------------------------------------------
 __inline void ConnTimeoutEvent(TMbPort *hPort)
 {
-	//hPort->Frame.Data = hPort->Frame.Buf;
-	#if defined(_MASTER_)
-	if (IsMaster())
+	/*if (IsMaster())
 	{
 		if (hPort->Packet.Exception)
 		{
@@ -114,11 +105,8 @@ __inline void ConnTimeoutEvent(TMbPort *hPort)
 			hPort->Packet.Exception = EX_NO_CONNECTION;
 		}
 		SendMasterResponse(hPort);
-	}
-	#endif
+	}*/
 	
-	#if defined(_SLAVE_)
-	//if (IsSlave()) hPort->Packet.Exception = EX_NO_CONNECTION;
 	if(IsSlave())
 	{
 		if (hPort->Params.ChannelID==SCIB)
@@ -127,23 +115,48 @@ __inline void ConnTimeoutEvent(TMbPort *hPort)
 			hPort->Packet.Exception = EX_NO_CONNECTION;
 		}
 	}
-	#endif
 }
 
 //-------------------------------------------------------------------------------
-#if defined(_SLAVE_)
 __inline void AcknoledgeEvent(TMbPort *hPort)
 {
-	hPort->Packet.Acknoledge = false;
+	if (hPort->Params.Mode==MB_SLAVE) hPort->Packet.Acknoledge = false;
+	else if (hPort->Params.Mode==MB_MASTER)
+	{
+		if (hPort->Params.HardWareType==UART_TYPE){
+			hPort->Params.TrEnable(1);
+			SCI_rx_disable(hPort->Params.ChannelID);
+			SCI_tx_disable(hPort->Params.ChannelID);
+
+			if (hPort->Stat.SlaveNoRespCount<65500) hPort->Stat.SlaveNoRespCount++;// Счетчик неответов
+			if (hPort->Frame.RetryCounter > hPort->Params.RetryCount)
+			{
+				//hPort->Packet.Exception = EX_NO_CONNECTION; //???
+				hPort->Stat.Status.bit.NoConnect = 1;
+			}
+			StopTimer(&hPort->Frame.TimerConn);
+			StopTimer(&hPort->Frame.TimerAck);
+			if (hPort->Frame.RetryCounter<65500) hPort->Frame.RetryCounter++;
+			hPort->Frame.WaitResponse = 0;
+			hPort->Stat.Status.bit.Error = 1;
+
+			//если времмя ожидания ответа истекло
+			// то делаем N повторов
+			// после последнего повтора выставляем статус нет связи
+			// тут так же надо сбрасывать все флаги для возможности повтора
+		}
+		//запрещаем прием данных
+		//смортим сколько повторов необходимо сделать
+		//делаем повтор
+		//если повторов не осталось то не делаем повтор
+	}
 }
-#endif
 
 //-------------------------------------------------------------------------------
 static void SendFrame(TMbPort *hPort)
 {
 	CrcPack(hPort);
 	hPort->Params.TrEnable(1);
-	//GpioDataRegs.GPADAT.bit.GPIO30=0;???
 
 	if (hPort->Params.HardWareType==UART_TYPE)
 	{

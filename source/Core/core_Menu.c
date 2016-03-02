@@ -43,6 +43,7 @@ void Core_MenuInit(TCoreMenu *p)
 	p->Data = ToPtr(&g_Ram);      	// Указатель на буфер данных
 	p->Group.Count = GROUP_COUNT;    // Количество групп
 	p->Params = params;   			// Указатель на структуры параметров
+	p->AtsParams = addr_params_altistar48;   			// Указатель на структуры параметров
 	p->Values = values;   			// Указатель на структуры строковых значений
 	p->EnableEdit = EnableEdit;
 	p->WriteValue = WriteValue;

@@ -11,7 +11,6 @@
 #include "g_Ram.h"
 
 #define TEK_DEVICE_FAULT_MASK	0xF910				// Маска на регистр дефектов устройства для модбаса ТЭК
-//#define TEK_DEVICE_FAULT_MASK	0xF990
 
 TComm	g_Comm;
 Uint16 ASU_Data[10];
@@ -53,21 +52,112 @@ void Comm_Init(TComm *p)
 
 	SerialCommInit(&g_Comm.mbAsu);
 	SerialCommInit(&g_Comm.mbShn);
-	g_Comm.mbShn.Frame.TimerPost.Timeout=100;
+	g_Comm.mbShn.Frame.TimerPost.Timeout=10;
+	g_Comm.mbShn.Frame.TimerConn.Timeout=1000;
+	g_Comm.mbShn.Frame.TimerAck.Timeout=80;
+
 	Comm_LocalControlInit(&g_Comm.localControl);
 
 	// настройка работы шнайдера
-
-	p->Shn.SHN_ReadFlag = 1;
-	p->Shn.SHN_Mode = 1;
+	//p->Shn.SHN_ReadFlag = 0;
+	//p->Shn.SHN_Mode = 1;
 	p->btn_reset_alarmFlag = 0;
+
 }
+
+/*
+Uint16 Busy:1;		// 0 - занят идет выполнение последней соманды
+					//
+Uint16 Ready:1;		// 1 - готов команда выполнена
+Uint16 Wait:1;		// 2 - ожидание команды
+Uint16 NoConnect:1; // 3 - нет связи
+Uint16 Error:1;		// 4 - ошибка при выполнении команды
+Uint16 Rsvd:11;		// 5-15
+*/
+
+void mb_read_ATS48(TComm *p, Uns addr, Uns count)
+{
+	if (p->mbShn.Stat.Status.bit.Error==0)
+	{
+		p->ioATS48.Func = MB_READ_REGS ;
+		p->ioATS48.Addr = addr;
+		p->ioATS48.CountOutput = count;
+		p->mbShn.Stat.Status.bit.Wait = 1;
+	}
+}
+
+void mb_write_ATS48(TComm *p, Uns addr, Uns count , Uns data)
+{
+	if (p->mbShn.Stat.Status.bit.Error==0)
+	{
+		p->ioATS48.Func = MB_WRITE_REGS ;
+		p->ioATS48.Addr = addr;
+		p->ioATS48.CountOutput = count;
+		p->ioATS48.DataOutput[0] = data;
+		p->mbShn.Stat.Status.bit.Wait = 1;
+	}
+}
+
+void Comm_ControlModbusUpdateAltistar48(TComm *p)
+{
+	Uns NumParam=0;
+	Uns Addr=0;
+	Uns *Dest = ToUnsPtr(&g_Ram) + p->ioATS48.Addr;
+
+	if (p->mbShn.Stat.Status.bit.Error==1)
+	{
+		//p->mbShn.Stat.Status.bit.Error=0;
+	}
+
+	// в соответствии с адресом выставляем соответствующую функцию
+	if (p->mbShn.Stat.Status.bit.Ready==1 && p->mbShn.Stat.Status.bit.Busy==1) p->mbShn.Stat.Status.bit.Busy=0;
+	if (p->mbShn.Stat.Status.bit.Busy==1)
+	{
+		p->mbShn.Stat.Status.bit.Wait = 0;
+		return;
+	}
+
+	// находимся в режиме ожидания команды
+	if (p->mbShn.Stat.Status.bit.Wait==1)
+	{
+		p->mbShn.Stat.Status.bit.Ready = 0;
+		p->mbShn.Packet.Request = p->ioATS48.Func;
+		p->mbShn.Packet.Data[0] = p->ioATS48.DataOutput[0];
+
+		NumParam = p->ioATS48.Addr - REG_CONTROL_ATS48;
+		PFUNC_blkRead((Ptr)&g_Core.menu.AtsParams[NumParam], (Uns*)(&Addr), 1);
+		p->mbShn.Packet.Addr = Addr;
+
+		p->mbShn.Packet.Count = p->ioATS48.CountOutput;
+		p->mbShn.Stat.Status.bit.Busy = 1;
+		p->mbShn.Stat.Status.bit.Wait = 0;
+
+		return;
+	}
+
+	// статус готовности команда выполнена можно забирать данные
+	if (p->mbShn.Stat.Status.bit.Ready==1 && p->ioATS48.Func!=0)
+	{
+		if (p->ioATS48.Func==MB_READ_REGS)
+		{
+			memcpy(Dest, &(p->mbShn.Packet.Data[0]), p->mbShn.Packet.Count);
+		}
+		p->ioATS48.Func = 0;
+	}
+
+	// на выполнение команды отведено 500мс затем если не выполнилась команда
+	// будет возможность заново подать команду
+	//
+
+}
+//TODO test read write
+Uns CommandATS48=0;
 
 //---------------------------------------------------
 void Comm_Update(TComm *p)
 {
 
-	Uint16 lAddr;
+	//Uint16 lAddr;
 
 	if (g_Comm.Bluetooth.ModeProtocol == 0)
 	{
@@ -77,18 +167,33 @@ void Comm_Update(TComm *p)
 	if (g_Comm.Bluetooth.ModeProtocol == 0)
 	{
 		ModBusUpdate(&g_Comm.mbShn);  // master канал связи с устройством плавного пуска
-		if (!p->Shn.SHN_Busy)
+
+		if (p->mbShn.Stat.Status.bit.Busy==0)
 		{
-			/*if(p->Shn.SHN_TaskFunc && (p->Shn.SHN_TaskStage == 1))
-			{
-				p->mbShn.Packet.Addr = p->Shn.SHN_TaskAddr;
-				p->mbShn.Packet.Count = 1;
-				if(p->Shn.SHN_TaskFunc == MB_WRITE_REGS) p->mbShn.Packet.Data[0] = *p->Shn.SHN_TaskData;
-				p->mbShn.Packet.Request = p->Shn.SHN_TaskFunc;
-				p->Shn.SHN_TaskEx = 0;
-				p->Shn.SHN_Busy = 0;
+			CommandATS48++;
+			p->mbShn.Stat.Status.bit.Ready=0;
+			switch(CommandATS48){
+			case 2: mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.State1), 1); break;
+			case 1: mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.State2), 1); break;
+			case 3: mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.State3), 1); CommandATS48=0; break;
 			}
-			else*/ if (p->Shn.SHN_WriteFlag)
+		}
+		Comm_ControlModbusUpdateAltistar48(&g_Comm);
+
+	}
+		/*if (!p->Shn.SHN_Busy)
+		{
+			//if(p->Shn.SHN_TaskFunc && (p->Shn.SHN_TaskStage == 1))
+			//{
+			//	p->mbShn.Packet.Addr = p->Shn.SHN_TaskAddr;
+			//	p->mbShn.Packet.Count = 1;
+			//	if(p->Shn.SHN_TaskFunc == MB_WRITE_REGS) p->mbShn.Packet.Data[0] = *p->Shn.SHN_TaskData;
+			//	p->mbShn.Packet.Request = p->Shn.SHN_TaskFunc;
+			//	p->Shn.SHN_TaskEx = 0;
+			//	p->Shn.SHN_Busy = 0;
+			//}
+			//else
+			if (p->Shn.SHN_WriteFlag)
 			{
 				//p->Shn.SHN_ReadFlag = 0;
 				if (p->Shn.SHN_Mode==1)
@@ -178,7 +283,7 @@ void Comm_Update(TComm *p)
 			p->Shn.SHN_Busy = 0;
 		}
 
-	}
+	}*/
 
 	//SciMasterConnBetweenBlockUpdate(&g_Comm.mbBkp);// master канал связи с
 

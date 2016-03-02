@@ -117,12 +117,12 @@ void InitHardware(void)
 	PieCtrlRegs.PIEIER6.bit.INTx5 = 1; // PIE Group 6, INT5 // MCBSPRXA
 	PieCtrlRegs.PIEIER6.bit.INTx6 = 1; // PIE Group 6, INT6 // MCBSPTXA
 
-	PieCtrlRegs.PIEIER1.bit.INTx6 = 1;
+	PieCtrlRegs.PIEIER1.bit.INTx6 = 1;// что это
 
-    IER |= M_INT8;   // для I2C
+    IER |= M_INT8;   // для I2C, SCI - C
 	IER |= M_INT1;   // для АЦП
 	IER |= M_INT6;   // для McBSP
-	IER |= M_INT9;   // для SCI A,B,C
+	IER |= M_INT9;   // для SCI A,B
 	EnableCpuTimer0();
 
 	// Configure ADC
@@ -230,8 +230,8 @@ void InitGpio(void)
 
 	//входы DIR - направление 1 - выход 0 - вход. DAT - начальное состояние
 
-	GpioCtrlRegs.GPADIR.bit.GPIO13	= 0;	//MOD_FAULT
-	GpioDataRegs.GPADAT.bit.GPIO13	= 0;
+	//GpioCtrlRegs.GPADIR.bit.GPIO13	= 0;	//MOD_FAULT
+	//GpioDataRegs.GPADAT.bit.GPIO13	= 0;
 
 	GpioCtrlRegs.GPBDIR.bit.GPIO44	= 0;	//CONTACTOR_1
 	GpioDataRegs.GPBDAT.bit.GPIO44	= 0;
@@ -322,8 +322,8 @@ void InitGpio(void)
 	GpioCtrlRegs.GPBDIR.bit.GPIO34	= 1;	//LED3
 	GpioDataRegs.GPBDAT.bit.GPIO34	= 1;
 
-	GpioCtrlRegs.GPBDIR.bit.GPIO48	= 1;	//RESET_FAULT
-	GpioDataRegs.GPBDAT.bit.GPIO48	= 0;
+	//GpioCtrlRegs.GPBDIR.bit.GPIO48	= 1;	//RESET_FAULT
+	//GpioDataRegs.GPBDAT.bit.GPIO48	= 0;
 
 	GpioCtrlRegs.GPBDIR.bit.GPIO50	= 1;	//RS485_DIR_SHN - УПП
 	GpioDataRegs.GPBDAT.bit.GPIO50	= 0;

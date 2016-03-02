@@ -122,6 +122,7 @@ void g_Ram_Update(TRam *p)
     p->ramGroupA.Us = g_Peref.sinObserver.US.Output;
     p->ramGroupA.Ut = g_Peref.sinObserver.UT.Output;
     p->ramGroupH.Umid = g_Peref.Umid;
+    p->ramGroupH.VSkValue = SkewCalc(p->ramGroupA.Ur, p->ramGroupA.Us, p->ramGroupA.Ut, p->ramGroupH.Umid);
 
     if (!g_Core.Status.bit.Stop)
 	{
@@ -131,6 +132,7 @@ void g_Ram_Update(TRam *p)
 	    p->ramGroupH.Imidpr = (g_Peref.Imid * 1000) / p->ramGroupC.Inom;
 	    p->ramGroupH.Imid 	= g_Peref.Imid;
 	    p->ramGroupA.AngleUI = g_Peref.AngleUI;
+	    p->ramGroupH.ISkewValue = SkewCalc(g_Peref.sinObserver.IU.Output, g_Peref.sinObserver.IV.Output, g_Peref.sinObserver.IW.Output,  g_Peref.Imid);
 	    if (p->ramGroupB.IIndicMode == imRms)
 		{
 		    p->ramGroupA.Iu = g_Peref.sinObserver.IU.Output;
@@ -151,6 +153,7 @@ void g_Ram_Update(TRam *p)
 	    p->ramGroupA.Iw = 0;
 	    p->ramGroupA.AngleUI = 0;
 	    p->ramGroupH.Imid = 0;
+	    p->ramGroupH.ISkewValue = 0;
 	}
 
     p->ramGroupA.Speed = g_Peref.Position.speedRPM;
@@ -164,7 +167,8 @@ void g_Ram_Update(TRam *p)
     p->ramGroupH.ReverseType 	= rvtNone;
 
     p->ramGroupB.MOD_FAULT = GpioDataRegs.GPBDAT.bit.GPIO39;
-    GpioDataRegs.GPBDAT.bit.GPIO48 = p->ramGroupB.RES_ERR;
+    //TODO нет такого сигнала
+    //GpioDataRegs.GPBDAT.bit.GPIO48 = p->ramGroupB.RES_ERR;
 
 	if (p->ramGroupH.BadTask_Reset)
 	{

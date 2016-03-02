@@ -154,8 +154,8 @@ typedef struct _TRamGroupA
 	Uns             VersionPO;       	// 24. 524 Версия ПО
 	Uns             VersionPOBkp;      	// 25. 525 Версия ПО БКП
 	Uns				VoltageDown;		// 27. 527 Падение напряжения
-	Uns				RevErrValue;		// 26. 526 Колво сбоев датчика положения
-	Uns 			Rsvd[12];			// 28-39. 528-539 Резерв
+	Uns				RevErrValue;		// 28. 526 Колво сбоев датчика положения
+	Uns 			Rsvd[10];			// 29-39. 528-539 Резерв
 } TRamGroupA;
 
 // Группа B (Адрес = 40, Количество = 100) - Параметры пользователя
@@ -189,13 +189,13 @@ typedef struct _TRamGroupB
 	Uns             RsStation;          // B25. 65 Адрес станции
 	TParityMode		RsMode;				// B26. 66 Режим связи
 	Uns				MuffTimer;			// B27. 67
-	Uns				reserv68;			// B28. 68 Резерв
+	Uns				KeyInvert;			// B28. 68 Маска кнопок управления
 	Uns				MOD_FAULT;			// B29. 69
 	Uns				RES_ERR;			// B30. 70
 	Uns 			Sec3Mode;			// B31. 71
 	Uns				NoMoveTime;		   	// B32. 72 Время отсутствия движения
 	Uns				OverwayZone;		// B33. 73 Макси
-	Uns				reserv74;			// B34. 74 Резерв
+	TInputReg		DigitalMode;		// B34. 74 режим потенциальный / импульсный
  	Uns             SleepTime;          // B35. 75 Дежурный режим
  	TStopMethod		StopMethod;			// B36. 76 Выбор типа торможения (Динамика, Противовключение)
  	Uns				ConductorSection;   // B37. 77 Сечение проводника
@@ -214,15 +214,15 @@ typedef struct _TRamGroupC
   	Uns             MaxTorque;          // C4. 94 Максимальный момент привода
 	Uns             Inom;               // C5. 95 Номинальный ток
   	Uns             GearRatio;          // C6. 96 Передаточное число редуктора
-  	Uns				reserv97;			// С7. 97 Резерв
-  	Uns				reserv98;			// С8. 98 Резерв
+	Uns             RevErrValue;       	// C7. 97 Количество сбоев датчика положения
+	Uns			    RevErrLevel;		// C8. 98 Уровень сбоя датчика положения
 	THallBlock      HallBlock;          // C9. 99 Состояние датчиков холла блока
 	Uns             SubVersionPO;	    // C10. 100 Подверсия ПО
-	Uns				reserv101;			// С11. 101 Резерв
-	Uns             PhOrdZone;      	// C12. 102 Расстояние чередования фаз двигателя
+	Int             BlockToGearRatio;   // C11.  101 Коэффициент передачи блок-редуктор коэффициент скорости
+	Uns             PhOrdZone;      	// C12.  102 Расстояние чередования фаз двигателя
 	Uns             MuffZone;           // C13. 103 Расстояние сброса муфты
 	Uns			    PosSensPow;			// C14. 104 Тип датчика положения
-	Uns			    reserv105;			// C15. 105 Резерв
+	Uns			    DisplResTout;		// C15. 105 Время сброса индикатора
 	Uns             SetDefaults;        // C16. 106 Задание параметров по умолчанию
 	Uns             Rsvd7[2];          	// C17-18. 107-108 резерв
 	Uns             BrakePause;         // C19. 109 Пауза перед торможением
@@ -258,9 +258,9 @@ typedef struct _TRamGroupC
 	Uns             UvLevel;   			// C61. 151 Уровень понижения напряжения
 	Uns             UvDTime;    		// C62. 152 Время понижения напряжения
 	Uns             UvTime;     		// C63. 153 Время превышения напряжения
-  	Uns				reserv154;			// С64. 154 Резерв
-  	Uns				reserv155;			// С65. 155 Резерв
-  	Uns				reserv156;			// С66. 156 Резерв
+	TPrtMode        VSk;               	// C64. 154 Защита от асиметрии напряжения
+	Uns             VSkLevel;          	// C65. 155 Уровень асиметрии напряжения
+	Uns             VSkTime;           	// C66. 156 Время асиметрии напряжения
 	TPrtMode        Bv;        			// C67. 157 Защита от обрыва входных фаз
 	Uns             BvLevel;   			// C68. 158 Уровень обрыва входных фаз
 	Uns				BvLevelMove;		// C69. 159 Уровень обрыва питающих фаз в движении
@@ -270,7 +270,10 @@ typedef struct _TRamGroupC
 	Uns             PhlLevel;      		// C73. 163 Уровень обрыва фаз
 	Uns             PhlTime;       		// C74. 164 Время определения обрыва фаз
 	TPrtMode        I2t;                // C75. 165 Время-токовая защита
-	Uns				Rsvd6[12];			// C76-84. 166-274 Резерв
+	Uns				Rsvd6[9];			// C76-84. 166-274 Резерв
+	TPrtMode        ISkew;              // C85. 175 Защита от асиметрии тока
+	Uns             ISkewLevel;         // C86. 176 Уровень асиметрии тока
+	Uns             ISkewTime;          // C87. 177 Время асиметрии тока
 	TPrtMode        ShC;        		// C88. 178 Защита от короткого замыкания
 	Uns				ShC_Up; 			// C89. 179 убрать
 	Uns				ShC_Down;			// C90. 180 уброать в H
@@ -284,7 +287,12 @@ typedef struct _TRamGroupC
 	TPrtMode        PhOrd;          	// C103. 193 Защита от неверного чередования фаз двигателя
 	Uns				PhOrdTime;			// C104. 194 Время чередования фаз двигателя
 	TPrtMode        MuDuDef;        	// C105. 195 Защита ошибки входов Му/Ду
-	Uns			    Rsvd12[8];			// C106-108. 196-198 Резерв
+	Uns			    Rsvd12[3];			// C106-108. 196-198 Резерв
+	Int				Upor25;				// C109. 199 Значение для добавлени/убавления значения упора при 220в 25% от максМ
+	Int				Upor35;				// C110. 200 Значение для добавлени/убавления значения упора при 220в 35% от максМ
+	Int				Upor50;				// C111. 201 Значение для добавлени/убавления значения упора при 220в 50% от максМ
+	Int				Upor75;				//1 C112. 202 Значение для добавлени/убавления значения упора при 220в 75% от максМ
+	Int				Upor100;			// C113. 203 Значение для добавлени/убавления значения упора при 220в 100% от максМ
 	Int				Corr40Trq;			// C114. 204 Параметр для корректировки индикации малых моментов (меньше 60%)
 	Int				Corr60Trq;			// C115. 205 Параметр для корректировки индикации больших моментов (больше 60%)
 	Int				Corr80Trq;			// C116. 206
@@ -335,7 +343,7 @@ typedef struct _TRamGroupD
 	TTaskReset     TaskOpen;            // D1. 261 Задание открыто
 	Uns            RevOpen;             // D2. 262 Обороты на открытие
 	Uns            RevClose;            // D3. 263 Обороты на закрытие
-	Uns			   reserv264;			// D4  264 резерв
+	Uns            AutoCalib;           // D4. 264 Автоматическая калибровка
 	Uns            CalibReset;          // D5. 265 Сброс калибровки
 	TValveCmd	   ControlWord;         // D6. 266 Команда управления
 	Uns			   PrtReset;      		// D7. 267 Сброс защит
@@ -387,7 +395,7 @@ typedef struct _TRamGroupH
 	Uns             TuState;             // H78. 388 Команды ТУ (открыть закрыть стопО СтопЗ)
   	Uns             Rsvd3[3];            // H79. 389 резерв
 	Uns             Umid;             	 // H82. 392 Среднее напряжение
-	Uns             Reserv393;           // H83. 393
+	Uns             VSkValue;          	 // H83. 393 Асиметрия фаз питающей сети
 	Uns				Rsvd8;				 // H98. 408
 	Uns             BKP_Temper;          // H85. 395 Температура БКП
 	Uns				Imidpr;			 	 // H86 396 Резерв
@@ -398,7 +406,7 @@ typedef struct _TRamGroupH
 	Uns             Imid;				 // H91. 401 Средний ток
   	LgUns           Position;            // H92-93. 402-403 Положение
 	LgUns  			FullStep;        	 // H94-95. 404-405 Полный ход
-  	Uns             reserv406;           // H96. 406 Резерв
+  	Uns             ISkewValue;          // H96. 406 Асиметрия токов нагрузки
 	TReverseType	ReverseType;         // H97. 407 Тип реверса
 	Uns				Rsvd4[4];				 // H98-101. 408-411
 	//-------------------------------
@@ -450,6 +458,20 @@ typedef struct _TRamGroupE
 	Uns 		   Rsvd[14];			// 16-29.Резерв
 } TRamGroupE;
 
+//---------------------------------------------------------------------------
+
+// ПАРАМЕТРЫ УСТРОЙСТВА ПЛАВНОГО ПУСКА
+// Группа A (Адрес = 540, Количество = 20) - Диагностика - просмотр
+typedef struct _TRamGroupATS
+{
+	Uns             		Control1;           // 0.
+	Uns	            		Control2;			// 1.
+	TATS48_StatusReg        State1;     	    // 2.
+	TATS48_ExStatusReg      State2;		    	// 3.
+	TATS48_Ex2StatusReg     State3;        		// 4.
+	Uns						Speed;				// 5
+	Uns 					Rsvd[14];			// 6-20. Резерв
+} TRamGroupATS;
 
 typedef struct _TRamLogBuff
 {
@@ -505,6 +527,7 @@ typedef struct TRam
   TRamGroupG		ramGroupG;			//адреса 280-309
   TRamGroupH		ramGroupH;			//адреса 310-
   TRamGroupA		ramGroupA;			// ПАРАМЕТРЫ НАСТРОЙКИ
+  TRamGroupATS		ramGroupATS;		// ПАРАМЕТРЫ УПП-ATS48
   TRamGroupE		ramGroupE;
 } TRam;
 
@@ -590,6 +613,8 @@ typedef struct TRam
 #define REG_SHC_FAULT		GetAdr(ramGroupH.ScFaults)
 #define REG_MUFF_FAULT		GetAdr(ramGroupH.MuffFault)
 #define REG_TEMP_BCP_FAULT	GetAdr(ramGroupH.TemperBCPFault)
+
+#define REG_CONTROL_ATS48	GetAdr(ramGroupATS.Control1) //540
 /*
 #define REG_TASK_TIME		GetAdr(ramGroupD.TASK_TIME)
 #define REG_TASK_DATE		GetAdr(ramGroupD.TASK_DATE)

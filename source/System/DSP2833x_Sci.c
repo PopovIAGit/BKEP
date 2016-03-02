@@ -97,6 +97,18 @@ void SCI_tx_enable(Byte Id)
 void SCI_tx_disable(Byte Id)
 	{SciRegs[Id]->SCICTL1.bit.TXENA   = 0; SciRegs[Id]->SCICTL2.bit.TXINTENA   = 0;}
 
+void SCI_stopBit2(Byte Id)
+	{//SciRegs[Id]->SCICCR.bit.STOPBITS   = 1;
+		SciRegs[Id]->SCIHBAUD = 0;
+		SciRegs[Id]->SCILBAUD = 68;
+	}
+
+void SCI_stopBit1(Byte Id)
+	{//SciRegs[Id]->SCICCR.bit.STOPBITS   = 0;
+		SciRegs[Id]->SCIHBAUD = 0;
+		SciRegs[Id]->SCILBAUD = SCI_BRR20700(207);
+	}
+
 
 //---------------------------------------------------------------------------
 // Example: InitSciGpio: 

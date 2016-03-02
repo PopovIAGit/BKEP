@@ -23,6 +23,16 @@
 #define ATS48_INJ_TIME					4042
 #define ATS48_START_TORQ				4028
 
+
+typedef struct {
+	Uns				DataInput[10];
+	Uns 			DataOutput[10];
+	Uns 			CountInput;
+	Uns 			CountOutput;
+	Uns 			Func;
+	Uns 			Addr;
+} TIOData_ATS48;
+
 typedef union {
 	Uint16 all;
 	struct {

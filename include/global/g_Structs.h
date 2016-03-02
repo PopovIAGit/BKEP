@@ -238,7 +238,9 @@ typedef enum
 	bcmSetDefaultsFact,			// Установка заводских параметров по умолчанию
 	bcmDefStop,					// Спсевдо команда стоп при авариях, нужна для определения общей продолжительности работы
 	bcmDiscrOutTest,			// Тест дискретных выходов
-	bcmDiscrInTest				// Тест дискретных входов
+	bcmDiscrInTest,				// Тест дискретных входов
+	bcmBlueOn,					// включение Bluetooth
+	bcmBlueOff					// выключение Bluetooth
 } TBurCmd;
 
 

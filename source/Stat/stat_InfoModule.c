@@ -5,7 +5,7 @@
 
 Uns ImEvLogMainAddrsTable[20];
 Uns ImEvLogBufAddrsTable[12];
-Uns ImCmdLogAddrsTable[5];
+Uns ImCmdLogAddrsTable[6];
 Uns ImParamLogAddrsTable[5];
 Uns ImSimLogAddrsTable[13];
 
@@ -105,6 +105,22 @@ void ReceiveFunc(TInfoModule *p)
 
 	switch (p->RdBuffer[0])
 	{
+		case 127: if (p->Index>28 && p->Index<32){
+			g_Comm.mbBt.Packet.Request = 0x10;
+			g_Comm.mbBt.Packet.Count = 10; //или 20
+			g_Comm.mbBt.Packet.Addr = 65345;
+			g_Comm.mbBt.Packet.Data[0] = p->RdBuffer[7]<<8 | p->RdBuffer[8];
+			g_Comm.mbBt.Packet.Data[1] = p->RdBuffer[9]<<8 | p->RdBuffer[10];
+			g_Comm.mbBt.Packet.Data[2] = p->RdBuffer[11]<<8 | p->RdBuffer[12];
+			g_Comm.mbBt.Packet.Data[3] = p->RdBuffer[13]<<8 | p->RdBuffer[14];
+			g_Comm.mbBt.Packet.Data[4] = p->RdBuffer[15]<<8 | p->RdBuffer[16];
+			g_Comm.mbBt.Packet.Data[5] = p->RdBuffer[17]<<8 | p->RdBuffer[18];
+			g_Comm.mbBt.Packet.Data[6] = p->RdBuffer[19]<<8 | p->RdBuffer[20];
+			g_Comm.mbBt.Packet.Data[7] = p->RdBuffer[21]<<8 | p->RdBuffer[22];
+			g_Comm.mbBt.Packet.Data[8] = p->RdBuffer[23]<<8 | p->RdBuffer[24];
+			g_Comm.mbBt.Packet.Data[9] = p->RdBuffer[25]<<8 | p->RdBuffer[26];
+		}
+		break;
 		// Device Info
 		case 0x01: 	if (p->Index>=2) p->Index = 1;
 
@@ -326,8 +342,12 @@ void SendData(TInfoModule *p)
 			*p->IsTxBusy = true;				// Выставляем флаг занятости передатчика. Нужно делать это именно в ИМ
 
 			if (p->HardwareSrc==imSrcBluetooth) {
-				Data = p->WrBuffer[p->TxIndex++];
-				p->TransmitByte(Data);// в драйвере Bluetooth
+				//if (p->WaitAndroidCounter==0) {
+					Data = p->WrBuffer[p->TxIndex++];
+					//for(i=0; i<20; i++) asm("NOP");
+					p->TransmitByte(Data);// в драйвере Bluetooth
+					//p->WaitAndroidCounter = 1;
+				//}
 			}
 			else if (p->HardwareSrc==imSrcModbus) {
 				if (p->CanSendDataMb) return;
@@ -355,7 +375,14 @@ __inline Bool FuncOne(TInfoModule *p)
 {
 	Uns StartIndex = p->Index;
 	Uns CurrentIndex = StartIndex + 1;
+	Uns i=0;
 	
+	//for(i=0; i<1000; i++) asm("NOP");
+	if (p->HardwareSrc!=imSrcModbus) {
+		p->WaitTime = 10;
+		while(p->WaitTime>0){};
+	}
+
 	p->WrBuffer[CurrentIndex++] = IM_FIRMWARE_VERSION >> 8;
 	p->WrBuffer[CurrentIndex++] = IM_FIRMWARE_VERSION & 0xFF;
 	p->WrBuffer[CurrentIndex++] = IM_DEVICE_ID >> 8;
@@ -381,6 +408,13 @@ __inline Bool FuncTwo(TInfoModule *p)
 {
 	Uns StartIndex = p->Index;
 	Uns CurrentIndex = StartIndex + 1;
+	Uns i = 0;
+
+	//for(i=0; i<1000; i++) asm("NOP");
+	if (p->HardwareSrc!=imSrcModbus) {
+		p->WaitTime = 10;
+		while(p->WaitTime>0){};
+	}
 
 	p->WrBuffer[CurrentIndex++] = IM_LOGEV_REC_ADDR >> 8;
 	p->WrBuffer[CurrentIndex++] = IM_LOGEV_REC_ADDR & 0xFF;
@@ -414,14 +448,16 @@ __inline Bool FuncTwo(TInfoModule *p)
 	return true;
 }
 
-
-
 __inline Bool FuncThree(TInfoModule *p, Byte LogType)
 {
 	Uns StartIndex = p->Index;
 	Uns CurrentIndex = StartIndex + 1;
 
 	Uns i;
+
+	//for(i=0; i<1000; i++) asm("NOP");
+	//p->WaitTime = 10;
+	//while(p->WaitTime>0){}
 
 	switch (LogType)
 	{
@@ -471,6 +507,7 @@ __inline Bool FuncFour(TInfoModule *p, Byte LogType, Byte CellNum)
 	Uns *table;	Uns size = 0; Uns index = 0; Uns addr = 0;
 	Uns StartIndex = p->Index;
 	Uns CurrentIndex = StartIndex + 1;
+
 
 	switch (LogType)
 	{
@@ -632,6 +669,15 @@ __inline Bool FuncFive(TInfoModule *p, Byte LogType, Uns RecordNum)
 
 		CurrentIndex--;								// В циклах лишнее инкрементирование
 
+		//for(i=0; i<2000; i++) asm("NOP");
+		//p->WaitTime = 5;
+		//while(p->WaitTime>0){}
+
+		if (p->HardwareSrc!=imSrcModbus) {
+			p->WaitTime = 10;//TODO 5 зменил на 10 для теста
+			while(p->WaitTime>0){};
+		}
+
 		p->Index = CurrentIndex;
 
 		if (++CurrentLogRec < CurrentLogCnt)
@@ -658,6 +704,10 @@ __inline Bool FuncSix(TInfoModule *p, Uns StartParamIndex)
 	Uns CurrentIndex = p->Index;
 	Uns i;
 
+	//for(i=0; i<200; i++) asm("NOP");
+	//p->WaitTime = 10;
+	//while(p->WaitTime>0){}
+
 	// Передаем за раз определенное количество параметров
 	for (i = 0; i < IM_PARAM_DOWNLOAD_NUM; i++)
 	{
@@ -675,6 +725,13 @@ __inline Bool FuncSix(TInfoModule *p, Uns StartParamIndex)
 
 void ImTimer(TInfoModule *p)
 {
+	if (p->WaitTime>0) p->WaitTime--;
+	if (p->WaitTime<0) p->WaitTime=0;
+
+	if (p->WaitAndroidCounter>0) p->WaitAndroidCounter--;
+	if (p->WaitAndroidCounter> 100) p->WaitAndroidCounter=0;
+	if (p->WaitAndroidCounter<0) p->WaitAndroidCounter=0;
+
 	if (p->Timer > 0)	p->Timer--; 
 
 	// Сброс инф. модуля по таймауту
@@ -860,7 +917,7 @@ void ImBufferReaderTest(TInfoModule *im, Byte LogType, Uns RecordNum)
 						{	ImBuf = &im->ImReadBuf[IM_READ_BUF_SIZE];
 							for(i=0; i<LOG_EV_DATA_CNT; i++) im->ImReadBuf[i+IM_READ_BUF_SIZE]=1+i;
 						}
-
+					//TODO почему закоментированны строки чтения данных с FLASH памяти
 					Addr = LOG_EV_START_ADDR + RecordNum * LOG_EV_DATA_CNT * LOG_EV_DATA_CELL;
 					//ReadPar(Addr, ImBuf, LOG_EV_DATA_CNT);
 					//for(i=0; i<LOG_EV_DATA_CNT; i++) im->ImReadBuf[i]=1+i;
