@@ -325,6 +325,8 @@ void InitGpio(void)
 	GpioCtrlRegs.GPBDIR.bit.GPIO34	= 1;	//LED3
 	GpioDataRegs.GPBDAT.bit.GPIO34	= 1;
 
+	//GpioCtrlRegs.GPBDIR.bit.GPIO48	= 1;	//RESET_FAULT
+	//GpioDataRegs.GPBDAT.bit.GPIO48	= 0;
 
 	GpioCtrlRegs.GPBDIR.bit.GPIO50	= 1;	//RS485_DIR_SHN - соо
 	GpioDataRegs.GPBDAT.bit.GPIO50	= 0;

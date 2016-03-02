@@ -467,11 +467,11 @@ void BluetoothRxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 	Uns Data;
 
 	// Обработчик прерывания зависит от текущего режима Bluetooth
-	if (bPort->WaitDelayAfterConnect>2)
+	/*if (bPort->WaitDelayAfterConnect>2)
 	{
 		Data = ReceiveBtByte();
 		return;
-	}
+	}*/
 	if 		(bPort->Mode == BT_COMMAND_MODE)	RxCommandMode(bPort);
 	else if (bPort->Mode == BT_DATA_MODE)		RxDataMode(bPort, hPort);
 }

@@ -101,7 +101,7 @@ typedef struct _TMbPacket {
 	Byte Response;             // Код функции ответа
 	Uns  SubRequest;           // Код подфункции запроса
 	Uns  Addr;                 // Начальный адрес данных
-	Uns  Data[10];             // Буфер данных
+	Uns  Data[100];             // Буфер данных
 	Uns  Count;                // Количество данных
 	Byte Exception;            // Код исключения
 	Bool Acknoledge;           // Флаг ожидания подтверждения

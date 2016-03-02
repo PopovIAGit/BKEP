@@ -125,6 +125,7 @@ typedef struct {
 		TAlarmElem 			overMax_VoltageR;	// Превышение напряжения R на 47% - авария
 		TAlarmElem 			overMax_VoltageS;	// Превышение напряжения S на 47% - авария
 		TAlarmElem 			overMax_VoltageT;	// Превышение напряжения T на 47% - авария
+		TAlarmElem			voltSkew;			// Асимметрия напряжения входной сети - неисправность
 		TAlarmElem 			breakVoltR;			// Обрыв фазы R - авария
 		TAlarmElem 			breakVoltS;			// Обрыв фазы S - авария
 		TAlarmElem 			breakVoltT;			// Обрыв фазы T - авария
@@ -132,6 +133,7 @@ typedef struct {
 		TAlarmElem			breakCurrU;			// Обрыв фазы U	- неисправность
 		TAlarmElem			breakCurrV;			// Обрыв фазы V - неисправность
 		TAlarmElem			breakCurrW;			// Обрыв фазы W - неисправность
+		TAlarmElem			currSkew;			// Ассиметрия тока - неисправность
 		TAlarmI2T 			I2t;				// Время-токовая перегрузка - авария
 		TAlarmSHC			ShC_U;				// Короткое замыкание фазы U - авария
 		TAlarmSHC			ShC_V;				// Короткое замыкание фазы V - авария
