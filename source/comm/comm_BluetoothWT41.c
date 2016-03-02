@@ -460,14 +460,12 @@ void SendCommandTwo(TBluetoothHandle bPort, char *ComStr, char *AddStr)
 	}
 }
 
-
-
 void BluetoothRxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 {
-	Uns Data;
+	/*Uns Data;
 
 	// Обработчик прерывания зависит от текущего режима Bluetooth
-	/*if (bPort->WaitDelayAfterConnect>2)
+	if (bPort->WaitDelayAfterConnect>2)
 	{
 		Data = ReceiveBtByte();
 		return;
