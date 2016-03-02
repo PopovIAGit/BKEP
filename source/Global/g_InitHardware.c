@@ -288,9 +288,6 @@ void InitGpio(void)
 	GpioCtrlRegs.GPADIR.bit.GPIO12	= 1;	//ON_TY - 24/220
 	GpioDataRegs.GPADAT.bit.GPIO12	= 1;
 
-	GpioCtrlRegs.GPADIR.bit.GPIO18	= 1;	//ON_TY - 24/220
-	GpioDataRegs.GPADAT.bit.GPIO18	= 0;
-
 	GpioCtrlRegs.GPAPUD.bit.GPIO22	= 1;
 	GpioCtrlRegs.GPADIR.bit.GPIO22	= 1;	//LED0
 	GpioDataRegs.GPADAT.bit.GPIO22	= 1;
@@ -321,12 +318,13 @@ void InitGpio(void)
 	GpioCtrlRegs.GPADIR.bit.GPIO29	= 1;	// WORK_DSP_LED
 	GpioDataRegs.GPADAT.bit.GPIO29	= 1;
 
+	GpioCtrlRegs.GPADIR.bit.GPIO30	= 1;	//ON_I_OUT
+	GpioDataRegs.GPADAT.bit.GPIO30	= 0;
+
 	GpioCtrlRegs.GPBPUD.bit.GPIO34	= 1;
 	GpioCtrlRegs.GPBDIR.bit.GPIO34	= 1;	//LED3
 	GpioDataRegs.GPBDAT.bit.GPIO34	= 1;
 
-	//GpioCtrlRegs.GPBDIR.bit.GPIO48	= 1;	//RESET_FAULT
-	//GpioDataRegs.GPBDAT.bit.GPIO48	= 0;
 
 	GpioCtrlRegs.GPBDIR.bit.GPIO50	= 1;	//RS485_DIR_SHN - соо
 	GpioDataRegs.GPBDAT.bit.GPIO50	= 0;

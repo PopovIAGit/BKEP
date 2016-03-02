@@ -51,6 +51,7 @@ void Core_Init(TCore *p)
 	Core_DisplayFaultsInit(&p->DisplayFaults);
 
 	p->Status.bit.Stop = 1;					// При включение выставляем стоп
+	g_Ram.ramGroupH.ContGroup 		= cgStop;
 }
 
 // Функция задания момента в зависимости от положения и направления движения
@@ -698,8 +699,7 @@ void Core_MuDuControl(TCore *p)
 			break;
 		case mdSelect:
 			{
-				if(g_Ram.ramGroupA.Status.bit.Stop == 1)
-				{
+
 					if(!g_Ram.ramGroupA.StateTu.bit.Mu && !g_Ram.ramGroupA.StateTu.bit.Du)
 					{
 						if(p->MuDuDefTimer++ > (2 * Prd10HZ))
@@ -730,7 +730,7 @@ void Core_MuDuControl(TCore *p)
 							p->MuDuDefTimer = 0;
 						}
 					}
-				}
+
 			}
 			break;
 

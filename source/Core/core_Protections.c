@@ -627,10 +627,11 @@ void Core_Protections50HZUpdate(TCoreProtections *p)
 
 
 	//-------- Ошибка ТИП БКП ------------------------
-//TODO привязать к посадочным местам и дописать
-		if (g_Ram.ramGroupA.Faults.Dev.bit.NoBCP_Connect == 0)
+
+		if (!g_Ram.ramGroupA.Faults.Dev.bit.NoBCP_Connect && g_Ram.ramGroupC.DriveType != 0)
 		{
-			if(g_Ram.ramGroupH.BkpType == 7 && g_Ram.ramGroupC.DriveType < dt35000_F48)
+			p->BcpTypeDubl = g_Ram.ramGroupH.BkpType*2;
+			if ((p->BcpTypeDubl != (Uns)g_Ram.ramGroupC.DriveType) && ((p->BcpTypeDubl-1) != (Uns)g_Ram.ramGroupC.DriveType))
 			{
 				p->outFaults.Dev.bit.BCP_ErrorType = 1;
 			}
@@ -711,7 +712,8 @@ void Core_Protections18kHzUpdate(TCoreProtections *p)
 			//Core_ValveDriveStop(&g_Core.VlvDrvCtrl);
 			//g_Core.VlvDrvCtrl.EvLog.Value = CMD_DEFSTOP;
 		}
-		if (g_Core.Status.bit.Fault)
+		//ToDo Обсудить реализацию режима пожарки
+		if (g_Core.Status.bit.Fault && g_Ram.ramGroupB.PlaceType != ptFire)   	// Если Включена пожарка то мы будем гореть но ехать....
 		{
 			Core_ValveDriveStop(&g_Core.VlvDrvCtrl);
 			g_Core.VlvDrvCtrl.EvLog.Value = CMD_DEFSTOP;

@@ -172,7 +172,17 @@ __inline void TeleControl(TCoreVlvDrvCtrl *p)
 			p->Tu.Ready = True;
 	}
 
-	if (*p->Tu.State & (TU_STOP_OPEN | TU_STOP_CLOSE)) TuControl = vcwStop;
+	if (g_Ram.ramGroupB.PlaceType == ptAgregat)	// Если выставлена агрегатная задвижка то реагируем только на стоп соответсвующий направлению.
+	{
+		if ((*p->Tu.State & TU_STOP_OPEN) && p->Status->bit.Opening)
+			TuControl = vcwStop;
+		if ((*p->Tu.State & TU_STOP_CLOSE) && p->Status->bit.Closing)
+			TuControl = vcwStop;
+	}
+	else // реагируем на любой стоп
+	{
+		if (*p->Tu.State & (TU_STOP_OPEN | TU_STOP_CLOSE)) TuControl = vcwStop;
+	}
 
 	if (TuControl != vcwNone)
 	{

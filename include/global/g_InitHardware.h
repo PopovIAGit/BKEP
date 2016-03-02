@@ -69,7 +69,7 @@ extern "C" {
 
 //---------- Enable DAC ---------------------
 
-#define ENABLE_DAC	GpioDataRegs.GPADAT.bit.GPIO18
+#define ENABLE_DAC	GpioDataRegs.GPADAT.bit.GPIO30
 
 //-----------------------------------------------
 //--- BUTTON's ---------------------------------------

@@ -189,14 +189,12 @@ typedef struct _TRamGroupB
 	Uns             RsStation;          // B25. 65 Адрес станции
 	TParityMode		RsMode;				// B26. 66 Режим связи
 	Uns				MuffTimer;			// B27. 67
-	Uns				reserv68;			// B28. 68 Резерв
-	Uns				MOD_FAULT;			// B29. 69
-	Uns				RES_ERR;			// B30. 70
+	Uns				reserv68[3];		// B28 -30. 68-70 Резерв
 	Uns 			Sec3Mode;			// B31. 71
 	Uns				NoMoveTime;		   	// B32. 72 Время отсутствия движения
 	Uns				OverwayZone;		// B33. 73 Макси
-	Uns				reserv74;			// B34. 74 Резерв
- 	Uns             SleepTime;          // B35. 75 Дежурный режим
+	TPlaceType		PlaceType;			// B34. 74 место установки привода (обычн, агрегатная, пожарка)
+	Uns				reserv75;		    // B35. 75 Резерв
  	TStopMethod		StopMethod;			// B36. 76 Выбор типа торможения (Динамика, Противовключение)
  	Uns				ConductorSection;   // B37. 77 Сечение проводника
  	Uns             ConductorLength;	// B38. 78 Длина проводника
@@ -231,7 +229,8 @@ typedef struct _TRamGroupC
 	Int				BreakZone;			// C22. 112 Число оборотов дв за которое начинаем тормозить
 	Uns				Rsvd5[12];			// C23-34. 113-124 резерв
 	Int             CorrTemper;         // C35. 125 Корректировка температуры блока БКП
-	Uns        		Rsvd8[2];           // C36-37. 126-127 резерв
+	Uns        		Rsvd8;           	// C36. 126 резерв
+	Uns				CurrentMpyType;		// C37. 127 Управление ножкой уселителя сигнала АЦП для ДТ. работает только если тип привода не определен
 	Uns             IU_Mpy;             // C38. 128 Корректировка тока фазы U
 	Uns             IV_Mpy;             // C39. 129 Корректировка тока фазы V
 	Uns             IW_Mpy;             // C40. 130 Корректировка тока фазы W

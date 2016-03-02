@@ -153,6 +153,7 @@ typedef struct {
 		Bool				ShcReset;			// Флаг по которому сбрасывается КЗ
 		Uns					FaultDelay;			// Пауза после инициализации для включения защит
 		Uns					MpoMpzErrorTimer;
+		Uns					BcpTypeDubl;
 
 }TCoreProtections;
 

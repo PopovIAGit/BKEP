@@ -247,9 +247,6 @@ void Peref_50HzCalc(TPeref *p)	// 50 Гц
     peref_ApFilter3Calc(&p->IV3fltr);
     peref_ApFilter3Calc(&p->IW3fltr);
 
-    if(g_Ram.ramGroupC.DriveType < 15 && g_Ram.ramGroupC.DriveType != 0) CUR_SENSOR_GAIN = 0;
-    if(g_Ram.ramGroupC.DriveType< 5 && g_Ram.ramGroupC.DriveType != 0) CUR_SENSOR_GAIN = 1;
-
     // корректировка оффсетов дл ТУ 220/24
 
     if (p->TU_Offset_Calib_timer <= TU_OFFSET_CALIB_TIME && g_Ram.ramGroupC.TuOffsetCalib == 1)
@@ -433,16 +430,17 @@ void Peref_10HzCalc(TPeref *p)	// 10 Гц
     if (g_Ram.ramGroupG.Mode)
     {
     	p->Dac.Data = g_Ram.ramGroupG.DacValue;
-    	ENABLE_DAC = 1;
+    	//ENABLE_DAC = 0;
     }
     else if (g_Ram.ramGroupH.CalibState != csCalib)
     	{
-    		ENABLE_DAC = 0;
+    	//	ENABLE_DAC = 1;
     		p->Dac.Data = 0;
     	}
     else
 	{
-    	ENABLE_DAC = 1;
+
+    	//ENABLE_DAC = 0;
 	    PosPr = g_Ram.ramGroupA.PositionPr;
 	    if (PosPr < 0)
 		PosPr = 0;
@@ -452,7 +450,53 @@ void Peref_10HzCalc(TPeref *p)	// 10 Гц
 	    if (PosPr == 9999)
 		p->Dac.Data = 0;//g_Ram.ramGroupC.Dac_Offset / 4;	//???
 	}
-    //---------------------------------------------------------------------------
+
+    //------Настройка коэффициентов и усилителей датчиков тока в зависимости от типа привода----------------------------
+
+    if(g_Ram.ramGroupC.DriveType < 15 && g_Ram.ramGroupC.DriveType != 0) CUR_SENSOR_GAIN = 0;
+    if(g_Ram.ramGroupC.DriveType< 5 && g_Ram.ramGroupC.DriveType != 0) CUR_SENSOR_GAIN = 1;
+/*
+ *  dt100_A25 	= 1,
+	dt100_A50 	= 2,
+	dt400_B20 	= 3,
+	dt400_B50 	= 4,
+	dt800_V40 	= 5,
+	dt1000_V20  = 6,
+	dt4000_G9   = 7,
+	dt4000_G18  = 8,
+	dt10000_D6  = 9,
+	dt10000_D12 = 10,
+	dt10000_D10 = 11,
+	dt15000_D10 = 12,
+	dt20000_F40 = 13,
+	dt35000_F48 = 14,
+	dt50000_F48 = 15
+ * */
+
+    if(g_Ram.ramGroupC.DriveType != 0)
+    {
+    	if(g_Ram.ramGroupC.DriveType < dt4000_G9)
+    	{
+    		CUR_SENSOR_GAIN = 1;
+    	}
+    	else if (g_Ram.ramGroupC.DriveType < dt10000_D10)
+    	{
+    		CUR_SENSOR_GAIN = 0;
+    	}
+    	else if (g_Ram.ramGroupC.DriveType < dt35000_F48)
+    	{
+    		CUR_SENSOR_GAIN = 1;
+    	}
+    	else if (g_Ram.ramGroupC.DriveType <= dt50000_F48)
+    	{
+    		CUR_SENSOR_GAIN = 0;
+    	}
+
+    }
+    else
+    {
+    	CUR_SENSOR_GAIN = g_Ram.ramGroupC.CurrentMpyType; // 0 - большие токи, 1 - малые токи
+    }
 
 }
 //-----------------Обработка данных с микросхем по И2С---------------------------

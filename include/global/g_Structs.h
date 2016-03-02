@@ -347,6 +347,13 @@ typedef enum {
   vtShiber   = 1			// Шиберная задвижка
 } TValveType;
 
+// место установки привода
+typedef enum {
+  ptNormal     	= 0,			// обычная задвижка
+  ptAgregat     = 1,			// агрегатная задвижка
+  ptFire    	= 2 			// пожарная задвижка
+} TPlaceType;
+
 // Тип работы тена
 typedef enum {
 	tmControl 		= 0, 	// Управление по уставкам

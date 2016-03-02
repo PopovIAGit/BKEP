@@ -163,10 +163,6 @@ void g_Ram_Update(TRam *p)
     //p->ramGroupA.StateTs.all 	= g_Comm.digitInterface.Outputs.all;
     p->ramGroupH.ReverseType 	= rvtNone;
 
-    p->ramGroupB.MOD_FAULT = GpioDataRegs.GPBDAT.bit.GPIO39;
-    //TODO нет такого сигнала
-    //GpioDataRegs.GPBDAT.bit.GPIO48 = p->ramGroupB.RES_ERR;
-
 	if (p->ramGroupH.BadTask_Reset)
 	{
 		p->ramGroupH.BadTask_Reset = 0;
