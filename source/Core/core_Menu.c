@@ -66,7 +66,7 @@ void Core_MenuInit(TCoreMenu *p)
 //---------------------------------------------------
 
 //------------------------------------------------------------------
-// Подтверждение или изменение паролей
+//TODO Подтверждение или изменение паролей
 Bool UpdateCode(Uns addrPassw, Uns addrCode, Uns value, Uns def)	// в WriteValue()
 {
 	Uns *password = ToUnsPtr(&g_Ram) + addrPassw;
@@ -79,7 +79,7 @@ Bool UpdateCode(Uns addrPassw, Uns addrCode, Uns value, Uns def)	// в WriteValue
 		if ((value == *password) || (value == def))
 		{
 			*code = 0; *password = 0;
-			writeFlag = true;
+			//writeFlag = true;
 		}
 	}
 	else if (value != 0)

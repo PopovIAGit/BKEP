@@ -39,6 +39,7 @@ void EnableBtTx(TBluetoothHandle);
 Byte ReceiveBtByte(TBluetoothHandle);
 void TransmitBtByte(TBluetoothHandle, Byte Data);
  */
+Uns count=0;
 
 void InitChanelBt(TBluetoothHandle bPort)
 {
@@ -233,7 +234,7 @@ void BluetoothActivation(TBluetoothHandle bPort)
 		}
 	}
 
-	if (bPort->TimerActive.Counter<(bPort->TimerActive.Timeout-300) && bPort->Connect==true)
+	if (bPort->TimerActive.Counter<(bPort->TimerActive.Timeout-1800) && bPort->Connect==true)
 	{
 		//TODO на время отладки отключаю
 		bPort->Connect=false;
@@ -366,7 +367,7 @@ void BluetoothWTUpdate(TBluetoothHandle bPort)
 				ClearValues(bPort);
 				bPort->State=9;
 				bPort->StrIndex=0;
-				if (bPort->ModeProtocol==2) bPort->WaitDelayAfterConnect = 40;
+				//if (bPort->ModeProtocol==2) bPort->WaitDelayAfterConnect = 40;
 				break;
 		case 9:
 			    if (bPort->Mode == BT_COMMAND_MODE)			// Работаем в режиме данных,
@@ -462,10 +463,10 @@ void SendCommandTwo(TBluetoothHandle bPort, char *ComStr, char *AddStr)
 
 void BluetoothRxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 {
-	/*Uns Data;
+	//Uns Data;
 
 	// Обработчик прерывания зависит от текущего режима Bluetooth
-	if (bPort->WaitDelayAfterConnect>2)
+	/*if (bPort->WaitDelayAfterConnect>2)
 	{
 		Data = ReceiveBtByte();
 		return;
@@ -690,6 +691,7 @@ void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 	TMbFrame *Frame = &hPort->Frame;
 	Uns DataSend=0;
 	Uns Stop=0;
+	Uns i=0;
 
 	bPort->TxBusy = false;
 
@@ -716,16 +718,28 @@ void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 			//else
 			//if (hPort->Params.HardWareType==MCBSP_TYPE)
 			//{
+			/*if (bPort->ModeProtocol==2)
+			{
+				count+=2;
+				if (count>=12)
+				{
+					count=0;
+					for(i=0; i<1000; i++) {}
+				}
+			}*/
+
 				if (((Frame->TxLength)&0x01) && ((Frame->Data - Frame->Buf)>=(Frame->TxLength-1)))
 				{
 					Stop = 1;
 					DataSend = ((*Frame->Data++)&0x00FF)|(((*Frame->Data++)<<8)&0xFF00);
+
 					McBsp_transmit(hPort->Params.ChannelID, DataSend, Stop);
 					hPort->Stat.TxBytesCount++;
 					hPort->Frame.AddCount++;
 				} else
 				{
 					DataSend = ((*Frame->Data++)&0x00FF)|(((*Frame->Data++)<<8)&0xFF00);
+
 					McBsp_transmit(hPort->Params.ChannelID, DataSend, 0);
 					hPort->Stat.TxBytesCount++;
 					hPort->Frame.AddCount++;
@@ -743,8 +757,8 @@ void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 
 void BluetoothTimer(TBluetoothHandle bPort)
 {
-	if (bPort->WaitDelayAfterConnect >0) bPort->WaitDelayAfterConnect--;
-	if (bPort->WaitDelayAfterConnect >40) bPort->WaitDelayAfterConnect = 0;
+	//if (bPort->WaitDelayAfterConnect >0) bPort->WaitDelayAfterConnect--;
+	//if (bPort->WaitDelayAfterConnect >40) bPort->WaitDelayAfterConnect = 0;
 	if (bPort->AssuredLaunchTimer<100) bPort->AssuredLaunchTimer++;
 	if (bPort->Timer > 0) bPort->Timer--;
 }

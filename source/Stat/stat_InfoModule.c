@@ -375,7 +375,7 @@ __inline Bool FuncOne(TInfoModule *p)
 {
 	Uns StartIndex = p->Index;
 	Uns CurrentIndex = StartIndex + 1;
-	Uns i=0;
+	//Uns i=0;
 	
 	//for(i=0; i<1000; i++) asm("NOP");
 	if (p->HardwareSrc!=imSrcModbus) {
@@ -408,7 +408,7 @@ __inline Bool FuncTwo(TInfoModule *p)
 {
 	Uns StartIndex = p->Index;
 	Uns CurrentIndex = StartIndex + 1;
-	Uns i = 0;
+	//Uns i = 0;
 
 	//for(i=0; i<1000; i++) asm("NOP");
 	if (p->HardwareSrc!=imSrcModbus) {
@@ -674,7 +674,7 @@ __inline Bool FuncFive(TInfoModule *p, Byte LogType, Uns RecordNum)
 		//while(p->WaitTime>0){}
 
 		if (p->HardwareSrc!=imSrcModbus) {
-			p->WaitTime = 10;//TODO 5 зменил на 10 для теста
+			p->WaitTime = 9;//TODO 5 зменил на 10 для теста
 			while(p->WaitTime>0){};
 		}
 

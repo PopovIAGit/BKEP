@@ -114,6 +114,7 @@ typedef struct TCoreMenu {
 void Core_MenuInit(TCoreMenu *);
 void Core_MenuUpdate(TCoreMenu *);
 
+//TODO Функция обновления кода
 Bool UpdateCode(Uns, Uns, Uns, Uns);
 Bool SleepMode(TCoreMenu *);
 void StartState(TCoreMenu *);

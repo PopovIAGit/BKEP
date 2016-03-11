@@ -161,6 +161,16 @@ void Comm_Update(TComm *p)
 
 	if (g_Comm.Bluetooth.ModeProtocol == 0)
 	{
+		// Команда на сброс связи
+		if(g_Ram.ramGroupD.RsReset != 0 )
+		{
+			//канал связи с верхним уровнем контроллеров
+			InitChanelAsuModbus(&g_Comm.mbAsu);
+			ModBusSlaveReset(&p->mbAsu);
+			p->mbAsu.Serial.RsReset = 0;
+			g_Ram.ramGroupD.RsReset = 0;
+		}
+
 		ModBusUpdate(&g_Comm.mbAsu); 	// slave канал связи с верхним уровнем АСУ
 	}
 
