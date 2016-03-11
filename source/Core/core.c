@@ -28,7 +28,8 @@ __inline void Eeprom2CsSet(Byte Lev)  {SC_EEPROM2 = !Lev;}
 static void MoveMode (void);
 static void StopMode(void);
 static void PlugBreakMode(void);
-static void ShnControlMode(void);
+static void ShnStartMode(void);
+static void ShnStopMode(void);
 static void StartMode(void);
 static void ShnControlErrCheck(void);
 
@@ -226,7 +227,6 @@ void StopPowerControl(void)
 	}
 	else if (g_Core.MotorControl.CalibStop)
 	{
-
 		switch(g_Ram.ramGroupB.StopMethod)
 		{
 			case smSlowDown: g_Core.MotorControl.WorkMode = wmStop; break;
@@ -234,27 +234,18 @@ void StopPowerControl(void)
 			case smDynBreak: g_Core.MotorControl.WorkMode = wmShnStop; break;
 		}
 	}
-	else g_Core.MotorControl.WorkMode = wmStop;
+	else
+		{
+			if(g_Ram.ramGroupB.StopMethod == smDynBreak)
+			{
+				g_Ram.ramGroupATS.Control1.all = 0x4000;
+			}
+			 g_Core.MotorControl.WorkMode = wmStop;
+		}
 
 	g_Core.MotorControl.CalibStop = 0;
 	g_Core.VlvDrvCtrl.StartDelay = (Uns)START_DELAY_TIME; // Выставляем задержку перед следующим пуском
 	g_Core.TorqObs.ObsEnable = false;
-
-
-	// сброс аварии при стопе для шнайдера
-	/*if(g_Comm.Shn.SHN_StopFlag == 1)
-	{
-		g_Comm.Shn.SHN_StopFlag 				= 0;
-		g_Comm.SHN_Regs.Control.all 			= 0;
-		g_Comm.SHN_Regs.Control.bit.ResetFaults = 1;
-		g_Comm.Shn.SHN_WriteFlag 				= 1;
-	}*/
-	/*if(g_Comm.Shn.SHN_StopFlag == 1 && !g_Core.MotorControl.CalibStop)
-	{
-		g_Comm.Shn.SHN_StopFlag 				= 0;
-		g_Comm.SHN_Regs.Control.all 			= 0x200f;
-		g_Comm.Shn.SHN_WriteFlag 				= 1;
-	}*/
 }
 
 // Действия при пуске
@@ -347,9 +338,9 @@ void Core_ControlMode(TCore *p) // 50 Гц
     {
     case wmStop:		StopMode();	break;
 	case wmPlugBreak:	PlugBreakMode();	break;
-	case wmShnStop:		ShnControlMode();break;
+	case wmShnStop:		ShnStopMode();break;
 	case wmStart:		StartMode();break;
-	case wmShnStart:	ShnControlMode();break;
+	case wmShnStart:	ShnStartMode();break;
 	case wmMove:		MoveMode(); break;
 //	case wmSpeedTest:	break; ???
     }
@@ -357,17 +348,26 @@ void Core_ControlMode(TCore *p) // 50 Гц
 
 static void StopMode(void)
 {
-	/*if(g_Comm.Shn.SHN_StopFlag == 1)
+	if (g_Ram.ramGroupB.StopMethod == smDynBreak && g_Core.Status.bit.Fault == 0)
 	{
-		g_Comm.SHN_Regs.Control.all = 0;
-		g_Comm.SHN_Regs.Control.bit.ResetFaults = 1;
-		g_Comm.Shn.SHN_WriteFlag = 1;
-	}*/
+		if (g_Ram.ramGroupATS.State1.bit.ReadyToSwitchOn == 0)
+		{
+			g_Ram.ramGroupATS.Control1.bit.DecelStopReq = 0;
+			g_Core.MotorControl.RequestDir  = 0;		// сбрасываем необходимое направение движения
+			g_Core.MotorControl.ShnControlErrTimer = 0;
+			g_Ram.ramGroupA.Torque 			= 0;		// отображаем момент
+			g_Ram.ramGroupH.ContGroup 		= cgStop; 	// Подали команду на стоп контакторам
+		}
+	}
+	else
+	{
+		g_Core.MotorControl.RequestDir  = 0;		// сбрасываем необходимое направение движения
+		g_Core.MotorControl.ShnControlErrTimer = 0;
+		g_Ram.ramGroupA.Torque 			= 0;		// отображаем момент
+		g_Ram.ramGroupH.ContGroup 		= cgStop; 	// Подали команду на стоп контакторам
+	}
 
-	g_Core.MotorControl.RequestDir  = 0;		// сбрасываем необходимое направение движения
-	g_Core.MotorControl.ShnControlErrTimer = 0;
-	g_Ram.ramGroupA.Torque 			= 0;		// отображаем момент
-	g_Ram.ramGroupH.ContGroup 		= cgStop; 	// Подали команду на стоп контакторам
+
 }
 
 static void MoveMode(void)
@@ -395,21 +395,15 @@ static void MoveMode(void)
 	else
 		g_Ram.ramGroupA.Torque = g_Core.TorqObs.Indication; // отображаем текущий момент
 
-
-
 	if (CONTACTOR_1_STATUS && g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
 	if (CONTACTOR_2_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
 
 	g_Core.Protections.MuffFlag = g_Core.Protections.MuffFlag200Hz;
 
-	/*if(g_Ram.ramGroupA.Torque < g_Core.MotorControl.TorqueSet)
+	if (g_Core.Protections.SoftStarterFlag == 1 && g_Ram.ramGroupATS.State1.bit.Malfunction == 1)
 	{
-		//g_Core.MotorControl.MufTimer = 0;
-		if (g_Core.MotorControl.MufTimer) g_Core.MotorControl.MufTimer--;
+		g_Core.MotorControl.WorkMode = wmShnStart;
 	}
-	else if (++g_Core.MotorControl.MufTimer >= ((Prd50HZ*0.1) * g_Ram.ramGroupB.MuffTimer))
-		g_Core.Protections.MuffFlag = 1;	//  1 выставляем муфту если в течении секунды момент больше заданного
-*/
 }
 
 void Protections_MuffFlag(void)
@@ -458,26 +452,10 @@ static void PlugBreakMode(void)
 
 static void StartMode(void)
 {
-	/*if ((g_Ram.ramGroupB.StopMethod == smDynBreak)
-			&& (g_Comm.SHN_Regs.Status.bit.Malfunction==1))
-	{
-		ShnControlErrCheck();
-
-		if (!g_Comm.Shn.SHN_WriteFlag)
-		{
-			g_Comm.SHN_Regs.Control.all = 0;
-			g_Comm.SHN_Regs.Control.bit.ResetFaults = 1;
-			g_Comm.Shn.SHN_WriteFlag = 1;
-			g_Comm.Shn.SHN_ReadFlag = 1;
-			g_Comm.Shn.SHN_Busy = 0;
-		}
-		return;
-	}*/
-
 	if (g_Ram.ramGroupB.StopMethod == smDynBreak)
 	{
 		g_Core.MotorControl.WorkMode = wmShnStart;
-		g_Core.MotorControl.ShnControlStep = 2;
+		g_Core.MotorControl.ShnControlStep = 1;
 	}
 	else
 	{
@@ -495,108 +473,73 @@ static void StartMode(void)
 	}
 }
 
-static void ShnControlMode(void)
+static void ShnStopMode(void)
 {
-	//TODO переписать
-	/*ShnControlErrCheck();
+	switch (g_Core.MotorControl.ShnControlStep)
+		{
+		case 0:
 
-	if(g_Core.MotorControl.DinBreakTimer > 0) g_Core.MotorControl.DinBreakTimer--;
+			g_Ram.ramGroupA.Status.bit.Stop = 1;
 
-	if (g_Comm.Shn.SHN_WriteFlag) return;
+			g_Ram.ramGroupATS.Control1.all = 0x200F;
+			g_Core.MotorControl.DinBreakTimer = g_Ram.ramGroupC.StopShnTime * BREAK_SCALE;
+			g_Core.MotorControl.ShnControlStep = 1;
+			break;
 
-	switch(g_Core.MotorControl.ShnControlStep)
+		case 1:
+			if(g_Core.MotorControl.DinBreakTimer > 0) g_Core.MotorControl.DinBreakTimer--;
+			if (g_Core.MotorControl.DinBreakTimer == 0)
+			{
+				g_Ram.ramGroupATS.Control1.all = 0x4000;
+				g_Core.MotorControl.ShnControlStep = 2;
+
+			}
+			break;
+		case 2:
+			if (g_Ram.ramGroupATS.State1.bit.ReadyToSwitchOn==0)
+			{
+				g_Core.MotorControl.WorkMode = wmStop;
+				g_Core.MotorControl.ShnControlStep = 0;
+			}
+			break;
+		}
+}
+
+static void ShnStartMode(void)
+{
+
+	switch (g_Core.MotorControl.ShnControlStep)
 	{
-	case 0:
-		g_Ram.ramGroupA.Status.bit.Stop = 1;
-		//LVS_flag = 2;
-	//	if(g_Core.MotorControl.CalibStop)
-	//	{
-
-		    g_Comm.SHN_Regs.Control.all 	= 0x200F;
-			g_Comm.mbShn.Packet.Request 	= 16;
-			g_Comm.mbShn.Packet.Addr		= 400;
-			g_Comm.mbShn.Packet.Response 	= 0;
-			g_Comm.mbShn.Frame.WaitResponse = false;
-			g_Comm.mbShn.Packet.Data[0] 	= 0x200F;
-			g_Comm.Shn.SHN_Busy 			= 1;
-			g_Comm.Shn.SHN_Mode=2;
-		//}
-		//else g_Comm.SHN_Regs.Control.all = 0;
-		g_Comm.Shn.SHN_WriteFlag = 0;
-		g_Core.MotorControl.DinBreakTimer = g_Ram.ramGroupC.StopShnTime * 5;//* BREAK_SCALE;
-		g_Core.MotorControl.ShnControlStep = 1;
-		return;
 	case 1:
-		g_Core.MotorControl.ShnControlErrTimer = 0;
-		if(!g_Core.MotorControl.DinBreakTimer) g_Core.MotorControl.WorkMode = wmStop;
-		return;
-	//-------------------------------------------------------------
+			g_Ram.ramGroupATS.Control1.all = 0x128;
+			g_Core.MotorControl.ShnControlStep = 2;
+			break;
 	case 2:
-		LVS_flag = 0;
-		//g_Comm.Shn.SHN_WriteFlag = 1;
-		g_Comm.Shn.SHN_Mode=0;
-		g_Comm.mbShn.Packet.Addr = ATS48_BIG_CONTROL_REG;
-		g_Comm.mbShn.Packet.Count = 1;
-		g_Comm.mbShn.Packet.Data[0] = 16384;
-
-		//ShnModeTimer =
-		g_Comm.SHN_Regs.Control.all = 0;
+		if(g_Ram.ramGroupATS.State1.bit.Malfunction == 0)
+		{
+			g_Ram.ramGroupATS.Control1.all = 0x06;
+			g_Core.MotorControl.ShnControlStep = 3;
+		}
 		break;
 	case 3:
-		g_Comm.Shn.SHN_Mode=1;
-		//if (g_Comm.Shn.SHN_WriteFlag !=0) return;
-		//g_Comm.Shn.SHN_Mode=0;
-		//g_Comm.mbShn.Packet.Addr = ATS48_BIG_CONTROL_REG;
-		//g_Comm.mbShn.Packet.Count = 1;
-		g_Comm.SHN_Regs.Control.all = 0;
+		if (g_Ram.ramGroupATS.State1.bit.ReadyToSwitchOn)
+		{
+			g_Ram.ramGroupATS.Control1.all = 0x07;
+			g_Core.MotorControl.ShnControlStep = 4;
+		}
 		break;
 	case 4:
-		g_Comm.SHN_Regs.Control.all = 0;
-		g_Comm.SHN_Regs.Control.bit.ResetFaults = 1;
+		if (g_Ram.ramGroupATS.State1.bit.SwichedOn)
+		{
+			g_Ram.ramGroupATS.Control1.all = 0x0F;
+			g_Core.MotorControl.WorkMode = wmMove;
+			g_Core.MotorControl.ShnControlStep = 0;
+		}
 		break;
-	case 5:
-		g_Comm.SHN_Regs.Control.all = 0;
-		g_Comm.SHN_Regs.Control.bit.EnableVoltage = 1;
-		g_Comm.SHN_Regs.Control.bit.DisableQuickStop = 1;
-		break;
-	case 6:
-		//if(!g_Comm.SHN_Regs.Status.bit.ReadyToSwitchOn) return;
-		g_Comm.SHN_Regs.Control.bit.SwitchOn = 1;
-		break;
-	case 7:
-		//if(!g_Comm.SHN_Regs.Status.bit.SwichedOn) return;
-		g_Comm.SHN_Regs.Control.bit.EnableOp = 1;
-		break;
-	case 8:
-		//if(!g_Comm.SHN_Regs.Status.bit.SwichedOn) return;
-		g_Comm.SHN_Regs.Control.bit.EnableOp = 1;
-		break;
-	case 9:
-		//if(!g_Comm.SHN_Regs.Status.bit.OperationEnabled) return;
-		g_Core.MotorControl.WorkMode = wmMove;
-		g_Core.MotorControl.ShnControlStep = 0;
-		return;
 	}
 
-	g_Comm.Shn.SHN_WriteFlag = 1;
-	//g_Comm.Shn.SHN_Busy = 0;
-	g_Core.MotorControl.ShnControlStep++;
-	g_Core.MotorControl.ShnControlErrTimer = 0;
-	*/
-}
 
-// Функция для остановки работу если упп не отзывается
-//TODO переписать или удалить
-static void ShnControlErrCheck(void)
-{
-	g_Core.MotorControl.ShnControlErrTimer++;
-	if (g_Core.MotorControl.ShnControlErrTimer > 250)//SHN_CONTROL_ERR_TIME)
-	{
-		g_Core.MotorControl.WorkMode = wmStop;
-		g_Core.MotorControl.ShnControlErr = 1;
-	}
 }
-
 
 void Core_LowPowerControl(TCore *p)
 {
@@ -741,9 +684,18 @@ void Core_MuDuControl(TCore *p)
 		if(!p->Status.bit.Stop) p->VlvDrvCtrl.Mpu.CancelFlag = true;
 		else {
 			Core_ProtectionsClear(&p->Protections);
+			if (g_Ram.ramGroupB.StopMethod == smDynBreak )
+			{
+				g_Ram.ramGroupATS.Control1.bit.ResetFaults = 1;
+			}
 			p->VlvDrvCtrl.EvLog.Value = CMD_RES_FAULT;
 		}
 		g_Ram.ramGroupD.PrtReset = 0;
+	}
+
+	if (g_Ram.ramGroupATS.Control1.bit.ResetFaults == 1 && g_Ram.ramGroupATS.State1.bit.Malfunction == 0)
+	{
+		g_Ram.ramGroupATS.Control1.bit.ResetFaults = 0;
 	}
 
 }

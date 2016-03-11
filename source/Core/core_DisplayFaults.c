@@ -98,6 +98,12 @@ void Core_DisplayFaultsUpdate(TCoreDislpayFaults *p)
 			p->DisplFaultUnion.Proc.bit.MuDuDef = 0;
 			p->DisplFault = MuDuDef_CODE;
 		}
+		else if (p->DisplFaultUnion.Proc.bit.SoftStarter)
+		{
+			p->DisplFaulstTimer = DISPL_FAULT_TIME;
+			p->DisplFaultUnion.Proc.bit.SoftStarter = 0;
+			p->DisplFault = SoftStarter_CODE;
+		}
 		else if (p->DisplFaultUnion.Net.bit.UvR || p->DisplFaultUnion.Net.bit.UvS || p->DisplFaultUnion.Net.bit.UvT)
 		{
 			p->DisplFaulstTimer = DISPL_FAULT_TIME;

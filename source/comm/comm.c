@@ -164,128 +164,56 @@ void Comm_Update(TComm *p)
 		ModBusUpdate(&g_Comm.mbAsu); 	// slave канал связи с верхним уровнем АСУ
 	}
 
-	if (g_Comm.Bluetooth.ModeProtocol == 0)
+	if (g_Comm.Bluetooth.ModeProtocol == 0 && g_Ram.ramGroupB.StopMethod == smDynBreak)
 	{
 		ModBusUpdate(&g_Comm.mbShn);  // master канал связи с устройством плавного пуска
 
-		if (p->mbShn.Stat.Status.bit.Busy==0)
+		if (p->mbShn.Stat.Status.bit.Busy == 0)
 		{
 			CommandATS48++;
-			p->mbShn.Stat.Status.bit.Ready=0;
-			switch(CommandATS48){
-			case 2: mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.State1), 1); break;
-			case 1: mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.State2), 1); break;
-			case 3: mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.State3), 1); CommandATS48=0; break;
+			p->mbShn.Stat.Status.bit.Ready = 0;
+			switch (CommandATS48)
+			{
+			case 1:
+				mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.State1), 1);
+				break;
+			case 2:
+				mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.State2), 1);
+				break;
+			case 3:
+				mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.State3), 1);
+
+				break;
+
+			case 4:
+				mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.LFT), 1);
+
+				break;
+			case 5:
+				mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.PHP), 1);
+
+				break;
+			case 6:
+				if (g_Ram.ramGroupATS.Control1.all != 0)
+				{
+					mb_write_ATS48(&g_Comm, GetAdr(ramGroupATS.Control1), 1,
+							g_Ram.ramGroupATS.Control1.all);
+				}
+				break;
+			case 7:
+				if (g_Ram.ramGroupATS.Control2 != 0)
+				{
+					mb_write_ATS48(&g_Comm, GetAdr(ramGroupATS.Control2), 1,
+							g_Ram.ramGroupATS.Control2);
+				}
+				CommandATS48 = 0;
+				break;
+
 			}
 		}
 		Comm_ControlModbusUpdateAltistar48(&g_Comm);
 
 	}
-		/*if (!p->Shn.SHN_Busy)
-		{
-			//if(p->Shn.SHN_TaskFunc && (p->Shn.SHN_TaskStage == 1))
-			//{
-			//	p->mbShn.Packet.Addr = p->Shn.SHN_TaskAddr;
-			//	p->mbShn.Packet.Count = 1;
-			//	if(p->Shn.SHN_TaskFunc == MB_WRITE_REGS) p->mbShn.Packet.Data[0] = *p->Shn.SHN_TaskData;
-			//	p->mbShn.Packet.Request = p->Shn.SHN_TaskFunc;
-			//	p->Shn.SHN_TaskEx = 0;
-			//	p->Shn.SHN_Busy = 0;
-			//}
-			//else
-			if (p->Shn.SHN_WriteFlag)
-			{
-				//p->Shn.SHN_ReadFlag = 0;
-				if (p->Shn.SHN_Mode==1)
-				{
-					p->mbShn.Packet.Addr = ATS48_CONTROL_REG;
-					p->mbShn.Packet.Count = 1;
-					p->mbShn.Packet.Data[0] = p->SHN_Regs.Control.all;
-					//if(LVS_flag ==2) LVS_flag = 3;
-				}
-				else if (p->Shn.SHN_Mode==0)
-				{
-					p->Shn.SHN_Mode=1;
-					//p->mbShn.Packet.Addr = 0;
-					//p->mbShn.Packet.Count = 10;
-					//memcpy(p->mbShn.Packet.Data, SHN_Data, p->mbShn.Packet.Count);
-				} else if (p->Shn.SHN_Mode==2) {
-
-				}
-				p->mbShn.Packet.Request = MB_WRITE_REGS;
-				p->Shn.SHN_Busy = 1;
-			}
-			else if (p->Shn.SHN_ReadFlag==1)
-			{
-				//p->Shn.SHN_WriteFlag=0;
-				if(p->Shn.SHN_Mode)
-				{
-					p->mbShn.Packet.Addr = ATS48_STATUS_REG;
-					p->mbShn.Packet.Count = 3;
-				}
-				else
-				{
-					//p->Shn.SHN_Mode=1;
-					//p->mbShn.Packet.Addr = 0;
-					//p->mbShn.Packet.Count = 10;
-				}
-
-				p->mbShn.Packet.Request = MB_READ_REGS;
-				p->Shn.SHN_Busy = 1;
-			}
-		}
-		else if (!p->mbShn.Packet.Request && !p->mbShn.Frame.WaitResponse)
-		{
-			p->Shn.SHN_Busy = 0;
-			//g_Comm.Shn.SHN_WriteFlag=0;
-		}
-		else if (p->mbShn.Packet.Response)
-		{
-			if(p->mbShn.Packet.Exception)
-			{
-				if(p->Shn.SHN_TaskStage == 1)
-				{
-					p->Shn.SHN_TaskEx = p->mbShn.Packet.Exception;
-					p->Shn.SHN_TaskStage = 2;
-				}
-				p->mbShn.Packet.Exception = 0;
-			}
-			else switch (p->mbShn.Packet.Response)
-			{
-			case MB_READ_REGS:
-
-				if(p->Shn.SHN_Mode)
-				{
-					if (p->mbShn.Packet.Addr == ATS48_STATUS_REG)
-					{
-						p->SHN_Regs.Status.all = p->mbShn.Packet.Data[0];
-						p->SHN_Regs.ExStatus.all = p->mbShn.Packet.Data[1];
-						p->SHN_Regs.Ex2Status.all = p->mbShn.Packet.Data[2];
-					}
-					if (p->mbShn.Packet.Addr == 402)
-					{
-						SHN_Data[0]= p->mbShn.Packet.Data[0];
-					}
-				}
-				else
-				{
-					memcpy(SHN_Data, p->mbShn.Packet.Data, p->mbShn.Packet.Count);
-				}
-				break;
-			case MB_WRITE_REGS:
-				if(p->mbShn.Packet.Addr == ATS48_CONTROL_REG) p->Shn.SHN_WriteFlag = 0;
-				if(p->mbShn.Packet.Addr == ATS48_BIG_CONTROL_REG) p->Shn.SHN_WriteFlag = 0;
-
-				p->Shn.SHN_WriteFlag = 0;
-				break;
-			}
-			p->mbShn.Packet.Response = 0;
-			p->Shn.SHN_Busy = 0;
-		}
-
-	}*/
-
-	//SciMasterConnBetweenBlockUpdate(&g_Comm.mbBkp);// master канал связи с
 
 	BluetoothWTUpdate(&g_Comm.Bluetooth); //драйвер Bluetooth
 	if (g_Comm.Bluetooth.ModeProtocol>0) ModBusUpdate(&g_Comm.mbBt);  // slave

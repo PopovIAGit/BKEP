@@ -30,6 +30,7 @@
 #define Overway_bit			5
 #define Mufta_bit			6
 #define MuDuDef_bit			7
+#define SoftStarter_bit		8
 
 // Номера битов g_Structs.h -> TNetReg
 #define UvR_bit				0
@@ -75,6 +76,7 @@
 #define Overway_CODE		4
 #define Mufta_CODE			5
 #define MuDuDef_CODE		6
+#define SoftStarter_CODE	7
 
 #define Uv_CODE				11
 #define Ov_CODE				12
@@ -125,7 +127,6 @@ typedef struct {
 		TAlarmElem 			overMax_VoltageR;	// Превышение напряжения R на 47% - авария
 		TAlarmElem 			overMax_VoltageS;	// Превышение напряжения S на 47% - авария
 		TAlarmElem 			overMax_VoltageT;	// Превышение напряжения T на 47% - авария
-		TAlarmElem			voltSkew;			// Асимметрия напряжения входной сети - неисправность
 		TAlarmElem 			breakVoltR;			// Обрыв фазы R - авария
 		TAlarmElem 			breakVoltS;			// Обрыв фазы S - авария
 		TAlarmElem 			breakVoltT;			// Обрыв фазы T - авария
@@ -133,7 +134,6 @@ typedef struct {
 		TAlarmElem			breakCurrU;			// Обрыв фазы U	- неисправность
 		TAlarmElem			breakCurrV;			// Обрыв фазы V - неисправность
 		TAlarmElem			breakCurrW;			// Обрыв фазы W - неисправность
-		TAlarmElem			currSkew;			// Ассиметрия тока - неисправность
 		TAlarmI2T 			I2t;				// Время-токовая перегрузка - авария
 		TAlarmSHC			ShC_U;				// Короткое замыкание фазы U - авария
 		TAlarmSHC			ShC_V;				// Короткое замыкание фазы V - авария
@@ -155,7 +155,10 @@ typedef struct {
 		Bool				ShcReset;			// Флаг по которому сбрасывается КЗ
 		Uns					FaultDelay;			// Пауза после инициализации для включения защит
 		Uns					MpoMpzErrorTimer;
-		Uns					BcpTypeDubl;
+		Uns					BcpTypeDubl;		// параметр для определения ошибки "не верный тип БКП"
+		Uns					SoftStarterFlag;	// flag что авария была но снялась
+		Uns					SoftStarterTimer;   // Таймер для сброса неисправности и выставления аварии
+		Uns					MoveOnFlag;			// флаг что было начато движение (для работы с УПП)
 
 }TCoreProtections;
 
