@@ -105,7 +105,7 @@ typedef struct _TPduData {
 #define PROC_DRV_T_MASK 	0x0040
 #define PROC_RESET_MASK		0x00A1
 //#define PROCESS_EVLOG_MASK	0x00A1
-#define PROCESS_EVLOG_MASK	0x00D3
+#define PROCESS_EVLOG_MASK	0x01F3
 typedef union _TProcessReg {
 	Uns all;
 	struct {
@@ -117,7 +117,8 @@ typedef union _TProcessReg {
 		Uns Overway:1;		// 5     Уплотнение не достигнуто
 		Uns Mufta:1;		// 6	 Муфта
 		Uns MuDuDef:1;		// 7     Ошибка по дискретным входам Му/Ду
-		Uns Rsvd:8;			// 8-15  Резерв
+		Uns SoftStarter:1;	// 8	 Ошибка УПП
+		Uns Rsvd:7;			// 9-15  Резерв
 	} bit;
 } TProcessReg;
 
@@ -182,7 +183,7 @@ typedef union _TLoadReg {
 #define DEV_TMP_MASK		0x0060
 #define DEV_RSC_MASK		0x0800
 //#define DEV_EVLOG_MASK	0x0400
-#define DEV_EVLOG_MASK		0x0421
+#define DEV_EVLOG_MASK		0x4FFF
 typedef union _TDeviceReg {
 	Uns all;
   struct {
@@ -346,6 +347,13 @@ typedef enum {
   vtKlin     = 0,		  	// Клиновая задвижка
   vtShiber   = 1			// Шиберная задвижка
 } TValveType;
+
+// место установки привода
+typedef enum {
+  ptNormal     	= 0,			// обычная задвижка
+  ptAgregat     = 1,			// агрегатная задвижка
+  ptFire    	= 2 			// пожарная задвижка
+} TPlaceType;
 
 // Тип работы тена
 typedef enum {

@@ -318,6 +318,9 @@ void InitGpio(void)
 	GpioCtrlRegs.GPADIR.bit.GPIO29	= 1;	// WORK_DSP_LED
 	GpioDataRegs.GPADAT.bit.GPIO29	= 1;
 
+	GpioCtrlRegs.GPADIR.bit.GPIO30	= 1;	//ON_I_OUT
+	GpioDataRegs.GPADAT.bit.GPIO30	= 0;
+
 	GpioCtrlRegs.GPBPUD.bit.GPIO34	= 1;
 	GpioCtrlRegs.GPBDIR.bit.GPIO34	= 1;	//LED3
 	GpioDataRegs.GPBDAT.bit.GPIO34	= 1;

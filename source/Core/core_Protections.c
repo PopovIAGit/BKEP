@@ -211,16 +211,6 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->breakVoltR.Scale = PROTECT_SCALE;
 	p->breakVoltS.Scale = PROTECT_SCALE;
 	p->breakVoltT.Scale = PROTECT_SCALE;
-
-	//---------Ассиметрия напряжений (неисправность)-----------------------------------
-	p->voltSkew.Cfg.all = PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL, VSk_bit, 20);
-	p->voltSkew.Input = (Int *) &g_Ram.ramGroupH.VSkValue;
-	p->voltSkew.Output = (Uns *) &p->outDefects.Net.all;
-	p->voltSkew.EnableLevel = (Int *) &g_Ram.ramGroupC.VSkLevel;
-	p->voltSkew.DisableLevel = (Int *) &g_Ram.ramGroupC.VSkLevel;
-	p->voltSkew.Timeout = &g_Ram.ramGroupC.VSkTime;
-	p->voltSkew.Scale = PROTECT_SCALE;
-
 	//---------ЗАЩИТЫ ПО ТОКУ---------------------------------------------
 	//---------Обрыв фаз по току (U V W неисправность)---------------------------------
 	p->breakCurrU.Cfg.all = PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL, PhlU_bit, HYST_OFF);
@@ -262,15 +252,6 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->I2t.Output = (Uns *) &p->outFaults.Load.all;
 	p->I2t.Scale = PROTECT_SCALE;
 	Core_ProtectionI2TInit(&p->I2t);
-
-	//--------Ассиметрия токов (неисправность)----------------------------------------------
-	p->voltSkew.Cfg.all = PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL, ISkew_bit, HYST_OFF);
-	p->voltSkew.Input = (Int *) &g_Ram.ramGroupH.ISkewValue;
-	p->voltSkew.Output = (Uns *) &p->outDefects.Load.all;
-	p->voltSkew.EnableLevel = (Int *) &g_Ram.ramGroupC.ISkewLevel;
-	p->voltSkew.DisableLevel = (Int *) &g_Ram.ramGroupC.ISkewLevel;
-	p->voltSkew.Timeout = &g_Ram.ramGroupC.ISkewTime;
-	p->voltSkew.Scale = PROTECT_SCALE;
 
 	//------Короткое замыкание----------------------------------------------
 	p->ShC_U.Cfg.bit.Num = ShCU_bit;
@@ -380,7 +361,6 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 		p->breakVoltS.Cfg.bit.Enable = Enable;
 		p->breakVoltT.Cfg.bit.Enable = Enable;
 
-		p->voltSkew.Cfg.bit.Enable = (g_Ram.ramGroupC.VSk != pmOff);						//Небаланс напряжений
 		break;
 	case 3:  // Защиты по току
 		Enable = (g_Ram.ramGroupC.Phl != pmOff) && (!g_Core.Status.bit.Stop);					// Обрыв выходных фаз (двиг.)
@@ -393,8 +373,6 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 		p->ShC_U.Cfg.bit.Enable = Enable;
 		p->ShC_V.Cfg.bit.Enable = Enable;
 		p->ShC_W.Cfg.bit.Enable = Enable;
-
-		p->currSkew.Cfg.bit.Enable = (g_Ram.ramGroupC.ISkew != pmOff) && (!g_Core.Status.bit.Stop);					// Небаланс токов
 
 		p->I2t.Cfg.bit.Enable = (g_Ram.ramGroupC.I2t != pmOff) && (!g_Core.Status.bit.Stop);		// ВТЗ
 		break;
@@ -530,7 +508,7 @@ void Core_ProtectionsClear(TCoreProtections *p)
 
 	g_Core.Protections.MuffFlag200Hz = 0;
 
-	if (g_Ram.ramGroupH.MuffFault == 1 && IsMemParReady())
+	if (g_Ram.ramGroupH.MuffFault != 0 && IsMemParReady())
 	{
 		g_Ram.ramGroupH.MuffFault = 0;
 		MuffAddr = REG_MUFF_FAULT;
@@ -648,15 +626,46 @@ void Core_Protections50HZUpdate(TCoreProtections *p)
 
 
 	//-------- Ошибка ТИП БКП ------------------------
-//TODO привязать к посадочным местам и дописать
-		if (g_Ram.ramGroupA.Faults.Dev.bit.NoBCP_Connect == 0)
+
+		if (g_Ram.ramGroupA.Faults.Dev.bit.NoBCP_Connect == 0  && g_Ram.ramGroupC.DriveType != 0)
 		{
-			if(g_Ram.ramGroupH.BkpType == 7 && g_Ram.ramGroupC.DriveType < dt35000_F48)
+			p->BcpTypeDubl = g_Ram.ramGroupH.BkpType*2;
+			if ((p->BcpTypeDubl != (Uns)g_Ram.ramGroupC.DriveType) && ((p->BcpTypeDubl-1) != (Uns)g_Ram.ramGroupC.DriveType))
 			{
 				p->outFaults.Dev.bit.BCP_ErrorType = 1;
 			}
 		}
 	//----------------------------------------
+	//------------ Ошибка УПП -------------------------------
+		if(g_Ram.ramGroupB.StopMethod == smDynBreak)
+		{
+			if ((g_Ram.ramGroupATS.State1.all & 0xFF) == 0x27)
+			{
+				p->MoveOnFlag = 1; // флаг что запустились
+			}
+
+			if((p->outDefects.Net.all & NET_UV_MASK || p->registerBrCurr || p->registerBrVolt) && p->MoveOnFlag)
+			{
+				if (g_Ram.ramGroupATS.State1.bit.Malfunction == 1)
+				{
+					p->outDefects.Proc.bit.SoftStarter = 1;
+					if (p->SoftStarterTimer++ >= 20 * Prd50HZ)
+					{
+						p->outDefects.Proc.bit.SoftStarter = 0;
+						p->outFaults.Proc.bit.SoftStarter = 1;
+						p->SoftStarterTimer = 0;
+					}
+				}
+			}
+			/*	else if((p->outDefects.Net.all & NET_UV_MASK) == 0 || p->registerBrCurr == 0 || p->registerBrVolt == 0)
+			{
+				if (!g_Ram.ramGroupA.Status.bit.Fault)
+				{
+					p->SoftStarterFlag = 1;
+				}
+			}*/
+		}
+	//----------------------------------------------------
 }
 
 void Core_Protections18kHzUpdate(TCoreProtections *p)
@@ -732,7 +741,8 @@ void Core_Protections18kHzUpdate(TCoreProtections *p)
 			//Core_ValveDriveStop(&g_Core.VlvDrvCtrl);
 			//g_Core.VlvDrvCtrl.EvLog.Value = CMD_DEFSTOP;
 		}
-		if (g_Core.Status.bit.Fault)
+		//ToDo Обсудить реализацию режима пожарки
+		if (g_Core.Status.bit.Fault && g_Ram.ramGroupB.PlaceType != ptFire)   	// Если Включена пожарка то мы будем гореть но ехать....
 		{
 			Core_ValveDriveStop(&g_Core.VlvDrvCtrl);
 			g_Core.VlvDrvCtrl.EvLog.Value = CMD_DEFSTOP;

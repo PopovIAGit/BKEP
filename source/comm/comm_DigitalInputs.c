@@ -42,10 +42,10 @@ void DigitalInpUpdate(TDigitalInput *p)	// На вход функции приходит сигнал с ТУ
 	// Вызов функции обработки сигнала для каждого бита
 	DigitalInputCalc (&p->inpOpen, 	 		p->deltOn, p->deltOff, p->timeDelay); 	// Результат записывается в Output
 	DigitalInputCalc (&p->inpClose, 		p->deltOn, p->deltOff, p->timeDelay);	// в СТОПе всё наоборот: вверх считаем быстро, а вниз медленно
-	DigitalInputCalc (&p->inpStopOpen, 	 		p->deltOn, p->deltOff, p->timeDelay);	// В обычном случае - растет медленно, убывает быстро
+	DigitalInputCalc (&p->inpStopOpen, 	 	p->deltOn, p->deltOff, p->timeDelay);	// В обычном случае - растет медленно, убывает быстро
 	DigitalInputCalc (&p->inpMu, 	 		p->deltOn, p->deltOff, p->timeDelay); 	// Результат записывается в Output
 	DigitalInputCalc (&p->inpResetAlarm, 	p->deltOn, p->deltOff, p->timeDelay); 	// Результат записывается в Output
-	DigitalInputCalc (&p->inpStopClose, 	 	p->deltOn, p->deltOff, p->timeDelay); 	// Результат записывается в Output
+	DigitalInputCalc (&p->inpStopClose, 	p->deltOn, p->deltOff, p->timeDelay); 	// Результат записывается в Output
 	DigitalInputCalc (&p->inpDu, 	 		p->deltOn, p->deltOff, p->timeDelay); 	// Результат записывается в Output
 
 	// Формируем выход

@@ -66,13 +66,13 @@
 				PFUNC_blkRead(&TransCurrDef[9], (Int *)(&g_Ram.ramGroupH.TransCurr),		  1);
 				break;
 			case dt35000_F48:
-							PFUNC_blkRead(&drive14,  	 	(Int *)(&g_Ram.ramGroupH.TqCurr),   LENGTH_TRQ);
-							PFUNC_blkRead(&TransCurrDef[9], (Int *)(&g_Ram.ramGroupH.TransCurr),		  1);
-							break;
+				PFUNC_blkRead(&drive14,  	 	(Int *)(&g_Ram.ramGroupH.TqCurr),   LENGTH_TRQ);
+				PFUNC_blkRead(&TransCurrDef[9], (Int *)(&g_Ram.ramGroupH.TransCurr),		  1);
+				break;
 			case dt50000_F48:
-							PFUNC_blkRead(&drive15,  	 	(Int *)(&g_Ram.ramGroupH.TqCurr),   LENGTH_TRQ);
-							PFUNC_blkRead(&TransCurrDef[9], (Int *)(&g_Ram.ramGroupH.TransCurr),		  1);
-							break;
+				PFUNC_blkRead(&drive15,  	 	(Int *)(&g_Ram.ramGroupH.TqCurr),   LENGTH_TRQ);
+				PFUNC_blkRead(&TransCurrDef[9], (Int *)(&g_Ram.ramGroupH.TransCurr),		  1);
+				break;
 		}
 
 		if ((g_Ram.ramGroupC.DriveType < 16)&&(g_Ram.ramGroupC.DriveType != 0))

@@ -13,10 +13,9 @@ extern void InterruptUpdate(void);
 
 void main(void)
 {
-	//TODO доделать с утра
 	//TODO 2 длинная линия (моменты, сбои связи)
 	// Сначала инициализируется процессор
- 	InitHardware();
+	InitHardware();
 	memset(&g_Core, 	0, sizeof(TCore));
 	memset(&g_Ram, 	    0, sizeof(TRam));
 	memset(&g_Comm, 	0, sizeof(TComm));

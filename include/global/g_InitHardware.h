@@ -67,6 +67,11 @@ extern "C" {
 #define CONTACTOR_1_CONTROL  GpioDataRegs.GPADAT.bit.GPIO10
 #define CONTACTOR_2_CONTROL  GpioDataRegs.GPADAT.bit.GPIO11
 
+//---------- Enable DAC ---------------------
+
+#define ENABLE_DAC	GpioDataRegs.GPADAT.bit.GPIO30
+
+//-----------------------------------------------
 //--- BUTTON's ---------------------------------------
 #define TY_24				GpioDataRegs.GPBDAT.bit.GPIO40 // 24 или 220 ТУ
 
