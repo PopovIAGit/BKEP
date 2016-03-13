@@ -87,6 +87,11 @@ Bool UpdateCode(Uns addrPassw, Uns addrCode, Uns value, Uns def)	// в WriteValue
 		*password = value; *code = 0;
 		writeFlag = true;
 	}
+	else if (value == 0)
+	{
+		*password = value; *code = 0;
+		writeFlag = true;
+	}
 	
 	if (writeFlag)
 	{
@@ -96,7 +101,7 @@ Bool UpdateCode(Uns addrPassw, Uns addrCode, Uns value, Uns def)	// в WriteValue
 		}
 	}
 
-	return false;
+	return true;
 }
 //---------------------------------------------------
 // Чтение настроек параметра

@@ -114,7 +114,7 @@ void InitTables(void)
 	ImEvLogMainAddrsTable[12]	= GetAdr(ramGroupA.Iu);
 	ImEvLogMainAddrsTable[13]	= GetAdr(ramGroupA.Iv);
 	ImEvLogMainAddrsTable[14]	= GetAdr(ramGroupA.Iw);
-	ImEvLogMainAddrsTable[15]	= GetAdr(ramGroupA.Temper);
+	ImEvLogMainAddrsTable[15]	= GetAdr(ramGroupA.TemperBKP);
 	ImEvLogMainAddrsTable[16]	= GetAdr(ramGroupA.StateTu);
 	ImEvLogMainAddrsTable[17]	= GetAdr(ramGroupA.StateTs);
 	ImEvLogMainAddrsTable[18]	= GetAdr(ramGroupH.Seconds);
@@ -129,7 +129,7 @@ void InitTables(void)
 	ImEvLogBufAddrsTable[6]  = GetAdr(ramGroupA.Iu);
 	ImEvLogBufAddrsTable[7]  = GetAdr(ramGroupA.Iv);
 	ImEvLogBufAddrsTable[8]  = GetAdr(ramGroupA.Iw);
-	ImEvLogBufAddrsTable[9]  = GetAdr(ramGroupA.Temper);
+	ImEvLogBufAddrsTable[9]  = GetAdr(ramGroupA.TemperBKP);
 	ImEvLogBufAddrsTable[10] = GetAdr(ramGroupA.StateTu);
 	ImEvLogBufAddrsTable[11] = GetAdr(ramGroupA.StateTs);
 
@@ -219,7 +219,7 @@ void InitLogEvent(TLogEvent *le)
 	le->Iu			= &g_Ram.ramGroupA.Iu;
 	le->Iv			= &g_Ram.ramGroupA.Iu;
 	le->Iw			= &g_Ram.ramGroupA.Iu;
-	le->Temper		= &g_Ram.ramGroupA.Temper;
+	le->Temper		= &g_Ram.ramGroupA.TemperBKP;
 	le->Inputs		= &g_Ram.ramGroupA.StateTu.all;
 	le->Outputs		= &g_Ram.ramGroupA.StateTs.all;
 	le->Seconds		= &g_Ram.ramGroupH.Seconds;
@@ -373,7 +373,7 @@ void DataBufferPre(TStat *s)
 		s->LogEventBuffer[LogEvBufIndex].LogIu		 	= g_Ram.ramGroupA.Iu;
 		s->LogEventBuffer[LogEvBufIndex].LogIv		 	= g_Ram.ramGroupA.Iv;
 		s->LogEventBuffer[LogEvBufIndex].LogIw		 	= g_Ram.ramGroupA.Iw;
-		s->LogEventBuffer[LogEvBufIndex].LogTemper	 	= g_Ram.ramGroupA.Temper;
+		s->LogEventBuffer[LogEvBufIndex].LogTemper	 	= g_Ram.ramGroupA.TemperBKP;
 		s->LogEventBuffer[LogEvBufIndex].LogInputs	 	= g_Ram.ramGroupA.StateTu.all;
 		s->LogEventBuffer[LogEvBufIndex].LogOutputs 	= g_Ram.ramGroupA.StateTs.all;
 
