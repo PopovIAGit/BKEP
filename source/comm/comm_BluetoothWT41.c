@@ -147,7 +147,7 @@ void BluetoothActivation(TBluetoothHandle bPort)
 			g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_MPU;
 			g_Core.VlvDrvCtrl.EvLog.Value = CMD_OFF_BLT;
 			StopTimer(&bPort->TimerActive);
-			ENABLE_BLUETOOTH=b_off;
+			GpioDataRegs.GPADAT.bit.GPIO27=1;
 			bPort->ModeProtocol = 0;
 			bPort->State = 7;
 			//McBsp_tx_disable(MCBSPA);
@@ -162,7 +162,7 @@ void BluetoothActivation(TBluetoothHandle bPort)
 		bPort->ButtActivTimer++;
 		if (bPort->ButtActivTimer>2)//300мс
 		{
-			ENABLE_BLUETOOTH=b_on;
+			GpioDataRegs.GPADAT.bit.GPIO27=0;
 			bPort->Function = 1;
 			if (bPort->ButtActivTimer>12) {
 				bPort->Function = 2;
@@ -184,7 +184,7 @@ void BluetoothActivation(TBluetoothHandle bPort)
 		RS485_DIR_BT = 0;//вкл
 		g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_MPU;
 		g_Core.VlvDrvCtrl.EvLog.Value = CMD_ON_BLT;
-		ENABLE_BLUETOOTH=b_on;
+		GpioDataRegs.GPADAT.bit.GPIO27=0;
 		bPort->ButtActivTimer=0;
 		bPort->ModeProtocol = 1; //Modbus
 	}
@@ -210,7 +210,7 @@ void BluetoothActivation(TBluetoothHandle bPort)
 				bPort->ButtActivTimer++;
 				if (bPort->ButtActivTimer>3)//300мс
 				{
-					ENABLE_BLUETOOTH=b_off;
+					GpioDataRegs.GPADAT.bit.GPIO27=1;
 				}
 			}
 		} else {
@@ -219,14 +219,14 @@ void BluetoothActivation(TBluetoothHandle bPort)
 				bPort->ButtActivTimer++;
 				if (bPort->ButtActivTimer>3)//300мс
 				{
-					ENABLE_BLUETOOTH=b_off;
+					GpioDataRegs.GPADAT.bit.GPIO27=1;
 				}
 			}
-			else if (bPort->ModeProtocol==1) ENABLE_BLUETOOTH=b_on;
+			else if (bPort->ModeProtocol==1) GpioDataRegs.GPADAT.bit.GPIO27=0;
 		}
 	} else if (bPort->Enabled==true && bPort->BlinkConnect==true)
 	{
-		ENABLE_BLUETOOTH=b_off;
+		GpioDataRegs.GPADAT.bit.GPIO27=1;
 		if (!TimerPending(&bPort->TimerBlink))
 		{
 			StopTimer(&bPort->TimerBlink);
@@ -252,7 +252,7 @@ void BluetoothActivation(TBluetoothHandle bPort)
 		bPort->Enabled=false;
 		RS485_DIR_BT = 1;//выкл
 		StopTimer(&bPort->TimerActive);
-		ENABLE_BLUETOOTH=b_off;
+		GpioDataRegs.GPADAT.bit.GPIO27=1;
 		g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_BLOCK;
 		g_Core.VlvDrvCtrl.EvLog.Value = CMD_OFF_BLT;
 		bPort->ModeProtocol = 0;
@@ -595,7 +595,7 @@ __inline void RxDataMode(TBluetoothHandle bPort, TMbHandle hPort)
 			Frame->Buf[1]=0;
 			Frame->Buf[2]=0;
 			bPort->StrIndex=0;
-			ENABLE_BLUETOOTH=b_on;
+			GpioDataRegs.GPADAT.bit.GPIO27=0;
 			StartTimer(&Frame->TimerPost);
 		}
 	}
@@ -608,7 +608,7 @@ __inline void RxDataMode(TBluetoothHandle bPort, TMbHandle hPort)
 	// Прием данных для инф.модуля
 	if (bPort->ModeProtocol == 2)
 	{
-		ENABLE_BLUETOOTH=b_off;
+		GpioDataRegs.GPADAT.bit.GPIO27=1;
 		Frame->Buf[0]=0;
 		Frame->Buf[1]=0;
 		Frame->Buf[2]=0;
@@ -660,7 +660,7 @@ __inline void RxDataMode(TBluetoothHandle bPort, TMbHandle hPort)
 			bPort->Mode = BT_COMMAND_MODE;
 			bPort->Status = BT_RECEIVE_COMPLETE;
 			RxState = 0;
-			ENABLE_BLUETOOTH=b_on;
+			GpioDataRegs.GPADAT.bit.GPIO27=0;
 		}
 
 	}
@@ -709,7 +709,7 @@ void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 		if (++countByte>20)
 		{
 			countByte=0;
-			ENABLE_BLUETOOTH=ENABLE_BLUETOOTH^1;
+			//GpioDataRegs.GPADAT.bit.GPIO27=GpioDataRegs.GPADAT.bit.GPIO27^1;
 		}
 
 		if (TestCount==4) {
@@ -743,7 +743,7 @@ void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 				if (((Frame->TxLength)&0x01) && ((Frame->Data - Frame->Buf)>=(Frame->TxLength-1)))
 				{
 					Stop = 1;
-					ENABLE_BLUETOOTH=0;
+					//GpioDataRegs.GPADAT.bit.GPIO27=0;
 					DataSend = ((*Frame->Data++)&0x00FF)|(((*Frame->Data++)<<8)&0xFF00);
 
 					McBsp_transmit(hPort->Params.ChannelID, DataSend, Stop);

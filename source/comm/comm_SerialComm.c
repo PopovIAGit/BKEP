@@ -162,7 +162,7 @@ void ModBusUpdate(TMbHandle hPort)
 			Packet->Request   = 0;
 			if (hPort->Params.HardWareType==MCBSP_TYPE)
 			{
-				ENABLE_BLUETOOTH=1;//off
+				GpioDataRegs.GPADAT.bit.GPIO27=1;//ENABLE_BLUETOOTH=1;//off
 			}
 		}
 	}
