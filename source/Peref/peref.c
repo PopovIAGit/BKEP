@@ -453,50 +453,70 @@ void Peref_10HzCalc(TPeref *p)	// 10 Гц
 
     //------Настройка коэффициентов и усилителей датчиков тока в зависимости от типа привода----------------------------
 
-    if(g_Ram.ramGroupC.DriveType < 15 && g_Ram.ramGroupC.DriveType != 0) CUR_SENSOR_GAIN = 0;
-    if(g_Ram.ramGroupC.DriveType< 5 && g_Ram.ramGroupC.DriveType != 0) CUR_SENSOR_GAIN = 1;
-/*
- *  dt100_A25 	= 1,
-	dt100_A50 	= 2,
-	dt400_B20 	= 3,
-	dt400_B50 	= 4,
-	dt800_V40 	= 5,
-	dt1000_V20  = 6,
-	dt4000_G9   = 7,
-	dt4000_G18  = 8,
-	dt10000_D6  = 9,
-	dt10000_D12 = 10,
-	dt10000_D10 = 11,
-	dt15000_D10 = 12,
-	dt20000_F40 = 13,
-	dt35000_F48 = 14,
-	dt50000_F48 = 15
- * */
+	if (g_Ram.ramGroupC.DriveType != 0)
+	{
+		if (g_Ram.ramGroupC.DriveType < dt4000_G9)
+		{
+			CUR_SENSOR_GAIN = 1;
+			if (g_Ram.ramGroupC.IU_Mpy != 850 || g_Ram.ramGroupC.IV_Mpy != 850 || g_Ram.ramGroupC.IW_Mpy != 850)
+			{
+				if (IsMemParReady())
+				{
+					g_Ram.ramGroupC.IU_Mpy = 850;
+					g_Ram.ramGroupC.IV_Mpy = 850;
+					g_Ram.ramGroupC.IW_Mpy = 850;
+					WriteToEeprom(REG_I_MPY, &g_Ram.ramGroupC.IU_Mpy, 3);
+				}
+			}
+		}
+		else if (g_Ram.ramGroupC.DriveType < dt10000_D10)
+		{
+			CUR_SENSOR_GAIN = 0;
+			if (g_Ram.ramGroupC.IU_Mpy != 4000 || g_Ram.ramGroupC.IV_Mpy != 4000 || g_Ram.ramGroupC.IW_Mpy != 4000)
+			{
+				if (IsMemParReady())
+				{
+					g_Ram.ramGroupC.IU_Mpy = 4000;
+					g_Ram.ramGroupC.IV_Mpy = 4000;
+					g_Ram.ramGroupC.IW_Mpy = 4000;
+					WriteToEeprom(REG_I_MPY, &g_Ram.ramGroupC.IU_Mpy, 3);
+				}
+			}
+		}
+		else if (g_Ram.ramGroupC.DriveType < dt35000_F48)
+		{
+			CUR_SENSOR_GAIN = 1;
+			if (g_Ram.ramGroupC.IU_Mpy != 6000 || g_Ram.ramGroupC.IV_Mpy != 6000 || g_Ram.ramGroupC.IW_Mpy != 6000)
+			{
+				if (IsMemParReady())
+				{
+					g_Ram.ramGroupC.IU_Mpy = 6000;
+					g_Ram.ramGroupC.IV_Mpy = 6000;
+					g_Ram.ramGroupC.IW_Mpy = 6000;
+					WriteToEeprom(REG_I_MPY, &g_Ram.ramGroupC.IU_Mpy, 3);
+				}
+			}
+		}
+		else if (g_Ram.ramGroupC.DriveType <= dt50000_F48)
+		{
+			CUR_SENSOR_GAIN = 0;
+			if (g_Ram.ramGroupC.IU_Mpy != 30000 || g_Ram.ramGroupC.IV_Mpy != 30000 || g_Ram.ramGroupC.IW_Mpy != 30000)
+			{
+				if (IsMemParReady())
+				{
+					g_Ram.ramGroupC.IU_Mpy = 30000;
+					g_Ram.ramGroupC.IV_Mpy = 30000;
+					g_Ram.ramGroupC.IW_Mpy = 30000;
+					WriteToEeprom(REG_I_MPY, &g_Ram.ramGroupC.IU_Mpy, 3);
+				}
+			}
+		}
 
-    if(g_Ram.ramGroupC.DriveType != 0)
-    {
-    	if(g_Ram.ramGroupC.DriveType < dt4000_G9)
-    	{
-    		CUR_SENSOR_GAIN = 1;
-    	}
-    	else if (g_Ram.ramGroupC.DriveType < dt10000_D10)
-    	{
-    		CUR_SENSOR_GAIN = 0;
-    	}
-    	else if (g_Ram.ramGroupC.DriveType < dt35000_F48)
-    	{
-    		CUR_SENSOR_GAIN = 1;
-    	}
-    	else if (g_Ram.ramGroupC.DriveType <= dt50000_F48)
-    	{
-    		CUR_SENSOR_GAIN = 0;
-    	}
-
-    }
-    else
-    {
-    	CUR_SENSOR_GAIN = g_Ram.ramGroupC.CurrentMpyType; // 0 - большие токи, 1 - малые токи
-    }
+	}
+	else
+	{
+		CUR_SENSOR_GAIN = g_Ram.ramGroupC.CurrentMpyType;  // 0 - большие токи, 1 - малые токи
+	}
 
 }
 //-----------------Обработка данных с микросхем по И2С---------------------------

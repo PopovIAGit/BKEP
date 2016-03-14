@@ -192,7 +192,7 @@ typedef struct _TRamGroupB
 	Uns				reserv68[3];		// B28 -30. 68-70 Резерв
 	Uns 			Sec3Mode;			// B31. 71
 	Uns				NoMoveTime;		   	// B32. 72 Время отсутствия движения
-	Uns				OverwayZone;		// B33. 73 Макси
+	Uns				OverwayZone;		// B33. 73 Максимальный путь уплотнения
 	TPlaceType		PlaceType;			// B34. 74 место установки привода (обычн, агрегатная, пожарка)
 	Uns				reserv75;		    // B35. 75 Резерв
  	TStopMethod		StopMethod;			// B36. 76 Выбор типа торможения (Динамика, Противовключение)
@@ -217,7 +217,7 @@ typedef struct _TRamGroupC
 	THallBlock      HallBlock;          // C9. 99 Состояние датчиков холла блока
 	Uns             SubVersionPO;	    // C10. 100 Подверсия ПО
 	Uns				reserv101;			// С11. 101 Резерв
-	Uns             PhOrdZone;      	// C12. 102 Расстояние чередования фаз двигателя
+	Uns				reserv102;			// С12. 102 Резерв
 	Uns             MuffZone;           // C13. 103 Расстояние сброса муфты
 	Uns			    PosSensPow;			// C14. 104 Тип датчика положения
 	Uns			    reserv105;			// C15. 105 Резерв
@@ -279,16 +279,17 @@ typedef struct _TRamGroupC
 	Int				Rsvd13[3];			// C94 - 96. Резерв
 	Int             TenOnValue;         // C97. 187 Уровень включения ТЕНа
 	Int             TenOffValue;        // C98. 188 Уровень выключения ТЕНа
-	Uns 			Rsvd11[4];			// С99-102.  189-192 резерв
-	TPrtMode        PhOrd;          	// C103. 193 Защита от неверного чередования фаз двигателя
-	Uns				PhOrdTime;			// C104. 194 Время чередования фаз двигателя
+	Uns 			Rsvd11[3];			// С99-101.  189-191 резерв
+	TPrtMode        PhOrd;          	// C102. 192 Защита от неверного чередования фаз двигателя
+	Uns				PhOrdTime;			// C103. 193 Время чередования фаз двигателя
+	Uns             PhOrdZone;      	// C104. 194 Расстояние чередования фаз двигателя
 	TPrtMode        MuDuDef;        	// C105. 195 Защита ошибки входов Му/Ду
 	Uns			    Rsvd12[8];			// C106-108. 196-198 Резерв
 	Int				Corr40Trq;			// C114. 204 Параметр для корректировки индикации малых моментов (меньше 60%)
 	Int				Corr60Trq;			// C115. 205 Параметр для корректировки индикации больших моментов (больше 60%)
 	Int				Corr80Trq;			// C116. 206
 	Int				Corr110Trq;			// C117. 207
-	Uns			    Rsvd2;			// C118-119. 208-209 Резерв
+	Uns			    Rsvd2;			// C118. 208 Резерв
 	Uns				TuOffsetCalib;		// C119.  209. калибровка офсетов ТУ - проводить при ту 220 для большей точности.
 	//------Параметры для ТУ------------------------------------
 	Uns				LevelOn220;			// C120. 210
@@ -452,16 +453,17 @@ typedef struct _TRamGroupE
 //---------------------------------------------------------------------------
 
 // ПАРАМЕТРЫ УСТРОЙСТВА ПЛАВНОГО ПУСКА
-// Группа A (Адрес = 540, Количество = 20) - Диагностика - просмотр
+// Группа ATS (Адрес = 540, Количество = 20) - Диагностика - просмотр
 typedef struct _TRamGroupATS
 {
-	Uns             		Control1;           // 0.
+	TATS48_ControlReg  		Control1;           // 0.
 	Uns	            		Control2;			// 1.
 	TATS48_StatusReg        State1;     	    // 2.
 	TATS48_ExStatusReg      State2;		    	// 3.
 	TATS48_Ex2StatusReg     State3;        		// 4.
-	Uns						Speed;				// 5
-	Uns 					Rsvd[14];			// 6-20. Резерв
+	Uns						LFT;				// 5. последняя появившаяся неисправность (код стр. 43 мануала)
+	Uns						PHP;				// 6. защита от обрыва фаз
+	Uns 					Rsvd[13];			// 7-20. Резерв
 } TRamGroupATS;
 
 typedef struct _TRamLogBuff
@@ -568,6 +570,7 @@ typedef struct TRam
 #define REG_DRIVE_TYPE			GetAdr(ramGroupC.DriveType)
 #define REG_MAX_TRQE			GetAdr(ramGroupC.MaxTorque)
 #define REG_I_NOM				GetAdr(ramGroupC.Inom)
+#define REG_I_MPY				GetAdr(ramGroupC.IU_Mpy)
 
 #define REG_TORQUE_CURR 		GetAdr(ramGroupH.TqCurr)
 #define REG_TORQUE_ANGLE_UI		GetAdr(ramGroupH.TqAngUI)
