@@ -204,13 +204,19 @@ void Comm_Update(TComm *p)
 
 				break;
 			case 6:
+				/*	if(g_Ram.ramGroupATS.PHP == 1)
+					{
+						mb_write_ATS48(&g_Comm,GetAdr(ramGroupATS.PHP), 1, 0);
+					}*/
+				break;
+			case 7:
 				if (g_Ram.ramGroupATS.Control1.all != 0)
 				{
 					mb_write_ATS48(&g_Comm, GetAdr(ramGroupATS.Control1), 1,
 							g_Ram.ramGroupATS.Control1.all);
 				}
 				break;
-			case 7:
+			case 8:
 				if (g_Ram.ramGroupATS.Control2 != 0)
 				{
 					mb_write_ATS48(&g_Comm, GetAdr(ramGroupATS.Control2), 1,
@@ -259,16 +265,21 @@ void Comm_50HzCalc(TComm *p)
 	}
 
 	//Кнопка сброса аварий на лицевой панели
-	if ((BTN_RESET_ALARM == 0) && (p->btn_reset_alarmFlag == 0))
+	if (BTN_RESET_ALARM == 0) //&& (p->btn_reset_alarmFlag == 0))
 	{
-		g_Ram.ramGroupD.PrtReset = 1;
-		p->btn_reset_alarmFlag = 1;
-		g_Peref.Display.data = 999;
+		if (p->btn_reset_alarmTimer++ >= 1 * Prd50HZ)
+		{
+			g_Ram.ramGroupD.PrtReset = 1;
+			p->btn_reset_alarmFlag = 1;
+			g_Peref.Display.data = 999;
+			p->btn_reset_alarmTimer =0;
+		}
 
 	}
-	else if (BTN_RESET_ALARM == 1 && p->btn_reset_alarmFlag == 1)
+	else if (BTN_RESET_ALARM == 1) //&& p->btn_reset_alarmFlag == 1)
 	{
 		p->btn_reset_alarmFlag = 0;
+		p->btn_reset_alarmTimer = 0;
 	}
 
 	//CommandUpdate(&g_Comm);

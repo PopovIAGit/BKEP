@@ -553,6 +553,7 @@ void Core_LowPowerControl(TCore *p)
 			&& (g_Ram.ramGroupA.Ut < 60))
 	{
 		p->Protections.outDefects.Dev.bit.LowPower = 1;
+		p->DisplayFaults.DisplFault = 999;
 	}
 	else p->Protections.outDefects.Dev.bit.LowPower = 0;
 
