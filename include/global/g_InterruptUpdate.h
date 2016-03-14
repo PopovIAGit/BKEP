@@ -170,6 +170,8 @@ TPeriodicalFunction Task10Hz[] =        //не более  200-т задач
 	PrdElemInit(Core_OnOff_TEN,             &g_Core.Temper),
 	PrdElemInit(TekModbusParamsUpdate,		NULL),				//на 10 √ц
 	PrdElemInit(Core_DisplayFaultsUpdate,			&g_Core.DisplayFaults),				//на 10 √ц
+	PrdElemInit(BlinkBluetoothLed,			&g_Stat.Im),				//на 10 √ц
+
 
 };
 //------------ онец файла-----------------------------------------------

@@ -105,7 +105,7 @@ void LogParamMbExec(TStat *);
 void LogParamControl(TStat *);
 //ma LogSim
 void LogSimControl(TStat *);
-
+void BlinkBluetoothLed(TInfoModule *);
 void GetCurrentCmd(TStat *);
 
 //Bool ReadWriteClearFlash(pAT25DF041A, Byte, Uns, Uns *, Uns);

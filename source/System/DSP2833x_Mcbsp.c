@@ -309,7 +309,7 @@ void McBsp_transmitIM(Byte Id, Uns Data)
 	Uns Count =0;
 	while(McBspRegs[Id]->SPCR2.bit.XRDY==0)
 	{
-		if(++Count>65000) return;
+		//TODO непонятно что это -> if(++Count>65000) return;
 	}
 	//if (McBspRegs[Id]->SPCR2.bit.XRDY==1)
 	//{

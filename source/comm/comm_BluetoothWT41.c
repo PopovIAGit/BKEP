@@ -9,7 +9,7 @@
 
 #define b_off		1
 #define b_on		0
-Uns countByte=0;
+
 
 #define BT_TIMER_SCALE			PRD3
 #define BT_TIMER				1.00 * BT_TIMER_SCALE
@@ -226,14 +226,14 @@ void BluetoothActivation(TBluetoothHandle bPort)
 		}
 	} else if (bPort->Enabled==true && bPort->BlinkConnect==true)
 	{
-		GpioDataRegs.GPADAT.bit.GPIO27=1;
+		GpioDataRegs.GPATOGGLE.bit.GPIO27=1;
 		if (!TimerPending(&bPort->TimerBlink))
 		{
 			StopTimer(&bPort->TimerBlink);
 			bPort->BlinkConnect = false;
 			bPort->Function = 0;
 			g_Stat.Im.Index=0;
-
+			GpioDataRegs.GPADAT.bit.GPIO27=0;
 			if (bPort->ModeProtocol == 1) bPort->Mode = BT_DATA_MODE;
 		}
 	}
@@ -608,7 +608,7 @@ __inline void RxDataMode(TBluetoothHandle bPort, TMbHandle hPort)
 	// Прием данных для инф.модуля
 	if (bPort->ModeProtocol == 2)
 	{
-		GpioDataRegs.GPADAT.bit.GPIO27=1;
+		GpioDataRegs.GPATOGGLE.bit.GPIO27=1;
 		Frame->Buf[0]=0;
 		Frame->Buf[1]=0;
 		Frame->Buf[2]=0;
@@ -706,11 +706,7 @@ void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 	if (bPort->ModeProtocol==1)
 	{
 
-		if (++countByte>20)
-		{
-			countByte=0;
-			//GpioDataRegs.GPADAT.bit.GPIO27=GpioDataRegs.GPADAT.bit.GPIO27^1;
-		}
+
 
 		if (TestCount==4) {
 			StartTimer(&Frame->TimerPost);

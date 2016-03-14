@@ -8,6 +8,7 @@ Uns ImEvLogBufAddrsTable[12];
 Uns ImCmdLogAddrsTable[6];
 Uns ImParamLogAddrsTable[5];
 Uns ImSimLogAddrsTable[13];
+Uns countByte=0;
 
 /*Uns ImEvLogMainAddrsTable[]	= {
 								GetAdr(ramGroupB.DevTime),
@@ -343,9 +344,11 @@ void SendData(TInfoModule *p)
 
 			if (p->HardwareSrc==imSrcBluetooth) {
 				//if (p->WaitAndroidCounter==0) {
+				p->BluetoothLedBlink = 1;
 					Data = p->WrBuffer[p->TxIndex++];
 					//for(i=0; i<20; i++) asm("NOP");
 					p->TransmitByte(Data);// ג הנאיגונו Bluetooth
+
 					//p->WaitAndroidCounter = 1;
 				//}
 			}
@@ -370,6 +373,16 @@ void SendData(TInfoModule *p)
 		}
 	}
 }
+
+void BlinkBluetoothLed(TInfoModule *p)
+{
+	if (p->BluetoothLedBlink == 1)
+	{
+		p->BluetoothLedBlink = 0;
+		GpioDataRegs.GPATOGGLE.bit.GPIO27=1;
+	}
+}
+
 
 __inline Bool FuncOne(TInfoModule *p)
 {
