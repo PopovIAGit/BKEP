@@ -204,10 +204,10 @@ void Comm_Update(TComm *p)
 
 				break;
 			case 6:
-				/*	if(g_Ram.ramGroupATS.PHP == 1)
+					if(g_Ram.ramGroupATS.PHP == 1)
 					{
 						mb_write_ATS48(&g_Comm,GetAdr(ramGroupATS.PHP), 1, 0);
-					}*/
+					}
 				break;
 			case 7:
 				if (g_Ram.ramGroupATS.Control1.all != 0)

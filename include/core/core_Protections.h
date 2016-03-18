@@ -159,6 +159,7 @@ typedef struct {
 		Uns					SoftStarterFlag;	// flag что авария была но снялась
 		Uns					SoftStarterTimer;   // Таймер для сброса неисправности и выставления аварии
 		Uns					MoveOnFlag;			// флаг что было начато движение (для работы с УПП)
+		Uns					SoftStarterConnTimer;
 
 }TCoreProtections;
 
