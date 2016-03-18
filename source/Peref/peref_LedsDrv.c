@@ -71,15 +71,18 @@ void Peref_LedsUpdate(pLeds p)
 
 	g_Ram.ramGroupH.BkpIndication.all = 0;
 
-	if (g_Comm.mbAsu.Serial.RsState==0) BlinkConnect++;
-	if (g_Comm.mbBkp.Frame.ConnFlag==1) BlinkConnect++;
+	if (g_Comm.mbAsu.Serial.RsState==0) BlinkConnect=1;
+	else {
+		BlinkConnect=0;
+	}
+	//if (g_Comm.mbBkp.Frame.ConnFlag==1) BlinkConnect++;
 	//if (g_Comm.mbShn.Serial.RsState==0) BlinkConnect++;
 
 	p->ledConnect.timeOfBlink = 20;
-	if (BlinkConnect==0) p->ledConnect.timeOfBlink = 20;
-	else if (BlinkConnect==1) p->ledConnect.timeOfBlink = 10;
-	else if (BlinkConnect==2) p->ledConnect.timeOfBlink = 5;
-	else if (BlinkConnect==3) p->ledConnect.timeOfBlink = 1;
+	if (BlinkConnect==1) p->ledConnect.timeOfBlink = 1;
+	//else if (BlinkConnect==1) p->ledConnect.timeOfBlink = 10;
+	//else if (BlinkConnect==2) p->ledConnect.timeOfBlink = 5;
+	//else if (BlinkConnect==3) p->ledConnect.timeOfBlink = 1;
 
 	//-------Моргание лампочкой процессора-----------------------------
 	LedTurnOnOff(&p->ledCntr, p->ledCntr.status);
@@ -87,7 +90,8 @@ void Peref_LedsUpdate(pLeds p)
 
 	//-------Моргание лампочкой процессора-----------------------------
 	LedTurnOnOff(&p->ledConnect, p->ledConnect.status);
-	LED_CONNECT = p->ledConnect.status;
+	if (BlinkConnect==1) LED_CONNECT = p->ledConnect.status;
+	else LED_CONNECT = 1;
 	p->leds.bit.Connect = p->ledConnect.status;
 
 	// ------Авария----------------------------------------

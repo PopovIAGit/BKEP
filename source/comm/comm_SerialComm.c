@@ -162,7 +162,7 @@ void ModBusUpdate(TMbHandle hPort)
 			Packet->Request   = 0;
 			if (hPort->Params.HardWareType==MCBSP_TYPE)
 			{
-				GpioDataRegs.GPATOGGLE.bit.GPIO27=1;
+				GpioDataRegs.GPATOGGLE.bit.GPIO27=1;//ENABLE_BLUETOOTH=1;//off
 			}
 		}
 	}
@@ -265,12 +265,21 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 						//записать в структуру и выставить флаг
 						//WriteLogConnectSimID(Packet->Data, Packet->Count);
 						Packet->Request = 0;
+						Packet->Response = 0;
 						g_Stat.Im.RdBuffer[0]=0;
 						for(i=0; i<Packet->Count; i++)
 						{
 							g_Stat.LogSim.NewSimID[i] = Packet->Data[i];
 						}
+						for(i=0; i<Packet->Count; i++)
+						{
+							Packet->Data[i] = 0;
+							g_Comm.mbBt.Frame.Buf[i]=0;
+						}
+						Packet->Count = 0;
 						g_Stat.LogSim.ExecFlag = true;
+						McBsp_tx_disable(0);
+						McBsp_rx_enable(0);
 
 						return 0;
 						//return WriteData(Packet->Addr, Packet->Data, Packet->Count);
@@ -323,16 +332,19 @@ __inline Byte WriteData(Uns Addr, Uns *Data, Uns Count)
 
 		//MbTmpData[i] = Tmp;
 	}
-	// » 
-	//обновление парол€
-	/*if (Addr == REG_CODE)
-		if ( UpdateCode(REG_PASSW1_NEW, Addr, *Data, g_Ram.ramGroupA.VER_PO) )
-			return FR_SUCCESS;
 
-	if (Addr == REG_FCODE)
-		if ( UpdateCode(REG_PASSW2_NEW, Addr, *Data, g_Ram.ramGroupA.VER_PO) )
+	//TODO обновление парол€
+	if (Addr == REG_CODE){
+		g_Core.VlvDrvCtrl.EvLog.Source = 0;
+		if ( UpdateCode(REG_PASSW1_NEW, Addr, *Data, DEF_USER_PASS) )
 			return FR_SUCCESS;
-	*/
+	}
+
+	if (Addr == REG_FCODE){
+		g_Core.VlvDrvCtrl.EvLog.Source = 0;
+		if ( UpdateCode(REG_PASSW2_NEW, Addr, *Data, DEF_FACT_PASS) )
+			return FR_SUCCESS;
+	}
 
 	//if (!g_Core.menu.EnableEdit(Val->PaswwPrt)) return FR_SUCCESS;
 
@@ -344,6 +356,12 @@ __inline Byte WriteData(Uns Addr, Uns *Data, Uns Count)
 		// ≈сли стоит блокировка, то не пропускаем команды, кроме команды стоп
 		if (!(g_Core.VlvDrvCtrl.ActiveControls & CMD_SRC_SERIAL) && (*Data != vcwStop) )
 			return EX_ILLEGAL_DATA_VALUE;
+	}
+
+	//TODO проверка на разрешение записи по ѕаролю
+	if (!g_Core.menu.EnableEdit(Val->PaswwPrt))
+	{
+		return FR_SUCCESS;
 	}
 
 	//проверка на обработку записи значени€ в пам€ть

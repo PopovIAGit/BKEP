@@ -226,15 +226,9 @@ void Core_DisplayFaultsUpdate(TCoreDislpayFaults *p)
 		else if (p->DisplFaultUnion.Dev.bit.MpoMpzError)
 		{
 			p->DisplFaulstTimer = DISPL_FAULT_TIME;
-			p->DisplFaultUnion.Dev.bit.NoBCP_Connect = 0;
+			p->DisplFaultUnion.Dev.bit.MpoMpzError = 0;
 			p->DisplFault = MpoMpzError_CODE;
 		}else if (p->DisplFaultUnion.Dev.bit.BlueNoLaunch)
-		{
-			p->DisplFaulstTimer = DISPL_FAULT_TIME;
-			p->DisplFaultUnion.Dev.bit.BlueNoLaunch = 0;
-			p->DisplFault = BlueNoLaunch_CODE;
-		}
-		else if (p->DisplFaultUnion.Dev.bit.BlueNoLaunch)
 		{
 			p->DisplFaulstTimer = DISPL_FAULT_TIME;
 			p->DisplFaultUnion.Dev.bit.BlueNoLaunch = 0;
@@ -245,6 +239,12 @@ void Core_DisplayFaultsUpdate(TCoreDislpayFaults *p)
 			p->DisplFaulstTimer = DISPL_FAULT_TIME;
 			p->DisplFaultUnion.Dev.bit.BCP_ErrorType = 0;
 			p->DisplFault = BCP_ErrorType_CODE;
+		}
+		else if (p->DisplFaultUnion.Dev.bit.LowPower)
+		{
+			p->DisplFaulstTimer = 0;
+			p->DisplFaultUnion.Dev.bit.LowPower = 0;
+			p->DisplFault = 999;
 		}
 
 

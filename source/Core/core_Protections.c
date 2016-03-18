@@ -581,28 +581,55 @@ void Core_Protections50HZUpdate(TCoreProtections *p)
 	if (p->outFaults.Net.bit.BvT & p->outDefects.Net.bit.UvT)
 		p->outDefects.Net.bit.UvT = 0;
 
-	if (prevStatus != g_Ram.ramGroupA.Status.bit.Stop)  // По переходу из "движения" в "стоп" и обратно
+	if (prevStatus != g_Ram.ramGroupA.Status.bit.Stop) // По переходу из "движения" в "стоп" и обратно
 	{
-		prevStatus = g_Ram.ramGroupA.Status.bit.Stop;  // переинициализируем защиту по обрыву питающих фаз как аварию или как неисправность
+		prevStatus = g_Ram.ramGroupA.Status.bit.Stop; // переинициализируем защиту по обрыву питающих фаз как аварию или как неисправность
 		if (g_Ram.ramGroupA.Status.bit.Stop == 1)		// Если в СТОПе
 		{
-			p->breakVoltR.Cfg.bit.CanBeReseted = CAN_NOT_BE_RESETED;
-			p->breakVoltS.Cfg.bit.CanBeReseted = CAN_NOT_BE_RESETED;
-			p->breakVoltT.Cfg.bit.CanBeReseted = CAN_NOT_BE_RESETED;
-
-			p->breakVoltR.Output = (Uns *) &p->outFaults.Net.all;
-			p->breakVoltS.Output = (Uns *) &p->outFaults.Net.all;
-			p->breakVoltT.Output = (Uns *) &p->outFaults.Net.all;
-
-			p->breakVoltR.EnableLevel = (Int *) &g_Ram.ramGroupC.BvLevel;
-			p->breakVoltS.EnableLevel = (Int *) &g_Ram.ramGroupC.BvLevel;
-			p->breakVoltT.EnableLevel = (Int *) &g_Ram.ramGroupC.BvLevel;
-
-			if (p->outDefects.Net.all & NET_BV_MASK)  // Если имеется неисправность по обрыву, превращаем неисправность в аварию
+			if (g_Ram.ramGroupB.StopMethod != smDynBreak)
 			{
-				p->outFaults.Net.all = (p->outFaults.Net.all & ~ NET_BV_MASK) | (p->outDefects.Net.all & NET_BV_MASK);
-				p->outDefects.Net.all &= ~NET_BV_MASK;
-				p->registerBrVolt = 0;
+				p->breakVoltR.Cfg.bit.CanBeReseted = CAN_NOT_BE_RESETED;
+				p->breakVoltS.Cfg.bit.CanBeReseted = CAN_NOT_BE_RESETED;
+				p->breakVoltT.Cfg.bit.CanBeReseted = CAN_NOT_BE_RESETED;
+
+				p->breakVoltR.Output = (Uns *) &p->outFaults.Net.all;
+				p->breakVoltS.Output = (Uns *) &p->outFaults.Net.all;
+				p->breakVoltT.Output = (Uns *) &p->outFaults.Net.all;
+
+				p->breakVoltR.EnableLevel = (Int *) &g_Ram.ramGroupC.BvLevel;
+				p->breakVoltS.EnableLevel = (Int *) &g_Ram.ramGroupC.BvLevel;
+				p->breakVoltT.EnableLevel = (Int *) &g_Ram.ramGroupC.BvLevel;
+
+				if (p->outDefects.Net.all & NET_BV_MASK) // Если имеется неисправность по обрыву, превращаем неисправность в аварию
+				{
+					p->outFaults.Net.all =	(p->outFaults.Net.all & ~ NET_BV_MASK) | (p->outDefects.Net.all & NET_BV_MASK);
+					p->outDefects.Net.all &= ~NET_BV_MASK;
+					p->registerBrVolt = 0;
+				}
+			}
+			else
+			{
+				if (!p->outDefects.Proc.bit.SoftStarter)
+				{
+					p->breakVoltR.Cfg.bit.CanBeReseted = CAN_NOT_BE_RESETED;
+					p->breakVoltS.Cfg.bit.CanBeReseted = CAN_NOT_BE_RESETED;
+					p->breakVoltT.Cfg.bit.CanBeReseted = CAN_NOT_BE_RESETED;
+
+					p->breakVoltR.Output = (Uns *) &p->outFaults.Net.all;
+					p->breakVoltS.Output = (Uns *) &p->outFaults.Net.all;
+					p->breakVoltT.Output = (Uns *) &p->outFaults.Net.all;
+
+					p->breakVoltR.EnableLevel =	(Int *) &g_Ram.ramGroupC.BvLevel;
+					p->breakVoltS.EnableLevel = (Int *) &g_Ram.ramGroupC.BvLevel;
+					p->breakVoltT.EnableLevel =	(Int *) &g_Ram.ramGroupC.BvLevel;
+
+					if (p->outDefects.Net.all & NET_BV_MASK) // Если имеется неисправность по обрыву, превращаем неисправность в аварию
+					{
+						p->outFaults.Net.all = (p->outFaults.Net.all & ~ NET_BV_MASK)| (p->outDefects.Net.all & NET_BV_MASK);
+						p->outDefects.Net.all &= ~NET_BV_MASK;
+						p->registerBrVolt = 0;
+					}
+				}
 			}
 		}
 		else
@@ -637,17 +664,18 @@ void Core_Protections50HZUpdate(TCoreProtections *p)
 		}
 	//----------------------------------------
 	//------------ Ошибка УПП -------------------------------
-		if(g_Ram.ramGroupB.StopMethod == smDynBreak)
+	if (g_Ram.ramGroupB.StopMethod == smDynBreak)
+	{
+		if ((g_Ram.ramGroupATS.State1.all & 0xFF) == 0x27)
 		{
-			if ((g_Ram.ramGroupATS.State1.all & 0xFF) == 0x27)
-			{
-				p->MoveOnFlag = 1; // флаг что запустились
-			}
+			p->MoveOnFlag = 1; // флаг что запустились
+		}
 
-			if((p->outDefects.Net.all & NET_UV_MASK || p->registerBrCurr || p->registerBrVolt) && p->MoveOnFlag)
+
+		if (g_Comm.mbShn.Stat.Status.bit.NoConnect)
+		{
+			if ((p->outDefects.Net.all & NET_UV_MASK || p->registerBrVolt)&& p->MoveOnFlag)
 			{
-				if (g_Ram.ramGroupATS.State1.bit.Malfunction == 1)
-				{
 					p->outDefects.Proc.bit.SoftStarter = 1;
 					if (p->SoftStarterTimer++ >= 20 * Prd50HZ)
 					{
@@ -655,16 +683,24 @@ void Core_Protections50HZUpdate(TCoreProtections *p)
 						p->outFaults.Proc.bit.SoftStarter = 1;
 						p->SoftStarterTimer = 0;
 					}
+			}
+
+			if(p->MoveOnFlag == 0)
+			{
+				if(p->SoftStarterConnTimer++ >= 1 * Prd50HZ)
+				{
+					p->outFaults.Proc.bit.SoftStarter = 1;
+					p->SoftStarterConnTimer = 0;
 				}
 			}
-			/*	else if((p->outDefects.Net.all & NET_UV_MASK) == 0 || p->registerBrCurr == 0 || p->registerBrVolt == 0)
-			{
-				if (!g_Ram.ramGroupA.Status.bit.Fault)
-				{
-					p->SoftStarterFlag = 1;
-				}
-			}*/
 		}
+		else if(g_Comm.mbShn.Stat.Status.bit.NoConnect == 0 && g_Ram.ramGroupA.Status.bit.Fault == 0 && p->MoveOnFlag == 1 && p->outDefects.Proc.bit.SoftStarter == 1)
+		{
+			p->outDefects.Proc.bit.SoftStarter = 0;
+			p->SoftStarterTimer = 0;
+			p->SoftStarterFlag  = 1;
+		}
+	}
 	//----------------------------------------------------
 }
 

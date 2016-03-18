@@ -199,7 +199,7 @@ typedef struct _TRamGroupB
  	Uns				ConductorSection;   // B37. 77 Сечение проводника
  	Uns             ConductorLength;	// B38. 78 Длина проводника
  	Int				VoltCorr;			// B39.
- 	Uns 			Rsvd[10];			// B37-49. 77-89
+ 	Uns 			Rsvd[10];			// B40 41 42 43 44 45 46 47 48 49 -49. 77-89
 } TRamGroupB;
 
 // Группа C (Адрес = 90, Количество = 120) - Заводские параметры

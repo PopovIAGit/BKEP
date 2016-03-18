@@ -161,6 +161,16 @@ void Comm_Update(TComm *p)
 
 	if (g_Comm.Bluetooth.ModeProtocol == 0)
 	{
+		// Команда на сброс связи
+		if(g_Ram.ramGroupD.RsReset != 0 )
+		{
+			//канал связи с верхним уровнем контроллеров
+			InitChanelAsuModbus(&g_Comm.mbAsu);
+			ModBusSlaveReset(&p->mbAsu);
+			p->mbAsu.Serial.RsReset = 0;
+			g_Ram.ramGroupD.RsReset = 0;
+		}
+
 		ModBusUpdate(&g_Comm.mbAsu); 	// slave канал связи с верхним уровнем АСУ
 	}
 
@@ -194,10 +204,10 @@ void Comm_Update(TComm *p)
 
 				break;
 			case 6:
-				/*	if(g_Ram.ramGroupATS.PHP == 1)
+					if(g_Ram.ramGroupATS.PHP == 1)
 					{
 						mb_write_ATS48(&g_Comm,GetAdr(ramGroupATS.PHP), 1, 0);
-					}*/
+					}
 				break;
 			case 7:
 				if (g_Ram.ramGroupATS.Control1.all != 0)

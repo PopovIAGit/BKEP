@@ -73,6 +73,7 @@ typedef struct
 	Uns *DeviceDataPtr;
 	//Uns *DownloadBuffer;
 	TImSrc HardwareSrc;
+	Uns BluetoothLedBlink;
 		
 	void (*EnableReceive)(void);
 	void (*EnableTransmit)(void);

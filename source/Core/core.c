@@ -87,7 +87,7 @@ void Core_DefineCtrlParams(TCore *p) // 50 hz
 				p->MotorControl.TorqueSet = g_Ram.ramGroupB.StartCloseTorque;
 				p->MotorControl.BreakFlag = 0;
 			}
-			else if (g_Ram.ramGroupA.CurWay >= CloseZone)
+			else if (g_Ram.ramGroupA.CurWay >= OpenZone)
 			{
 				p->MotorControl.TorqueSet = g_Ram.ramGroupB.BreakOpenTorque;
 				p->MotorControl.BreakFlag = 1;
@@ -106,7 +106,7 @@ void Core_DefineCtrlParams(TCore *p) // 50 hz
 				p->MotorControl.TorqueSet = g_Ram.ramGroupB.BreakCloseTorque;
 				p->MotorControl.BreakFlag = 1;
 			}
-			else if (g_Ram.ramGroupA.CurWay >= CloseZone)
+			else if (g_Ram.ramGroupA.CurWay >= OpenZone)
 			{
 				p->MotorControl.TorqueSet = g_Ram.ramGroupB.StartOpenTorque;
 				p->MotorControl.BreakFlag = 0;
@@ -246,6 +246,10 @@ void StopPowerControl(void)
 	g_Core.MotorControl.CalibStop = 0;
 	g_Core.VlvDrvCtrl.StartDelay = (Uns)START_DELAY_TIME; // Выставляем задержку перед следующим пуском
 	g_Core.TorqObs.ObsEnable = false;
+	g_Core.Protections.SoftStarterTimer = 0;
+	g_Core.Protections.MoveOnFlag = 0;
+	g_Core.Protections.SoftStarterFlag = 0;
+	g_Core.Protections.SoftStarterConnTimer = 0;
 }
 
 // Действия при пуске
@@ -400,9 +404,11 @@ static void MoveMode(void)
 
 	g_Core.Protections.MuffFlag = g_Core.Protections.MuffFlag200Hz;
 
-	if (g_Core.Protections.SoftStarterFlag == 1 && g_Ram.ramGroupATS.State1.bit.Malfunction == 1)
+	if (g_Core.Protections.SoftStarterFlag == 1 && g_Ram.ramGroupB.StopMethod == smDynBreak)
 	{
 		g_Core.MotorControl.WorkMode = wmShnStart;
+		g_Core.Protections.SoftStarterFlag = 0;
+
 	}
 }
 
@@ -510,8 +516,10 @@ static void ShnStartMode(void)
 
 	switch (g_Core.MotorControl.ShnControlStep)
 	{
+	case 0: g_Ram.ramGroupATS.Control1.all = 0;
+			g_Core.MotorControl.ShnControlStep = 1; break;
 	case 1:
-			g_Ram.ramGroupATS.Control1.all = 0x128;
+			g_Ram.ramGroupATS.Control1.bit.ResetFaults = 1;
 			g_Core.MotorControl.ShnControlStep = 2;
 			break;
 	case 2:
@@ -625,7 +633,7 @@ void Core_LowPowerControl(TCore *p)
 		    else if (p->Status.bit.Opening) p->SaveDirection = vcwOpen;
 	    }
 	}
-	//--------------------------------------------------------------------------
+
 }
 
 void Core_MuDuControl(TCore *p)
@@ -703,8 +711,7 @@ void Core_MuDuControl(TCore *p)
 
 void Core_OnOff_TEN(TCoreTemper *t)
 {
-	g_Ram.ramGroupA.TemperBKP = g_Ram.ramGroupH.BKP_Temper
-			+ g_Ram.ramGroupC.CorrTemper;
+	g_Ram.ramGroupA.TemperBKP = g_Ram.ramGroupH.BKP_Temper + g_Ram.ramGroupC.CorrTemper;
 	if (g_Ram.ramGroupA.TemperBKP >= g_Ram.ramGroupC.TenOffValue)
 		t->OnOffTEN = TEN_OFF;
 	else if (g_Ram.ramGroupA.TemperBKP <= g_Ram.ramGroupC.TenOnValue)
