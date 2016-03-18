@@ -87,7 +87,7 @@ void Core_DefineCtrlParams(TCore *p) // 50 hz
 				p->MotorControl.TorqueSet = g_Ram.ramGroupB.StartCloseTorque;
 				p->MotorControl.BreakFlag = 0;
 			}
-			else if (g_Ram.ramGroupA.CurWay >= CloseZone)
+			else if (g_Ram.ramGroupA.CurWay >= OpenZone)
 			{
 				p->MotorControl.TorqueSet = g_Ram.ramGroupB.BreakOpenTorque;
 				p->MotorControl.BreakFlag = 1;
@@ -106,7 +106,7 @@ void Core_DefineCtrlParams(TCore *p) // 50 hz
 				p->MotorControl.TorqueSet = g_Ram.ramGroupB.BreakCloseTorque;
 				p->MotorControl.BreakFlag = 1;
 			}
-			else if (g_Ram.ramGroupA.CurWay >= CloseZone)
+			else if (g_Ram.ramGroupA.CurWay >= OpenZone)
 			{
 				p->MotorControl.TorqueSet = g_Ram.ramGroupB.StartOpenTorque;
 				p->MotorControl.BreakFlag = 0;
@@ -372,8 +372,8 @@ static void StopMode(void)
 
 static void MoveMode(void)
 {
-	if (g_Ram.ramGroupC.DriveType == 1)
-	{
+//	if (g_Ram.ramGroupC.DriveType == 1)
+//	{
 		if (g_Ram.ramGroupA.Faults.Net.bit.UvR
 				|| g_Ram.ramGroupA.Faults.Net.bit.UvS
 				|| g_Ram.ramGroupA.Faults.Net.bit.UvT
@@ -391,9 +391,9 @@ static void MoveMode(void)
 		{
 			g_Ram.ramGroupA.Torque = g_Core.TorqObs.Indication; // отображаем текущий момент
 		}
-	}
-	else
-		g_Ram.ramGroupA.Torque = g_Core.TorqObs.Indication; // отображаем текущий момент
+//	}
+//	else
+//		g_Ram.ramGroupA.Torque = g_Core.TorqObs.Indication; // отображаем текущий момент
 
 	if (CONTACTOR_1_STATUS && g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
 	if (CONTACTOR_2_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
@@ -408,22 +408,45 @@ static void MoveMode(void)
 
 void Protections_MuffFlag(void)
 {
-	if(g_Core.MotorControl.WorkMode != wmMove)
+	/*if(g_Core.MotorControl.WorkMode != wmMove)
 	{
 		g_Core.MotorControl.MufTimer = 0;
 		return;
+	}*/
+
+	if (g_Ram.ramGroupA.Torque > g_Core.MotorControl.TorqueSet)
+	{
+		if (g_Core.MotorControl.MufTimer < (80 * g_Ram.ramGroupB.MuffTimer))
+		{
+			g_Core.MotorControl.MufTimer += 4;
+		}
+
+		if (g_Core.MotorControl.MufTimer >= (80 * g_Ram.ramGroupB.MuffTimer))
+		{
+			g_Core.Protections.MuffFlag200Hz = 1;	//  1 выставл€ем муфту если в течении секунды момент больше заданного
+		}
+	}
+	else
+	{
+		if (g_Core.MotorControl.MufTimer) g_Core.MotorControl.MufTimer--;
 	}
 
-
-	if(g_Ram.ramGroupA.Torque < g_Core.MotorControl.TorqueSet)
+	/*if(g_Ram.ramGroupA.Torque < g_Core.MotorControl.TorqueSet)
 	{
 		//g_Core.MotorControl.MufTimer = 0;
 		if (g_Core.MotorControl.MufTimer) g_Core.MotorControl.MufTimer--;
 	}
-	else if (g_Core.MotorControl.MufTimer >= ((Prd200HZ*0.4) * g_Ram.ramGroupB.MuffTimer)){
-		g_Core.Protections.MuffFlag200Hz = 1;	//  1 выставл€ем муфту если в течении секунды момент больше заданного
-	} else g_Core.MotorControl.MufTimer+=4;
+	else {
+		if (g_Core.MotorControl.MufTimer >= (80 * g_Ram.ramGroupB.MuffTimer)) //(Prd200HZ*0.4)
+		{
+			g_Core.Protections.MuffFlag200Hz = 1;	//  1 выставл€ем муфту если в течении секунды момент больше заданного
+		} else
+		{
+			g_Core.MotorControl.MufTimer+=4;
+		}
+	}*/
 
+	//+//if ()
 }
 
 static void PlugBreakMode(void)
@@ -440,7 +463,7 @@ static void PlugBreakMode(void)
 		break;
 	case 1:
 		if (g_Core.MotorControl.PlugBreakTimer > 0)	break;
-		g_Ram.ramGroupH.ContGroup 	   	   = (g_Core.MotorControl.RequestDir > 0) ? cgClose : cgOpen;
+		g_Ram.ramGroupH.ContGroup 	   	   = (g_Core.MotorControl.RequestDir > 0) ? cgOpen : cgClose;
 		g_Core.MotorControl.PlugBreakTimer = 5 * g_Ram.ramGroupC.BrakeTime;
 		g_Core.MotorControl.PlugBreakStep  = 2;
 		break;

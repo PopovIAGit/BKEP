@@ -174,7 +174,7 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 	bPort->TxPacket.Data[4] = g_Ram.ramGroupH.BkpIndication.all;  // индикация светодиодов
 	//bPort->TxPacket.Data[5] = g_Core.Temper.OnOffTEN;			  // управление теном
 	bPort->TxPacket.Data[5] = 0;
-	bPort->TxPacket.Data[5] = (g_Core.Temper.OnOffTEN==1)&0x01;
+	bPort->TxPacket.Data[5] = (g_Core.Temper.OnOffTEN)&0x01;
 	bPort->TxPacket.Data[5] |= ((g_Ram.ramGroupA.PositionPr==9999)<<1)&0x02;
 	bPort->TxPacket.Data[5] |= ((g_Peref.Display.data==999)<<2)&0x04;
 	bPort->TxPacket.Data[5] |= ((g_Ram.ramGroupA.Faults.Proc.bit.NoOpen==0)<<3)&0x08;

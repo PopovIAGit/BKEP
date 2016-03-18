@@ -134,7 +134,7 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakVoltR),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakVoltS),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakVoltT),
-	PrdElemInit(Core_ProtectionI2TUpdate,		&g_Core.Protections.I2t),
+
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakCurrU),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakCurrV),
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.breakCurrW),
@@ -148,6 +148,7 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(Core_Protections50HZUpdate,		&g_Core.Protections),
 	//PrdElemInit(Comm_TuTsUpdate,				&g_Comm.digitInterface),
 	PrdElemInit(Comm_CommandUpdate,				&g_Comm),
+	//PrdElemInit(Core_ProtectionI2TUpdate,		&g_Core.Protections.I2t)
 
 };
 
