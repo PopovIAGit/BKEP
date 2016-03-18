@@ -14,8 +14,8 @@
 Int VoltArray[CUB_COUNT1] = {160, 190,  220,  250};
 //Int CurrArray[CUB_COUNT2] = {400, 800, 1200, 1600, 2000};
 Int CurrArray[CUB_COUNT2] = {400,600, 800, 1200, 1600}; // для эпц 50000
-//Int AnUIArray[CUB_COUNT2] = { 50,  55,   65,   69,   73};//для эпц100а50
-Int AnUIArray[CUB_COUNT2] = { 25,  35,   50,   65,   80};
+Int AnUIArray[CUB_COUNT2] = { 50,  55,   65,   69,   73};//для эпц100а50
+//Int AnUIArray[CUB_COUNT2] = { 25,  35,   50,   65,   80};
 
 
 void CubInit(TCubStr *p, TCubConfig *Cfg)	//инициализация куба
