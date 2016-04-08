@@ -318,7 +318,6 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->FaultDelay = (Uns) (Prd10HZ * 2);
 	p->registerBrCurr = 0;
 	p->registerBrVolt = 0;
-	p->MpoMpzErrorTimer = 0;
 
 }
 
@@ -494,6 +493,8 @@ void Core_ProtectionsReset(TCoreProtections *p)
 	p->registerBrCurr = 0;
 
 	p->outDefects.Proc.bit.Overway = 0;
+	p->outDefects.Proc.bit.FireContErr = 0;
+	p->FireContErr_Timer = 0;
 //	p->outDefects.Proc.bit.NoMove = 0;
 //	p->outFaults.Proc.bit.NoMove = 0;
 }
@@ -547,6 +548,7 @@ void Core_ProtectionsClear(TCoreProtections *p)
 	 */
 	p->ShcTmpState = 0;
 	p->ShcReset = true;
+	p->FireContErr_Timer = 0;
 
 }
 
@@ -652,56 +654,98 @@ void Core_Protections50HZUpdate(TCoreProtections *p)
 	}
 
 
+
+}
+
+void Core_Protections50HZUpdate2(TCoreProtections *p)
+{
+	Uns BatteryLowHideDataReg = 0;
+
 	//-------- Ошибка ТИП БКП ------------------------
 
-		if (g_Ram.ramGroupA.Faults.Dev.bit.NoBCP_Connect == 0  && g_Ram.ramGroupC.DriveType != 0)
-		{
-			p->BcpTypeDubl = g_Ram.ramGroupH.BkpType*2;
-			if ((p->BcpTypeDubl != (Uns)g_Ram.ramGroupC.DriveType) && ((p->BcpTypeDubl-1) != (Uns)g_Ram.ramGroupC.DriveType))
+			if (g_Ram.ramGroupA.Faults.Dev.bit.NoBCP_Connect == 0  && g_Ram.ramGroupC.DriveType != 0)
 			{
-				p->outFaults.Dev.bit.BCP_ErrorType = 1;
-			}
-		}
-	//----------------------------------------
-	//------------ Ошибка УПП -------------------------------
-	if (g_Ram.ramGroupB.StopMethod == smDynBreak)
-	{
-		if ((g_Ram.ramGroupATS.State1.all & 0xFF) == 0x27)
-		{
-			p->MoveOnFlag = 1; // флаг что запустились
-		}
-
-
-		if (g_Comm.mbShn.Stat.Status.bit.NoConnect)
-		{
-			if ((p->outDefects.Net.all & NET_UV_MASK || p->registerBrVolt)&& p->MoveOnFlag)
-			{
-					p->outDefects.Proc.bit.SoftStarter = 1;
-					if (p->SoftStarterTimer++ >= 20 * Prd50HZ)
-					{
-						p->outDefects.Proc.bit.SoftStarter = 0;
-						p->outFaults.Proc.bit.SoftStarter = 1;
-						p->SoftStarterTimer = 0;
-					}
-			}
-
-			if(p->MoveOnFlag == 0)
-			{
-				if(p->SoftStarterConnTimer++ >= 1 * Prd50HZ)
+				p->BcpTypeDubl = g_Ram.ramGroupH.BkpType*2;
+				if ((p->BcpTypeDubl != (Uns)g_Ram.ramGroupC.DriveType) && ((p->BcpTypeDubl-1) != (Uns)g_Ram.ramGroupC.DriveType))
 				{
-					p->outFaults.Proc.bit.SoftStarter = 1;
-					p->SoftStarterConnTimer = 0;
+					if(p->BcpTypeTimer++ >= 2*Prd50HZ)
+					{
+						p->outFaults.Dev.bit.BCP_ErrorType = 1;
+						p->BcpTypeTimer = 0;
+					}
+				}
+				else p->BcpTypeTimer = 0;
+			}
+		//----------------------------------------
+		//------------ Ошибка УПП -------------------------------
+		if (g_Ram.ramGroupB.StopMethod == smDynBreak)
+		{
+			if ((g_Ram.ramGroupATS.State1.all & 0xFF) == 0x27)
+			{
+				p->MoveOnFlag = 1; // флаг что запустились
+			}
+
+
+			if (g_Comm.mbShn.Stat.Status.bit.NoConnect)
+			{
+				if ((p->outDefects.Net.all & NET_UV_MASK || p->registerBrVolt)&& p->MoveOnFlag)
+				{
+						p->outDefects.Proc.bit.SoftStarter = 1;
+						if (p->SoftStarterTimer++ >= 20 * Prd50HZ)
+						{
+							p->outDefects.Proc.bit.SoftStarter = 0;
+							p->outFaults.Proc.bit.SoftStarter = 1;
+							p->SoftStarterTimer = 0;
+						}
+				}
+
+				if(p->MoveOnFlag == 0)
+				{
+					if(p->outFaults.Proc.bit.SoftStarter == 0)
+					{
+						if(p->SoftStarterConnTimer++ >= (1 * Prd50HZ))
+						{
+							p->outFaults.Proc.bit.SoftStarter = 1;
+							p->SoftStarterConnTimer = 0;
+						}
+					}
+
 				}
 			}
+			else if(g_Comm.mbShn.Stat.Status.bit.NoConnect == 0 && g_Ram.ramGroupA.Status.bit.Fault == 0 && p->MoveOnFlag == 1 && p->outDefects.Proc.bit.SoftStarter == 1)
+			{
+				p->outDefects.Proc.bit.SoftStarter = 0;
+				p->SoftStarterTimer = 0;
+				p->SoftStarterFlag  = 1;
+			}
 		}
-		else if(g_Comm.mbShn.Stat.Status.bit.NoConnect == 0 && g_Ram.ramGroupA.Status.bit.Fault == 0 && p->MoveOnFlag == 1 && p->outDefects.Proc.bit.SoftStarter == 1)
+		//----------------Замена батарейки!!!----------------------
+
+		// если часы установлены и не записанно - записываем
+	if (g_Ram.ramGroupB.DevDate.bit.Year != 0 && g_Ram.ramGroupH.HideDate.all == 0)
+	{
+		if (IsMemParReady())
 		{
-			p->outDefects.Proc.bit.SoftStarter = 0;
-			p->SoftStarterTimer = 0;
-			p->SoftStarterFlag  = 1;
+			BatteryLowHideDataReg = REG_BATTERY_FAULT;
+			g_Ram.ramGroupH.HideDate.all = g_Ram.ramGroupB.DevDate.all;
+			WriteToEeprom(BatteryLowHideDataReg, &g_Ram.ramGroupH.HideDate, 1);	// то записали состояние КЗ
 		}
 	}
-	//----------------------------------------------------
+
+	if (g_Ram.ramGroupB.DevDate.bit.Year == 0 && g_Ram.ramGroupH.HideDate.all != 0)  // если часы сбросились но записанно - стираем
+	{
+		if (IsMemParReady())
+		{
+			BatteryLowHideDataReg = REG_BATTERY_FAULT;
+			g_Ram.ramGroupH.HideDate.all = 0;
+			WriteToEeprom(BatteryLowHideDataReg, &g_Ram.ramGroupH.HideDate, 1);	// то записали состояние КЗ
+		}
+	}
+
+	if (g_Ram.ramGroupH.HideDate.all != 0 && (g_Ram.ramGroupB.DevDate.all >= (g_Ram.ramGroupH.HideDate.all + 1536)))// || g_Ram.ramGroupB.DevDate.bit.Year == 0)
+	{
+		p->outDefects.Dev.bit.BatteryLow = 1;
+	}
 }
 
 void Core_Protections18kHzUpdate(TCoreProtections *p)
@@ -786,3 +830,21 @@ void Core_Protections18kHzUpdate(TCoreProtections *p)
 	}
 
 }
+
+// ToDo проверить в режиме пожарки!
+void Core_ProtectionFireControl(void)
+{
+	if (g_Ram.ramGroupB.PlaceType != ptFire) return;
+
+	if ((g_Ram.ramGroupA.StateTs.bit.Closing && !g_Ram.ramGroupA.StateTu.bit.Du)||(g_Ram.ramGroupA.StateTs.bit.Opening && !g_Ram.ramGroupA.StateTu.bit.Mu))
+	{
+		if((g_Core.Protections.FireContErr_Timer++ >= 1*Prd10HZ) && (g_Core.Protections.outDefects.Proc.bit.FireContErr == 0))
+		{
+			g_Core.Protections.outDefects.Proc.bit.FireContErr = 1;
+			g_Core.Protections.FireContErr_Timer = 0;
+		}
+	}
+}
+
+
+

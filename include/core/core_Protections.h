@@ -77,6 +77,7 @@
 #define Mufta_CODE			5
 #define MuDuDef_CODE		6
 #define SoftStarter_CODE	7
+#define FireContactorErr_CODE 8
 
 #define Uv_CODE				11
 #define Ov_CODE				12
@@ -97,10 +98,11 @@
 #define Th_BCD_CODE			37
 #define Tl_BCD_CODE			38
 #define NoBCP_Connect_CODE	31
-#define BCP_ErrorType_CODE	40
 
-#define MpoMpzError_CODE	41
+#define BCP_ErrorType_CODE	40
+#define BatteryLow_CODE		41
 #define BlueNoLaunch_CODE	42
+
 
 //--------------------- Макросы --------------------------------------------
 #define PRT_CFG_SET(CanBeReseted, Level, Bit, Hyst) \
@@ -154,12 +156,13 @@ typedef struct {
 		Uns					NoMoveFlag;
 		Bool				ShcReset;			// Флаг по которому сбрасывается КЗ
 		Uns					FaultDelay;			// Пауза после инициализации для включения защит
-		Uns					MpoMpzErrorTimer;
 		Uns					BcpTypeDubl;		// параметр для определения ошибки "не верный тип БКП"
+		Uns					BcpTypeTimer;
 		Uns					SoftStarterFlag;	// flag что авария была но снялась
 		Uns					SoftStarterTimer;   // Таймер для сброса неисправности и выставления аварии
 		Uns					MoveOnFlag;			// флаг что было начато движение (для работы с УПП)
 		Uns					SoftStarterConnTimer;
+		Uns					FireContErr_Timer;	// таймер для определения не замкнутости контактора в режиме пожарки
 
 }TCoreProtections;
 
@@ -169,10 +172,12 @@ typedef struct {
 void Core_ProtectionsInit(TCoreProtections *);			// Инициализация модуля защит
 void Core_Protections18kHzUpdate(TCoreProtections *);	// Реакция системы на срабатывание защит
 void Core_Protections50HZUpdate(TCoreProtections *);	// Реакция системы на срабатывание защит 50 хз
+void Core_Protections50HZUpdate2(TCoreProtections *);	// Реакция системы на срабатывание защит 50 хз
 void Core_ProtectionsReset(TCoreProtections *);			// Сброс защит при повторном пуске
 void Core_ProtectionsClear(TCoreProtections *);			// Сброс всех защит
 void Core_ProtectionsEnable(TCoreProtections *);		// Включение/Выключение защит
 void Core_DevProc_FaultIndic(TCoreProtections *);		// Индикация ошибок устройства и технологического процесса
 void EngPhOrdPrt(TCoreProtections *);					// неверное чередование фаз двигателя
+void Core_ProtectionFireControl(void);					// конероль контакторов для пожарки
 
 #endif

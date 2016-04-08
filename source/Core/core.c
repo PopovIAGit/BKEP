@@ -16,9 +16,6 @@
 TFM25V10 Eeprom1;
 TFM25V10 Eeprom2;
 
-//Uns LVS_flag  	 = 0;
-//Uns ShnModeTimer = 0;
-
 TCore	g_Core;
 
 //выбор микросхем
@@ -134,9 +131,6 @@ void Core_CalibStop (TCore *p)
 
 	if(p->Status.bit.Stop) return;
 
-	//if((p->MotorControl.RequestDir < 0) && (p->MotorControl.TargetPos <= 0)) StopFlag = True;
-	//if((p->MotorControl.RequestDir > 0) && (p->MotorControl.TargetPos >= 0)) StopFlag = True;
-
 	if((p->MotorControl.RequestDir < 0) && (p->MotorControl.TargetPos <= g_Ram.ramGroupC.BreakZone)) StopFlag = True;
 	if((p->MotorControl.RequestDir > 0) && (p->MotorControl.TargetPos >= -g_Ram.ramGroupC.BreakZone)) StopFlag = True;
 
@@ -247,7 +241,7 @@ void StopPowerControl(void)
 	g_Core.VlvDrvCtrl.StartDelay = (Uns)START_DELAY_TIME; // Выставляем задержку перед следующим пуском
 	g_Core.TorqObs.ObsEnable = false;
 	g_Core.Protections.SoftStarterTimer = 0;
-	g_Core.Protections.MoveOnFlag = 0;
+	g_Core.Protections.MoveOnFlag 	= 0;
 	g_Core.Protections.SoftStarterFlag = 0;
 	g_Core.Protections.SoftStarterConnTimer = 0;
 }
@@ -279,24 +273,20 @@ void StartPowerControl(TValveCmd ControlWord)
 		case vcwClose:
 			g_Core.MotorControl.RequestDir = -1;
 			g_Core.MotorControl.WorkMode = wmStart;
-		//	g_Ram.ramGroupH.ContGroup = cgClose;
 			break;
 		case vcwOpen:
 			g_Core.MotorControl.RequestDir = 1;
 			g_Core.MotorControl.WorkMode = wmStart;
-		//	g_Ram.ramGroupH.ContGroup = cgOpen;
 			break;
 		case vcwTestClose:
 			g_Core.MotorControl.RequestDir = -1;
 			g_Core.MotorControl.WorkMode = wmStart;
 			g_Core.Status.bit.Test = 1;
-			//g_Ram.ramGroupH.ContGroup = cgClose;
 			break;
 		case vcwTestOpen:
 			g_Core.MotorControl.RequestDir = 1;
 			g_Core.MotorControl.WorkMode = wmStart;
 			g_Core.Status.bit.Test = 1;
-		//	g_Ram.ramGroupH.ContGroup = cgOpen;
 			break;
 	}
 }
@@ -307,16 +297,6 @@ void Core_ControlMode(TCore *p) // 50 Гц
     p->Status.bit.Mufta = p->Protections.outFaults.Proc.bit.Mufta;
 
 	// выставляем состояние замкнутости контакторов МПО МПЗ
-
-    if(p->Status.bit.Stop == 1 && (CONTACTOR_1_STATUS || CONTACTOR_2_STATUS) && p->Protections.MpoMpzErrorTimer++ >= (2 * Prd50HZ))
-    {
-    	p->Protections.outFaults.Dev.bit.MpoMpzError = 0;
-
-    }
-    else if (p->Status.bit.Stop == 0)
-    {
-    	p->Protections.MpoMpzErrorTimer = 0;
-    }
 
     if(p->Status.bit.Stop)
     {
@@ -361,6 +341,7 @@ static void StopMode(void)
 			g_Core.MotorControl.ShnControlErrTimer = 0;
 			g_Ram.ramGroupA.Torque 			= 0;		// отображаем момент
 			g_Ram.ramGroupH.ContGroup 		= cgStop; 	// Подали команду на стоп контакторам
+
 		}
 	}
 	else
@@ -371,7 +352,8 @@ static void StopMode(void)
 		g_Ram.ramGroupH.ContGroup 		= cgStop; 	// Подали команду на стоп контакторам
 	}
 
-
+	g_Core.Protections.MoveOnFlag 	= 0;
+	g_Core.MotorControl.accelTimer          = 0;		// таймер разгона
 }
 
 static void MoveMode(void)
@@ -414,11 +396,18 @@ static void MoveMode(void)
 
 void Protections_MuffFlag(void)
 {
-	/*if(g_Core.MotorControl.WorkMode != wmMove)
+	if(g_Core.Status.bit.Stop)				// Выключаем защиту от муфты в стопе
 	{
 		g_Core.MotorControl.MufTimer = 0;
 		return;
-	}*/
+	}
+
+	if (g_Ram.ramGroupC.DriveType == dt50000_F48 	//Если тип привода - ЭПЦР50000
+	    && g_Core.MotorControl.accelTimer < 1200)	//и таймер разгона еще не насчитал (400 = 6 сек * 200 hz)
+	{
+		g_Core.MotorControl.accelTimer++;			// выходим из функции, муфту не считаем
+		return;
+	}
 
 	if (g_Ram.ramGroupA.Torque > g_Core.MotorControl.TorqueSet)
 	{
@@ -437,22 +426,6 @@ void Protections_MuffFlag(void)
 		if (g_Core.MotorControl.MufTimer) g_Core.MotorControl.MufTimer--;
 	}
 
-	/*if(g_Ram.ramGroupA.Torque < g_Core.MotorControl.TorqueSet)
-	{
-		//g_Core.MotorControl.MufTimer = 0;
-		if (g_Core.MotorControl.MufTimer) g_Core.MotorControl.MufTimer--;
-	}
-	else {
-		if (g_Core.MotorControl.MufTimer >= (80 * g_Ram.ramGroupB.MuffTimer)) //(Prd200HZ*0.4)
-		{
-			g_Core.Protections.MuffFlag200Hz = 1;	//  1 выставляем муфту если в течении секунды момент больше заданного
-		} else
-		{
-			g_Core.MotorControl.MufTimer+=4;
-		}
-	}*/
-
-	//+//if ()
 }
 
 static void PlugBreakMode(void)
@@ -536,17 +509,26 @@ static void ShnStopMode(void)
 
 static void ShnStartMode(void)
 {
-
 	switch (g_Core.MotorControl.ShnControlStep)
 	{
-	case 0: g_Ram.ramGroupATS.Control1.all = 0;
-			g_Core.MotorControl.ShnControlStep = 1; break;
+	case 0:
+		if (g_Ram.ramGroupATS.State1.bit.ReadyToSwitchOn == 0)
+		{
+			g_Ram.ramGroupATS.Control1.all = 0;
+			g_Core.MotorControl.ShnControlStep = 1;
+		}
+		else
+		{
+			g_Ram.ramGroupATS.Control1.all = 0xb;
+			g_Core.MotorControl.ShnControlStep = 1;
+		}
+		break;
 	case 1:
 			g_Ram.ramGroupATS.Control1.bit.ResetFaults = 1;
 			g_Core.MotorControl.ShnControlStep = 2;
 			break;
 	case 2:
-		if(g_Ram.ramGroupATS.State1.bit.Malfunction == 0)
+		if(g_Ram.ramGroupATS.State1.bit.Malfunction == 0 && g_Ram.ramGroupATS.State1.bit.ReadyToSwitchOn == 0)
 		{
 			g_Ram.ramGroupATS.Control1.all = 0x06;
 			g_Core.MotorControl.ShnControlStep = 3;
@@ -568,8 +550,6 @@ static void ShnStartMode(void)
 		}
 		break;
 	}
-
-
 }
 
 void Core_LowPowerControl(TCore *p)
@@ -674,8 +654,13 @@ void Core_MuDuControl(TCore *p)
 			break;
 		case mdSelect:
 			{
+				if(g_Ram.ramGroupB.PlaceType == ptFire)
+				{
+					g_Ram.ramGroupB.MuDuSetup = mdOff;
+					break;
+				}
 
-					if(!g_Ram.ramGroupA.StateTu.bit.Mu && !g_Ram.ramGroupA.StateTu.bit.Du)
+				if(!g_Ram.ramGroupA.StateTu.bit.Mu && !g_Ram.ramGroupA.StateTu.bit.Du)
 					{
 						if(p->MuDuDefTimer++ > (2 * Prd10HZ))
 						{
@@ -735,11 +720,12 @@ void Core_MuDuControl(TCore *p)
 void Core_OnOff_TEN(TCoreTemper *t)
 {
 	g_Ram.ramGroupA.TemperBKP = g_Ram.ramGroupH.BKP_Temper + g_Ram.ramGroupC.CorrTemper;
-	if (g_Ram.ramGroupA.TemperBKP >= g_Ram.ramGroupC.TenOffValue)
+	if (g_Ram.ramGroupA.TemperBKP >= g_Ram.ramGroupC.TenOffValue) 		// если температура больше температуры выкючения - выключаем = 1
 		t->OnOffTEN = TEN_OFF;
-	else if (g_Ram.ramGroupA.TemperBKP <= g_Ram.ramGroupC.TenOnValue)
-		t->OnOffTEN = TEN_ON;
+	else if (g_Ram.ramGroupA.TemperBKP <= g_Ram.ramGroupC.TenOnValue)	// иначе если температура ниже температуры включения - включаем = 0
+		t->OnOffTEN = TEN_ON ;
 }
+
 
 
 

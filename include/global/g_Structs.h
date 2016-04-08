@@ -56,7 +56,8 @@ typedef union _TStatusReg {
 		Uns MuDu:1;				// 8     Местное управление
      	Uns Ten:1;        		// 9     Включен ТЕН
      	Uns EnableBluetooth:1;  // 10    Резервное питание
-		Uns Rsvd:2;			    // 11-12	 Резерв
+     	Uns MiddlePosition:1;	// 11    Промежуточное положение
+		Uns Rsvd:1;			    // 11-12	 Резерв
 		Uns Defect:1;			// 13	 Неисправность
 		Uns Rsvd2:2;		    // 14 -15 	Резерв
 	} bit;
@@ -105,7 +106,7 @@ typedef struct _TPduData {
 #define PROC_DRV_T_MASK 	0x0040
 #define PROC_RESET_MASK		0x00A1
 //#define PROCESS_EVLOG_MASK	0x00A1
-#define PROCESS_EVLOG_MASK	0x01F3
+#define PROCESS_EVLOG_MASK	0x03F3
 typedef union _TProcessReg {
 	Uns all;
 	struct {
@@ -118,7 +119,8 @@ typedef union _TProcessReg {
 		Uns Mufta:1;		// 6	 Муфта
 		Uns MuDuDef:1;		// 7     Ошибка по дискретным входам Му/Ду
 		Uns SoftStarter:1;	// 8	 Ошибка УПП
-		Uns Rsvd:7;			// 9-15  Резерв
+		Uns FireContErr:1;	// 9	 не замкнут конитактор в режиме пожрка
+		Uns Rsvd:6;			// 10-15  Резерв
 	} bit;
 } TProcessReg;
 
@@ -199,7 +201,7 @@ typedef union _TDeviceReg {
 		Uns Dac:1;			// 9     Сбой ЦАП
 		Uns LowPower:1;		// 10     Выключение БКД
 		Uns NoBCP_Connect:1;// 11   нет связи с БКП
-		Uns MpoMpzError:1;	// 12   Ошибка МПО МПЗ
+		Uns BatteryLow:1;	// 12   Замена батарейки через 3 года
 		Uns BlueNoLaunch:1;	// 13	не запустился БКЭП
 		Uns BCP_ErrorType:1;// 14	не верный тип БКП
 		Uns Rsvd:1;       	// 15 Резерв

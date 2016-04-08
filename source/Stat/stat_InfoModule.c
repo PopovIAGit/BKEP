@@ -679,8 +679,7 @@ __inline Bool FuncFive(TInfoModule *p, Byte LogType, Uns RecordNum)
 
 
 		}
-
-		CurrentIndex--;								// В циклах лишнее инкрементирование
+	CurrentIndex--;								// В циклах лишнее инкрементирование
 
 		//for(i=0; i<2000; i++) asm("NOP");
 		//p->WaitTime = 5;

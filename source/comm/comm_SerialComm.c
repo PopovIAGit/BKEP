@@ -76,7 +76,6 @@ void InitChanelAsuModbus(TMbHandle hPort)
 //---------------------------------------------------
 void InitChanelShnModbus(TMbHandle hPort)
 {
-	//TODO УПП связь init
 	hPort->Params.ChannelID   = SHN_SCI_ID;
 	hPort->Params.Mode     = MB_MASTER;
 	hPort->Params.Slave    = 1;//g_Ram.ramGroupB.RS_STATION;
@@ -358,7 +357,6 @@ __inline Byte WriteData(Uns Addr, Uns *Data, Uns Count)
 			return EX_ILLEGAL_DATA_VALUE;
 	}
 
-	//TODO проверка на разрешение записи по Паролю
 	if (!g_Core.menu.EnableEdit(Val->PaswwPrt))
 	{
 		return FR_SUCCESS;

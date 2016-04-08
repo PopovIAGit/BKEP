@@ -515,7 +515,6 @@ void GetCurrentCmd(TStat *s)
 		}
 		if (!g_Core.VlvDrvCtrl.EvLog.Source) g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_BLOCK;
 
-		//TODO чё такое
 		LogControlWord = LogControlWord | g_Core.VlvDrvCtrl.EvLog.Source;
 		g_Core.VlvDrvCtrl.EvLog.Source = 0;
 	}

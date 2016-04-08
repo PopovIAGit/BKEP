@@ -377,8 +377,9 @@ typedef struct _TRamGroupH
 	Uns             CycleCnt;            // H10. 320 Счетчик циклов
 	Uns             TemperBCPFault;      // H11. 321 запись аварии ТЕМПЕРАТУРА БКП 110
 	Uns				CmdButton;			 // H12. 322 Команда с ручек управления
-	Uns				BkpType;			 // H13. тип БКП для выставления соответсвующего типа привода
-	Uns				Rsvd1[2];			 // H14-15. 323-325 Резерв
+	Uns				BkpType;			 // H13. 323 тип БКП для выставления соответсвующего типа привода
+	TDateVar 		HideDate;			 // H14. 324 Дата
+	Uns				Rsvd1;			 	 // H15. 325 Резерв
 	Uns				TransCurr;			 // H16. 326 Ток перехода
 	TCubArray		TqCurr;				 // H17-36. 327-346 Ток поверхности
 	TCubArray		TqAngUI;			 // H37-56. 347-366 Углы нагрузки
@@ -588,13 +589,6 @@ typedef struct TRam
 #define REG_TASKCLOSE			GetAdr(ramGroupD.TaskClose)
 #define REG_RSRESET				GetAdr(ramGroupD.RsReset)
 
-/*
-#define GLOBAL_REG_GR		0
-#define GLOBAL_COUNT_GR		1
-
-#define REG_GR				GetAdr(ramGroup.STATUS)
-#define COUNT_GR			30
-*/
 
 #define REG_CALIB_STATE		GetAdr(ramGroupH.CalibState)
 #define REG_CALIB_CLOSE		GetAdr(ramGroupH.ClosePosition)
@@ -607,67 +601,15 @@ typedef struct TRam
 #define REG_SHC_FAULT		GetAdr(ramGroupH.ScFaults)
 #define REG_MUFF_FAULT		GetAdr(ramGroupH.MuffFault)
 #define REG_TEMP_BCP_FAULT	GetAdr(ramGroupH.TemperBCPFault)
+#define REG_BATTERY_FAULT	GetAdr(ramGroupH.HideDate)
 
 #define REG_CONTROL_ATS48	GetAdr(ramGroupATS.Control1) //540
-/*
-#define REG_TASK_TIME		GetAdr(ramGroupD.TASK_TIME)
-#define REG_TASK_DATE		GetAdr(ramGroupD.TASK_DATE)
-//-------- СКРЫТЫЕ ПАРАМЕТРЫ
-#define REG_PASSW1_NEW		GetAdr(ramGroupF.PASSW1)
-#define REG_PASSW2_NEW		GetAdr(ramGroupF.PASSW2)
-#define REG_REV_ERR_VALUE	GetAdr(ramGroupF.REV_ERR_VALUE)
-#define REG_LAST_MIN		GetAdr(ramGroupF.LAST_MIN)
-#define REG_LAST_SEC		GetAdr(ramGroupF.LAST_SEC)
-#define REG_LAST_STATUS		GetAdr(ramGroupF.LAST_STATUS)
-#define REG_CALIB_CLOSE		GetAdr(ramGroupF.CLB_CLOSE)
-#define REG_CALIB_OPEN		REG_CALIB_CLOSE+2
-#define REG_CALIB_STATUS	GetAdr(ramGroupF.CLB_STATUS)
-//-------- ФИЛЬТРЫ
-#define REG_SIN_FILTER_TF	GetAdr(ramGroupC.SIN_TF)
-#define REG_RMS_FILTER_TF	GetAdr(ramGroupC.RMS_TF)
-#define REG_TEMP_FILTER_TF	GetAdr(ramGroupC.TEMP_TF)
-#define REG_ISOL_FILTER_TF	GetAdr(ramGroupC.ISO_TF)
-//-------- ЗАЩИТЫ
-#define REG_INOM			GetAdr(ramGroupC.INOM)
-#define REG_OVER_VOL_TIME	GetAdr(ramGroupC.OVER_VOL_TIME)
-#define REG_UNDER_VOLT_TIME	GetAdr(ramGroupC.UNDER_VOLT_TIME)
-#define REG_OVER_VOL_TIME_SHTDWN	GetAdr(ramGroupC.OVER_VOL_TIME_SHTDWN)
-#define REG_UNDER_VOLT_TIME_SHTDWN	GetAdr(ramGroupC.UNDER_VOLT_TIME_SHTDWN)
-#define REG_VSK_TIME		GetAdr(ramGroupC.VSK_TIME)
-#define REG_BV_TIME			GetAdr(ramGroupC.BV_TIME)
-#define REG_TEST_ISO_TIME	GetAdr(ramGroupC.TEST_ISO_TIME)
-#define REG_OVER_CURRENT_TIME	GetAdr(ramGroupC.OVER_CURRENT_TIME)
-#define REG_TEMP_MOTOR_TIME	GetAdr(ramGroupC.TEMP_MOTOR_TIME)
-#define REG_PHL_TIME		GetAdr(ramGroupC.PHL_TIME)
-#define REG_ISKEW_TIME		GetAdr(ramGroupC.ISKEW_TIME)
-#define REG_TEMP_HIGH_TIME	GetAdr(ramGroupC.TEMP_HIGH_TIME)
-#define REG_TEMP_LOW_TIME	GetAdr(ramGroupC.TEMP_LOW_TIME)
-#define REG_CHANGE_RST		GetAdr(ramGroupC.CHANGE_RST)
-#define REG_CHANGE_UVW_MOVE		GetAdr(ramGroupC.CHANGE_UVW_MOVE)
-#define REG_CHANGE_UVW_STOP		GetAdr(ramGroupC.CHANGE_UVW_STOP)
-#define REG_TEST_MOTOR_SC_TIME  GetAdr(ramGroupC.TEST_MOTOR_SC_TIME)
 
-#define REG_TEMP_MOTOR_ENABLE_LEVEL		GetAdr(ramGroupC.TEMP_MOTOR_ENABLE_LEVEL)
-#define REG_TEMP_MOTOR_DISABLE_LEVEL  	GetAdr(ramGroupC.TEMP_MOTOR_DISABLE_LEVEL)
-
-#define REG_GEAR_RATIO		GetAdr(ramGroupC.GEAR_RATIO)
-#define REG_FACTORY_NUMBER	GetAdr(ramGroupC.FACTORY_NUMBER)
-#define REG_PRODUCT_DATE	GetAdr(ramGroupC.PRODUCT_DATE)
-
-#define REG_TIME_TU			GetAdr(ramGroupB.TIME_TU)
-#define REG_INDICATOR_TYPE	GetAdr(ramGroupB.INDICATOR_TYPE)
-#define REG_LOCK_CONTROL	GetAdr(ramGroupB.LOCK_CONTROL)
-#define REG_TEMP_SENS_TYPE	GetAdr(ramGroupB.TEMP_SENS_TYPE)
-#define REG_LEVEL_DYN_BRAKE_BIG	GetAdr(ramGroupB.LEVEL_DYN_BRAKE_BIG)
-*/
 #define REG_RS_BAUD_RATE	GetAdr(ramGroupB.RsBaudRate)
 
 // Глобальные переменные модуля
 #define REG_VER_PO			GetAdr(ramGroupA.VersionPO)
 #define REG_SUBVER_PO		GetAdr(ramGroupC.SubVersionPO)
-
-//#define IsImpulseMode		(!g_Ram.ramGroupA.digitalMode.all)
-//#define IsPotentialMode		(g_Ram.ramGroupA.digitalMode.all)
 
 // Коды блокировки
 #define LOCK_MPU			BIT0	// Блокировка МПУ

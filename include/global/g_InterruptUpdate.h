@@ -146,7 +146,7 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(GetCurrentCmd,					&g_Stat),
 	PrdElemInit(Core_MenuDisplay,				&g_Core.menu),
 	PrdElemInit(Core_Protections50HZUpdate,		&g_Core.Protections),
-	//PrdElemInit(Comm_TuTsUpdate,				&g_Comm.digitInterface),
+	PrdElemInit(Core_Protections50HZUpdate2,	&g_Core.Protections),
 	PrdElemInit(Comm_CommandUpdate,				&g_Comm),
 	//PrdElemInit(Core_ProtectionI2TUpdate,		&g_Core.Protections.I2t)
 

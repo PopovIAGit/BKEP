@@ -181,6 +181,8 @@ void g_Ram_Update(TRam *p)
     	TU_24_220 = 0;
     }
 
+    p->ramGroupA.Status.bit.MiddlePosition = !p->ramGroupA.Faults.Proc.bit.NoCalib & !p->ramGroupA.Status.bit.Opened & !p->ramGroupA.Status.bit.Closed;
+
     ReWriteParams();
 
 }

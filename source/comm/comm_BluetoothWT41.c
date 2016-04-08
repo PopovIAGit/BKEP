@@ -240,11 +240,8 @@ void BluetoothActivation(TBluetoothHandle bPort)
 
 	if (bPort->TimerActive.Counter<(bPort->TimerActive.Timeout-1800) && bPort->Connect==true)
 	{
-		//TODO на время отладки отключаю
 		bPort->Connect=false;
 		StartTimer(&bPort->TimerActive);
-		/*p->EvLog.Source = CMD_SRC_MPU;
-		p->EvLog.Source = CMD_SRC_MPU;*/
 	}
 
 	if (!TimerPending(&bPort->TimerActive))

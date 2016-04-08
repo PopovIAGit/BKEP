@@ -81,6 +81,7 @@ typedef struct _TDmControl {
 	Uns 		ShnControlStep;			// Шаги для работы упп
 	Uns 		ShnControlErrTimer;		// Таймер остановки если упп не отработает
 	Uns 		ShnControlErr;			// ошибка отработки упп
+	Uns			accelTimer;				// Таймер разгона. Пока он считает, муфта не работает
 } TDmControl;
 
 typedef struct _TCoreTemper {

@@ -150,7 +150,6 @@ void Comm_ControlModbusUpdateAltistar48(TComm *p)
 	//
 
 }
-//TODO test read write
 Uns CommandATS48=0;
 
 //---------------------------------------------------
@@ -159,8 +158,8 @@ void Comm_Update(TComm *p)
 
 	//Uint16 lAddr;
 
-	if (g_Comm.Bluetooth.ModeProtocol == 0)
-	{
+//	if (g_Comm.Bluetooth.ModeProtocol == 0)
+//	{
 		// Команда на сброс связи
 		if(g_Ram.ramGroupD.RsReset != 0 )
 		{
@@ -172,9 +171,9 @@ void Comm_Update(TComm *p)
 		}
 
 		ModBusUpdate(&g_Comm.mbAsu); 	// slave канал связи с верхним уровнем АСУ
-	}
+	//}
 
-	if (g_Comm.Bluetooth.ModeProtocol == 0 && g_Ram.ramGroupB.StopMethod == smDynBreak)
+	if (/*g_Comm.Bluetooth.ModeProtocol == 0 &&*/ g_Ram.ramGroupB.StopMethod == smDynBreak)
 	{
 		ModBusUpdate(&g_Comm.mbShn);  // master канал связи с устройством плавного пуска
 
@@ -188,41 +187,32 @@ void Comm_Update(TComm *p)
 				mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.State1), 1);
 				break;
 			case 2:
-				mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.State2), 1);
+				mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.LFT), 1);
 				break;
 			case 3:
-				mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.State3), 1);
-
-				break;
-
-			case 4:
-				mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.LFT), 1);
-
-				break;
-			case 5:
 				mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.PHP), 1);
 
 				break;
-			case 6:
-					if(g_Ram.ramGroupATS.PHP == 1)
+			case 4:
+				/*	if(g_Ram.ramGroupATS.PHP == 1 && g_Core.MotorControl.WorkMode == wmMove)
 					{
 						mb_write_ATS48(&g_Comm,GetAdr(ramGroupATS.PHP), 1, 0);
 					}
+					else if (g_Ram.ramGroupATS.PHP == 0 && g_Core.MotorControl.WorkMode != wmMove)
+					{
+						mb_write_ATS48(&g_Comm,GetAdr(ramGroupATS.PHP), 1, 1);
+					}*/
+				if(g_Ram.ramGroupATS.PHP == 1)
+									{
+										mb_write_ATS48(&g_Comm,GetAdr(ramGroupATS.PHP), 1, 0);
+									}
 				break;
-			case 7:
+			case 5:
 				if (g_Ram.ramGroupATS.Control1.all != 0)
 				{
 					mb_write_ATS48(&g_Comm, GetAdr(ramGroupATS.Control1), 1,
 							g_Ram.ramGroupATS.Control1.all);
 				}
-				break;
-			case 8:
-				if (g_Ram.ramGroupATS.Control2 != 0)
-				{
-					mb_write_ATS48(&g_Comm, GetAdr(ramGroupATS.Control2), 1,
-							g_Ram.ramGroupATS.Control2);
-				}
-				CommandATS48 = 0;
 				break;
 
 			}
@@ -267,7 +257,7 @@ void Comm_50HzCalc(TComm *p)
 	//Кнопка сброса аварий на лицевой панели
 	if (BTN_RESET_ALARM == 0) //&& (p->btn_reset_alarmFlag == 0))
 	{
-		if (p->btn_reset_alarmTimer++ >= 1 * Prd50HZ)
+		if (p->btn_reset_alarmTimer++ >= 2 * Prd50HZ)
 		{
 			g_Ram.ramGroupD.PrtReset = 1;
 			p->btn_reset_alarmFlag = 1;
