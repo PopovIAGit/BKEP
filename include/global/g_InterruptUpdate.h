@@ -19,7 +19,6 @@
 #include "core.h"
 #include "comm.h"
 #include "g_Ram.h"
-//#include "drive.h"
 #include "peref.h"
 #include "stat.h"
 #include "csl/csl_dlog.h"

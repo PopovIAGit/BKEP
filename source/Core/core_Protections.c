@@ -292,8 +292,8 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underColdBCD.Cfg.all = PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL, Tl_BCD_bit, 1);
 	p->underColdBCD.Input = &g_Ram.ramGroupA.Temper;
 	p->underColdBCD.Output = &p->outDefects.Dev.all;
-	p->underColdBCD.EnableLevel = &TemperM40;
-	p->underColdBCD.DisableLevel = &TemperM40;
+	p->underColdBCD.EnableLevel = &TemperM10;
+	p->underColdBCD.DisableLevel = &TemperM10;
 	p->underColdBCD.Timeout = &g_Ram.ramGroupC.BvTime;
 	p->underColdBCD.Scale = PROTECT_SCALE;
 
@@ -310,8 +310,8 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underColdBCP.Cfg.all = PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL, Tl_BCP_bit, 1);
 	p->underColdBCP.Input = &g_Ram.ramGroupA.TemperBKP;
 	p->underColdBCP.Output = &p->outDefects.Dev.all;
-	p->underColdBCP.EnableLevel = &TemperM10;
-	p->underColdBCP.DisableLevel = &TemperM10;
+	p->underColdBCP.EnableLevel = &TemperM40;
+	p->underColdBCP.DisableLevel = &TemperM40;
 	p->underColdBCP.Timeout = &g_Ram.ramGroupC.BvTime;
 	p->underColdBCP.Scale = PROTECT_SCALE;
 
@@ -722,7 +722,7 @@ void Core_Protections50HZUpdate2(TCoreProtections *p)
 		//----------------Замена батарейки!!!----------------------
 
 		// если часы установлены и не записанно - записываем
-	if (g_Ram.ramGroupB.DevDate.bit.Year != 0 && g_Ram.ramGroupH.HideDate.all == 0)
+	/*if (g_Ram.ramGroupB.DevDate.bit.Year != 0 && g_Ram.ramGroupH.HideDate.all == 0)
 	{
 		if (IsMemParReady())
 		{
@@ -745,7 +745,7 @@ void Core_Protections50HZUpdate2(TCoreProtections *p)
 	if (g_Ram.ramGroupH.HideDate.all != 0 && (g_Ram.ramGroupB.DevDate.all >= (g_Ram.ramGroupH.HideDate.all + 1536)))// || g_Ram.ramGroupB.DevDate.bit.Year == 0)
 	{
 		p->outDefects.Dev.bit.BatteryLow = 1;
-	}
+	}*/
 }
 
 void Core_Protections18kHzUpdate(TCoreProtections *p)
