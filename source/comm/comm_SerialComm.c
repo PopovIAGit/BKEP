@@ -284,10 +284,13 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 						//return WriteData(Packet->Addr, Packet->Data, Packet->Count);
 					default: return EX_ILLEGAL_FUNCTION;
 				}
+				case MB_WRITE_REG: return 0; //ToDo реализовать фукцию записи одного регистра, как ипользуемую на объектах АК Транснефть
 			default: return EX_ILLEGAL_FUNCTION;
 		}
 		return 0;
 }
+
+
 //---------------------------------------------------
 /*__inline Byte WriteDataRegsTek(Uns Addr, Uns *Data, Uns Count)
 {

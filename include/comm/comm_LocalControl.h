@@ -39,6 +39,7 @@ typedef union
 		Uns rsvd2:12;	// 4-15 - резерв
 	} bit;
 } TInputData;
+
 // Состояние датчиков холла блока
 typedef union _THallBlock {
 	Uns all;

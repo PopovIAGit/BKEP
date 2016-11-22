@@ -51,8 +51,7 @@ typedef union _TTek_TechReg
 		Uns Opening:1;		// 8
 		Uns Closing:1;		// 9
 		Uns Stop:1;			// 10
-		Uns Rsvd3:2;		// 11-12
-		Uns Ten:1;			// 13
+		Uns Rsvd3:3;		// 11-13
 		Uns Rsvd4:1;		// 14
 		Uns Ready:1;		// 15
 	} bit;
@@ -62,8 +61,21 @@ typedef union _TTek_DefReg
 {
 	Uns all;
 	struct
-	{
-		Uns I2t:1;		// 0	времятоковая защита
+	{	// БУ50
+		Uns Rsvd5:1;		// 0
+		Uns ShC:1;		// 1	короткое замыкание
+		Uns I2t:1;		// 2	времятоковая защита
+		Uns Rsvd3:1;		// 3
+		Uns Phl:1;		// 4	Резерв
+		Uns Rsvd1:5;		// 5-9
+		Uns Uv:1;		// 10	пониженное напряжение входной сети
+		Uns Th:1;		// 11	Перегрев блока
+		Uns Tl:1;		// 12
+		Uns Ov:1;		// 13	Повышенное напряжение входной сети
+		Uns Rsvd2:1;	// 14
+		Uns NoCalib:1;  // 15
+		// БУР
+	/*	Uns I2t:1;		// 0	времятоковая защита
 		Uns ShC:1;		// 1	короткое замыкание
 		Uns Drv_T:1;	// 2	перегрев электродвигателя
 		Uns Uv:1;		// 3	пониженное напряжение входной сети
@@ -78,7 +90,7 @@ typedef union _TTek_DefReg
 		Uns PhOrdU:1;	// 12	Неверное чередование фаз сети
 		Uns PhOrdDrv:1;	// 13	Неверное чередование фаз двигателя
 		Uns DevDef:1;	// 14
-		Uns Rsvd2:1;	// 15
+		Uns NoCalib:1;	// 15*/
 	} bit;
 } TTek_DefReg;
 
@@ -491,21 +503,21 @@ typedef struct _TRamLogBuff
 typedef struct _TRamGroupT
 {
 	TTek_TechReg 	TechReg;			// T1 0 Технологический регистр
-	TTek_DefReg  	DefReg;				// T2 1 Регистр дефектов
-	Uns 		 	PositionPr;			// T3 2 Текущее положение %
+	TTek_DefReg	  	DefReg;				// T2 1 Регистр дефектов
+	Int 		 	PositionPr;			// T3 2 Текущее положение %
 	TTek_ComReg  	ComReg;				// T4 3 Регистр команд
 	Uns 		 	CycleCnt;			// T5 4 Счетчик циклов
 	Uns			 	Rsvd1;				// T6 5 Резерв
 	Uns 		 	Iu;					// T7 6 Ток фазы U
 	Uns 		 	Rsvd2[9];			// T8-16 7-15 Резерв
 	Uns 			Ur;					// T17 16 Напряжение входной сети
-	Uns				Rsvd3;				// T18 17 Резерв
+	Uns				Torque;				// T18 17 Резерв
 	Uns 		 	Speed;				// T19 18 Текущая скорость
 	Uns			 	Rsvd4;				// T20 19 Резерв
-	Uns 		 	Torque;				// T21 20 Текущий момент нагрузки Н*м
+	Uns 		 	Rsvd3;				// T21 20 Текущий момент нагрузки Н*м
 	TTek_Discrete 	TsTu;				// T22 21 ТС/ТУ
 	Uns				Rsvd6[4];			// T23-26 22-25 Резерв
-	Uns				RsStation;			// T27 26 Адрес станции (только для чтения)
+	Uns				RsStation;			// T27 26 Адрес станции (только для чтения) 40027
 	Uns				Rsvd7;				// T28 27 Резерв
 	Uns				Rsvd8[12];			// T29-40 28-39 Резерв
 } TRamGroupT;

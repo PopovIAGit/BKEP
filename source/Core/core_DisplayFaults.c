@@ -19,7 +19,6 @@ void Core_DisplayFaultsInit(TCoreDislpayFaults *p)
 	p->DisplFaultUnion.Load.all = 0;
 }
 
-
 void Core_DisplayFaultsUpdate(TCoreDislpayFaults *p)
 {
 

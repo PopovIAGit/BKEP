@@ -360,6 +360,7 @@ static void MoveMode(void)
 {
 //	if (g_Ram.ramGroupC.DriveType == 1)
 //	{
+		//ToDo ”брать или привести к нормальному виду.
 		if (g_Ram.ramGroupA.Faults.Net.bit.UvR
 				|| g_Ram.ramGroupA.Faults.Net.bit.UvS
 				|| g_Ram.ramGroupA.Faults.Net.bit.UvT
@@ -381,6 +382,8 @@ static void MoveMode(void)
 //	else
 //		g_Ram.ramGroupA.Torque = g_Core.TorqObs.Indication; // отображаем текущий момент
 
+
+		//ToDo —татус выставл€ть в зависимости от типа штока + добавить сигнал не корректной обратной св€зи!!!
 	if (CONTACTOR_1_STATUS && g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
 	if (CONTACTOR_2_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
 
@@ -494,7 +497,6 @@ static void ShnStopMode(void)
 			{
 				g_Ram.ramGroupATS.Control1.all = 0x4000;
 				g_Core.MotorControl.ShnControlStep = 2;
-
 			}
 			break;
 		case 2:
