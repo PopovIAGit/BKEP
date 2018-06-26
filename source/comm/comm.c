@@ -15,7 +15,7 @@
 TComm	g_Comm;
 Uint16 ASU_Data[10];
 Uint16 SHN_Data[10];
-
+Uns CommandATS48=0;
 Uns TmpPosition = 0;
 
 
@@ -152,7 +152,7 @@ void Comm_ControlModbusUpdateAltistar48(TComm *p)
 	//
 
 }
-Uns CommandATS48=0;
+
 
 //---------------------------------------------------
 void Comm_Update(TComm *p)
@@ -183,8 +183,26 @@ void Comm_Update(TComm *p)
 		{
 			CommandATS48++;
 			p->mbShn.Stat.Status.bit.Ready = 0;
+
+
+
 			switch (CommandATS48)
 			{
+			case 1:
+							mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.State1), 1);
+							break;
+			case 2:
+			//	if (g_Ram.ramGroupATS.Control1.all != 0)
+			//	{
+					mb_write_ATS48(&g_Comm, GetAdr(ramGroupATS.Control1), 1,
+							g_Ram.ramGroupATS.Control1.all);
+				//}
+				break;
+			case 3:
+				CommandATS48 = 0;
+				break;
+
+/*
 			case 1:
 				mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.State1), 1);
 				break;
@@ -196,14 +214,14 @@ void Comm_Update(TComm *p)
 
 				break;
 			case 4:
-				/*	if(g_Ram.ramGroupATS.PHP == 1 && g_Core.MotorControl.WorkMode == wmMove)
+					if(g_Ram.ramGroupATS.PHP == 1 && g_Core.MotorControl.WorkMode == wmMove)
 					{
 						mb_write_ATS48(&g_Comm,GetAdr(ramGroupATS.PHP), 1, 0);
 					}
 					else if (g_Ram.ramGroupATS.PHP == 0 && g_Core.MotorControl.WorkMode != wmMove)
 					{
 						mb_write_ATS48(&g_Comm,GetAdr(ramGroupATS.PHP), 1, 1);
-					}*/
+					}
 				if(g_Ram.ramGroupATS.PHP == 1)
 									{
 										mb_write_ATS48(&g_Comm,GetAdr(ramGroupATS.PHP), 1, 0);
@@ -215,7 +233,7 @@ void Comm_Update(TComm *p)
 					mb_write_ATS48(&g_Comm, GetAdr(ramGroupATS.Control1), 1,
 							g_Ram.ramGroupATS.Control1.all);
 				}
-				break;
+				break;*/
 
 			}
 		}
@@ -292,13 +310,27 @@ void Comm_CommandUpdate(TComm *p)
 	DigitalInpUpdate(&p->digitInput); // Вызов функции обработки цифрового сигнала, защита от помех
 	g_Ram.ramGroupA.StateTu.all = p->digitInput.output;
 
-	if (!(p->digitInput.output & 0x20)) // Если не выставлен ТУ дистанции то игнорируем конмады кроме стопа.
+	if (g_Ram.ramGroupB.SwitcherMuDuMode == 1)
 	{
-		p->outputCmdReg = (p->digitInput.output & 0xC);
+	    p->outputCmdReg = (p->digitInput.output & 0xF);
 	}
-	else
+	else if (g_Ram.ramGroupB.SwitcherMuDuMode == 0)
 	{
-		p->outputCmdReg = (p->digitInput.output & 0xF);
+	   if (g_Ram.ramGroupB.MuDuSetup == mdSelect)
+	   {
+		    if (!(p->digitInput.output & 0x20)) // Если не выставлен ТУ дистанции то игнорируем конмады кроме стопа.
+		    {
+			    p->outputCmdReg = (p->digitInput.output & 0xC);
+		    }
+		    else
+		    {
+			    p->outputCmdReg = (p->digitInput.output & 0xF);
+		    }
+	   }
+	   else
+	   {
+	       p->outputCmdReg = (p->digitInput.output & 0xF);
+	   }
 	}
 
 	g_Ram.ramGroupH.TuState = p->outputCmdReg;
@@ -402,32 +434,51 @@ void TekModbusParamsUpdate(void) //??? необходимы проверки
 	tek->TechReg.bit.Opening = g_Ram.ramGroupA.Status.bit.Opening;
 	tek->TechReg.bit.Closing = g_Ram.ramGroupA.Status.bit.Closing;
 	tek->TechReg.bit.Stop    = g_Ram.ramGroupA.Status.bit.Stop;
-	//tek->TechReg.bit.Ten     = g_Ram.ramGroupA.Status.bit.Ten;
+	//tek->TechReg.bit.Ten   = g_Ram.ramGroupA.Status.bit.Ten;
 	tek->TechReg.bit.Ready   = !g_Ram.ramGroupA.Status.bit.Fault;
-	tek->TechReg.bit.Rsvd1 = 0;
-	tek->TechReg.bit.Rsvd4 = 0;
-	tek->TechReg.bit.Rsvd3 = 0;
-
+	tek->TechReg.bit.Rsvd1   = 0;
+	tek->TechReg.bit.Rsvd4   = 0;
+	tek->TechReg.bit.Rsvd3   = 0;
 
 	// Заполняем регистр дефектов
-   tek->DefReg.bit.I2t = g_Ram.ramGroupA.Faults.Load.bit.I2t;
-	tek->DefReg.bit.ShC = (g_Ram.ramGroupA.Faults.Load.bit.ShCU || g_Ram.ramGroupA.Faults.Load.bit.ShCV || g_Ram.ramGroupA.Faults.Load.bit.ShCW);
-	tek->DefReg.bit.Drv_T = 0;
-	tek->DefReg.bit.Uv = (g_Ram.ramGroupA.Faults.Net.bit.UvR || g_Ram.ramGroupA.Faults.Net.bit.UvS || g_Ram.ramGroupA.Faults.Net.bit.UvT || g_Ram.ramGroupA.Faults.Net.bit.BvR || g_Ram.ramGroupA.Faults.Net.bit.BvS || g_Ram.ramGroupA.Faults.Net.bit.BvT);
-	tek->DefReg.bit.Phl = (g_Ram.ramGroupA.Faults.Load.bit.PhlU || g_Ram.ramGroupA.Faults.Load.bit.PhlV || g_Ram.ramGroupA.Faults.Load.bit.PhlW);
-	tek->DefReg.bit.NoMove = 0;//g_Ram.ramGroupA.Faults.Proc.bit.NoMove;
-	tek->DefReg.bit.Ov = (g_Ram.ramGroupA.Faults.Net.bit.OvR || g_Ram.ramGroupA.Faults.Net.bit.OvS || g_Ram.ramGroupA.Faults.Net.bit.OvT);
-	tek->DefReg.bit.Bv = (g_Ram.ramGroupA.Faults.Net.bit.BvR || g_Ram.ramGroupA.Faults.Net.bit.BvS || g_Ram.ramGroupA.Faults.Net.bit.BvT);
-	tek->DefReg.bit.Th = g_Ram.ramGroupA.Faults.Dev.bit.Th_BCP;
-	tek->DefReg.bit.Tl = g_Ram.ramGroupA.Faults.Dev.bit.Tl_BCP;
-	tek->DefReg.bit.PhOrdU = 0;//g_Ram.ramGroupA.Faults.Net.bit.PhOrd;
-	tek->DefReg.bit.PhOrdDrv = g_Ram.ramGroupA.Faults.Proc.bit.PhOrd;
-	tek->DefReg.bit.DevDef 	 = 0;//((g_Ram.ramGroupA.Faults.Dev.all & TEK_DEVICE_FAULT_MASK) != 0); //маску переделать
-//	tek->DefReg.bit.Rsvd5 = 0;
-	tek->DefReg.bit.Rsvd1 = 0;
-	tek->DefReg.bit.Rsvd2 = 0;
-//	tek->DefReg.bit.Rsvd3 = 0;
-
+	if (g_Ram.ramGroupC.TekDefRegSwitch == 0) // Заполняем для БУР
+	{
+	    tek->DefReg.bit.I2t 	= g_Ram.ramGroupA.Faults.Load.bit.I2t;
+	    tek->DefReg.bit.ShC 	= (g_Ram.ramGroupA.Faults.Load.bit.ShCU || g_Ram.ramGroupA.Faults.Load.bit.ShCV || g_Ram.ramGroupA.Faults.Load.bit.ShCW);
+	    tek->DefReg.bit.Drv_T 	= 0;
+	    tek->DefReg.bit.Uv 		= (g_Ram.ramGroupA.Faults.Net.bit.UvR || g_Ram.ramGroupA.Faults.Net.bit.UvS || g_Ram.ramGroupA.Faults.Net.bit.UvT);
+	    tek->DefReg.bit.Phl 	= (g_Ram.ramGroupA.Faults.Load.bit.PhlU || g_Ram.ramGroupA.Faults.Load.bit.PhlV || g_Ram.ramGroupA.Faults.Load.bit.PhlW);
+	    tek->DefReg.bit.NoMove 	= g_Ram.ramGroupA.Faults.Proc.bit.NoMove;
+	    tek->DefReg.bit.Ov 		= (g_Ram.ramGroupA.Faults.Net.bit.OvR || g_Ram.ramGroupA.Faults.Net.bit.OvS || g_Ram.ramGroupA.Faults.Net.bit.OvT);
+	    tek->DefReg.bit.Bv 		= (g_Ram.ramGroupA.Faults.Net.bit.BvR || g_Ram.ramGroupA.Faults.Net.bit.BvS || g_Ram.ramGroupA.Faults.Net.bit.BvT);
+	    tek->DefReg.bit.Rsvd	= 0;
+	    tek->DefReg.bit.Th 		= g_Ram.ramGroupA.Faults.Dev.bit.Th_BCP;
+	    tek->DefReg.bit.Tl 		= g_Ram.ramGroupA.Faults.Dev.bit.Tl_BCP;
+	    tek->DefReg.bit.Rsvd1 	= 0;
+	    tek->DefReg.bit.PhOrdU 	= 0;//g_Ram.ramGroupA.Faults.Net.bit.PhOrd;
+	    tek->DefReg.bit.PhOrdDrv 	= g_Ram.ramGroupA.Faults.Proc.bit.PhOrd;
+	    tek->DefReg.bit.DevDef 	= ((g_Ram.ramGroupA.Faults.Dev.all & TEK_DEVICE_FAULT_MASK) != 0); //маску переделать
+	    tek->DefReg.bit.NoCalib 	= (g_Ram.ramGroupA.Faults.Proc.bit.NoCalib|| g_Ram.ramGroupA.Faults.Proc.bit.NoClose || g_Ram.ramGroupA.Faults.Proc.bit.NoOpen);
+	}
+	else if (g_Ram.ramGroupC.TekDefRegSwitch == 1) //Заполняем для БУ50
+	{
+	    tek->DefReg.bit.I2t 	= 0;
+	    tek->DefReg.bit.ShC 	= (g_Ram.ramGroupA.Faults.Load.bit.ShCU || g_Ram.ramGroupA.Faults.Load.bit.ShCV || g_Ram.ramGroupA.Faults.Load.bit.ShCW);
+	    tek->DefReg.bit.Drv_T 	= g_Ram.ramGroupA.Faults.Load.bit.I2t;
+	    tek->DefReg.bit.Uv 		= 0;
+	    tek->DefReg.bit.Phl 	= (g_Ram.ramGroupA.Faults.Load.bit.PhlU || g_Ram.ramGroupA.Faults.Load.bit.PhlV || g_Ram.ramGroupA.Faults.Load.bit.PhlW);
+	    tek->DefReg.bit.NoMove 	= 0;
+	    tek->DefReg.bit.Ov 		= 0;
+	    tek->DefReg.bit.Bv 		= 0;
+	    tek->DefReg.bit.Rsvd	= 0;
+	    tek->DefReg.bit.Th 		= 0;
+	    tek->DefReg.bit.Tl 		= (g_Ram.ramGroupA.Faults.Net.bit.UvR || g_Ram.ramGroupA.Faults.Net.bit.UvS || g_Ram.ramGroupA.Faults.Net.bit.UvT || g_Ram.ramGroupA.Faults.Net.bit.BvR || g_Ram.ramGroupA.Faults.Net.bit.BvS || g_Ram.ramGroupA.Faults.Net.bit.BvT);
+	    tek->DefReg.bit.Rsvd1 	= g_Ram.ramGroupA.Faults.Dev.bit.Th_BCP;
+	    tek->DefReg.bit.PhOrdU 	= g_Ram.ramGroupA.Faults.Dev.bit.Tl_BCP;
+	    tek->DefReg.bit.PhOrdDrv 	= (g_Ram.ramGroupA.Faults.Net.bit.OvR || g_Ram.ramGroupA.Faults.Net.bit.OvS || g_Ram.ramGroupA.Faults.Net.bit.OvT);
+	    tek->DefReg.bit.DevDef 	= 0;
+	    tek->DefReg.bit.NoCalib 	= (g_Ram.ramGroupA.Faults.Proc.bit.NoCalib|| g_Ram.ramGroupA.Faults.Proc.bit.NoClose || g_Ram.ramGroupA.Faults.Proc.bit.NoOpen);
+	}
 
 	// Регистр команд
 	// При срабатывании одной команды, сбрасываем все
@@ -513,17 +564,22 @@ void TekModbusParamsUpdate(void) //??? необходимы проверки
 			tek->ComReg.bit.SetMu = 0;
 		}*/
 
+
+
 	if(g_Ram.ramGroupA.PositionPr < 0) tek->PositionPr = 0;
-	else tek->PositionPr 	 = g_Ram.ramGroupA.PositionPr/10;
+	else tek->PositionPr = g_Ram.ramGroupA.PositionPr;
+    if(g_Ram.ramGroupA.PositionPr == 9999) tek->PositionPr = 0;
+
 
 	tek->CycleCnt 		 = g_Ram.ramGroupA.CycleCnt;
 	tek->Iu				 = g_Ram.ramGroupA.Iu;
-	tek->Ur				 = g_Ram.ramGroupA.Ur;
+	//tek->Ur				 = g_Ram.ramGroupA.Ur;
 	tek->Torque			 = g_Ram.ramGroupA.Torque;
 	tek->Speed			 = g_Ram.ramGroupA.Speed;
 	tek->RsStation		 = g_Ram.ramGroupB.RsStation;
 
 	//Состояние дискретных входов и выходов
+	/*
 	tek->TsTu.bit.IsDiscrOutActive = (g_Ram.ramGroupG.DiscrOutTest);
 	tek->TsTu.bit.IsDiscrInActive = (g_Ram.ramGroupG.DiscrInTest);
 
@@ -554,5 +610,5 @@ void TekModbusParamsUpdate(void) //??? необходимы проверки
 		g_Comm.digitInterface.Outputs.bit.Closing = tek->TsTu.bit.OutClosing;
 		g_Comm.digitInterface.Outputs.bit.MUDU = tek->TsTu.bit.OutMuDu;
 		g_Comm.digitInterface.Outputs.bit.Defect = tek->TsTu.bit.OutNeispr;
-	}
+	}*/
 }

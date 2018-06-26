@@ -350,16 +350,9 @@ void Peref_50HzCalc(TPeref *p)	// 50 Гц
 
     	default: p->NumCalcTU_50Hz=0; break;
 
-    }*/
-        		g_Comm.digitInterface.dinOpen.inputDIN = p->InDigSignal.sigOpen.Output;
-    			g_Comm.digitInterface.dinClose.inputDIN = p->InDigSignal.sigClose.Output;
-    			g_Comm.digitInterface.dinStopOpen.inputDIN = p->InDigSignal.sigStopOpen.Output;
-    			g_Comm.digitInterface.dinMu.inputDIN = p->InDigSignal.sigMU.Output;
-    			g_Comm.digitInterface.dinDu.inputDIN = p->InDigSignal.sigDU.Output;
-    			g_Comm.digitInterface.dinStopClose.inputDIN = p->InDigSignal.sigStopClose.Output;
-    			g_Comm.digitInterface.dinResetAlarm.inputDIN = p->InDigSignal.sigResetAlarm.Output;
+    }
 
-    /*p->U3fltrOpen.Input 		= p->InDigSignal.sigOpen.Output;
+    p->U3fltrOpen.Input 		= p->InDigSignal.sigOpen.Output;
     p->U3fltrClose.Input 		= p->InDigSignal.sigClose.Output;
     p->U3fltrStopOpen.Input 	= p->InDigSignal.sigStopOpen.Output;
     p->U3fltrMu.Input 			= p->InDigSignal.sigMU.Output;
@@ -383,6 +376,18 @@ void Peref_50HzCalc(TPeref *p)	// 50 Гц
     g_Comm.digitInterface.dinStopClose.inputDIN = p->U3fltrStopClose.Output;
     g_Comm.digitInterface.dinResetAlarm.inputDIN = p->U3fltrResetAlarm.Output;
 	*/
+
+	g_Comm.digitInterface.dinOpen.inputDIN = p->InDigSignal.sigOpen.Output;
+	g_Comm.digitInterface.dinClose.inputDIN = p->InDigSignal.sigClose.Output;
+	g_Comm.digitInterface.dinStopOpen.inputDIN = p->InDigSignal.sigStopOpen.Output;
+	g_Comm.digitInterface.dinMu.inputDIN = p->InDigSignal.sigMU.Output;
+	g_Comm.digitInterface.dinDu.inputDIN = p->InDigSignal.sigDU.Output;
+	g_Comm.digitInterface.dinStopClose.inputDIN = p->InDigSignal.sigStopClose.Output;
+	g_Comm.digitInterface.dinResetAlarm.inputDIN = p->InDigSignal.sigResetAlarm.Output;
+
+
+
+
     peref_ApFilter1Calc(&p->Phifltr);
     if (!g_Core.Status.bit.Stop)
 	p->AngleUI = _IQtoIQ16(p->Phifltr.Output);
@@ -391,13 +396,175 @@ void Peref_50HzCalc(TPeref *p)	// 50 Гц
     peref_ApFilter1Calc(&p->Umfltr);
     p->Umid = _IQtoIQ16(p->Umfltr.Output);
 
-   // p->Imfltr.Input = Mid3ValueUns(p->sinObserver.IU.Output, p->sinObserver.IV.Output, p->sinObserver.IW.Output);
     p->Imfltr.Input = ((p->sinObserver.IV.Output + p->sinObserver.IV.Output + p->sinObserver.IV.Output)/3.0);
     peref_ApFilter3Calc(&p->Imfltr);
     p->Imid = _IQtoIQ16(p->Imfltr.Output);
 
     I2CDevUpdate(p);
 }
+
+void Peref_AvtoCalibTu(TPeref *p)
+{
+    //------------------Автокалибровка ТУ ----------------------------------------
+    Uns Tu_Offset_adr = 0;
+
+    g_Ram.ramGroupC.Tu_Open_Value = p->InDigSignal.sigOpen.Output;
+    g_Ram.ramGroupC.Tu_Close_Value = p->InDigSignal.sigClose.Output;
+    g_Ram.ramGroupC.Tu_StopOpen_Value = p->InDigSignal.sigStopOpen.Output;
+    g_Ram.ramGroupC.Tu_StopClose_Value = p->InDigSignal.sigStopClose.Output;
+    g_Ram.ramGroupC.Tu_Mu_Value = p->InDigSignal.sigMU.Output;
+    g_Ram.ramGroupC.Tu_Du_Value = p->InDigSignal.sigDU.Output;
+    g_Ram.ramGroupC.Tu_ResetAlarm_Value = p->InDigSignal.sigResetAlarm.Output;
+
+    if (g_Ram.ramGroupB.InputType == it220)
+    {
+	if (g_Ram.ramGroupC.Tu_Mpy_Calib == 1 && p->TU_Mpy_Calib_timer <= TU_MPY_CALIB_TIME)
+	{
+	    p->TU_Mpy_Calib_timer++;
+	    if (!InRange(g_Ram.ramGroupC.Tu_Open_Value, 218, 222))
+	    {
+		if (g_Ram.ramGroupC.Tu_Open_Value > 222)
+		    g_Ram.ramGroupC.p_UOpen_Mpy220--;
+		if (g_Ram.ramGroupC.Tu_Open_Value < 218)
+		    g_Ram.ramGroupC.p_UOpen_Mpy220++;
+	    }
+	    if (!InRange(g_Ram.ramGroupC.Tu_Open_Value, 218, 222))
+	    {
+		if (g_Ram.ramGroupC.Tu_Close_Value > 222)
+		    g_Ram.ramGroupC.p_UClose_Mpy220--;
+		if (g_Ram.ramGroupC.Tu_Close_Value < 218)
+		    g_Ram.ramGroupC.p_UClose_Mpy220++;
+	    }
+	    if (!InRange(g_Ram.ramGroupC.Tu_StopClose_Value, 218, 222))
+	    {
+		if (g_Ram.ramGroupC.Tu_StopClose_Value > 222)
+		    g_Ram.ramGroupC.p_UStopClose_Mpy220--;
+		if (g_Ram.ramGroupC.Tu_StopClose_Value < 218)
+		    g_Ram.ramGroupC.p_UStopClose_Mpy220++;
+	    }
+	    if (!InRange(g_Ram.ramGroupC.Tu_StopOpen_Value, 218, 222))
+	    {
+		if (g_Ram.ramGroupC.Tu_StopOpen_Value > 222)
+		    g_Ram.ramGroupC.p_UStopOpen_Mpy220--;
+		if (g_Ram.ramGroupC.Tu_StopOpen_Value < 218)
+		    g_Ram.ramGroupC.p_UStopOpen_Mpy220++;
+	    }
+	    if (!InRange(g_Ram.ramGroupC.Tu_Mu_Value, 218, 222))
+	    {
+		if (g_Ram.ramGroupC.Tu_Mu_Value > 222)
+		    g_Ram.ramGroupC.p_UMu_Mpy220--;
+		if (g_Ram.ramGroupC.Tu_Mu_Value < 218)
+		    g_Ram.ramGroupC.p_UMu_Mpy220++;
+	    }
+	    if (!InRange(g_Ram.ramGroupC.Tu_Du_Value, 218, 222))
+	    {
+		if (g_Ram.ramGroupC.Tu_Du_Value > 222)
+		    g_Ram.ramGroupC.p_UDu_Mpy220--;
+		if (g_Ram.ramGroupC.Tu_Du_Value < 218)
+		    g_Ram.ramGroupC.p_UDu_Mpy220++;
+	    }
+	    if (!InRange(g_Ram.ramGroupC.Tu_Du_Value, 218, 222))
+	    {
+		if (g_Ram.ramGroupC.Tu_Du_Value > 222)
+		    g_Ram.ramGroupC.p_UDu_Mpy220--;
+		if (g_Ram.ramGroupC.Tu_Du_Value < 218)
+		    g_Ram.ramGroupC.p_UDu_Mpy220++;
+	    }
+	    if (!InRange(g_Ram.ramGroupC.Tu_ResetAlarm_Value, 218, 222))
+	    {
+		if (g_Ram.ramGroupC.Tu_ResetAlarm_Value > 222)
+		    g_Ram.ramGroupC.p_UResetAlarm_Mpy220--;
+		if (g_Ram.ramGroupC.Tu_ResetAlarm_Value < 218)
+		    g_Ram.ramGroupC.p_UResetAlarm_Mpy220++;
+	    }
+	}
+	else if(p->TU_Mpy_Calib_timer >= TU_MPY_CALIB_TIME && g_Ram.ramGroupC.Tu_Mpy_Calib == 1)
+	    {
+	    	p->TU_Mpy_Calib_timer = 0;
+	    	g_Ram.ramGroupC.Tu_Mpy_Calib = 0;
+	    	Tu_Offset_adr = GetAdr(ramGroupC.p_UOpen_Mpy220);
+	    	if(IsMemParReady())
+	    	{
+	    		WriteToEeprom(Tu_Offset_adr, &g_Ram.ramGroupC.p_UOpen_Mpy220, 21);
+	    	}
+	    }
+    }
+    else if (g_Ram.ramGroupB.InputType == it24)
+    {
+	if (g_Ram.ramGroupC.Tu_Mpy_Calib == 1 && p->TU_Mpy_Calib_timer <= TU_MPY_CALIB_TIME)
+	{
+	    p->TU_Mpy_Calib_timer++;
+	    if (!InRange(g_Ram.ramGroupC.Tu_Open_Value, 23, 25))
+	    {
+		if (g_Ram.ramGroupC.Tu_Open_Value > 25)
+		    g_Ram.ramGroupC.p_UOpen_Mpy24--;
+		if (g_Ram.ramGroupC.Tu_Open_Value < 23)
+		    g_Ram.ramGroupC.p_UOpen_Mpy24++;
+	    }
+	    if (!InRange(g_Ram.ramGroupC.Tu_Open_Value, 23, 25))
+	    {
+		if (g_Ram.ramGroupC.Tu_Close_Value > 25)
+		    g_Ram.ramGroupC.p_UClose_Mpy24--;
+		if (g_Ram.ramGroupC.Tu_Close_Value < 23)
+		    g_Ram.ramGroupC.p_UClose_Mpy24++;
+	    }
+	    if (!InRange(g_Ram.ramGroupC.Tu_StopClose_Value, 23, 25))
+	    {
+		if (g_Ram.ramGroupC.Tu_StopClose_Value > 25)
+		    g_Ram.ramGroupC.p_UStopClose_Mpy24--;
+		if (g_Ram.ramGroupC.Tu_StopClose_Value < 23)
+		    g_Ram.ramGroupC.p_UStopClose_Mpy24++;
+	    }
+	    if (!InRange(g_Ram.ramGroupC.Tu_StopOpen_Value, 23, 25))
+	    {
+		if (g_Ram.ramGroupC.Tu_StopOpen_Value > 25)
+		    g_Ram.ramGroupC.p_UStopOpen_Mpy24--;
+		if (g_Ram.ramGroupC.Tu_StopOpen_Value < 23)
+		    g_Ram.ramGroupC.p_UStopOpen_Mpy24++;
+	    }
+	    if (!InRange(g_Ram.ramGroupC.Tu_Mu_Value, 23, 25))
+	    {
+		if (g_Ram.ramGroupC.Tu_Mu_Value > 25)
+		    g_Ram.ramGroupC.p_UMu_Mpy24--;
+		if (g_Ram.ramGroupC.Tu_Mu_Value < 23)
+		    g_Ram.ramGroupC.p_UMu_Mpy24++;
+	    }
+	    if (!InRange(g_Ram.ramGroupC.Tu_Du_Value, 23, 25))
+	    {
+		if (g_Ram.ramGroupC.Tu_Du_Value > 25)
+		    g_Ram.ramGroupC.p_UDu_Mpy24--;
+		if (g_Ram.ramGroupC.Tu_Du_Value < 23)
+		    g_Ram.ramGroupC.p_UDu_Mpy24++;
+	    }
+	    if (!InRange(g_Ram.ramGroupC.Tu_Du_Value, 23, 25))
+	    {
+		if (g_Ram.ramGroupC.Tu_Du_Value > 25)
+		    g_Ram.ramGroupC.p_UDu_Mpy24--;
+		if (g_Ram.ramGroupC.Tu_Du_Value < 23)
+		    g_Ram.ramGroupC.p_UDu_Mpy24++;
+	    }
+	    if (!InRange(g_Ram.ramGroupC.Tu_ResetAlarm_Value, 23, 25))
+	    {
+		if (g_Ram.ramGroupC.Tu_ResetAlarm_Value > 25)
+		    g_Ram.ramGroupC.p_UResetAlarm_Mpy24--;
+		if (g_Ram.ramGroupC.Tu_ResetAlarm_Value < 23)
+		    g_Ram.ramGroupC.p_UResetAlarm_Mpy24++;
+	    }
+	}
+	else if(p->TU_Mpy_Calib_timer >= TU_MPY_CALIB_TIME && g_Ram.ramGroupC.Tu_Mpy_Calib == 1)
+	    {
+	    	p->TU_Mpy_Calib_timer = 0;
+	    	g_Ram.ramGroupC.Tu_Mpy_Calib = 0;
+	    	Tu_Offset_adr = GetAdr(ramGroupC.p_UOpen_Mpy220);
+	    	if(IsMemParReady())
+	    	{
+	    		WriteToEeprom(Tu_Offset_adr, &g_Ram.ramGroupC.p_UOpen_Mpy220, 21);
+	    	}
+	    }
+    }
+    //----------------------------------------------------------------------------
+}
+
 
 void Peref_10HzCalc(TPeref *p)	// 10 Гц
 {
@@ -452,10 +619,10 @@ void Peref_10HzCalc(TPeref *p)	// 10 Гц
 	}
 
     //------Настройка коэффициентов и усилителей датчиков тока в зависимости от типа привода----------------------------
-
+// ToDo сделать нормальную автонастройку
 	if (g_Ram.ramGroupC.DriveType != 0)
 	{
-		if (g_Ram.ramGroupC.DriveType < dt4000_G9)
+		if (g_Ram.ramGroupC.DriveType < dt4000_G9 || g_Ram.ramGroupC.DriveType == dt100_A25_S || g_Ram.ramGroupC.DriveType == dt100_A50_S || g_Ram.ramGroupC.DriveType == dt400_B20_S || g_Ram.ramGroupC.DriveType == dt400_B50_S || g_Ram.ramGroupC.DriveType == dt800_V40_S || g_Ram.ramGroupC.DriveType == dt1000_V20_S)
 		{
 			CUR_SENSOR_GAIN = 1;
 			if (g_Ram.ramGroupC.IU_Mpy != 850 || g_Ram.ramGroupC.IV_Mpy != 850 || g_Ram.ramGroupC.IW_Mpy != 850)
@@ -469,7 +636,7 @@ void Peref_10HzCalc(TPeref *p)	// 10 Гц
 				}
 			}
 		}
-		else if (g_Ram.ramGroupC.DriveType < dt10000_D10)
+		else if (g_Ram.ramGroupC.DriveType < dt10000_D10 || g_Ram.ramGroupC.DriveType == dt4000_G9_S || g_Ram.ramGroupC.DriveType == dt4000_G18_S || g_Ram.ramGroupC.DriveType == dt10000_D6_S || g_Ram.ramGroupC.DriveType == dt10000_D12_S)
 		{
 			CUR_SENSOR_GAIN = 0;
 			if (g_Ram.ramGroupC.IU_Mpy != 4000 || g_Ram.ramGroupC.IV_Mpy != 4000 || g_Ram.ramGroupC.IW_Mpy != 4000)

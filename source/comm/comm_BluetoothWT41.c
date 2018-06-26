@@ -704,8 +704,7 @@ void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 	{
 
 
-
-		if (TestCount==4) {
+		/*if (TestCount==4) {
 			StartTimer(&Frame->TimerPost);
 			TestCount++;
 			return;
@@ -714,7 +713,7 @@ void BluetoothTxHandler(TBluetoothHandle bPort, TMbHandle hPort)
 			TestCount++;
 			return;
 		}
-		TestCount++;
+		TestCount++;*/
 
 		if ((Frame->Data - Frame->Buf) < Frame->TxLength){
 		//if ((Frame->TxLength-hPort->Frame.AddCount)>0){

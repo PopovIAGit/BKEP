@@ -183,7 +183,7 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 {
 	Uns Addr=0, Res=0, Tmp=0, i=0;
 
-		Addr = Packet->Addr;// + (Packet->Count - 1);//??? чё за хрень ???
+		Addr = Packet->Addr;
 
 		Tmp  = Packet->Addr + Packet->Count - 1;
 
@@ -194,10 +194,14 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 		else if (Addr==65345)	{Res = 7;}
 		else {Res = 0;}
 
-		if (!Res) {return EX_ILLEGAL_DATA_ADDRESS;}
+		if (!Res && Packet->Request!=MB_REPORT_ID) {return EX_ILLEGAL_DATA_ADDRESS;}
 
 		switch(Packet->Request)
 		{
+
+			case MB_REPORT_ID:
+				memcpy(Packet->Data, &g_Ram.ramGroupC.ProductYear, 2);
+				break;
 			case MB_READ_REGS:
 				switch(Res)
 				{
@@ -284,10 +288,13 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 						//return WriteData(Packet->Addr, Packet->Data, Packet->Count);
 					default: return EX_ILLEGAL_FUNCTION;
 				}
+				case MB_WRITE_REG: return 0; //ToDo реализовать фукцию записи одного регистра, как ипользуемую на объектах АК Транснефть
 			default: return EX_ILLEGAL_FUNCTION;
 		}
 		return 0;
 }
+
+
 //---------------------------------------------------
 /*__inline Byte WriteDataRegsTek(Uns Addr, Uns *Data, Uns Count)
 {
@@ -353,7 +360,7 @@ __inline Byte WriteData(Uns Addr, Uns *Data, Uns Count)
 	if (Addr == REG_CONTROL)
 	{
 		// Если стоит блокировка, то не пропускаем команды, кроме команды стоп
-		if (!(g_Core.VlvDrvCtrl.ActiveControls & CMD_SRC_SERIAL) && (*Data != vcwStop) )
+		if (!(g_Core.VlvDrvCtrl.ActiveControls & CMD_SRC_SERIAL) && (*Data != vcwStop))
 			return EX_ILLEGAL_DATA_VALUE;
 	}
 

@@ -3,8 +3,6 @@
 #include "comm.h"
 #include "g_Ram.h"
 
-Byte testLeds=0;
-
 #define BKP_SCI_ID				SCIA
 //#define BKP_SCI_BAUD			192
 #define BKP_SCI_PARITY			0
@@ -125,10 +123,13 @@ void SciMasterConnBetweenBlockUpdate(TMbBBHandle Port)
 			{
 				Port->Stat.RxNoRespErrCount++;
 				Port->Stat.RxErrCount++;
-				if(Port->Frame.RetryCounter < Port->Params.RetryCount)
+				if (Port->Frame.RetryCounter < Port->Params.RetryCount)
 					Port->Frame.RetryCounter++;
-				else {Port->Frame.ConnFlag = 0;
-					if (Port->Frame.ConnFlagCount>0) Port->Frame.ConnFlagCount--;
+				else
+				{
+					Port->Frame.ConnFlag = 0;
+					if (Port->Frame.ConnFlagCount > 0)
+						Port->Frame.ConnFlagCount--;
 				}
 				Port->TxPacket.Flag = 1;
 			}
@@ -171,10 +172,10 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 
 	SciMasterConnBetweenBlockUpdate(bPort);
 
-	bPort->TxPacket.Data[4] = g_Ram.ramGroupH.BkpIndication.all;  // индикация светодиодов
+	bPort->TxPacket.Data[4]  = g_Ram.ramGroupH.BkpIndication.all;  // индикация светодиодов
 	//bPort->TxPacket.Data[5] = g_Core.Temper.OnOffTEN;			  // управление теном
-	bPort->TxPacket.Data[5] = 0;
-	bPort->TxPacket.Data[5] = (g_Core.Temper.OnOffTEN)&0x01;
+	bPort->TxPacket.Data[5]  = 0;
+	bPort->TxPacket.Data[5]  = (g_Core.Temper.OnOffTEN)&0x01;
 	bPort->TxPacket.Data[5] |= ((g_Ram.ramGroupA.PositionPr==9999)<<1)&0x02;
 	bPort->TxPacket.Data[5] |= ((g_Peref.Display.data==999)<<2)&0x04;
 	bPort->TxPacket.Data[5] |= ((g_Ram.ramGroupA.Faults.Proc.bit.NoOpen==0)<<3)&0x08;
@@ -192,25 +193,23 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 	if(!bPort->RxPacket.Flag) return;
 	bPort->RxPacket.Flag = 0;
 
+    g_Ram.ramGroupA.VersionPOBkp 	= bPort->RxPacket.Data[0] + 5000;
+    BkpEncErr 				= (Uns) bPort->RxPacket.Data[4] << 8;
+    BkpEncErr 				|= (Uns) bPort->RxPacket.Data[3] << 0;
+    BkpEncPostion 			= (Uns) bPort->RxPacket.Data[2] << 8;
+    BkpEncPostion 			|= (Uns) bPort->RxPacket.Data[1] << 0;
+    g_Ram.ramGroupH.Position 		= 32767-BkpEncPostion;
+    g_Ram.ramGroupC.HallBlock.all 	= bPort->RxPacket.Data[5] & 0x1F;
+    g_Ram.ramGroupH.BKP_Temper 		= (int16) bPort->RxPacket.Data[6];
+    if (g_Ram.ramGroupH.BKP_Temper > 128)
+	g_Ram.ramGroupH.BKP_Temper -= 255;
+    g_Core.Status.bit.Ten 		= !(bPort->RxPacket.Data[7] & 0xF);
+    g_Ram.ramGroupH.BkpType 		= (bPort->RxPacket.Data[7] >> 4) & 0xF;
+    g_Ram.ramGroupA.RevErrValue		= BkpEncErr;
 
-	g_Ram.ramGroupA.VersionPOBkp     = bPort->RxPacket.Data[0] + 5000;
-	BkpEncErr  			= (Uns)bPort->RxPacket.Data[4] << 8;
-	BkpEncErr 		   |= (Uns)bPort->RxPacket.Data[3] << 0;
-	BkpEncPostion      	= (Uns)bPort->RxPacket.Data[2] << 8;
-	BkpEncPostion      |= (Uns)bPort->RxPacket.Data[1] << 0;
-	g_Ram.ramGroupH.Position 		= BkpEncPostion;
-	g_Ram.ramGroupC.HallBlock.all   = bPort->RxPacket.Data[5]&0x1F;
-	//g_Ram.ramGroupA.TemperBKP       = (int16)bPort->RxPacket.Data[6];
-	g_Ram.ramGroupH.BKP_Temper      = (int16)bPort->RxPacket.Data[6];//???
-	if (g_Ram.ramGroupH.BKP_Temper > 128) g_Ram.ramGroupH.BKP_Temper -= 255;
-	g_Core.Status.bit.Ten 			= !(bPort->RxPacket.Data[7] & 0xF);
-	g_Ram.ramGroupH.BkpType			= (bPort->RxPacket.Data[7]>>4) & 0xF;
-	g_Ram.ramGroupA.RevErrValue		= BkpEncErr;
+    g_Core.Protections.outFaults.Dev.bit.PosSens = (bPort->RxPacket.Data[2] << 7) & 0x01;
 
-	g_Core.Protections.outFaults.Dev.bit.PosSens = (bPort->RxPacket.Data[5]>>5)&0x01;
-
-	bPort->TxPacket.Flag = 1;
-
+    bPort->TxPacket.Flag = 1;
 }
 
 void SciMasterConnBetweenBlockRxHandler(TMbBBHandle bPort)
@@ -407,7 +406,4 @@ static char timerExpired(unsigned int *Timer)
 	}
 	return 0;
 }
-
-
-
 

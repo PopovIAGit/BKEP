@@ -45,8 +45,8 @@ Outputs
 #define SHN_MODE_TIME			(Uint16)(0.200 * Prd50HZ)
 
 
-#define TEN_OFF				1
-#define TEN_ON				0
+#define TEN_OFF				0
+#define TEN_ON				1
 //--------------------- Макросы --------------------------------------------
 //-------------------- Структуры -------------------------------------------
 
@@ -78,7 +78,8 @@ typedef struct _TDmControl {
 	Uns 		PlugBreakTimer;			// Таймер используемый для торможения противовключением (пауза перед и само противовключение)
 	Uns 		PlugBreakStep;			// Шаги противовключения (Пауза, торможение, выключение)
 	Uns 		DinBreakTimer;			// Таймер используемый для динамического торможения
-	Uns 		ShnControlStep;			// Шаги для работы упп
+	Uns 		ShnControlStepStart;	// Шаги для работы упп
+	Uns			ShnControlStepStop;
 	Uns 		ShnControlErrTimer;		// Таймер остановки если упп не отработает
 	Uns 		ShnControlErr;			// ошибка отработки упп
 	Uns			accelTimer;				// Таймер разгона. Пока он считает, муфта не работает
@@ -140,6 +141,8 @@ void Core_OnOff_TEN(TCoreTemper *);			// функия управления теном на БКП
 void Core_ProtectionsBreakRST(TCoreProtections *);
 
 void Protections_MuffFlag(void);
+
+void Core_TechProgon(void);				// режим тех прогона
 
 extern TCore g_Core;
 extern volatile Uns setTorque;

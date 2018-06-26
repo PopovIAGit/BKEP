@@ -48,7 +48,7 @@ void Core_Init(TCore *p)
 	Core_ProtectionsInit(&p->Protections);	// Защиты
 	Core_DisplayFaultsInit(&p->DisplayFaults);
 
-	p->Status.bit.Stop = 1;					// При включение выставляем стоп
+	p->Status.bit.Stop 			= 1;					// При включение выставляем стоп
 	g_Ram.ramGroupH.ContGroup 		= cgStop;
 }
 
@@ -360,6 +360,7 @@ static void MoveMode(void)
 {
 //	if (g_Ram.ramGroupC.DriveType == 1)
 //	{
+		//ToDo Убрать или привести к нормальному виду.
 		if (g_Ram.ramGroupA.Faults.Net.bit.UvR
 				|| g_Ram.ramGroupA.Faults.Net.bit.UvS
 				|| g_Ram.ramGroupA.Faults.Net.bit.UvT
@@ -382,9 +383,18 @@ static void MoveMode(void)
 //		g_Ram.ramGroupA.Torque = g_Core.TorqObs.Indication; // отображаем текущий момент
 
 
-		//ToDo Статусы выставлять нормально
-	if (CONTACTOR_1_STATUS && g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
-	if (CONTACTOR_2_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
+		//ToDo Статус выставлять в зависимости от типа штока + добавить сигнал не корректной обратной связи!!!
+	if(g_Peref.phaseOrder.Direction == 1)
+	{
+	    if (CONTACTOR_1_STATUS && g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
+	    if (CONTACTOR_2_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
+	}
+	else if(g_Peref.phaseOrder.Direction == -1)
+	{
+	    if (CONTACTOR_2_STATUS && g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
+	    if (CONTACTOR_1_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
+	}
+
 
 	g_Core.Protections.MuffFlag = g_Core.Protections.MuffFlag200Hz;
 
@@ -392,7 +402,6 @@ static void MoveMode(void)
 	{
 		g_Core.MotorControl.WorkMode = wmShnStart;
 		g_Core.Protections.SoftStarterFlag = 0;
-
 	}
 }
 
@@ -459,7 +468,8 @@ static void StartMode(void)
 	if (g_Ram.ramGroupB.StopMethod == smDynBreak)
 	{
 		g_Core.MotorControl.WorkMode = wmShnStart;
-		g_Core.MotorControl.ShnControlStep = 1;
+		g_Core.MotorControl.ShnControlStepStart = 0;
+		g_Core.MotorControl.ShnControlStepStop = 0;
 	}
 	else
 	{
@@ -479,7 +489,7 @@ static void StartMode(void)
 
 static void ShnStopMode(void)
 {
-	switch (g_Core.MotorControl.ShnControlStep)
+	switch (g_Core.MotorControl.ShnControlStepStop)
 		{
 		case 0:
 
@@ -487,7 +497,7 @@ static void ShnStopMode(void)
 
 			g_Ram.ramGroupATS.Control1.all = 0x200F;
 			g_Core.MotorControl.DinBreakTimer = g_Ram.ramGroupC.StopShnTime * BREAK_SCALE;
-			g_Core.MotorControl.ShnControlStep = 1;
+			g_Core.MotorControl.ShnControlStepStop = 1;
 			break;
 
 		case 1:
@@ -495,51 +505,81 @@ static void ShnStopMode(void)
 			if (g_Core.MotorControl.DinBreakTimer == 0)
 			{
 				g_Ram.ramGroupATS.Control1.all = 0x4000;
-				g_Core.MotorControl.ShnControlStep = 2;
+				g_Core.MotorControl.ShnControlStepStop = 2;
 			}
 			break;
 		case 2:
 			if (g_Ram.ramGroupATS.State1.bit.ReadyToSwitchOn==0)
 			{
 				g_Core.MotorControl.WorkMode = wmStop;
-				g_Core.MotorControl.ShnControlStep = 0;
+				g_Ram.ramGroupATS.Control1.all = 0;
+				g_Core.MotorControl.ShnControlStepStop = 0;
 			}
 			break;
+
+
+
 		}
 }
 
 static void ShnStartMode(void)
 {
-	switch (g_Core.MotorControl.ShnControlStep)
+	switch (g_Core.MotorControl.ShnControlStepStart)
 	{
+			/*case 0:
+				g_Ram.ramGroupATS.Control1.all = 0;
+				g_Ram.ramGroupATS.Control1.bit.EnableVoltage = 1;
+				g_Ram.ramGroupATS.Control1.bit.DisableQuickStop = 1;
+				g_Ram.ramGroupATS.Control1.bit.ResetFaults = 1;
+				break;
+			case 1:
+				if (!g_Ram.ramGroupATS.State1.bit.ReadyToSwitchOn) return;
+				g_Ram.ramGroupATS.Control1.bit.SwitchOn = 1;
+				break;
+			case 2:
+				if (!g_Ram.ramGroupATS.State1.bit.SwichedOn) return;
+				g_Ram.ramGroupATS.Control1.bit.EnableOp = 1;
+				break;
+			case 3:
+				if (!g_Ram.ramGroupATS.State1.bit.OperationEnabled) return;
+				g_Core.MotorControl.WorkMode = wmMove;
+				g_Core.MotorControl.ShnControlStepStart = 0;
+				return;*/
+
+
 	case 0:
 		if (g_Ram.ramGroupATS.State1.bit.ReadyToSwitchOn == 0)
 		{
 			g_Ram.ramGroupATS.Control1.all = 0;
-			g_Core.MotorControl.ShnControlStep = 1;
+			g_Core.MotorControl.ShnControlStepStart = 1;
 		}
 		else
 		{
 			g_Ram.ramGroupATS.Control1.all = 0xb;
-			g_Core.MotorControl.ShnControlStep = 1;
+			g_Core.MotorControl.ShnControlStepStart = 1;
 		}
 		break;
 	case 1:
 			g_Ram.ramGroupATS.Control1.bit.ResetFaults = 1;
-			g_Core.MotorControl.ShnControlStep = 2;
+			g_Core.MotorControl.ShnControlStepStart = 2;
 			break;
 	case 2:
-		if(g_Ram.ramGroupATS.State1.bit.Malfunction == 0 && g_Ram.ramGroupATS.State1.bit.ReadyToSwitchOn == 0)
+		if(g_Ram.ramGroupATS.State1.bit.ReadyToSwitchOn == 0)
 		{
 			g_Ram.ramGroupATS.Control1.all = 0x06;
-			g_Core.MotorControl.ShnControlStep = 3;
+			g_Core.MotorControl.ShnControlStepStart = 3;
+		}
+		else
+		{
+			g_Ram.ramGroupATS.Control1.all = 0;
+			g_Core.MotorControl.ShnControlStepStart = 0;
 		}
 		break;
 	case 3:
 		if (g_Ram.ramGroupATS.State1.bit.ReadyToSwitchOn)
 		{
 			g_Ram.ramGroupATS.Control1.all = 0x07;
-			g_Core.MotorControl.ShnControlStep = 4;
+			g_Core.MotorControl.ShnControlStepStart = 4;
 		}
 		break;
 	case 4:
@@ -547,10 +587,11 @@ static void ShnStartMode(void)
 		{
 			g_Ram.ramGroupATS.Control1.all = 0x0F;
 			g_Core.MotorControl.WorkMode = wmMove;
-			g_Core.MotorControl.ShnControlStep = 0;
+			g_Core.MotorControl.ShnControlStepStart = 0;
 		}
 		break;
 	}
+//	g_Core.MotorControl.ShnControlStepStart++;
 }
 
 void Core_LowPowerControl(TCore *p)
@@ -567,7 +608,11 @@ void Core_LowPowerControl(TCore *p)
 		p->Protections.outDefects.Dev.bit.LowPower = 1;
 		p->DisplayFaults.DisplFault = 999;
 	}
-	else p->Protections.outDefects.Dev.bit.LowPower = 0;
+	else
+	{
+		p->Protections.outDefects.Dev.bit.LowPower = 0;
+	}
+
 
 
 	ShCState = p->Protections.ShcTmpState & LOAD_SHC_MASK; //p->Protections.outFaults.Load.all & LOAD_SHC_MASK;
@@ -646,12 +691,18 @@ void Core_MuDuControl(TCore *p)
 	{
 		case mdOff:
 			p->Protections.outDefects.Proc.bit.MuDuDef = 0;
+			p->VlvDrvCtrl.Tu.LocalFlag = false;
+
 			break;
 		case mdMuOnly:
 			p->Protections.outDefects.Proc.bit.MuDuDef = 0;
+			p->VlvDrvCtrl.Tu.LocalFlag = false;
+
 			break;
 		case mdDuOnly:
 			p->Protections.outDefects.Proc.bit.MuDuDef = 0;
+			p->VlvDrvCtrl.Tu.LocalFlag = false;
+
 			break;
 		case mdSelect:
 			{
@@ -668,6 +719,8 @@ void Core_MuDuControl(TCore *p)
 							p->VlvDrvCtrl.MuDuInput = 0;
 							p->Protections.outFaults.Proc.bit.MuDuDef = 1;
 							p->MuDuDefTimer = 0;
+							p->VlvDrvCtrl.Tu.LocalFlag = false;
+
 						}
 					}
 					if(g_Ram.ramGroupA.StateTu.bit.Mu && !g_Ram.ramGroupA.StateTu.bit.Du)
@@ -675,12 +728,19 @@ void Core_MuDuControl(TCore *p)
 						p->VlvDrvCtrl.MuDuInput = 1;
 						p->Protections.outDefects.Proc.bit.MuDuDef = 0;
 						p->MuDuDefTimer = 0;
+						if (g_Ram.ramGroupB.SwitcherMuDuMode == 1)
+						{
+							p->VlvDrvCtrl.Tu.LocalFlag = true;
+						}
+						else p->VlvDrvCtrl.Tu.LocalFlag = false;
+
 					}
 					if(!g_Ram.ramGroupA.StateTu.bit.Mu && g_Ram.ramGroupA.StateTu.bit.Du)
 					{
 						p->VlvDrvCtrl.MuDuInput = 0;
 						p->Protections.outDefects.Proc.bit.MuDuDef = 0;
 						p->MuDuDefTimer = 0;
+						p->VlvDrvCtrl.Tu.LocalFlag = false;
 					}
 					if(g_Ram.ramGroupA.StateTu.bit.Mu && g_Ram.ramGroupA.StateTu.bit.Du)
 					{
@@ -689,12 +749,11 @@ void Core_MuDuControl(TCore *p)
 							p->VlvDrvCtrl.MuDuInput = 0;
 							p->Protections.outDefects.Proc.bit.MuDuDef = 1;
 							p->MuDuDefTimer = 0;
+							p->VlvDrvCtrl.Tu.LocalFlag = false;
 						}
 					}
-
 			}
 			break;
-
 	}
 
 	if (g_Ram.ramGroupD.PrtReset)
@@ -727,7 +786,70 @@ void Core_OnOff_TEN(TCoreTemper *t)
 		t->OnOffTEN = TEN_ON ;
 }
 
+void Core_TechProgon(void)
+{
+    static Uns progonDelay = 0,			// Задержка перед пуском, когда привод достигает крайней точки
+	    halfCycle = 0,			// Полцикла (открыто -> закрыто или закрыто -> открыто). Два полцикла равны 1 циклу
+	    stopTimer = 0;			// Таймер задержки снятия режима прогона, если стоп
+    static Byte isComandDone = false;		// Флаг, подана ли команда. Команда должна подаваться только 1 раз из положения закрыто или открыто
 
+    if (g_Ram.ramGroupC.progonCycles == 0)
+	return;
+
+    if (g_Ram.ramGroupA.Status.bit.Fault || g_Ram.ramGroupA.CalibState != csCalib) 	// Без калибровки режим тестового прогона не работает
+    {
+	g_Ram.ramGroupC.progonCycles = 0;
+	g_Core.Status.bit.CycleMode = 0;
+    }
+
+    if (!g_Core.Status.bit.CycleMode)
+    {
+	if (g_Ram.ramGroupA.Status.bit.Closing || g_Ram.ramGroupA.Status.bit.Opening)
+	    g_Core.Status.bit.CycleMode = 1;
+    }
+    else
+    {
+	if (g_Ram.ramGroupA.Status.bit.Closed || g_Ram.ramGroupA.Status.bit.Opened)
+	{
+	    stopTimer = 0;
+	    if (!isComandDone)			// Если команда еще не была подана
+	    {
+		if (progonDelay++ > 50)	// 50 = 5 сек на 10 Гц
+		{
+		    if (g_Ram.ramGroupC.progonCycles != 0)
+		    {
+			g_Ram.ramGroupD.ControlWord = g_Ram.ramGroupA.Status.bit.Closed ? vcwOpen : vcwClose;
+		    }
+		    isComandDone = true;
+		    progonDelay = 0;
+		    if (++halfCycle == 2) // Два полцикла = один полный цикл
+		    {
+			halfCycle = 0;
+			g_Ram.ramGroupC.progonCycles--;
+			if (g_Ram.ramGroupC.progonCycles == 0)
+			{
+			    progonDelay = 0;
+			    g_Core.Status.bit.CycleMode = 0;
+			}
+		    }
+		}
+	    }
+	}
+	else
+	{
+	    isComandDone = false;
+	    if (g_Ram.ramGroupA.Status.bit.Stop) // Если выполнилось это условие, то во время прогона поступила команда "стоп"
+	    {
+		if (stopTimer++ > 20)	// Снимаем статус режима прогона с задержкой в 2 секунды
+		{
+		    g_Ram.ramGroupC.progonCycles = 0;
+		    g_Core.Status.bit.CycleMode = 0;
+		    stopTimer = 0;
+		}
+	    }
+	}
+    }
+}
 
 
 

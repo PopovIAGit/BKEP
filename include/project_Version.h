@@ -16,10 +16,13 @@ extern "C" {
 #endif
 
 
-#define DEVICE_GROUP			4 			// Группа устройств
-#define VERSION					006			// Версия проекта
-#define MODULE_VERSION			40			// Версия модулей и спецификации
-#define SUBVERSION				01 			// Подверсия проекта
+#define DEVICE_GROUP				4 			// Группа устройств
+#define VERSION					9			// Версия проекта
+#define MODULE_VERSION				40			// Версия модулей и спецификации
+#define SUBVERSION				02 			// Подверсия проекта
+
+// Версия подготовки к выпуску первой партии 4.008.4.0.13 16/12/17
+
 
 #ifdef __cplusplus
 }

@@ -61,11 +61,11 @@ extern "C" {
 
 //----CONTACTORS -------------------------------------
 
-#define CONTACTOR_1_STATUS GpioDataRegs.GPBDAT.bit.GPIO44
-#define CONTACTOR_2_STATUS GpioDataRegs.GPBDAT.bit.GPIO45
+#define CONTACTOR_1_STATUS GpioDataRegs.GPBDAT.bit.GPIO45
+#define CONTACTOR_2_STATUS GpioDataRegs.GPBDAT.bit.GPIO44
 
-#define CONTACTOR_1_CONTROL  GpioDataRegs.GPADAT.bit.GPIO10
-#define CONTACTOR_2_CONTROL  GpioDataRegs.GPADAT.bit.GPIO11
+#define CONTACTOR_1_CONTROL  GpioDataRegs.GPADAT.bit.GPIO11
+#define CONTACTOR_2_CONTROL  GpioDataRegs.GPADAT.bit.GPIO10
 
 //---------- Enable DAC ---------------------
 

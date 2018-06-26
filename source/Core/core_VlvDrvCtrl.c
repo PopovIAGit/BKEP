@@ -79,7 +79,6 @@ void Core_ValveDriveUpdate(TCoreVlvDrvCtrl *p)
 //
 __inline void GetActiveControls(TCoreVlvDrvCtrl *p)
 {
-
 		Uns  DigState = 0;
 
 		p->ActiveControls = 0;
@@ -87,7 +86,12 @@ __inline void GetActiveControls(TCoreVlvDrvCtrl *p)
 		switch(*p->MuDuSetup)
 		{
 			case mdOff:    p->Status->bit.MuDu = 0; Flag = True; break;
-			case mdSelect: p->Status->bit.MuDu = p->MuDuInput; Flag = false; break;
+			case mdSelect:
+						{
+							p->Status->bit.MuDu = p->MuDuInput;
+							Flag = false;
+							break;
+						}
 			case mdMuOnly: p->Status->bit.MuDu = 1; Flag = false;  break;
 			case mdDuOnly: p->Status->bit.MuDu = 0; Flag = false;  break;
 			default:       return;
@@ -150,7 +154,15 @@ __inline void TeleControl(TCoreVlvDrvCtrl *p)
 	TValveCmd TuControl = vcwNone;
 	Bool Ready;
 
-	p->Tu.Enable = !p->Status->bit.MuDu & !g_Ram.ramGroupA.Faults.Proc.bit.NoCalib;
+	if (g_Ram.ramGroupB.SwitcherMuDuMode == 1)
+	{
+	    p->Tu.Enable = !g_Ram.ramGroupA.Faults.Proc.bit.NoCalib;
+	}
+	else if (g_Ram.ramGroupB.SwitcherMuDuMode == 0)
+	{
+	    p->Tu.Enable = !p->Status->bit.MuDu & !g_Ram.ramGroupA.Faults.Proc.bit.NoCalib;
+	}
+
 
 	if (!p->Tu.Enable) return;
 

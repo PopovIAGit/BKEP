@@ -686,7 +686,7 @@ __inline Bool FuncFive(TInfoModule *p, Byte LogType, Uns RecordNum)
 		//while(p->WaitTime>0){}
 
 		if (p->HardwareSrc!=imSrcModbus) {
-			p->WaitTime = 9;//TODO 5 зменил на 10 для теста
+			p->WaitTime = 9;
 			while(p->WaitTime>0){};
 		}
 

@@ -19,7 +19,7 @@
 #include "peref_ApFilter3.h"  		// PIA 04.04.14
 #include "peref_SensObserver.h" 	// PIA 07.04.14
 #include "peref_SinObserver.h"		// PIA 08.04.14
-#include "peref_Calibs.h"			// PIA 14.04.14
+#include "peref_Calibs.h"		// PIA 14.04.14
 #include "peref_ContactorControl.h"	// PIA 17.04.14
 #include "peref_LedsDrv.h"
 #include "peref_Clock.h"
@@ -37,6 +37,7 @@ extern "C" {
 #endif
 //-----------------define------------------------
 #define TU_OFFSET_CALIB_TIME  (15.0 * Prd50HZ)
+#define TU_MPY_CALIB_TIME  (120.0 * Prd50HZ)
 
 //-------------------- Структуры -------------------------------------------
 // Структура для работы с фильтрами переферии
@@ -73,16 +74,16 @@ typedef struct {
 	APFILTER3  			U3fltrStopClose;
 	APFILTER3  			U3fltrDU;
 	// ------------------------------
-	TSensObserver		sensObserver;		// Масштабирование сигналов с датчиков
-	TSinObserver		sinObserver;		// Вычисление RMS
+	TSensObserver			sensObserver;		// Масштабирование сигналов с датчиков
+	TSinObserver			sinObserver;		// Вычисление RMS
 	TPhaseOrder			phaseOrder; 		// Чередование фаз сети
 	//-------------------------------
 	APFILTER1 			Phifltr;			// Фильтр угола фи
 	APFILTER1 			Umfltr;				// Фильтр среднего напряжения
 	APFILTER3 			Imfltr;				// Фильтр среднего тока
 	//-------------------------------
-	TPerefPosition 		Position;			// Калибровка датчика положения и расчет скорости
-	TContactorControl 	ContactorControl;	// Управление контакторами
+	TPerefPosition 			Position;			// Калибровка датчика положения и расчет скорости
+	TContactorControl 		ContactorControl;	// Управление контакторами
 	//-------------------------------
 	Uns 				Umid;
 	Float 				Imid;
@@ -95,13 +96,14 @@ typedef struct {
 	DS3231				Rtc;					// Часы
 	RTC_Obj				RtcData;
 	//---------------------------
-	TSensTuObserver		InDigSignalObserver;	// Масштабирование сигналов с датчиков
-	Uns					TaktTuSensUpdate;
-	TSinSignalObserver  InDigSignal;			// Вычисление RMS
+	TSensTuObserver			InDigSignalObserver;	// Масштабирование сигналов с датчиков
+	Uns				TaktTuSensUpdate;
+	TSinSignalObserver  		InDigSignal;			// Вычисление RMS
 	//-----------------------------
-	TPerefDisplay		Display;
-	TPeref_74hc595 		ShiftReg;
+	TPerefDisplay			Display;
+	TPeref_74hc595 			ShiftReg;
 	Uns 				TU_Offset_Calib_timer;
+	Uns				TU_Mpy_Calib_timer;
 	//-----------------------------
 	Uns 				NumCalcTU_18kHz;
 	Uns 				NumCalcTU_50Hz;
@@ -112,6 +114,7 @@ void Peref_Init(TPeref *);
 void Peref_18kHzCalc(TPeref *);
 void Peref_50HzCalc (TPeref *);
 void Peref_10HzCalc (TPeref *);
+void Peref_AvtoCalibTu(TPeref *);
 void I2CDevUpdate(TPeref *);
 void RTC_Control(void);
 

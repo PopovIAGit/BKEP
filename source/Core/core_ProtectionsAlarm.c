@@ -14,7 +14,6 @@ void Core_ProtectionsAlarmInit(TAlarmElem *p)
 
 }
 
-
 void Core_ProtectionsAlarmUpdate(TAlarmElem *p)
 {
 	register Uns BitMask, Tmp;

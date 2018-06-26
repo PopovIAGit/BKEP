@@ -225,37 +225,69 @@ void SetDefaultValues(TCoreMenu *p, Byte *groupNumber) // в Core_MenuDisplay()
 	else DefCode = M_FACT_PAR;
 
 	if (DefAddr < RAM_DATA_SIZE)
-	{	
-		Core_MenuReadDcr(p,&Dcr,DefAddr);
+	{
+	    Core_MenuReadDcr(p, &Dcr, DefAddr);
 
-		// Проверяем какие параметры записывать
-		// Если не Время и не Дата или
-		// Если Код доступа групп B и C
-		if ((((Dcr.Config.all & DefCode) == DefCode)
-				&&(DefAddr != REG_DRIVE_TYPE) // Не тип привода
-				&&(DefAddr != REG_GEAR_RATIO) // Не тип редуктора
-				&&(DefAddr != REG_FACTORY_NUMBER) // Не номер
-				&&(DefAddr != REG_PRODUCT_DATE) // Не дата изготовления
-				&&(DefAddr != REG_TASK_TIME)
-				&&(DefAddr != REG_MAX_TRQE)
-				&&(DefAddr != REG_I_NOM)
-				&&(DefAddr != REG_TASK_DATE))
-			||(DefAddr == REG_CODE)||(DefAddr == REG_FCODE))//??? а надо ли перезаписывать пароли
+	    // Проверяем какие параметры записывать
+	    // Если не Время и не Дата или
+	    // Если Код доступа групп B и C
+	    if ((((Dcr.Config.all & DefCode) == DefCode)
+		    && (DefAddr != REG_DRIVE_TYPE) // Не тип привода
+		    && (DefAddr != REG_GEAR_RATIO) // Не тип редуктора
+		    && (DefAddr != REG_FACTORY_NUMBER) // Не номер
+		    && (DefAddr != REG_PRODUCT_DATE) // Не дата изготовления
+		    && (DefAddr != REG_TASK_TIME)
+		    && (DefAddr != REG_MAX_TRQE)
+		    && (DefAddr != REG_I_NOM)
+		    && (DefAddr != REG_TU_OPEN_220)
+		    && (DefAddr != REG_TU_OPEN_24)
+		    && (DefAddr != REG_TU_OPEN_OFF)
+		    && (DefAddr != REG_TU_CLOSE_220)
+		    && (DefAddr != REG_TU_CLOSE_24)
+		    && (DefAddr != REG_TU_CLOSE_OFF)
+		    && (DefAddr != REG_TU_STOPC_220)
+		    && (DefAddr != REG_TU_STOPC_24)
+		    && (DefAddr != REG_TU_STOPC_OFF)
+		    && (DefAddr != REG_TU_STOPO_220)
+		    && (DefAddr != REG_TU_STOPO_24)
+		    && (DefAddr != REG_TU_STOPO_OFF)
+		    && (DefAddr != REG_TU_MU_220)
+		    && (DefAddr != REG_TU_MU_24)
+		    && (DefAddr != REG_TU_MU_OFF)
+		    && (DefAddr != REG_TU_DU_220)
+		    && (DefAddr != REG_TU_DU_24)
+		    && (DefAddr != REG_TU_DU_OFF)
+		    && (DefAddr != REG_TU_RESETAL_220)
+		    && (DefAddr != REG_TU_RESETAL_24)
+		    && (DefAddr != REG_TU_RESETAL_OFF)
+		    && (DefAddr != REG_TASK_DATE))
+		    || (DefAddr == REG_CODE) || (DefAddr == REG_FCODE)) //??? а надо ли перезаписывать пароли
+	    {
+		*(ToUnsPtr(&g_Ram) + DefAddr) = Dcr.Def;
+
+		ReadWriteEeprom(&Eeprom1, F_WRITE, DefAddr,
+			ToUnsPtr(&g_Ram) + DefAddr, 1);
+		while (!IsMemParReady())
 		{
-			*(ToUnsPtr(&g_Ram) + DefAddr) = Dcr.Def;
+		    FM25V10_Update(&Eeprom1);
+		}
+		// Инициализация фильтров, масштабов и т.д.
+		RefreshParams(DefAddr);
 
-			ReadWriteEeprom(&Eeprom1,F_WRITE,DefAddr,ToUnsPtr(&g_Ram) + DefAddr,1);
-			while (!IsMemParReady()) {FM25V10_Update(&Eeprom1); }
-			// Инициализация фильтров, масштабов и т.д.
-			RefreshParams(DefAddr);
+		DefAddr++;
 
-			DefAddr++;
-
-		} else {DefAddr++; return;}
-	} else {
-		*groupNumber =0;
-		DefAddr = 0;
+	    }
+	    else
+	    {
+		DefAddr++;
 		return;
+	    }
+	}
+	else
+	{
+	    *groupNumber = 0;
+	    DefAddr = 0;
+	    return;
 	}
 	
 
@@ -310,7 +342,7 @@ void ReadWriteAllParams(Byte cmd, TCoreMenu *p)	// в Core_MenuInit()
 }
 //---------------------------------------------------
 // Установка значений ModBus
-void SetModBusParams()
+void SetModBusParams(void)
 {
 	//для БКД
 	/*

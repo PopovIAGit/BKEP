@@ -47,17 +47,17 @@ typedef union _TStatusReg {
 		
 		Uns Stop:1;				// 0     Стоп
 		Uns Fault:1;			// 1     Авария
-     	Uns Closing:1;    		// 2     Идет закрытие
-     	Uns Opening:1;			// 3     Идет открытие
-    	Uns Test:1;				// 4     Идет тест
-     	Uns Closed:1;			// 5     Закрыто
-     	Uns Opened:1;			// 6     Открыто
+		Uns Closing:1;    		// 2     Идет закрытие
+		Uns Opening:1;			// 3     Идет открытие
+		Uns Test:1;				// 4     Идет тест
+		Uns Closed:1;			// 5     Закрыто
+		Uns Opened:1;			// 6     Открыто
 		Uns Mufta:1;			// 7     Муфта
 		Uns MuDu:1;				// 8     Местное управление
-     	Uns Ten:1;        		// 9     Включен ТЕН
-     	Uns EnableBluetooth:1;  // 10    Резервное питание
-     	Uns MiddlePosition:1;	// 11    Промежуточное положение
-		Uns Rsvd:1;			    // 11-12	 Резерв
+		Uns Ten:1;        		// 9     Включен ТЕН
+		Uns EnableBluetooth:1;  // 10    Резервное питание
+		Uns MiddlePosition:1;	// 11    Промежуточное положение
+		Uns CycleMode:1;			    // 12	 Резерв
 		Uns Defect:1;			// 13	 Неисправность
 		Uns Rsvd2:2;		    // 14 -15 	Резерв
 	} bit;
@@ -120,7 +120,7 @@ typedef union _TProcessReg {
 		Uns MuDuDef:1;		// 7     Ошибка по дискретным входам Му/Ду
 		Uns SoftStarter:1;	// 8	 Ошибка УПП
 		Uns FireContErr:1;	// 9	 не замкнут конитактор в режиме пожрка
-		Uns Rsvd:6;			// 10-15  Резерв
+		Uns Rsvd:6;			// 11-15  Резерв
 	} bit;
 } TProcessReg;
 
@@ -269,32 +269,33 @@ typedef enum {
 
 // тип привода
 typedef enum {
-	Empty 	  = 0,
-	dt100_A25 = 1,
-	dt100_A50 = 2,
-	dt400_B20 = 3,
-	dt400_B50 = 4,
-	dt800_V40 = 5,
-	dt1000_V20  = 6,
-	dt4000_G9   = 7,
-	dt4000_G18  = 8,
-	dt10000_D6  = 9,
-	dt10000_D12 = 10,
-	dt10000_D10 = 11,
-	dt15000_D10 = 12,
-	dt20000_F40 = 13,
-	dt35000_F48 = 14,
-	dt50000_F48 = 15
+	Empty 	  	= 0,
+	dt100_A25 	= 1,
+	dt100_A50 	= 2,
+	dt400_B20 	= 3,
+	dt400_B50 	= 4,
+	dt800_V40 	= 5,
+	dt1000_V20  	= 6,
+	dt4000_G9   	= 7,
+	dt4000_G18  	= 8,
+	dt10000_D6  	= 9,
+	dt10000_D12 	= 10,
+	dt10000_D10 	= 11,
+	dt15000_D10 	= 12,
+	dt20000_F40 	= 13,
+	dt35000_F48 	= 14,
+	dt50000_F48 	= 15,
+	dt100_A25_S 	= 16,// Сарапуль
+	dt100_A50_S 	= 17,
+	dt400_B20_S 	= 18,
+	dt400_B50_S 	= 19,
+	dt800_V40_S 	= 20,
+	dt1000_V20_S  	= 21,
+	dt4000_G9_S   	= 22,
+	dt4000_G18_S  	= 23,
+	dt10000_D6_S  	= 24,
+	dt10000_D12_S 	= 25
 }TDriveType;
-/*
-// Управление работой защит
-typedef enum {
-  pmOff       = 0,		// Защита выключена
-  pmBlkSign   = 1,		// Сигнализация на блоке
-  pmBlkTsSign = 2,		// Сигнализация на блоке и ТС
-  pmSignStop  = 3,		// Сигнализация и останов
-  pmCount     = 4		// Количество режимов
-} TPrtMode;*/
 
 // Управление работой защит
 typedef enum {
@@ -327,22 +328,6 @@ typedef enum {
   imRms     = 0,		  	// Действующие значения
   imPercent = 1			  	// В процентах от номинального тока двигателя
 } TIndicMode;
-
-// Состояние светодиодов блока
-/*typedef union _TLedsReg {	// МОИ
-	Uns all;
-	struct {
-		Uns Opened:1;     	// 0     Открыто
-		Uns Muff:1;      	// 1     Муфта
-		Uns Defect:1;       // 2     Неисправность
-		Uns Closed:1;     	// 4     Закрыто
-		Uns Fault:1;     	// 3     Авария
-		Uns Pdu:1;			// 5	 ПДУ
-		Uns MuDu:1;       	// 6     Режим
-		Uns DspOn:1;		// 7	 DSP_ON
-		Uns Rsvd:8;      	// 6-15  Резерв
-	} bit;
-} TLedsReg;*/
 
 // Тип задвижки клин/шибер
 typedef enum {
@@ -379,12 +364,12 @@ typedef union _TTEK_TechReg
 		Uns Mufta1:1;		// 2 		В нашем случае муфта не разделяется на трогание или движение
 		Uns Mufta2:1;		// 3 		Дублируем муфту
 		Uns Rsvd2:3;		// 4-6 		Резерв
-		Uns MuDu:1;			// 7 		МУ/ДУ
+		Uns MuDu:1;		// 7 		МУ/ДУ
 		Uns Opening:1;		// 8 		"Открывается"
 		Uns Closing:1;		// 9 		"Закрывается"
-		Uns Stop:1;			// 10 		Стоп
+		Uns Stop:1;		// 10 		Стоп
 		Uns Rsvd3:2;		// 11-12 	Резерв
-		Uns Ten:1;			// 13; 		Включен тен
+		Uns Ten:1;		// 13; 		Включен тен
 		Uns Rsvd4:2;		// 14-15; 	Резерв
 	} bit;
 } TTEK_TechReg;

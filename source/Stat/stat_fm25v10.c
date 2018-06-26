@@ -16,8 +16,6 @@
 // Маска для самых старших бит
 #define ADDRESS_HIGH_MASK		0x10000
 
-
-
 void FM25V10_Init(TFM25V10 *p)
 {
 	p->SpiId   	= SPIA;					// Идентификатор SPI канала (SPIA, SPIB, ...)

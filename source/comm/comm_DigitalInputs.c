@@ -31,13 +31,13 @@ void DigitalInpUpdate(TDigitalInput *p)	// На вход функции приходит сигнал с ТУ
 	p->inpDu.inputBit 			= (p->input>>DIN_DU_BIT) & 0x0001;
 
 	// Определяем тип входного сигнала
-	p->inpOpen.signalType = (*p->TypeLogicSignal >> DIN_OPEN_BIT)&0x0001;
-	p->inpClose.signalType = (*p->TypeLogicSignal >> DIN_CLOSE_BIT)&0x0001;
-	p->inpStopOpen.signalType = (*p->TypeLogicSignal >> DIN_STOP_OPEN_BIT)&0x0001;
-	p->inpMu.signalType = (*p->TypeLogicSignal >> DIN_MU_BIT)&0x0001;
-	p->inpResetAlarm.signalType = (*p->TypeLogicSignal >> DIN_RESETALARM_BIT)&0x0001;
-	p->inpStopClose.signalType = (*p->TypeLogicSignal >> DIN_STOP_CLOSE_BIT)&0x0001;
-	p->inpDu.signalType = (*p->TypeLogicSignal >> DIN_DU_BIT)&0x0001;
+	p->inpOpen.signalType 		= (*p->TypeLogicSignal >> DIN_OPEN_BIT)&0x0001;
+	p->inpClose.signalType 		= (*p->TypeLogicSignal >> DIN_CLOSE_BIT)&0x0001;
+	p->inpStopOpen.signalType 	= (*p->TypeLogicSignal >> DIN_STOP_OPEN_BIT)&0x0001;
+	p->inpStopClose.signalType 	= (*p->TypeLogicSignal >> DIN_STOP_CLOSE_BIT)&0x0001;
+	p->inpMu.signalType 		= (*p->TypeLogicSignal >> DIN_MU_BIT)&0x0001;
+	p->inpDu.signalType 		= (*p->TypeLogicSignal >> DIN_DU_BIT)&0x0001;
+	p->inpResetAlarm.signalType 	= (*p->TypeLogicSignal >> DIN_RESETALARM_BIT)&0x0001;
 
 	// Вызов функции обработки сигнала для каждого бита
 	DigitalInputCalc (&p->inpOpen, 	 		p->deltOn, p->deltOff, p->timeDelay); 	// Результат записывается в Output

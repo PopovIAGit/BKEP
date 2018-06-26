@@ -158,7 +158,7 @@ void Core_DisplayFaultsUpdate(TCoreDislpayFaults *p)
 		else if (p->DisplFaultUnion.Load.bit.I2t)
 		{
 			p->DisplFaulstTimer = DISPL_FAULT_TIME;
-			p->DisplFaultUnion.Load.bit.PhlU = 0;
+			p->DisplFaultUnion.Load.bit.I2t = 0;
 			p->DisplFault = I2t_CODE;
 		}
 		else if (p->DisplFaultUnion.Load.bit.ShCU || p->DisplFaultUnion.Load.bit.ShCV || p->DisplFaultUnion.Load.bit.ShCW)

@@ -17,6 +17,8 @@ Int TemperM40 = -40;
 
 Uns tmpTime=0;
 
+//ToDo добавить нет движения как аварию встроенного датчика положения
+
 void Core_ProtectionsInit(TCoreProtections *p)
 {
 	//---------ЗАЩИТЫ ПРОЦЕССА--------------------------------------------------------
@@ -250,7 +252,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->I2t.InputCurrentMid = &g_Ram.ramGroupH.Imid;
 	p->I2t.NomCurrent = &g_Ram.ramGroupC.Inom;
 	p->I2t.Output = (Uns *) &p->outFaults.Load.all;
-	p->I2t.Scale = PROTECT_SCALE;
+	p->I2t.Scale = 50;//PROTECT_SCALE;
 	Core_ProtectionI2TInit(&p->I2t);
 
 	//------Короткое замыкание----------------------------------------------
@@ -373,7 +375,7 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 		p->ShC_V.Cfg.bit.Enable = Enable;
 		p->ShC_W.Cfg.bit.Enable = Enable;
 
-		p->I2t.Cfg.bit.Enable = (g_Ram.ramGroupC.I2t != pmOff) && (!g_Core.Status.bit.Stop);		// ВТЗ
+		p->I2t.Cfg.bit.Enable = (g_Ram.ramGroupC.I2t != pmOff) /*&& (!g_Core.Status.bit.Stop)*/;		// ВТЗ
 		break;
 	case 4:  // Защиты устройства
 		Enable = g_Ram.ramGroupC.TemperTrack != pmOff;
@@ -416,7 +418,7 @@ void Core_DevProc_FaultIndic(TCoreProtections *p)
 		p->outDefects.Dev.bit.TSens = (Uns) g_Peref.TSens.Error;
 		p->outDefects.Dev.bit.Dac = (Uns) g_Peref.Dac.Error;
 
-
+		// Ошибка нет связи с БКП
 		if (g_Comm.Bluetooth.ModeProtocol != 2 && tmpTime++>20 && p->outFaults.Dev.bit.NoBCP_Connect == 0)
 			p->outFaults.Dev.bit.NoBCP_Connect = (g_Comm.mbBkp.Frame.ConnFlagCount==0);
 		    //p->outFaults.Dev.bit.NoBCP_Connect = !g_Comm.mbBkp.Frame.ConnFlag;
@@ -432,6 +434,7 @@ void EngPhOrdPrt(TCoreProtections *p)
 	static LgUns StartPos;
 	static Uns Timer = 0;
 	static Int EngPhOrdValue = 0;
+	LgInt data = 16384;//(REV_MAX + 1)/2;
 	LgInt Delta;
 
 	if ((g_Ram.ramGroupC.PhOrd == pmOff) || (g_Core.Status.bit.Stop))
@@ -448,10 +451,10 @@ void EngPhOrdPrt(TCoreProtections *p)
 	{
 		Delta = g_Ram.ramGroupA.Position - StartPos;
 
-		if (Delta > ((REV_MAX + 1) / 2))
-			Delta -= (REV_MAX + 1);
-		if (Delta < -((REV_MAX + 1) / 2))
-			Delta += (REV_MAX + 1);
+		if (Delta > data)
+			Delta -= 32768; //(LgInt)(REV_MAX + 1);
+		if (Delta < -data)
+			Delta += 32768; //(LgInt)(REV_MAX + 1);
 
 		EngPhOrdValue = 0;
 		if (Delta >= ((LgInt) g_Ram.ramGroupC.PhOrdZone))
@@ -509,6 +512,13 @@ void Core_ProtectionsClear(TCoreProtections *p)
 
 	g_Core.Protections.MuffFlag200Hz = 0;
 
+	g_Core.DisplayFaults.DisplFaultUnion.Dev.all = 0;
+	g_Core.DisplayFaults.DisplFaultUnion.Load.all = 0;
+	g_Core.DisplayFaults.DisplFaultUnion.Net.all = 0;
+	g_Core.DisplayFaults.DisplFaultUnion.Proc.all = 0;
+
+	p->MuffFlag200Hz = 0;
+	p->MuffFlag = 0;
 	if (g_Ram.ramGroupH.MuffFault != 0 && IsMemParReady())
 	{
 		g_Ram.ramGroupH.MuffFault = 0;
@@ -660,15 +670,26 @@ void Core_Protections50HZUpdate(TCoreProtections *p)
 void Core_Protections50HZUpdate2(TCoreProtections *p)
 {
 	Uns BatteryLowHideDataReg = 0;
+	Uns BCPDriveType = 0;
 
 	//-------- Ошибка ТИП БКП ------------------------
 
 			if (g_Ram.ramGroupA.Faults.Dev.bit.NoBCP_Connect == 0  && g_Ram.ramGroupC.DriveType != 0)
 			{
 				p->BcpTypeDubl = g_Ram.ramGroupH.BkpType*2;
-				if ((p->BcpTypeDubl != (Uns)g_Ram.ramGroupC.DriveType) && ((p->BcpTypeDubl-1) != (Uns)g_Ram.ramGroupC.DriveType))
+
+				if ((Uns)g_Ram.ramGroupC.DriveType > 15)
 				{
-					if(p->BcpTypeTimer++ >= 2*Prd50HZ)
+				    BCPDriveType = (Uns)g_Ram.ramGroupC.DriveType - 15;
+				}
+				else if((Uns)g_Ram.ramGroupC.DriveType <= 15)
+				{
+				    BCPDriveType = (Uns)g_Ram.ramGroupC.DriveType;
+				}
+
+				if ((p->BcpTypeDubl != BCPDriveType) && ((p->BcpTypeDubl-1) != BCPDriveType))
+				{
+					if(p->BcpTypeTimer++ >= 5*Prd50HZ)
 					{
 						p->outFaults.Dev.bit.BCP_ErrorType = 1;
 						p->BcpTypeTimer = 0;
@@ -762,10 +783,9 @@ void Core_Protections18kHzUpdate(TCoreProtections *p)
 	// Запись МУФТЫ в память!!!!!! Оо
 	if (p->MuffFlag == 1 && g_Ram.ramGroupH.MuffFault == 0)
 	{
-		g_Ram.ramGroupH.MuffFault = p->MuffFlag;
-
 		if (IsMemParReady())
 		{
+			g_Ram.ramGroupH.MuffFault = p->MuffFlag;
 			p->MuffFlag = 0;
 			MuffAddr = REG_MUFF_FAULT;
 			WriteToEeprom(MuffAddr, &g_Ram.ramGroupH.MuffFault, 1);	// то записали состояние КЗ
@@ -831,7 +851,7 @@ void Core_Protections18kHzUpdate(TCoreProtections *p)
 
 }
 
-// ToDo проверить в режиме пожарки!
+// ToDo проверить в режиме пожарки! + отстроить уровни дискретного упарвления
 void Core_ProtectionFireControl(void)
 {
 	if (g_Ram.ramGroupB.PlaceType != ptFire) return;

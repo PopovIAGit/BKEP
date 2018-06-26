@@ -23,7 +23,7 @@ extern "C" {
 #define	CLB_OPEN    0x02  // Задано Открыто/находимся в зоне Открыто
 #define	CLB_FLAG    0x03  // Калибровка выполнена
 
-#define REV_MAX		0x3FFF
+#define REV_MAX		0x7FFF
 #define MUFF_CLB_TIME	(3.000 * Prd50HZ)	// Время удержания муфты для калибровок
 #define SP_POS_LIMIT 400
 

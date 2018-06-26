@@ -183,6 +183,28 @@ void g_Ram_Update(TRam *p)
 
     p->ramGroupA.Status.bit.MiddlePosition = !p->ramGroupA.Faults.Proc.bit.NoCalib & !p->ramGroupA.Status.bit.Opened & !p->ramGroupA.Status.bit.Closed;
 
+
+
+    Uns PassAddr;
+    //-------- Для первого включения -----------------------
+	if (g_Ram.ramGroupH.Password1 == 65535 && g_Ram.ramGroupH.Password2 == 65535)
+	{
+	    if (IsMemParReady())
+	    {
+		PassAddr = REG_PASSW1_NEW;
+		g_Ram.ramGroupH.Password1 = 0;
+		g_Ram.ramGroupH.Password2 = 0;
+		WriteToEeprom(PassAddr, &g_Ram.ramGroupH.Password1, 2);
+	    }
+	}
+
+	SetModBusParams();
+
+
+    //------------------------------------------------------
+
+
+
     ReWriteParams();
 
 }

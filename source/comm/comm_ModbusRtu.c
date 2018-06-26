@@ -133,6 +133,7 @@ __inline void UpdateNewFrame(TMbPort *hPort)
 		goto FRAMING_ERROR;
 	}
 
+	if (Frame->RxLength==5 && hPort->Params.HardWareType==MCBSP_TYPE) Frame->RxLength=4;//приём команды 17 для msbsp
 	if (Frame->RxLength==12 && hPort->Params.HardWareType==MCBSP_TYPE) Frame->RxLength=11;//приём команды 16 для msbsp
 	if (Frame->RxLength==30 && hPort->Params.HardWareType==MCBSP_TYPE) Frame->RxLength=29;
 	//CRC = CalcFrameCrc(Frame->Buf, Frame->RxLength);

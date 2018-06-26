@@ -29,7 +29,7 @@ typedef struct {
 } TCubPoint;
 
 #define CUB_COUNT1		4
-#define CUB_COUNT2		5
+#define CUB_COUNT2		6
 typedef struct {
 	Int Data[CUB_COUNT1][CUB_COUNT2];
 } TCubArray;
@@ -63,10 +63,6 @@ typedef struct {
 	Uns			*TorqueSetPr;	// Задание на момент в процентах
 	Uns 		*Imidpr;		// Данные по средниму току в % от In
 	Uns     	Indication;		// Индикация значения момента
-	Uns			Corr40Trq;		// Коэффициент корректировки индикации момента для значний меньше 40%
-	Uns			Corr60Trq;		//	-//- 60%
-	Uns			Corr80Trq;		//	-//- 80%
-	Uns			Corr110Trq;		// 	-//- 110%
 	APFILTER3	Trqfltr;		// фильтр для моментаы
 	TCubStr 	Cub1;			// Куб по углу фи
 	TCubStr 	Cub2;			// куб по току

@@ -353,7 +353,7 @@ void DataBufferPre(TStat *s)
 		g_Ram.ramGroupH.LogEvAddr 	  = 0;
 		g_Ram.ramGroupH.LogCmdAddr    = 0;
 		g_Ram.ramGroupH.LogParamAddr  = 0;
-		g_Ram.ramGroupH.LogSimAddr  = 0; //ma LogSIM
+		g_Ram.ramGroupH.LogSimAddr    = 0; //ma LogSIM
 		g_Ram.ramGroupH.LogEvCount    = 0;
 		g_Ram.ramGroupH.LogCmdCount   = 0;
 		g_Ram.ramGroupH.LogParamCount = 0;
@@ -518,7 +518,13 @@ void GetCurrentCmd(TStat *s)
 		LogControlWord = LogControlWord | g_Core.VlvDrvCtrl.EvLog.Source;
 		g_Core.VlvDrvCtrl.EvLog.Source = 0;
 	}
-	g_Core.VlvDrvCtrl.EvLog.Value = 0;
+	//g_Core.VlvDrvCtrl.EvLog.Value = 0;
+
+
+	if (LogControlWord != bcmNone)
+	{
+		g_Core.VlvDrvCtrl.EvLog.Value = 0;
+	}
 
 	s->LogCmd.CmdReg = LogControlWord;
 }

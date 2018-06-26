@@ -1,17 +1,17 @@
-/*======================================================================
-Имя файла:          g_InterruptUpdate.h
-Автор:
-Версия файла:
-Дата изменения:
-Описанте: 
-	Заголовочный файл для организации работы функций блока БКД
-Функции раскиданы по группам прерываний: 18кГц, 2кГц, 200Гц, 50Гц, 10 Гц.
-Эти частоты заданы жестко, менять их - не рекомендуется.
-Максимальное количество задач (функций) для каждой группы прерываний:
-2кГц - не более 4-х задач
-200Гц - не более  20-ти задач 
-50 Гц - не более  80-ти задач
-10 Гц - не более  200-т задач
+п»ї/*======================================================================
+В»РјВ¤ С„Р°Р№Р»Р°:          g_InterruptUpdate.h
+СРІС‚РѕСЂ:
+В¬РµСЂСЃРёВ¤ С„Р°Р№Р»Р°:
+Ж’Р°С‚Р° РёР·РјРµРЅРµРЅРёВ¤:
+СњРїРёСЃР°РЅС‚Рµ: 
+	В«Р°РіРѕР»РѕРІРѕС‡РЅС‹Р№ С„Р°Р№Р» РґР»В¤ РѕСЂРіР°РЅРёР·Р°С†РёРё СЂР°Р±РѕС‚С‹ С„СѓРЅРєС†РёР№ Р±Р»РѕРєР° Р…В Ж’
+вЂСѓРЅРєС†РёРё СЂР°СЃРєРёРґР°РЅС‹ РїРѕ РіСЂСѓРїРїР°Рј РїСЂРµСЂС‹РІР°РЅРёР№: 18Рєв€љС†, 2Рєв€љС†, 200в€љС†, 50в€љС†, 10 в€љС†.
+РЃС‚Рё С‡Р°СЃС‚РѕС‚С‹ Р·Р°РґР°РЅС‹ Р¶РµСЃС‚РєРѕ, РјРµРЅВ¤С‚СЊ РёС… - РЅРµ СЂРµРєРѕРјРµРЅРґСѓРµС‚СЃВ¤.
+С›Р°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р·Р°РґР°С‡ (С„СѓРЅРєС†РёР№) РґР»В¤ РєР°Р¶РґРѕР№ РіСЂСѓРїРїС‹ РїСЂРµСЂС‹РІР°РЅРёР№:
+2Рєв€љС† - РЅРµ Р±РѕР»РµРµ 4-С… Р·Р°РґР°С‡
+200в€љС† - РЅРµ Р±РѕР»РµРµ  20-С‚Рё Р·Р°РґР°С‡ 
+50 в€љС† - РЅРµ Р±РѕР»РµРµ  80-С‚Рё Р·Р°РґР°С‡
+10 в€љС† - РЅРµ Р±РѕР»РµРµ  200-С‚ Р·Р°РґР°С‡
 ======================================================================*/
 
 #include "config.h"	
@@ -23,66 +23,66 @@
 #include "stat.h"
 #include "csl/csl_dlog.h"
 
-//--------ОБЪЯВЛЕНИЕ МАКРОСОВ------------------------------------------------
+//--------СњР…РЏСЏВ¬Р‹в‰€РЊВ»в‰€ С›СВ вЂ“СњвЂ”СњВ¬------------------------------------------------
 
-// Макрос преобразования функции в указатель на функцию,
-// аргумента функции в указатель на аргумент функции
+// С›Р°РєСЂРѕСЃ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёВ¤ С„СѓРЅРєС†РёРё РІ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° С„СѓРЅРєС†РёСЋ,
+// Р°СЂРіСѓРјРµРЅС‚Р° С„СѓРЅРєС†РёРё РІ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° Р°СЂРіСѓРјРµРЅС‚ С„СѓРЅРєС†РёРё
 #define PrdElemInit(Name, Argument) \
 	{ (TPrdFunc)(Name), (void *)(Argument), 0 }
 
-// Макрос подсчета количества элементов массива
+// С›Р°РєСЂРѕСЃ РїРѕРґСЃС‡РµС‚Р° РєРѕР»РёС‡РµСЃС‚РІР° СЌР»РµРјРµРЅС‚РѕРІ РјР°СЃСЃРёРІР°
 #define TaskCount(List)	(sizeof(List) / sizeof(TPeriodicalFunction))
 
-#define TASK_COUNT_MAX_2kHZ  10		//Максимальное кол-во задач для частоты 2 кГц
-#define TASK_COUNT_MAX_200HZ 20		//Максимальное кол-во задач для частоты 200 Гц
-#define TASK_COUNT_MAX_50HZ  80		//Максимальное кол-во задач для частоты 50 Гц
-#define TASK_COUNT_MAX_10HZ  200	//Максимальное кол-во задач для частоты 10 Гц
+#define TASK_COUNT_MAX_2kHZ  10		//С›Р°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»-РІРѕ Р·Р°РґР°С‡ РґР»В¤ С‡Р°СЃС‚РѕС‚С‹ 2 Рєв€љС†
+#define TASK_COUNT_MAX_200HZ 20		//С›Р°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»-РІРѕ Р·Р°РґР°С‡ РґР»В¤ С‡Р°СЃС‚РѕС‚С‹ 200 в€љС†
+#define TASK_COUNT_MAX_50HZ  80		//С›Р°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»-РІРѕ Р·Р°РґР°С‡ РґР»В¤ С‡Р°СЃС‚РѕС‚С‹ 50 в€љС†
+#define TASK_COUNT_MAX_10HZ  200	//С›Р°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»-РІРѕ Р·Р°РґР°С‡ РґР»В¤ С‡Р°СЃС‚РѕС‚С‹ 10 в€љС†
 
-//---------ОПРЕДЕЛЕНИЕ--ТИПОВ--ДАННЫХ----------------------------------------
+//---------СњС•вЂ“в‰€Ж’в‰€Р‹в‰€РЊВ»в‰€--вЂњВ»С•СњВ¬--Ж’СРЊРЊСџвЂ™----------------------------------------
 
-typedef void (*TPrdFunc)(void *Data);	// Определение типа "Указатель на функцию"
+typedef void (*TPrdFunc)(void *Data);	// СњРїСЂРµРґРµР»РµРЅРёРµ С‚РёРїР° "вЂќРєР°Р·Р°С‚РµР»СЊ РЅР° С„СѓРЅРєС†РёСЋ"
 
-typedef struct _TPrdElem				// Определение типа данных структуры, которая содержит поля:
+typedef struct _TPrdElem				// СњРїСЂРµРґРµР»РµРЅРёРµ С‚РёРїР° РґР°РЅРЅС‹С… СЃС‚СЂСѓРєС‚СѓСЂС‹, РєРѕС‚РѕСЂР°В¤ СЃРѕРґРµСЂР¶РёС‚ РїРѕР»В¤:
 {
-	TPrdFunc Func;						// - указатель на функцию;
-    void *Data;							// - указатель на аргумент функции
-    Uns CpuTime;						// - процессорное время выполнения
-} TPeriodicalFunction;					// Объявление структуры соответствующего типа
+	TPrdFunc Func;						// - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° С„СѓРЅРєС†РёСЋ;
+    void *Data;							// - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° Р°СЂРіСѓРјРµРЅС‚ С„СѓРЅРєС†РёРё
+    Uns CpuTime;						// - РїСЂРѕС†РµСЃСЃРѕСЂРЅРѕРµ РІСЂРµРјВ¤ РІС‹РїРѕР»РЅРµРЅРёВ¤
+} TPeriodicalFunction;					// СњР±СЉВ¤РІР»РµРЅРёРµ СЃС‚СЂСѓРєС‚СѓСЂС‹ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРіРѕ С‚РёРїР°
 
-//---------ПРОТОТИПЫ---ФУНКЦИЙ-----------------------------------------------
-extern  void InterruptUpdate	(void); 		//Функция обработки прерываний
+//---------С•вЂ“СњвЂњСњвЂњВ»С•Сџ---вЂвЂќРЊВ Г·В»вЂ¦-----------------------------------------------
+extern  void InterruptUpdate	(void); 		//вЂСѓРЅРєС†РёВ¤ РѕР±СЂР°Р±РѕС‚РєРё РїСЂРµСЂС‹РІР°РЅРёР№
 
-// Высокоприоритетные прерывания на частоте 18 кГц
+// В¬С‹СЃРѕРєРѕРїСЂРёРѕСЂРёС‚РµС‚РЅС‹Рµ РїСЂРµСЂС‹РІР°РЅРёВ¤ РЅР° С‡Р°СЃС‚РѕС‚Рµ 18 Рєв€љС†
 
-// ================================ 18 кГц ==================================
+// ================================ 18 Рєв€љС† ==================================
 
 TPeriodicalFunction Task18kHz[] =         
 {
 	PrdElemInit(Peref_SensObserverUpdate,				&g_Peref.sensObserver),
 	PrdElemInit(Peref_SensTuObserverUpdate,				&g_Peref.InDigSignalObserver),
 	PrdElemInit(Peref_18kHzCalc,						&g_Peref),
-	PrdElemInit(SciMasterConnBetweenBlockCommTimer,		&g_Comm.mbBkp),	//на 18кГц
+	PrdElemInit(SciMasterConnBetweenBlockCommTimer,		&g_Comm.mbBkp),	//РЅР° 18Рєв€љС†
 	PrdElemInit(Core_Protections18kHzUpdate,			&g_Core.Protections),
 	//PrdElemInit(MonitorUpdate,							Null),
 };
 
-//Сюда вставляем функции для соответствующей группы
+//вЂ”СЋРґР° РІСЃС‚Р°РІР»В¤РµРј С„СѓРЅРєС†РёРё РґР»В¤ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµР№ РіСЂСѓРїРїС‹
 
-// ================================ 2 кГц ==================================
+// ================================ 2 Рєв€љС† ==================================
 
-TPeriodicalFunction Task2kHz[] =          //Не более 8-х задач
+TPeriodicalFunction Task2kHz[] =          //РЊРµ Р±РѕР»РµРµ 8-С… Р·Р°РґР°С‡
 {
-	PrdElemInit(SerialCommTimings,						&g_Comm.mbAsu),	//на 2 кГц
+	PrdElemInit(SerialCommTimings,						&g_Comm.mbAsu),	//РЅР° 2 Рєв€љС†
 	PrdElemInit(SerialCommTimings,						&g_Comm.mbShn),
-	PrdElemInit(SerialCommTimings,						&g_Comm.mbBt),	//на 2 кГц
-	PrdElemInit(FM25V10_Update,							&Eeprom1),		//на 2 кГц
-	PrdElemInit(FM25V10_Update,							&Eeprom2),		//на 2 кГц
+	PrdElemInit(SerialCommTimings,						&g_Comm.mbBt),	//РЅР° 2 Рєв€љС†
+	PrdElemInit(FM25V10_Update,							&Eeprom1),		//РЅР° 2 Рєв€љС†
+	PrdElemInit(FM25V10_Update,							&Eeprom2),		//РЅР° 2 Рєв€љС†
 
 
 };
-// ================================ 200 Гц ==================================
+// ================================ 200 в€љС† ==================================
 
-TPeriodicalFunction Task200Hz[] =       	//не более  20-ти задач
+TPeriodicalFunction Task200Hz[] =       	//РЅРµ Р±РѕР»РµРµ  20-С‚Рё Р·Р°РґР°С‡
 {
 	PrdElemInit(Peref_CalibUpdate, 						&g_Peref.Position),
 	PrdElemInit(Core_LowPowerControl, 					&g_Core),
@@ -91,17 +91,17 @@ TPeriodicalFunction Task200Hz[] =       	//не более  20-ти задач
 	PrdElemInit(LogCmdControl,							&g_Stat),
 	PrdElemInit(LogParamMbExec,							&g_Stat),
 	PrdElemInit(LogParamControl,						&g_Stat),
-	PrdElemInit(LogSimControl,						&g_Stat), //ma LogSim
-	PrdElemInit(ImTimer,				                &g_Stat.Im),// на 200Г
+	PrdElemInit(LogSimControl,							&g_Stat), //ma LogSim
+	PrdElemInit(ImTimer,				                &g_Stat.Im),// РЅР° 200в€љ
 	PrdElemInit(DisplDrvUpdate,             			&g_Peref.Display),
-	PrdElemInit(Comm_TuTsUpdate,				&g_Comm.digitInterface),
+	PrdElemInit(Comm_TuTsUpdate,						&g_Comm.digitInterface),
 	PrdElemInit(Protections_MuffFlag,						NULL),
 	PrdElemInit(Core_VoltageDown,								NULL),
 };
 
-// ================================ 50 Гц ==================================
+// ================================ 50 в€љС† ==================================
 
-TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
+TPeriodicalFunction Task50Hz[] =        //РЅРµ Р±РѕР»РµРµ  80-С‚Рё Р·Р°РґР°С‡
 {
 	PrdElemInit(Peref_50HzCalc,					&g_Peref),
 	PrdElemInit(Peref_SpeedCalc, 				&g_Peref.Position),
@@ -147,13 +147,14 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(Core_Protections50HZUpdate,		&g_Core.Protections),
 	PrdElemInit(Core_Protections50HZUpdate2,	&g_Core.Protections),
 	PrdElemInit(Comm_CommandUpdate,				&g_Comm),
-	//PrdElemInit(Core_ProtectionI2TUpdate,		&g_Core.Protections.I2t)
+	PrdElemInit(Peref_AvtoCalibTu,			&g_Peref),
+	PrdElemInit(Core_ProtectionI2TUpdate,		&g_Core.Protections.I2t)
 
 };
 
-// ================================ 10 Гц ==================================
+// ================================ 10 в€љС† ==================================
 
-TPeriodicalFunction Task10Hz[] =        //не более  200-т задач
+TPeriodicalFunction Task10Hz[] =        //РЅРµ Р±РѕР»РµРµ  200-С‚ Р·Р°РґР°С‡
 {
     PrdElemInit(Peref_Calibration, 			&g_Peref.Position),
 	PrdElemInit(CalcClbCycle, 				&g_Peref.Position),
@@ -161,20 +162,21 @@ TPeriodicalFunction Task10Hz[] =        //не более  200-т задач
 	PrdElemInit(Peref_SpeedCalc,			&g_Peref.Position),
 	PrdElemInit(Peref_LedsUpdate,			&g_Peref.leds),
 	PrdElemInit(Peref_10HzCalc,				&g_Peref),
-	PrdElemInit(BluetoothTimer,				&g_Comm.Bluetooth),	//на 10 Гц
-	PrdElemInit(RTC_Control,				NULL),				//на 10 Гц
-	PrdElemInit(BluetoothActivation,		&g_Comm.Bluetooth),	//на 10 Гц
-	PrdElemInit(ImTimerIndex,				&g_Stat.Im),		//на 10 Гц
-	PrdElemInit(Core_MuDuControl,			&g_Core),			//на 10 Гц
+	PrdElemInit(BluetoothTimer,				&g_Comm.Bluetooth),	//РЅР° 10 в€љС†
+	PrdElemInit(RTC_Control,				NULL),				//РЅР° 10 в€љС†
+	PrdElemInit(BluetoothActivation,		&g_Comm.Bluetooth),	//РЅР° 10 в€љС†
+	PrdElemInit(ImTimerIndex,				&g_Stat.Im),		//РЅР° 10 в€љС†
+	PrdElemInit(Core_MuDuControl,			&g_Core),			//РЅР° 10 в€љС†
 	PrdElemInit(Core_DevProc_FaultIndic,	&g_Core.Protections),
 	PrdElemInit(Core_OnOff_TEN,             &g_Core.Temper),
-	PrdElemInit(TekModbusParamsUpdate,		NULL),				//на 10 Гц
-	PrdElemInit(Core_DisplayFaultsUpdate,			&g_Core.DisplayFaults),				//на 10 Гц
-	PrdElemInit(BlinkBluetoothLed,			&g_Stat.Im),				//на 10 Гц
+	PrdElemInit(TekModbusParamsUpdate,		NULL),				//РЅР° 10 в€љС†
+	PrdElemInit(Core_DisplayFaultsUpdate,	&g_Core.DisplayFaults),				//РЅР° 10 в€љС†
+	PrdElemInit(BlinkBluetoothLed,			&g_Stat.Im),				//РЅР° 10 в€љС†
+	PrdElemInit(Core_TechProgon,			NULL),
 
 
 };
-//------------Конец файла-----------------------------------------------
+//------------В РѕРЅРµС† С„Р°Р№Р»Р°-----------------------------------------------
 
 
 

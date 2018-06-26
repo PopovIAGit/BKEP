@@ -140,6 +140,9 @@ void Peref_LedsUpdate(pLeds p)
 	else 													// Если статус не "муфта"
 		p->leds.all |= LED_MUFTA_MASK;						// Гасим светодиод
 
+
+
+
 	// ------Авария----------------------------------------
 	if (*p->pStatus & STATUS_FAULT)// Если авария
 	{
@@ -173,6 +176,7 @@ void Peref_LedsUpdate(pLeds p)
 	if(g_Ram.ramGroupG.Mode)	p->leds.all = ~g_Ram.ramGroupG.LedsReg.all;
 
 	LED_MUFTA	=  p->leds.bit.Mufta;		asm(" RPT #9 || NOP");
+
 	LED_DEFECT	=  p->leds.bit.Defect;		asm(" RPT #9 || NOP");
 	LED_FAULT	=  p->leds.bit.Fault;		asm(" RPT #9 || NOP");
 

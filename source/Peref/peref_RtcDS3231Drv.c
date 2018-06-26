@@ -44,7 +44,11 @@ void DS3231_Update(DS3231 *p)
 	}
 	else if(I2cMsg.Status == I2C_MSGSTAT_INACTIVE)//I2C_MSGSTAT_NACK)
 	{
-		if(p->Flag) {p->Flag = 0; p->Error = 1;}
+		if (p->Flag)
+		{
+		    p->Flag = 0;
+		//    p->Error = 1;
+		}
 		else for(i = 0; i < 7; i++)
 		{
 			p->Error = 0;

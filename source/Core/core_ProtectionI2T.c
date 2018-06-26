@@ -45,7 +45,9 @@ void Core_ProtectionI2TUpdate(TAlarmI2T *p)
 			}
 			else
 			{
-				p->Timeout =  I2T_CONV( *p->InputCurrentMid, *p->NomCurrent, _IQ15(50), _IQ15(1.4), _IQ15(60));
+				p->Timeout =  (50/((*p->InputCurrentMid / *p->NomCurrent) - 0.8)) + 60;
+
+					//I2T_CONV( *p->InputCurrentMid, *p->NomCurrent, 50, 1.4, 60);
 				if (++p->Timer >= (p->Timeout * p->Scale)) //  таймер  достиг времени срабатывания аварии
 				{
 					*p->Output |= BitMask;	// выставляем АВАРИЮ

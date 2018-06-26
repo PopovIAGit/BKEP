@@ -248,7 +248,7 @@ void CalcClbCycle(TPerefPosition *p)
 
 	if (p->Zone != 0)
 		{
-			if (!p->CycleData) p->CycleData = p->Zone;
+			if (!p->CycleData && p->Zone != 0x3) p->CycleData = p->Zone;
 
 			if (p->Zone == (p->CycleData & CLB_FLAG))
 			{

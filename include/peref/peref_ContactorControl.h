@@ -15,8 +15,8 @@
 //--------------------- Константы-------------------------------------------
 #define CONT_ERR_TIME	(0.200 * Prd50HZ) // Время задержки на включение выключение контактора
 //--------------------- Макросы --------------------------------------------
-#define SET_CONT_CLOSE(V)		CONTACTOR_1_CONTROL = V; asm(" RPT #9 || NOP")
-#define SET_CONT_OPEN(V)		CONTACTOR_2_CONTROL = V; asm(" RPT #9 || NOP")
+#define SET_CONT_CLOSE(V)		CONTACTOR_1_CONTROL = V; asm(" RPT #4 || NOP")//9
+#define SET_CONT_OPEN(V)		CONTACTOR_2_CONTROL = V; asm(" RPT #4 || NOP")
 
 //-------------------- Структуры -------------------------------------------
 

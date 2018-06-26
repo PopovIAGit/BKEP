@@ -50,9 +50,9 @@ __inline void CrcPack(TMbPort *hPort)
 	Uns Crc = CalcFrameCrc((hPort->Frame.Buf), hPort->Frame.TxLength);
 	hPort->Frame.Buf[hPort->Frame.TxLength++] = (Byte)(Crc & 0xFF);
 	hPort->Frame.Buf[hPort->Frame.TxLength++] = (Byte)(Crc >> 8);
-	if ( (hPort->Params.Mode==0)&&(hPort->Params.HardWareType == MCBSP_TYPE) )
+	if ( (hPort->Params.Mode==MB_SLAVE)&&(hPort->Params.HardWareType == MCBSP_TYPE) )
 	{
-		if (hPort->Frame.Buf[1]!=16) hPort->Frame.Buf[7]=0;
+		if (hPort->Frame.Buf[1]!=16 && hPort->Frame.Buf[1]!=17) hPort->Frame.Buf[7]=0;
 	}
 	
 }
@@ -422,9 +422,14 @@ __inline void ReportSlaveIdIndication(TMbPort *hPort)
 __inline void ReportSlaveIdResponse(TMbPort *hPort)
 {
 	Byte i, *Buf = hPort->Frame.Buf;
-	Buf[2] = hPort->Packet.Count;
-	for (i=0; i < Buf[2]; i++) Buf[i+3] = hPort->Packet.Data[i];
+	Buf[2] = 4;//hPort->Packet.Count;
+	//for (i=0; i < Buf[2]; i++) Buf[i+3] = hPort->Packet.Data[i];
+	Buf[3] = (DEVICE_ID>>8)&0x00FF;
+	Buf[4] = DEVICE_ID&0x00FF;
+	Buf[5] = (DEVICE_YEAR>>8)&0x00FF;
+	Buf[6] = DEVICE_YEAR&0x00FF;
 	hPort->Frame.TxLength = Buf[2] + 3;
+
 }
 
 __inline void ReportSlaveIdConfirmation(TMbPort *hPort)

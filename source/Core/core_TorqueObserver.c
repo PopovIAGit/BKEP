@@ -11,13 +11,20 @@
 #include "peref.h"
 
 // фиксированные точки для снятия момента
-Int VoltArray[CUB_COUNT1] = {160, 190,  220,  250};
-Int CurrArray[CUB_COUNT2] = {400, 800, 1200, 1600, 2000};
-//Int CurrArray[CUB_COUNT2] = {400,600, 800, 1200, 1600}; // для эпц 50000
+Int VoltArray[CUB_COUNT1] 	= {160, 190,  220,  250};
 
-//Int AnUIArray[CUB_COUNT2] = { 50,  55,   65,   69,   73};//для эпц100а50
-Int AnUIArray[CUB_COUNT2] = { 25,  35,   50,   65,   80};
-//Int AnUIArray[CUB_COUNT2] = {50,  61,   69,   74,   80};// для эпцр 100 а25
+Int CurrArray[CUB_COUNT2] 	= {400, 800, 1200, 1600, 2000, 3000};		// добавил 3000 PIA 14.11.17
+//Int CurrArray[CUB_COUNT2] 	= {400,600, 800, 1200, 1600}; // для эпц 50000
+
+//Int AnUIArray[CUB_COUNT2] 	= { 50,  55,   65,   69,   73};//для эпц100а50
+Int AnUIArray[CUB_COUNT2] 	= {25, 35, 50, 65, 70,  80};	// добавил 70 	PIA 14.11.17
+//Int AnUIArray[CUB_COUNT2] 	= {50,  61,   69,   74,   80};// для эпцр 100 а25
+
+/*
+Int CurrArray[CUB_COUNT2] 	= {400, 800, 1200, 1600, 2000, 3000};
+Int AnUIArray[CUB_COUNT2] 	= { 25,  35,   50,   65, 70,   80};	// добавил 70 	PIA 19.05.15s
+  */
+
 
 void CubInit(TCubStr *p, TCubConfig *Cfg)	//инициализация куба
 {
@@ -162,20 +169,39 @@ void Core_TorqueCalc(TTorqObs *p)
 
 		CubCalc(Cub);	// считаем выбранный куб
 
-		if (*p->TorqueSetPr < 40) 	Add = p->Corr40Trq;		// Добавил PIA 09.10.2012
-		else if (*p->TorqueSetPr < 60)	Add = p->Corr60Trq;		// корректировка индикации момента для +- изменения времени перехода на поверхность упора
-		else if (*p->TorqueSetPr < 80)	Add = p->Corr80Trq;
-		else if (*p->TorqueSetPr < 110)	Add = p->Corr110Trq;
+		if (g_Core.MotorControl.RequestDir == -1)
+		{
+		    if      (*p->TorqueSetPr < 30) 	Add = g_Ram.ramGroupC.CorrClose30Trq;		// Добавил PIA 09.10.2012
+		    else if (*p->TorqueSetPr < 40)	Add = g_Ram.ramGroupC.CorrClose40Trq;
+		    else if (*p->TorqueSetPr < 60)	Add = g_Ram.ramGroupC.CorrClose60Trq;		// корректировка индикации момента для +- изменения времени перехода на поверхность упора
+		    else if (*p->TorqueSetPr < 80)	Add = g_Ram.ramGroupC.CorrClose80Trq;
+		    else if (*p->TorqueSetPr < 110)	Add = g_Ram.ramGroupC.CorrClose110Trq;
+		}
+		else if (g_Core.MotorControl.RequestDir == 1)
+		{
+		    if 	    (*p->TorqueSetPr < 30) 	Add = g_Ram.ramGroupC.CorrOpen30Trq;		// Добавил PIA 09.10.2012
+		    else if (*p->TorqueSetPr < 40)	Add = g_Ram.ramGroupC.CorrOpen40Trq;
+		    else if (*p->TorqueSetPr < 60)	Add = g_Ram.ramGroupC.CorrOpen60Trq;		// корректировка индикации момента для +- изменения времени перехода на поверхность упора
+		    else if (*p->TorqueSetPr < 80)	Add = g_Ram.ramGroupC.CorrOpen80Trq;
+		    else if (*p->TorqueSetPr < 110)	Add = g_Ram.ramGroupC.CorrOpen110Trq;
+		}
+		else if (g_Core.MotorControl.RequestDir == 0) Add = 0;
+
 
 		p->Trqfltr.Input = (Float)Cub->Output; // фильтруем значение момента
 		peref_ApFilter3Calc(&p->Trqfltr);
-		p->Tmp =((Uns)(p->Trqfltr.Output)) + Add;
+
+		p->Tmp =((Uns)(p->Trqfltr.Output));
 
 		if (p->Tmp < TORQ_MIN_PR) p->Tmp = TORQ_MIN_PR;	// проверяем на вхождение в зону от
 		if (p->Tmp > TORQ_MAX_PR) p->Tmp = TORQ_MAX_PR;   // 10 до 110 %
 
+
+
+		if (abs(Add) > p->Tmp) Add = 0;
+
 		//PU0ToValue(Tmp, p->TorqueMax);// переводим проценты в Нм относительно максимального М
-		p->Indication = (Uns)(((LgUns)p->Tmp * p->TorqueMax) / 100);
+		p->Indication = ((Uns)((((LgUns)p->Tmp + Add) * p->TorqueMax) / 100));
 }
 
 void Core_VoltageDown(void)

@@ -2,10 +2,10 @@
 #include "core.h"
 
 	Uns FirstUpdate = 0;
-	Int InomDef[15]  	 = {13,11,18,52,52,47,56,110,85,148,240,294,358,840,840};						// default значения для Inom для разных приводов
-	Int MomMaxDef[15]  	 = {10,10,40,40,80,100,400,400,1000,1000,1000,1500,2000,3500,5000};				//				для Mmax
-	Int TransCurrDef[10] = {1500,1000,1000,1000,1000,1000,1100,1100,1100,700};					//				для TransCur править
-	Int GearRatioDef[15] = {5250,5250,7360,7360,7360,7360,8360,8360,12570,12570,17400,14400,14400,15600,15600};						//для передаточного числа редуктора
+	Int InomDef[25]  	 = {13,11,18,52,52,47,56,110,85,148,240,294,358,840,840,11,9,13,32,32,33,73,85,95,150};		// default значения для Inom для разных приводов
+	Int MomMaxDef[25]  	 = {10,10,40,40,80,100,400,400,1000,1000,1000,1500,2000,3500,5000,10,10,40,40,80,100,400,400,1000,1000};	//				для Mmax
+	Int TransCurrDef[10] 	 = {1500,1000,1000,1000,1000,1000,1100,1100,1100,700};			//				для TransCur править
+	Int GearRatioDef[25] 	 = {5250,5250,7560,5320,7560,7560,16720,16720,25116,25116,14400,14400,14400,16800,15600,5250,5250,7560,5320,7560,7560,16720,16720,25116,25116};		//для передаточного числа редуктора
 
 
 	void Core_Drive_Update(void)
@@ -73,37 +73,69 @@
 				PFUNC_blkRead(&drive15,  	 	(Int *)(&g_Ram.ramGroupH.TqCurr),   LENGTH_TRQ);
 				PFUNC_blkRead(&TransCurrDef[9], (Int *)(&g_Ram.ramGroupH.TransCurr),		  1);
 				break;
-		}
+			case dt100_A25_S:
+				PFUNC_blkRead(&drive16, (Int *) (&g_Ram.ramGroupH.TqCurr),		    LENGTH_TRQ);
+				PFUNC_blkRead(&TransCurrDef[0],		    (Int *) (&g_Ram.ramGroupH.TransCurr), 1);
+				break;
+			case dt100_A50_S:
+				PFUNC_blkRead(&drive17, (Int *) (&g_Ram.ramGroupH.TqCurr), LENGTH_TRQ);
+				PFUNC_blkRead(&TransCurrDef[1], (Int *) (&g_Ram.ramGroupH.TransCurr), 1);
+				break;
+			case dt400_B20_S:
+				PFUNC_blkRead(&drive18, (Int *) (&g_Ram.ramGroupH.TqCurr), LENGTH_TRQ);
+				PFUNC_blkRead(&TransCurrDef[2], (Int *) (&g_Ram.ramGroupH.TransCurr), 1);
+				break;
+			case dt400_B50_S:
+				PFUNC_blkRead(&drive19, (Int *) (&g_Ram.ramGroupH.TqCurr), LENGTH_TRQ);
+				PFUNC_blkRead(&TransCurrDef[3], (Int *) (&g_Ram.ramGroupH.TransCurr), 1);
+				break;
+			case dt800_V40_S:
+				PFUNC_blkRead(&drive20, (Int *) (&g_Ram.ramGroupH.TqCurr), LENGTH_TRQ);
+				PFUNC_blkRead(&TransCurrDef[4], (Int *) (&g_Ram.ramGroupH.TransCurr), 1);
+				break;
+			case dt1000_V20_S:
+				PFUNC_blkRead(&drive21, (Int *) (&g_Ram.ramGroupH.TqCurr), LENGTH_TRQ);
+				PFUNC_blkRead(&TransCurrDef[5], (Int *) (&g_Ram.ramGroupH.TransCurr), 1);
+				break;
+			case dt4000_G9_S:
+				PFUNC_blkRead(&drive22, (Int *) (&g_Ram.ramGroupH.TqCurr), LENGTH_TRQ);
+				PFUNC_blkRead(&TransCurrDef[6], (Int *) (&g_Ram.ramGroupH.TransCurr), 1);
+				break;
+			case dt4000_G18_S:
+				PFUNC_blkRead(&drive23, (Int *) (&g_Ram.ramGroupH.TqCurr), LENGTH_TRQ);
+				PFUNC_blkRead(&TransCurrDef[7], (Int *) (&g_Ram.ramGroupH.TransCurr), 1);
+				break;
+			case dt10000_D6_S:
+				PFUNC_blkRead(&drive24, (Int *) (&g_Ram.ramGroupH.TqCurr), LENGTH_TRQ);
+				PFUNC_blkRead(&TransCurrDef[8], (Int *) (&g_Ram.ramGroupH.TransCurr), 1);
+				break;
+			case dt10000_D12_S:
+				PFUNC_blkRead(&drive25, (Int *) (&g_Ram.ramGroupH.TqCurr), LENGTH_TRQ);
+				PFUNC_blkRead(&TransCurrDef[8], (Int *) (&g_Ram.ramGroupH.TransCurr), 1);
+				break;
+		    }
 
-		if ((g_Ram.ramGroupC.DriveType < 16)&&(g_Ram.ramGroupC.DriveType != 0))
+		if ((g_Ram.ramGroupC.DriveType < 26)&&(g_Ram.ramGroupC.DriveType != 0))
 		{
 			if ((g_Ram.ramGroupC.GearRatio != GearRatioDef[g_Ram.ramGroupC.DriveType - 1])
 					|| (g_Ram.ramGroupC.Inom!= InomDef[g_Ram.ramGroupC.DriveType - 1])
 					|| (g_Ram.ramGroupC.MaxTorque != MomMaxDef[g_Ram.ramGroupC.DriveType - 1]))
 			{
-				/*if (FirstUpdate==1)
+				if (FirstUpdate==0)
 				{
-					WAIT_FOR_EEPROM_READY();
-					if (IsMemParReady())
-					{
-						g_Ram.ramGroupC.GearRatio = GearRatioDef[g_Ram.ramGroupC.DriveType - 1];
-						g_Ram.ramGroupC.Inom = InomDef[g_Ram.ramGroupC.DriveType - 1];
-						g_Ram.ramGroupC.MaxTorque = MomMaxDef[g_Ram.ramGroupC.DriveType - 1];
-						WriteToEeprom(GetAdr(ramGroupC.MaxTorque), &g_Ram.ramGroupC.MaxTorque, 3);
-					}
-				} else*/
-				if (FirstUpdate==0){
 					g_Ram.ramGroupC.GearRatio = GearRatioDef[g_Ram.ramGroupC.DriveType - 1];
 					g_Ram.ramGroupC.Inom = InomDef[g_Ram.ramGroupC.DriveType - 1];
 					g_Ram.ramGroupC.MaxTorque = MomMaxDef[g_Ram.ramGroupC.DriveType - 1];
+					Core_ProtectionI2TInit(&g_Core.Protections.I2t);
 				}
 			}
-		} FirstUpdate=1;
+		}
+		FirstUpdate=1;
 	}
 
 	void Drive_ReWrite_Update(void)
 	{
-		if ((g_Ram.ramGroupC.DriveType < 16)&&(g_Ram.ramGroupC.DriveType != 0))
+		if ((g_Ram.ramGroupC.DriveType < 26)&&(g_Ram.ramGroupC.DriveType != 0))
 		{
 			if ((g_Ram.ramGroupC.GearRatio != GearRatioDef[g_Ram.ramGroupC.DriveType - 1])
 					|| (g_Ram.ramGroupC.Inom!= InomDef[g_Ram.ramGroupC.DriveType - 1])
@@ -114,6 +146,7 @@
 					g_Ram.ramGroupC.GearRatio = GearRatioDef[g_Ram.ramGroupC.DriveType - 1];
 					g_Ram.ramGroupC.Inom = InomDef[g_Ram.ramGroupC.DriveType - 1];
 					g_Ram.ramGroupC.MaxTorque = MomMaxDef[g_Ram.ramGroupC.DriveType - 1];
+					Core_ProtectionI2TInit(&g_Core.Protections.I2t);
 					WriteToEeprom(REG_MAX_TRQE, &g_Ram.ramGroupC.MaxTorque, 3);
 				}
 			}

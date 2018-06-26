@@ -20,90 +20,58 @@ void ContactorInit(TContactorControl *p)
 
 void ContactorControlUpdate(TContactorControl *p)
 {
-	switch (*p->ContactorGroup)
-	//switch (ContTest)
-	{
-		case cgStop:
+		if (g_Ram.ramGroupG.Mode == 1)
 		{
-				SET_CONT_CLOSE(1);
-				SET_CONT_OPEN(1);
-
-		/*	if (CONTACTOR_1_STATUS || CONTACTOR_2_STATUS)		// Если сигнал с контактора не уходит за 0,2 секунды после подачи команды стоп
+			switch (g_Ram.ramGroupG.TestContactor)
 			{
-				if (++p->ContactorErrTimer >= CONT_ERR_TIME)
-				{
-					p->ContactorErrTimer = CONT_ERR_TIME;		// Остаемся в данном состоянии
-					p->ContactorError = true;					// Выставляем аварию
-				}
+				case cgStop:
+					{
+						SET_CONT_CLOSE(1);
+						SET_CONT_OPEN(1);
+					}
+					break;
+				case cgOpen:
+					{
+						SET_CONT_CLOSE(1);
+						DELAY_US(1);
+						SET_CONT_OPEN(0);
+						DELAY_US(1);
+					}
+					break;
+				case cgClose:
+					{
+						SET_CONT_CLOSE(0);
+						SET_CONT_OPEN(1);
+					}
+					break;
 			}
-			else
-			{
-				p->ContactorErrTimer = 0;						// Если сигналы с контакторов снялись то сбрасываем таймер, авария при этом не уходит
-			}*/
 		}
-			break;
-		case cgOpen:
+		else
 		{
-			SET_CONT_CLOSE(1);
-			DELAY_US(1);
-			SET_CONT_OPEN(0);
-			DELAY_US(1);
-		/*
-			if (CONTACTOR_2_STATUS || p->ContactorError) 		//Если уже активирован встречный контактор или авария контактора то уходим в стоп
+			switch (*p->ContactorGroup)
 			{
-				p->ContactorGroup = cgStop;
+			case cgStop:
+				{
+					SET_CONT_CLOSE(1);
+					SET_CONT_OPEN(1);
+				}
+				break;
+			case cgOpen:
+				{
+					SET_CONT_CLOSE(1);
+					DELAY_US(1);
+					SET_CONT_OPEN(0);
+					DELAY_US(1);
+				}
+				break;
+			case cgClose:
+				{
+					SET_CONT_CLOSE(0);
+					SET_CONT_OPEN(1);
+				}
 				break;
 			}
-			else
-			{
-				SET_CONT_CLOSE(0);
-				SET_CONT_OPEN(1);
-
-				if (!CONTACTOR_1_STATUS)						// Если обратная связь не пришла или отключилась, ждем и уходим в стоп
-				{
-					if(++p->ContactorErrTimer >= CONT_ERR_TIME)
-					{
-						p->ContactorError = true;
-						p->ContactorErrTimer = 0;
-						p->ContactorGroup = cgStop;
-						Tmp++;
-					}
-				}
-				else p->ContactorErrTimer = 0;
-			}*/
 		}
-			break;
-		case cgClose:
-		{
-			SET_CONT_CLOSE(0);
-			SET_CONT_OPEN(1);						// Если все хорошо, включаем контактор
-
-			/*if (CONTACTOR_1_STATUS || p->ContactorError) 		//Если уже активирован встречный контактор или авария контакторов то уходим в стоп
-			{
-				p->ContactorGroup = cgStop;
-				break;
-			}
-			else
-			{
-				SET_CONT_CLOSE(1);
-				SET_CONT_OPEN(0);						// Если все хорошо, включаем контактор
-
-				if (!CONTACTOR_2_STATUS)
-				{
-					if(++p->ContactorErrTimer >= CONT_ERR_TIME)
-					{
-						p->ContactorError = true;
-						p->ContactorErrTimer = 0;
-						p->ContactorGroup = cgStop;
-					}
-				}
-				else p->ContactorErrTimer = 0;
-			}
-			*/
-		}
-			break;
-	}
-
 }
 
 // Сброс аварии контактора с обнулением таймера
