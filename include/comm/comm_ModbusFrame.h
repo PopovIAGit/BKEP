@@ -422,12 +422,18 @@ __inline void ReportSlaveIdIndication(TMbPort *hPort)
 __inline void ReportSlaveIdResponse(TMbPort *hPort)
 {
 	Byte i, *Buf = hPort->Frame.Buf;
-	Buf[2] = 4;//hPort->Packet.Count;
-	//for (i=0; i < Buf[2]; i++) Buf[i+3] = hPort->Packet.Data[i];
-	Buf[3] = (DEVICE_ID>>8)&0x00FF;
+	Buf[2] = 8;//hPort->Packet.Count;
+	for (i=0; i < Buf[2]; i++) Buf[i+3] = hPort->Packet.Data[i];
+	/*Buf[3] = (DEVICE_ID>>8)&0x00FF;
 	Buf[4] = DEVICE_ID&0x00FF;
 	Buf[5] = (DEVICE_YEAR>>8)&0x00FF;
 	Buf[6] = DEVICE_YEAR&0x00FF;
+	//
+	Buf[7] = (g_Ram.ramGroupA.VersionPO>>8)&0x00FF;
+	Buf[8] = g_Ram.ramGroupA.VersionPO&0x00FF;
+	if (g_Ram.ramGroupH.Password1!=0) Buf[9] = 1; else Buf[9] = 0;
+	if (g_Ram.ramGroupH.Password2!=0) Buf[10] = 1; else Buf[10] = 0;*/
+
 	hPort->Frame.TxLength = Buf[2] + 3;
 
 }

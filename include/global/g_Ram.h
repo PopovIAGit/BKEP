@@ -167,7 +167,8 @@ typedef struct _TRamGroupA
 	Uns             VersionPOBkp;   // 25. 525 Версия ПО БКП
 	Uns		VoltageDown;	// 27. 527 Падение напряжения
 	Uns		RevErrValue;	// 28. 526 Колво сбоев датчика положения
-	Uns 		Rsvd[10];	// 29-39. 528-539 Резерв
+	Int 		Rsvd1;
+	Uns 		Rsvd[9];	// 29-39. 528-539 Резерв
 } TRamGroupA;
 
 // Группа B (Адрес = 40, Количество = 100) - Параметры пользователя

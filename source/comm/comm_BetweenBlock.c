@@ -43,6 +43,9 @@ static void async_wrap_char(TMbBBHandle Port);
 static char timerExpired(unsigned int *Timer);
 static void BkpConnTrEnable(char Level);
 
+Uns BkpEncPostion=0;
+	Uns BkpEncErr=0;
+
 void SciMasterConnBetweenBlockInit(TMbBBHandle Port)
 {
 	memset(&Port->RxPacket, 0, sizeof(TScPacket));
@@ -167,8 +170,7 @@ void SciMasterConnBetweenBlockUpdate(TMbBBHandle Port)
 
 void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 {
-	Uns BkpEncPostion=0;
-	Uns BkpEncErr=0;
+
 
 	SciMasterConnBetweenBlockUpdate(bPort);
 

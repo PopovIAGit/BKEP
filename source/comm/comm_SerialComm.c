@@ -200,12 +200,23 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 		{
 
 			case MB_REPORT_ID:
-				memcpy(Packet->Data, &g_Ram.ramGroupC.ProductYear, 2);
+				Packet->Data[0] = (DEVICE_ID>>8)&0x00FF;
+				Packet->Data[1] = DEVICE_ID&0x00FF;
+				Packet->Data[2] = (DEVICE_YEAR>>8)&0x00FF;
+				Packet->Data[3] = DEVICE_YEAR&0x00FF;
+				//
+				Packet->Data[4] = (g_Ram.ramGroupA.VersionPO>>8)&0x00FF;
+				Packet->Data[5] = g_Ram.ramGroupA.VersionPO&0x00FF;
+				if (g_Ram.ramGroupH.Password1!=0) Packet->Data[6] = 1; else Packet->Data[6] = 0;
+				if (g_Ram.ramGroupH.Password2!=0) Packet->Data[7] = 1; else Packet->Data[7] = 0;
+
 				break;
 			case MB_READ_REGS:
 				switch(Res)
 				{
-					case 1: memcpy(Packet->Data, /*ToUnsPtr*/(&g_Ram.ramGroupT.TechReg) + Packet->Addr, Packet->Count);
+					case 1:memcpy(Packet->Data, /*ToUnsPtr*/(&g_Ram.ramGroupT.TechReg) + Packet->Addr, Packet->Count);
+					    //if (Packet->Addr==522) memcpy(Packet->Data, &g_Ram.ramGroupA.Rsvd1, Packet->Count);
+					    //else memcpy(Packet->Data, /*ToUnsPtr*/(&g_Ram.ramGroupT.TechReg) + Packet->Addr, Packet->Count);
 							//Port->Frame.Exception = ReadRegs(Port, (Uint16 *)&Ram, Addr, Count);
 							break;
 					case 5:
