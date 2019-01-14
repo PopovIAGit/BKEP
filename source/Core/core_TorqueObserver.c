@@ -13,18 +13,14 @@
 // фиксированные точки для снятия момента
 Int VoltArray[CUB_COUNT1] 	= {160, 190,  220,  250};
 
-//Int CurrArray[CUB_COUNT2] 	= {400, 800, 1200, 1600, 2000, 3000};		// добавил 3000 PIA 14.11.17
-Int CurrArray[CUB_COUNT2] 	= {400,600, 800, 1200, 1600}; // для эпц 50000
+Int CurrArray[CUB_COUNT2] 		= {400, 800, 1200, 1600, 2000, 3000};		// добавил 3000 PIA 14.11.17
+Int CurrArray50000[CUB_COUNT2] 	= {400, 600, 800, 1200, 1600, 2000}; // для эпц 50000
+Int CurrArray35000[CUB_COUNT2] 	= {400, 500, 600, 800, 1200, 1600}; // для эпц 50000
 
-//Int AnUIArray[CUB_COUNT2] 	= { 50,  55,   65,   69,   73};//для эпц100а50
-Int AnUIArray[CUB_COUNT2] 	= {25, 35, 50, 65, 70,  80};	// добавил 70 	PIA 14.11.17
-//Int AnUIArray[CUB_COUNT2] 	= {50,  61,   69,   74,   80};// для эпцр 100 а25
 
-/*
-Int CurrArray[CUB_COUNT2] 	= {400, 800, 1200, 1600, 2000, 3000};
-Int AnUIArray[CUB_COUNT2] 	= { 25,  35,   50,   65, 70,   80};	// добавил 70 	PIA 19.05.15s
-  */
-
+Int AnUIArray100A50[CUB_COUNT2] 	= { 50,  55,   65,   69,   73}; //для эпц100а50
+Int AnUIArray[CUB_COUNT2] 			= {25, 35, 50, 65, 70,  80};	// добавил 70 	PIA 14.11.17
+Int AnUIArray100A25[CUB_COUNT2] 	= {50,  61,   69,   74,   80};  // для эпцр 100 а25
 
 void CubInit(TCubStr *p, TCubConfig *Cfg)	//инициализация куба
 {
@@ -119,17 +115,28 @@ void CubCalc(TCubStr *p)
 // Инициализация
 void Core_TorqueInit(TTorqObs *p)
 {
-	if (g_Ram.ramGroupC.DriveType == dt35000_F48)
+	if (g_Ram.ramGroupC.DriveType == dt50000_F48)
 	{
-		// первая поверхность U и I - большие токи
-		Int VoltTmp = 0;
-		Float Volt = 0;
-		if (Volt != 0)
+		//CurrArray = CurrArray50000;//{400, 600, 800, 1200, 1600};
+		memcpy(CurrArray, CurrArray50000, sizeof(CurrArray));
+	}
+
+	if (g_Ram.ramGroupC.DriveType == dt35000_F48 )
 		{
-			Volt = g_Ram.ramGroupB.VoltCorr / 10;
+			//CurrArray = CurrArray50000;//{400, 600, 800, 1200, 1600};
+			memcpy(CurrArray, CurrArray35000, sizeof(CurrArray));
 		}
 
-		VoltTmp = g_Ram.ramGroupA.VoltageDown * Volt;
+	if (g_Ram.ramGroupC.DriveType == dt100_A25_S || g_Ram.ramGroupC.DriveType == dt100_A25)
+	{
+		//AnUIArray =  AnUIArray100A25;//{50,  61,   69,   74,   80};
+		memcpy(AnUIArray, AnUIArray100A25, sizeof(AnUIArray));
+	}
+
+	if (g_Ram.ramGroupC.DriveType == dt100_A50 || g_Ram.ramGroupC.DriveType == dt100_A50_S)
+	{
+		//AnUIArray = AnUIArray100A50;//{ 50,  55,   65,   69,   73};
+		memcpy(AnUIArray, AnUIArray100A50, sizeof(AnUIArray));
 	}
 
 	p->TqCurr.X_Value = (Int *)&g_Ram.ramGroupH.Umid;// - VoltTmp;
@@ -144,7 +151,7 @@ void Core_TorqueInit(TTorqObs *p)
 	p->TqAngUI.Y_Array = AnUIArray;
 
 	// Забираем средний ток
-	p->Imidpr 	= &g_Ram.ramGroupH.Imidpr;
+	p->Imidpr 	    = &g_Ram.ramGroupH.Imidpr;
 	p->TorqueSetPr 	= &g_Core.MotorControl.TorqueSetPr;
 	p->TransCurr 	= &g_Ram.ramGroupH.TransCurr;
 

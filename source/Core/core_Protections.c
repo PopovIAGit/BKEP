@@ -662,15 +662,14 @@ void Core_Protections50HZUpdate(TCoreProtections *p)
 			p->breakVoltT.EnableLevel = (Int *) &g_Ram.ramGroupC.BvLevelMove;
 		}
 	}
-
-
-
 }
 
 void Core_Protections50HZUpdate2(TCoreProtections *p)
 {
-	Uns BatteryLowHideDataReg = 0;
 	Uns BCPDriveType = 0;
+
+	if (p->FaultDelay > 0)
+		return;
 
 	//-------- Ошибка ТИП БКП ------------------------
 
@@ -686,6 +685,8 @@ void Core_Protections50HZUpdate2(TCoreProtections *p)
 				{
 				    BCPDriveType = (Uns)g_Ram.ramGroupC.DriveType;
 				}
+
+				if (BCPDriveType == 14) BCPDriveType = 15;
 
 				if ((p->BcpTypeDubl != BCPDriveType) && ((p->BcpTypeDubl-1) != BCPDriveType))
 				{
@@ -786,7 +787,15 @@ void Core_Protections50HZUpdate2(TCoreProtections *p)
 		}
 		//----------------Замена батарейки!!!----------------------
 
-		// если часы установлены и не записанно - записываем
+		if(g_Ram.ramGroupB.DevDate.bit.Year == 0 && g_Ram.ramGroupB.DevTime.bit.Hour == 0)
+		{
+			p->outDefects.Dev.bit.BatteryLow = 1;
+		}
+		else
+		{
+			p->outDefects.Dev.bit.BatteryLow = 0;
+		}
+
 	/*if (g_Ram.ramGroupB.DevDate.bit.Year != 0 && g_Ram.ramGroupH.HideDate.all == 0)
 	{
 		if (IsMemParReady())

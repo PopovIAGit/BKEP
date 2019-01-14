@@ -2,9 +2,9 @@
 #include "core.h"
 
 	Uns FirstUpdate = 0;
-	Int InomDef[25]  	 = {13,11,18,52,52,47,56,110,85,148,240,294,358,840,840,11,9,13,32,32,33,73,85,95,150};		// default значения для Inom для разных приводов
+	Int InomDef[25]  	 = {13,11,18,52,52,47 ,56 ,110,85  ,148 ,240 ,294 ,358 ,574 ,840 ,11,9 ,13,32,32,33 ,73 ,85 ,95  ,150};		// default значения для Inom для разных приводов
 	Int MomMaxDef[25]  	 = {10,10,40,40,80,100,400,400,1000,1000,1000,1500,2000,3500,5000,10,10,40,40,80,100,400,400,1000,1000};	//				для Mmax
-	Int TransCurrDef[10] 	 = {1500,1000,1000,1000,1000,1000,1100,1100,1100,700};			//				для TransCur править
+	Int TransCurrDef[11] 	 = {1500,1000,1000,1000,1000,1000,1100,1100,1100,700,300};			//				для TransCur править
 	Int GearRatioDef[25] 	 = {5250,5250,7560,5320,7560,7560,16720,16720,25116,25116,14400,14400,14400,16800,15600,5250,5250,7560,5320,7560,7560,16720,16720,25116,25116};		//для передаточного числа редуктора
 
 
@@ -67,7 +67,7 @@
 				break;
 			case dt35000_F48:
 				PFUNC_blkRead(&drive14,  	 	(Int *)(&g_Ram.ramGroupH.TqCurr),   LENGTH_TRQ);
-				PFUNC_blkRead(&TransCurrDef[9], (Int *)(&g_Ram.ramGroupH.TransCurr),		  1);
+				PFUNC_blkRead(&TransCurrDef[10], (Int *)(&g_Ram.ramGroupH.TransCurr),		  1);
 				break;
 			case dt50000_F48:
 				PFUNC_blkRead(&drive15,  	 	(Int *)(&g_Ram.ramGroupH.TqCurr),   LENGTH_TRQ);
