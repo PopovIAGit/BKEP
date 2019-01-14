@@ -160,6 +160,8 @@ typedef struct {
 		Uns					BcpTypeTimer;
 		Uns					SoftStarterFlag;	// flag что авария была но снялась
 		Uns					SoftStarterTimer;   // Таймер для сброса неисправности и выставления аварии
+		Uns					SoftStarterTimer2;   // Таймер для сброса неисправности и выставления аварии
+		Uns					VoltErrFlag;
 		Uns					MoveOnFlag;			// флаг что было начато движение (для работы с УПП)
 		Uns					SoftStarterConnTimer;
 		Uns					FireContErr_Timer;	// таймер для определения не замкнутости контактора в режиме пожарки

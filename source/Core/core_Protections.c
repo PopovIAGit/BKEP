@@ -699,11 +699,52 @@ void Core_Protections50HZUpdate2(TCoreProtections *p)
 			}
 		//----------------------------------------
 		//------------ Ошибка УПП -------------------------------
+
 		if (g_Ram.ramGroupB.StopMethod == smDynBreak)
 		{
 			if ((g_Ram.ramGroupATS.State1.all & 0xFF) == 0x27)
 			{
 				p->MoveOnFlag = 1; // флаг что запустились
+			}
+
+			// Если с УПП пришел бит "авария" && Висит флаг, что движение начато && Связь с УПП присутствует
+			if(g_Ram.ramGroupATS.State1.bit.Malfunction == 1 && p->MoveOnFlag == 1 && g_Comm.mbShn.Stat.Status.bit.NoConnect == 0)
+			{
+				//
+				if(p->outDefects.Load.all & LOAD_PHL_MASK && p->MoveOnFlag)
+				{
+					p->outDefects.Proc.bit.SoftStarter = 1;
+
+					if (p->SoftStarterTimer2++ >= 20 * Prd50HZ)
+					{
+						p->outDefects.Proc.bit.SoftStarter = 0;
+						p->outFaults.Proc.bit.SoftStarter = 1;
+						p->SoftStarterTimer2 = 0;
+					}
+				}
+
+				if ((p->outDefects.Net.all & NET_UV_MASK || p->registerBrVolt)&& p->MoveOnFlag)
+				{
+					p->outDefects.Proc.bit.SoftStarter = 1;
+					p->VoltErrFlag = 1;
+					if (p->SoftStarterTimer++ >= 20 * Prd50HZ)
+					{
+						p->outDefects.Proc.bit.SoftStarter = 0;
+						p->outFaults.Proc.bit.SoftStarter = 1;
+						p->SoftStarterTimer = 0;
+					}
+				}
+				else if (((p->outDefects.Net.all & NET_UV_MASK) == 0 || p->registerBrVolt == 0)&& p->MoveOnFlag)
+				{
+					if(p->VoltErrFlag == 1 && g_Comm.mbShn.Stat.Status.bit.NoConnect == 0 && g_Ram.ramGroupA.Status.bit.Fault == 0 && p->MoveOnFlag == 1 && p->outDefects.Proc.bit.SoftStarter == 1)
+					{
+						p->outDefects.Proc.bit.SoftStarter = 0;
+						p->SoftStarterTimer = 0;
+						p->SoftStarterTimer2 = 0;
+						p->SoftStarterFlag  = 1;
+						p->VoltErrFlag = 0;
+					}
+				}
 			}
 
 
@@ -720,11 +761,12 @@ void Core_Protections50HZUpdate2(TCoreProtections *p)
 						}
 				}
 
+
 				if(p->MoveOnFlag == 0)
 				{
 					if(p->outFaults.Proc.bit.SoftStarter == 0)
 					{
-						if(p->SoftStarterConnTimer++ >= (1 * Prd50HZ))
+						if(p->SoftStarterConnTimer++ >= (2 * Prd50HZ))
 						{
 							p->outFaults.Proc.bit.SoftStarter = 1;
 							p->SoftStarterConnTimer = 0;
@@ -737,7 +779,9 @@ void Core_Protections50HZUpdate2(TCoreProtections *p)
 			{
 				p->outDefects.Proc.bit.SoftStarter = 0;
 				p->SoftStarterTimer = 0;
+				p->SoftStarterTimer2 = 0;
 				p->SoftStarterFlag  = 1;
+				p->VoltErrFlag = 0;
 			}
 		}
 		//----------------Замена батарейки!!!----------------------

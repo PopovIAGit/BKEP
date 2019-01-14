@@ -241,9 +241,11 @@ void StopPowerControl(void)
 	g_Core.VlvDrvCtrl.StartDelay = (Uns)START_DELAY_TIME; // Выставляем задержку перед следующим пуском
 	g_Core.TorqObs.ObsEnable = false;
 	g_Core.Protections.SoftStarterTimer = 0;
+	g_Core.Protections.SoftStarterTimer2 = 0;
 	g_Core.Protections.MoveOnFlag 	= 0;
 	g_Core.Protections.SoftStarterFlag = 0;
 	g_Core.Protections.SoftStarterConnTimer = 0;
+	g_Core.Protections.VoltErrFlag = 0;
 }
 
 // Действия при пуске
@@ -526,27 +528,6 @@ static void ShnStartMode(void)
 {
 	switch (g_Core.MotorControl.ShnControlStepStart)
 	{
-			/*case 0:
-				g_Ram.ramGroupATS.Control1.all = 0;
-				g_Ram.ramGroupATS.Control1.bit.EnableVoltage = 1;
-				g_Ram.ramGroupATS.Control1.bit.DisableQuickStop = 1;
-				g_Ram.ramGroupATS.Control1.bit.ResetFaults = 1;
-				break;
-			case 1:
-				if (!g_Ram.ramGroupATS.State1.bit.ReadyToSwitchOn) return;
-				g_Ram.ramGroupATS.Control1.bit.SwitchOn = 1;
-				break;
-			case 2:
-				if (!g_Ram.ramGroupATS.State1.bit.SwichedOn) return;
-				g_Ram.ramGroupATS.Control1.bit.EnableOp = 1;
-				break;
-			case 3:
-				if (!g_Ram.ramGroupATS.State1.bit.OperationEnabled) return;
-				g_Core.MotorControl.WorkMode = wmMove;
-				g_Core.MotorControl.ShnControlStepStart = 0;
-				return;*/
-
-
 	case 0:
 		if (g_Ram.ramGroupATS.State1.bit.ReadyToSwitchOn == 0)
 		{
@@ -561,7 +542,11 @@ static void ShnStartMode(void)
 		break;
 	case 1:
 			g_Ram.ramGroupATS.Control1.bit.ResetFaults = 1;
-			g_Core.MotorControl.ShnControlStepStart = 2;
+			if (g_Ram.ramGroupATS.Control1.bit.ResetFaults == 1 && g_Ram.ramGroupATS.State1.bit.Malfunction == 0)
+				{
+					g_Ram.ramGroupATS.Control1.bit.ResetFaults = 0;
+					g_Core.MotorControl.ShnControlStepStart = 2;
+				}
 			break;
 	case 2:
 		if(g_Ram.ramGroupATS.State1.bit.ReadyToSwitchOn == 0)
