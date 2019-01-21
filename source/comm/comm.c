@@ -434,51 +434,69 @@ void TekModbusParamsUpdate(void) //??? необходимы проверки
 	tek->TechReg.bit.Opening = g_Ram.ramGroupA.Status.bit.Opening;
 	tek->TechReg.bit.Closing = g_Ram.ramGroupA.Status.bit.Closing;
 	tek->TechReg.bit.Stop    = g_Ram.ramGroupA.Status.bit.Stop;
-	//tek->TechReg.bit.Ten   = g_Ram.ramGroupA.Status.bit.Ten;
+	tek->TechReg.bit.Ten   	 = g_Ram.ramGroupA.Status.bit.Ten;
 	tek->TechReg.bit.Ready   = !g_Ram.ramGroupA.Status.bit.Fault;
 	tek->TechReg.bit.Rsvd1   = 0;
-	tek->TechReg.bit.Rsvd4   = 0;
-	tek->TechReg.bit.Rsvd3   = 0;
+	tek->TechReg.bit.Rsvd11  = 0;
+	tek->TechReg.bit.Rsvd12  = 0;
+	tek->TechReg.bit.Rsvd14  = 0;
 
-	// Заполняем регистр дефектов
+	// Заполняем регистр дефектов привел в соответсвие с актом и РЭ 18.01.2019 (только для TekDefRegSwitch == 0)
 	if (g_Ram.ramGroupC.TekDefRegSwitch == 0) // Заполняем для БУР
 	{
 	    tek->DefReg.bit.I2t 	= g_Ram.ramGroupA.Faults.Load.bit.I2t;
 	    tek->DefReg.bit.ShC 	= (g_Ram.ramGroupA.Faults.Load.bit.ShCU || g_Ram.ramGroupA.Faults.Load.bit.ShCV || g_Ram.ramGroupA.Faults.Load.bit.ShCW);
 	    tek->DefReg.bit.Drv_T 	= 0;
 	    tek->DefReg.bit.Uv 		= (g_Ram.ramGroupA.Faults.Net.bit.UvR || g_Ram.ramGroupA.Faults.Net.bit.UvS || g_Ram.ramGroupA.Faults.Net.bit.UvT);
-	    tek->DefReg.bit.Phl 	= (g_Ram.ramGroupA.Faults.Load.bit.PhlU || g_Ram.ramGroupA.Faults.Load.bit.PhlV || g_Ram.ramGroupA.Faults.Load.bit.PhlW);
+	    tek->DefReg.bit.Phl 	= 0;//;(g_Ram.ramGroupA.Faults.Load.bit.PhlU || g_Ram.ramGroupA.Faults.Load.bit.PhlV || g_Ram.ramGroupA.Faults.Load.bit.PhlW);
 	    tek->DefReg.bit.NoMove 	= g_Ram.ramGroupA.Faults.Proc.bit.NoMove;
 	    tek->DefReg.bit.Ov 		= (g_Ram.ramGroupA.Faults.Net.bit.OvR || g_Ram.ramGroupA.Faults.Net.bit.OvS || g_Ram.ramGroupA.Faults.Net.bit.OvT);
 	    tek->DefReg.bit.Bv 		= (g_Ram.ramGroupA.Faults.Net.bit.BvR || g_Ram.ramGroupA.Faults.Net.bit.BvS || g_Ram.ramGroupA.Faults.Net.bit.BvT);
 	    tek->DefReg.bit.Rsvd	= 0;
 	    tek->DefReg.bit.Th 		= g_Ram.ramGroupA.Faults.Dev.bit.Th_BCP;
-	    tek->DefReg.bit.Tl 		= g_Ram.ramGroupA.Faults.Dev.bit.Tl_BCP;
+	    tek->DefReg.bit.Tl 		= 0;//g_Ram.ramGroupA.Faults.Dev.bit.Tl_BCP;
 	    tek->DefReg.bit.Rsvd1 	= 0;
 	    tek->DefReg.bit.PhOrdU 	= 0;//g_Ram.ramGroupA.Faults.Net.bit.PhOrd;
-	    tek->DefReg.bit.PhOrdDrv 	= g_Ram.ramGroupA.Faults.Proc.bit.PhOrd;
-	    tek->DefReg.bit.DevDef 	= ((g_Ram.ramGroupA.Faults.Dev.all & TEK_DEVICE_FAULT_MASK) != 0); //маску переделать
-	    tek->DefReg.bit.NoCalib 	= (g_Ram.ramGroupA.Faults.Proc.bit.NoCalib|| g_Ram.ramGroupA.Faults.Proc.bit.NoClose || g_Ram.ramGroupA.Faults.Proc.bit.NoOpen);
+	    tek->DefReg.bit.PhOrdDrv= g_Ram.ramGroupA.Faults.Proc.bit.PhOrd;
+	    tek->DefReg.bit.DevDef 	= 0;//((g_Ram.ramGroupA.Faults.Dev.all & TEK_DEVICE_FAULT_MASK) != 0); //маску переделать
+	    tek->DefReg.bit.NoCalib = 0;//(g_Ram.ramGroupA.Faults.Proc.bit.NoCalib|| g_Ram.ramGroupA.Faults.Proc.bit.NoClose || g_Ram.ramGroupA.Faults.Proc.bit.NoOpen);
 	}
 	else if (g_Ram.ramGroupC.TekDefRegSwitch == 1) //Заполняем для БУ50
 	{
-	    tek->DefReg.bit.I2t 	= 0;
-	    tek->DefReg.bit.ShC 	= (g_Ram.ramGroupA.Faults.Load.bit.ShCU || g_Ram.ramGroupA.Faults.Load.bit.ShCV || g_Ram.ramGroupA.Faults.Load.bit.ShCW);
-	    tek->DefReg.bit.Drv_T 	= g_Ram.ramGroupA.Faults.Load.bit.I2t;
-	    tek->DefReg.bit.Uv 		= 0;
-	    tek->DefReg.bit.Phl 	= (g_Ram.ramGroupA.Faults.Load.bit.PhlU || g_Ram.ramGroupA.Faults.Load.bit.PhlV || g_Ram.ramGroupA.Faults.Load.bit.PhlW);
-	    tek->DefReg.bit.NoMove 	= 0;
-	    tek->DefReg.bit.Ov 		= 0;
-	    tek->DefReg.bit.Bv 		= 0;
-	    tek->DefReg.bit.Rsvd	= 0;
-	    tek->DefReg.bit.Th 		= 0;
-	    tek->DefReg.bit.Tl 		= (g_Ram.ramGroupA.Faults.Net.bit.UvR || g_Ram.ramGroupA.Faults.Net.bit.UvS || g_Ram.ramGroupA.Faults.Net.bit.UvT || g_Ram.ramGroupA.Faults.Net.bit.BvR || g_Ram.ramGroupA.Faults.Net.bit.BvS || g_Ram.ramGroupA.Faults.Net.bit.BvT);
-	    tek->DefReg.bit.Rsvd1 	= g_Ram.ramGroupA.Faults.Dev.bit.Th_BCP;
-	    tek->DefReg.bit.PhOrdU 	= g_Ram.ramGroupA.Faults.Dev.bit.Tl_BCP;
+	    tek->DefReg.bit.I2t 		= 0;
+	    tek->DefReg.bit.ShC 		= (g_Ram.ramGroupA.Faults.Load.bit.ShCU || g_Ram.ramGroupA.Faults.Load.bit.ShCV || g_Ram.ramGroupA.Faults.Load.bit.ShCW);
+	    tek->DefReg.bit.Drv_T 		= g_Ram.ramGroupA.Faults.Load.bit.I2t;
+	    tek->DefReg.bit.Uv 			= 0;
+	    tek->DefReg.bit.Phl 		= (g_Ram.ramGroupA.Faults.Load.bit.PhlU || g_Ram.ramGroupA.Faults.Load.bit.PhlV || g_Ram.ramGroupA.Faults.Load.bit.PhlW);
+	    tek->DefReg.bit.NoMove 		= 0;
+	    tek->DefReg.bit.Ov 			= 0;
+	    tek->DefReg.bit.Bv 			= 0;
+	    tek->DefReg.bit.Rsvd		= 0;
+	    tek->DefReg.bit.Th 			= 0;
+	    tek->DefReg.bit.Tl 			= (g_Ram.ramGroupA.Faults.Net.bit.UvR || g_Ram.ramGroupA.Faults.Net.bit.UvS || g_Ram.ramGroupA.Faults.Net.bit.UvT || g_Ram.ramGroupA.Faults.Net.bit.BvR || g_Ram.ramGroupA.Faults.Net.bit.BvS || g_Ram.ramGroupA.Faults.Net.bit.BvT);
+	    tek->DefReg.bit.Rsvd1 		= g_Ram.ramGroupA.Faults.Dev.bit.Th_BCP;
+	    tek->DefReg.bit.PhOrdU 		= g_Ram.ramGroupA.Faults.Dev.bit.Tl_BCP;
 	    tek->DefReg.bit.PhOrdDrv 	= (g_Ram.ramGroupA.Faults.Net.bit.OvR || g_Ram.ramGroupA.Faults.Net.bit.OvS || g_Ram.ramGroupA.Faults.Net.bit.OvT);
-	    tek->DefReg.bit.DevDef 	= 0;
+	    tek->DefReg.bit.DevDef 		= 0;
 	    tek->DefReg.bit.NoCalib 	= (g_Ram.ramGroupA.Faults.Proc.bit.NoCalib|| g_Ram.ramGroupA.Faults.Proc.bit.NoClose || g_Ram.ramGroupA.Faults.Proc.bit.NoOpen);
 	}
+
+		tek->FaultReg.bit.NoCalib 	= (g_Ram.ramGroupA.Faults.Proc.bit.NoCalib|| g_Ram.ramGroupA.Faults.Proc.bit.NoClose || g_Ram.ramGroupA.Faults.Proc.bit.NoOpen);
+		tek->FaultReg.bit.MuDu 		=  g_Ram.ramGroupA.Faults.Proc.bit.MuDuDef;
+		tek->FaultReg.bit.Uv 		= (g_Core.Protections.outDefects.Net.bit.UvR|| g_Core.Protections.outDefects.Net.bit.UvS||g_Core.Protections.outDefects.Net.bit.UvT);
+		tek->FaultReg.bit.Ov 		= (g_Core.Protections.outDefects.Net.bit.OvR|| g_Core.Protections.outDefects.Net.bit.OvS||g_Core.Protections.outDefects.Net.bit.OvT);
+		tek->FaultReg.bit.Vsk 		= (g_Ram.ramGroupA.Faults.Net.bit.BvR || g_Ram.ramGroupA.Faults.Net.bit.BvS || g_Ram.ramGroupA.Faults.Net.bit.BvT);;
+		tek->FaultReg.bit.Bv 		= (g_Ram.ramGroupA.Faults.Load.bit.PhlU|| g_Ram.ramGroupA.Faults.Load.bit.PhlV || g_Ram.ramGroupA.Faults.Load.bit.PhlW);
+		tek->FaultReg.bit.ThErr 	= (g_Ram.ramGroupA.Faults.Dev.bit.Th_BCD || g_Ram.ramGroupA.Faults.Dev.bit.Th_BCP);
+		tek->FaultReg.bit.Tl 		= (g_Ram.ramGroupA.Faults.Dev.bit.Tl_BCD || g_Ram.ramGroupA.Faults.Dev.bit.Tl_BCP);
+		tek->FaultReg.bit.DevDef 	= ((g_Ram.ramGroupA.Faults.Dev.all & TEK_DEVICE_FAULT_MASK) != 0); //маску переделать
+		tek->FaultReg.bit.Rsvd1 	= 0;
+		tek->FaultReg.bit.Rsvd2 	= 0;
+		tek->FaultReg.bit.Rsvd3 	= 0;
+		tek->FaultReg.bit.Rsvd4 	= 0;
+		tek->FaultReg.bit.Rsvd5 	= 0;
+		tek->FaultReg.bit.Rsvd6 	= 0;
+		tek->FaultReg.bit.Rsvd7 	= 0;
 
 	// Регистр команд
 	// При срабатывании одной команды, сбрасываем все
@@ -572,11 +590,25 @@ void TekModbusParamsUpdate(void) //??? необходимы проверки
 
 
 	tek->CycleCnt 		 = g_Ram.ramGroupA.CycleCnt;
-	tek->Iu				 = g_Ram.ramGroupA.Iu;
-	//tek->Ur				 = g_Ram.ramGroupA.Ur;
+	tek->Iu				 = g_Ram.ramGroupH.Imid;
+	tek->Ur				 = g_Ram.ramGroupH.Umid;
 	tek->Torque			 = g_Ram.ramGroupA.Torque;
 	tek->Speed			 = g_Ram.ramGroupA.Speed;
 	tek->RsStation		 = g_Ram.ramGroupB.RsStation;
+	tek->MuDu 			 = g_Ram.ramGroupA.Status.bit.MuDu;
+
+	tek->Rsvd28 		 = 0;
+	tek->PoVersion 		 = g_Ram.ramGroupA.VersionPO;
+	tek->Rsvd32 		 = 0;
+	tek->Rsvd33 		 = 0;
+	tek->Rsvd34 		 = 0;
+	tek->Rsvd35 		 = 0;
+	tek->Rsvd36 		 = 0;
+	tek->Rsvd37 		 = 0;
+	tek->Rsvd38 		 = 0;
+	tek->Rsvd39 		 = 0;
+	tek->Rsvd40 		 = 0;
+
 
 	//Состояние дискретных входов и выходов
 	/*

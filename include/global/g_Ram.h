@@ -51,8 +51,10 @@ typedef union _TTek_TechReg
 		Uns Opening:1;		// 8
 		Uns Closing:1;		// 9
 		Uns Stop:1;			// 10
-		Uns Rsvd3:3;		// 11-13
-		Uns Rsvd4:1;		// 14
+		Uns Rsvd11;			// 11-12
+		Uns Rsvd12;
+		Uns Ten:1;			// 13
+		Uns Rsvd14:1;		// 14
 		Uns Ready:1;		// 15
 	} bit;
 } TTek_TechReg;
@@ -62,7 +64,7 @@ typedef union _TTek_DefReg
 	Uns all;
 	struct
 	{	// БУ50
-	      /*Uns Rsvd5:1;		// 0
+	    /*Uns Rsvd5:1;		// 0
 		Uns ShC:1;		// 1	короткое замыкание
 		Uns I2t:1;		// 2	времятоковая защита
 		Uns Rsvd3:1;		// 3
@@ -75,17 +77,17 @@ typedef union _TTek_DefReg
 		Uns Rsvd2:1;		// 14
 		Uns NoCalib:1;  	// 15*/
 		// БУР
-		Uns I2t:1;		// 0	времятоковая защита
-		Uns ShC:1;		// 1	короткое замыкание
+		Uns I2t:1;			// 0	времятоковая защита
+		Uns ShC:1;			// 1	короткое замыкание
 		Uns Drv_T:1;		// 2	перегрев электродвигателя
-		Uns Uv:1;		// 3	пониженное напряжение входной сети
-		Uns Phl:1;		// 4	Резерв
+		Uns Uv:1;			// 3	пониженное напряжение входной сети
+		Uns Phl:1;			// 4	Резерв
 		Uns NoMove:1;		// 5	Отсутствие движения
-		Uns Ov:1;		// 6	Повышенное напряжение входной сети
-		Uns Bv:1;		// 7	Обрыв фаз входной сети
-		Uns Rsvd:1;		// 8	Резерв
-		Uns Th:1;		// 9	Перегрев блока
-		Uns Tl:1;		// 10
+		Uns Ov:1;			// 6	Повышенное напряжение входной сети
+		Uns Bv:1;			// 7	Обрыв фаз входной сети
+		Uns Rsvd:1;			// 8	Резерв
+		Uns Th:1;			// 9	Перегрев блока
+		Uns Tl:1;			// 10
 		Uns Rsvd1:1;		// 11
 		Uns PhOrdU:1;		// 12	Неверное чередование фаз сети
 		Uns PhOrdDrv:1;		// 13	Неверное чередование фаз двигателя
@@ -93,6 +95,30 @@ typedef union _TTek_DefReg
 		Uns NoCalib:1;		// 15
 	} bit;
 } TTek_DefReg;
+
+typedef union _TTEK_FaultReg
+{
+	Uns all;
+	struct
+	{
+		Uns NoCalib:1;		// 0 	Время-токовая защита
+		Uns MuDu:1;			// 1 	Короткое замыкание
+		Uns Uv:1;			// 2 	Перегрев двигателя
+		Uns Ov:1;			// 3 	Пониженеое напряжение фаз сети
+		Uns Vsk:1;			// 4 	Обрыв фазы электродвигателя
+		Uns Bv:1;			// 5 	Нет движения
+		Uns ThErr:1;		// 6 	Перенапряжение на входе
+		Uns Tl:1;			// 7 	Критическое снижение напряжения на входе
+		Uns DevDef:1;		// 8 	Резерв
+		Uns Rsvd1:1;		// 9  	Перегрев блока
+		Uns Rsvd2:1;		// 10 	Переохлождение блока
+		Uns Rsvd3:1;		// 11 	Резерв
+		Uns Rsvd4:1;		// 12   Неверное чередование фаз сети
+		Uns Rsvd5:1;		// 13   Чередование фаз двигателя
+		Uns Rsvd6:1;		// 14 	Дефект устройства (кроме перегрева и переохлаждения)
+		Uns Rsvd7:1;		// 15 	Резерв
+	} bit;
+} TTEK_FaultReg;
 
 typedef union _TTek_ComReg
 {
@@ -165,10 +191,10 @@ typedef struct _TRamGroupA
 	Int             TemperBKP;      // 23. 523 Температура блока БКП
 	Uns             VersionPO;      // 24. 524 Версия ПО
 	Uns             VersionPOBkp;   // 25. 525 Версия ПО БКП
-	Uns		VoltageDown;	// 27. 527 Падение напряжения
-	Uns		RevErrValue;	// 28. 526 Колво сбоев датчика положения
-	Int 		Rsvd1;
-	Uns 		Rsvd[9];	// 29-39. 528-539 Резерв
+	Uns				VoltageDown;	// 27. 527 Падение напряжения
+	Uns				RevErrValue;	// 28. 526 Колво сбоев датчика положения
+	Int 			Rsvd1;
+	Uns 			Rsvd[9];	// 29-39. 528-539 Резерв
 } TRamGroupA;
 
 // Группа B (Адрес = 40, Количество = 100) - Параметры пользователя
@@ -180,40 +206,40 @@ typedef struct _TRamGroupB
 	Uns				StartCloseTorque; 	// B3. 43 Момент трогания на закрытие
 	Uns				BreakOpenTorque;  	// B4. 44 Момент уплотнения на открытие
 	Uns				StartOpenTorque;  	// B5. 45 Момент трогания на открытие
-	TValveType			ValveType;		// B6. 46 Тип задвижки (клин/шибер)
-	TBreakMode      		BreakMode;		// B7. 47 Тип уплотнения
-	TRodType        		RodType;           	// B8. 48 Тип штока
-	Uns				CloseZone;		// B9. 49 Зона закрыто
-	Uns				OpenZone;		// B10. 50 Зона открыто
-	Uns             		PositionAcc;        	// B11. 51 Зона смещения
-	Uns            			MainCode;        	// B12. 52 Код доступа
-	TTimeVar 			DevTime;		// B13. 53 Время
-	TDateVar 			DevDate;		// B14. 54 Дата
+	TValveType		ValveType;			// B6. 46 Тип задвижки (клин/шибер)
+	TBreakMode      BreakMode;			// B7. 47 Тип уплотнения
+	TRodType        RodType;           	// B8. 48 Тип штока
+	Uns				CloseZone;			// B9. 49 Зона закрыто
+	Uns				OpenZone;			// B10. 50 Зона открыто
+	Uns             PositionAcc;        // B11. 51 Зона смещения
+	Uns            	MainCode;        	// B12. 52 Код доступа
+	TTimeVar 		DevTime;			// B13. 53 Время
+	TDateVar 		DevDate;			// B14. 54 Дата
 	Int		 		TimeCorrection;		// B15. 55 Корректеровка времени
-	TIndicMode  			IIndicMode;         	// B16. 56 Режим индикации тока
-	TMuDuSetup  			MuDuSetup;          	// B17. 57 Настройка режима МУ/ДУ
-	TDuSource			DuSource;		// B18. 58 Источник команд ДУ
-	Uns         			TuLockSeal;         	// B19. 59 Блокировка залипани
-	Uns         			TuTime;             	// B20. 60 Время команды
-	TInputType 			InputType;		// B21. 61 Тип входного сигнала 24/220
-	TUInvert	    		TuInvert;		// B22. 62 Маска дискретных входов
-	TSInvert 			TsInvert;		// B23. 63 Маска дискретных выходов
-	TBaudRate       		RsBaudRate;         	// B24. 64 Скорость связи
-	Uns             		RsStation;          	// B25. 65 Адрес станции
-	TParityMode			RsMode;			// B26. 66 Режим связи
-	Uns				MuffTimer;		// B27. 67
+	TIndicMode  	IIndicMode;         // B16. 56 Режим индикации тока
+	TMuDuSetup  	MuDuSetup;          // B17. 57 Настройка режима МУ/ДУ
+	TDuSource		DuSource;			// B18. 58 Источник команд ДУ
+	Uns         	TuLockSeal;         // B19. 59 Блокировка залипани
+	Uns         	TuTime;             // B20. 60 Время команды
+	TInputType 		InputType;			// B21. 61 Тип входного сигнала 24/220
+	TUInvert	    TuInvert;			// B22. 62 Маска дискретных входов
+	TSInvert 		TsInvert;			// B23. 63 Маска дискретных выходов
+	TBaudRate       RsBaudRate;         // B24. 64 Скорость связи
+	Uns             RsStation;          // B25. 65 Адрес станции
+	TParityMode		RsMode;				// B26. 66 Режим связи
+	Uns				MuffTimer;			// B27. 67
 	Uns				SwitcherMuDuMode;	// B28. режим с использованием переключателя МУ/ДУ на ЩТМ (опрос ТУ в режиме МУ)
 	Uns				reserv68[2];		// B29 -30. 69-70 Резерв
-	Uns 				Sec3Mode;		// B31. 71
-	Uns				NoMoveTime;		// B32. 72 Время отсутствия движения
+	Uns 			Sec3Mode;			// B31. 71
+	Uns				NoMoveTime;			// B32. 72 Время отсутствия движения
 	Uns				OverwayZone;		// B33. 73 Максимальный путь уплотнения
-	TPlaceType			PlaceType;		// B34. 74 место установки привода (обычн, агрегатная, пожарка)
-	Uns				reserv75;		// B35. 75 Резерв
- 	TStopMethod			StopMethod;		// B36. 76 Выбор типа торможения (Динамика, Противовключение)
- 	Uns				ConductorSection;   	// B37. 77 Сечение проводника
- 	Uns             		ConductorLength;	// B38. 78 Длина проводника
- 	Int				VoltCorr;		// B39.
- 	Uns 				Rsvd[10];		// B40 41 42 43 44 45 46 47 48 49 -49. 77-89
+	TPlaceType		PlaceType;			// B34. 74 место установки привода (обычн, агрегатная, пожарка)
+	Uns				reserv75;			// B35. 75 Резерв
+ 	TStopMethod		StopMethod;			// B36. 76 Выбор типа торможения (Динамика, Противовключение)
+ 	Uns				ConductorSection;   // B37. 77 Сечение проводника
+ 	Uns             ConductorLength;	// B38. 78 Длина проводника
+ 	Int				VoltCorr;			// B39.
+ 	Uns 			Rsvd[10];			// B40 41 42 43 44 45 46 47 48 49 -49. 77-89
 } TRamGroupB;
 
 // Группа C (Адрес = 90, Количество = 120) - Заводские параметры
@@ -221,30 +247,31 @@ typedef struct _TRamGroupC
 {
 	Uns             FactCode;           	// C0. 90 Код доступа
 	TDriveType      DriveType;          	// C1. 91 Тип привода
-	Uns        	ProductYear;        	// C2. 92 Год изготовления блока
+	Uns        		ProductYear;        	// C2. 92 Год изготовления блока
   	Uns             FactoryNumber;      	// C3. 93 Заводской номер блока
   	Uns             MaxTorque;          	// C4. 94 Максимальный момент привода
 	Uns             Inom;               	// C5. 95 Номинальный ток
   	Uns             GearRatio;          	// C6. 96 Передаточное число редуктора
-  	Uns		reserv97;	    	// С7. 97 Резерв
-  	Uns		TekDefRegSwitch;	// С8. 98 Резерв
+  	Uns				reserv97;	    		// С7. 97 Резерв
+  	Uns				TekDefRegSwitch;		// С8. 98 Резерв
 	THallBlock      HallBlock;          	// C9. 99 Состояние датчиков холла блока
 	Uns             SubVersionPO;	    	// C10. 100 Подверсия ПО
-	Uns		progonCycles;		// С11. 101 Резерв
-	Uns		reserv102;		// С12. 102 Резерв
+	Uns				progonCycles;			// С11. 101 циклы прогона
+	Uns				reserv102;				// С12. 102 Резерв
 	Uns             MuffZone;           	// C13. 103 Расстояние сброса муфты
-	Uns		PosSensPow;		// C14. 104 Тип датчика положения
-	Uns		reserv105;		// C15. 105 Резерв
+	Uns				PosSensPow;				// C14. 104 Тип датчика положения
+	Uns				reserv105;				// C15. 105 Резерв
 	Uns             SetDefaults;        	// C16. 106 Задание параметров по умолчанию
-	Uns             Rsvd7[2];          	// C17-18. 107-108 резерв
+	Uns				ConnFlagCountBCP;		// C17. 107 временная задержка на определение аварии связь с БКП
+	Uns             Rsvd18;          		// C18. 108 резерв
 	Uns             BrakePause;         	// C19. 109 Пауза перед торможением
 	Uns             BrakeTime;          	// C20. 110 Время торможения
-	Uns       	StopShnTime;   		// C21. 111 Время торможения динамическим торможением
-	Int		BreakZone;		// C22. 112 Число оборотов дв за которое начинаем тормозить
-	Uns		Rsvd5[12];		// C23-34. 113-124 резерв
+	Uns       		StopShnTime;   			// C21. 111 Время торможения динамическим торможением
+	Int				BreakZone;				// C22. 112 Число оборотов дв за которое начинаем тормозить
+	Uns				Rsvd5[12];				// C23-34. 113-124 резерв
 	Int             CorrTemper;         	// C35. 125 Корректировка температуры блока БКП
-	Uns        	Rsvd8;           	// C36. 126 резерв
-	Uns		CurrentMpyType;		// C37. 127 Управление ножкой уселителя сигнала АЦП для ДТ. работает только если тип привода не определен
+	Uns        		Rsvd8;           		// C36. 126 резерв
+	Uns				CurrentMpyType;			// C37. 127 Управление ножкой уселителя сигнала АЦП для ДТ. работает только если тип привода не определен
 	Uns             IU_Mpy;             	// C38. 128 Корректировка тока фазы U
 	Uns             IV_Mpy;             	// C39. 129 Корректировка тока фазы V
 	Uns             IW_Mpy;             	// C40. 130 Корректировка тока фазы W
@@ -257,120 +284,120 @@ typedef struct _TRamGroupC
 	Uns             UR_Offset;          	// C47. 137 Смещение напряжения фазы R
 	Uns             US_Offset;          	// C48. 138 Смещение напряжения фазы S
 	Uns             UT_Offset;          	// C49. 139 Смещение напряжения фазы T
-	Uns		SinTf;			// C50. 140 ПОСТ.ВРЕМЕНИ ФИЛЬТРОВ СИНУСОВ
-	Uns		RmsTf;			// C51. 141 ПОСТ.ВРЕМЕНИ ФИЛЬТРОВ RMS
-	Uns		Dac_Mpy;		// C52. 142 Корректировка ЦАП
-	Int		Dac_Offset;		// C53. 143 Смещение ЦАП
-	TPrtMode        Ov;			// C54. 144 Защита от превышения напряжения
+	Uns				SinTf;					// C50. 140 ПОСТ.ВРЕМЕНИ ФИЛЬТРОВ СИНУСОВ
+	Uns				RmsTf;					// C51. 141 ПОСТ.ВРЕМЕНИ ФИЛЬТРОВ RMS
+	Uns				Dac_Mpy;				// C52. 142 Корректировка ЦАП
+	Int				Dac_Offset;				// C53. 143 Смещение ЦАП
+	TPrtMode        Ov;						// C54. 144 Защита от превышения напряжения
 	Uns             OvLevel_max;        	// C55. 145 Уровень превышения напряжения при 47% превышения (320В)
-	Uns             OvTime_max;     	// C56. 146 Время превышения напряжения при 47% превышения (1с)
-	Uns             OvLevel;    		// C57. 147 Уровень превышения напряжения
-	Uns             OvDTime;     		// C58. 148 Время превышения напряжения неисправность
+	Uns             OvTime_max;     		// C56. 146 Время превышения напряжения при 47% превышения (1с)
+	Uns             OvLevel;    			// C57. 147 Уровень превышения напряжения
+	Uns             OvDTime;     			// C58. 148 Время превышения напряжения неисправность
 	Uns             OvTime;     		// C59. 149 Время превышения напряжения
 	TPrtMode        Uv;			// C60. 150 Защита от превышения напряжения
 	Uns             UvLevel;   		// C61. 151 Уровень понижения напряжения
 	Uns             UvDTime;    		// C62. 152 Время понижения напряжения
 	Uns             UvTime;     		// C63. 153 Время превышения напряжения
-  	Uns		reserv154;		// С64. 154 Резерв
-  	Uns		reserv155;		// С65. 155 Резерв
-  	Uns		reserv156;		// С66. 156 Резерв
+  	Uns				reserv154;		// С64. 154 Резерв
+  	Uns				reserv155;		// С65. 155 Резерв
+  	Uns				reserv156;		// С66. 156 Резерв
 	TPrtMode        Bv;        		// C67. 157 Защита от обрыва входных фаз
 	Uns             BvLevel;   		// C68. 158 Уровень обрыва входных фаз
-	Uns		BvLevelMove;		// C69. 159 Уровень обрыва питающих фаз в движении
+	Uns				BvLevelMove;		// C69. 159 Уровень обрыва питающих фаз в движении
 	Uns             BvTime;    		// C70. 160 Время обрыва входных фаз
-	Uns		Rsvd14;			// C71  161 резерв
+	Uns				Rsvd14;			// C71  161 резерв
 	TPrtMode        Phl;           		// C72. 162 Защита от обрыва фаз нагрузки
 	Uns             PhlLevel;      		// C73. 163 Уровень обрыва фаз
 	Uns             PhlTime;       		// C74. 164 Время определения обрыва фаз
 	TPrtMode        I2t;                	// C75. 165 Время-токовая защита
-	Uns		Rsvd6[12];		// C76-84. 166-274 Резерв
+	Uns				Rsvd6[12];		// C76-84. 166-274 Резерв
 	TPrtMode        ShC;        		// C88. 178 Защита от короткого замыкания
-	Uns		ShC_Up; 		// C89. 179 убрать
-	Uns		ShC_Down;		// C90. 180 уброать в H
+	Uns				ShC_Up; 		// C89. 179 убрать
+	Uns				ShC_Down;		// C90. 180 уброать в H
 	TPrtMode        CalibIndic;         	// C91. 181 Индикация калибровки
 	TPrtMode        ErrIndic;           	// C92. 182 Индикация аварий устройства
 	TPrtMode        TemperTrack;        	// C93. 183 Защита от перегрева/переохлаждения блока
-	Int		Rsvd13[3];		// C94 - 96. Резерв
+	Int				Rsvd13[3];		// C94 - 96. Резерв
 	Int             TenOnValue;         	// C97. 187 Уровень включения ТЕНа
 	Int             TenOffValue;        	// C98. 188 Уровень выключения ТЕНа
-	Uns 		Rsvd11[3];		// С99-101.  189-191 резерв
+	Uns 			Rsvd11[3];		// С99-101.  189-191 резерв
 	TPrtMode        PhOrd;          	// C102. 192 Защита от неверного чередования фаз двигателя
-	Uns		PhOrdTime;		// C103. 193 Время чередования фаз двигателя
+	Uns				PhOrdTime;		// C103. 193 Время чередования фаз двигателя
 	Uns             PhOrdZone;      	// C104. 194 Расстояние чередования фаз двигателя
 	TPrtMode        MuDuDef;        	// C105. 195 Защита ошибки входов Му/Ду
-	Uns		Rsvd12[2];		// C106-107. 196-197 Резерв
-	Int		CorrClose30Trq;		// C108. 198
-	Int		CorrClose40Trq;		// C109. 199 Параметр для корректировки индикации малых моментов (меньше 60%)
-	Int		CorrClose60Trq;		// C110. 200 Параметр для корректировки индикации больших моментов (больше 60%)		Int		CorrOpen80Trq;		// C116. 206
-	Int		CorrClose80Trq;		// C111. 201
-	Int		CorrClose110Trq;	// C112. 202
-	Int		CorrOpen30Trq;		// C113. 203
-	Int		CorrOpen40Trq;		// C114. 204 Параметр для корректировки индикации малых моментов (меньше 60%)
-	Int		CorrOpen60Trq;		// C115. 205 Параметр для корректировки индикации больших моментов (больше 60%)
-	Int		CorrOpen80Trq;		// C116. 206
-	Int		CorrOpen110Trq;		// C117. 207
-	Uns		Rsvd118;		// C118. 208 Корректеровка момента в открытие
-	Uns		TuOffsetCalib;		// C119.  209. калибровка офсетов ТУ - проводить при ту 220 для большей точности.
+	Uns				Rsvd12[2];		// C106-107. 196-197 Резерв
+	Int				CorrClose30Trq;		// C108. 198
+	Int				CorrClose40Trq;		// C109. 199 Параметр для корректировки индикации малых моментов (меньше 60%)
+	Int				CorrClose60Trq;		// C110. 200 Параметр для корректировки индикации больших моментов (больше 60%)		Int		CorrOpen80Trq;		// C116. 206
+	Int				CorrClose80Trq;		// C111. 201
+	Int				CorrClose110Trq;	// C112. 202
+	Int				CorrOpen30Trq;		// C113. 203
+	Int				CorrOpen40Trq;		// C114. 204 Параметр для корректировки индикации малых моментов (меньше 60%)
+	Int				CorrOpen60Trq;		// C115. 205 Параметр для корректировки индикации больших моментов (больше 60%)
+	Int				CorrOpen80Trq;		// C116. 206
+	Int				CorrOpen110Trq;		// C117. 207
+	Uns				Rsvd118;		// C118. 208 Корректеровка момента в открытие
+	Uns				TuOffsetCalib;		// C119.  209. калибровка офсетов ТУ - проводить при ту 220 для большей точности.
 	//------Параметры для ТУ------------------------------------
-	Uns		LevelOn220;		// C120. 210
-	Uns		LevelOff220;		// C121. 211
-	Uns		LevelOn24;		// C122. 212
-	Uns		LevelOff24;		// C123. 213
+	Uns				LevelOn220;		// C120. 210
+	Uns				LevelOff220;		// C121. 211
+	Uns				LevelOn24;		// C122. 212
+	Uns				LevelOff24;		// C123. 213
 	//--------------------------------------------------
-	Uns		p_UOpen_Mpy220;   	// C124. 214
-	Uns		p_UOpen_Mpy24;   	// C125. 215
-	Uns		p_UOpen_Offset;		// C126. 216
+	Uns				p_UOpen_Mpy220;   	// C124. 214
+	Uns				p_UOpen_Mpy24;   	// C125. 215
+	Uns				p_UOpen_Offset;		// C126. 216
 		//------------------------------
-	Uns		p_UClose_Mpy220;	// C127. 217
-	Uns		p_UClose_Mpy24;		// C128. 218
-	Uns		p_UClose_Offset;	// C129. 219
+	Uns				p_UClose_Mpy220;	// C127. 217
+	Uns				p_UClose_Mpy24;		// C128. 218
+	Uns				p_UClose_Offset;	// C129. 219
 		//-------------------------------
-	Uns		p_UStopOpen_Mpy220;	// C130. 220
-	Uns		p_UStopOpen_Mpy24;	// C131. 221
-	Uns		p_UStopOpen_Offset;	// C132. 222
+	Uns				p_UStopOpen_Mpy220;	// C130. 220
+	Uns				p_UStopOpen_Mpy24;	// C131. 221
+	Uns				p_UStopOpen_Offset;	// C132. 222
 	//-------------------------------
-	Uns		p_UStopClose_Mpy220;	 // C133. 223
-	Uns		p_UStopClose_Mpy24;	 // C134. 224
-	Uns		p_UStopClose_Offset;	 // C135. 225
+	Uns				p_UStopClose_Mpy220;	 // C133. 223
+	Uns				p_UStopClose_Mpy24;	 // C134. 224
+	Uns				p_UStopClose_Offset;	 // C135. 225
 		//-------------------------------
-	Uns		p_UMu_Mpy220;		 // C136. 226
-	Uns		p_UMu_Mpy24;		 // C137. 227
-	Uns		p_UMu_Offset;		 // C138. 228
+	Uns				p_UMu_Mpy220;		 // C136. 226
+	Uns				p_UMu_Mpy24;		 // C137. 227
+	Uns				p_UMu_Offset;		 // C138. 228
 		//------------------------------
-	Uns		p_UDu_Mpy220;		 // C139. 229
-	Uns		p_UDu_Mpy24;		 // C140. 230
-	Uns		p_UDu_Offset;		 // C141. 231
+	Uns				p_UDu_Mpy220;		 // C139. 229
+	Uns				p_UDu_Mpy24;		 // C140. 230
+	Uns				p_UDu_Offset;		 // C141. 231
 	//-------------------------------
-	Uns		p_UResetAlarm_Mpy220;	 // C142. 232
-	Uns		p_UResetAlarm_Mpy24; 	 // C143. 233
-	Uns		p_UResetAlarm_Offset;	 // C144. 234
-	Uns		Tu_Mpy_Calib;		 // C145. 235
-	Uns		Tu_Open_Value;		 // C146. 236
-	Uns		Tu_Close_Value;		 // C147. 237
-	Uns		Tu_StopOpen_Value;	 // C148. 238
-	Uns		Tu_StopClose_Value;	 // C149. 239
-	Uns		Tu_Du_Value;		 // C150. 240
-	Uns		Tu_Mu_Value;		 // C151. 241
-	Uns		Tu_ResetAlarm_Value;	 // C152. 242
-	Uns 		Rsvd20[17];		 //С153-169 243-259
+	Uns				p_UResetAlarm_Mpy220;	 // C142. 232
+	Uns				p_UResetAlarm_Mpy24; 	 // C143. 233
+	Uns				p_UResetAlarm_Offset;	 // C144. 234
+	Uns				Tu_Mpy_Calib;		 // C145. 235
+	Uns				Tu_Open_Value;		 // C146. 236
+	Uns				Tu_Close_Value;		 // C147. 237
+	Uns				Tu_StopOpen_Value;	 // C148. 238
+	Uns				Tu_StopClose_Value;	 // C149. 239
+	Uns				Tu_Du_Value;		 // C150. 240
+	Uns				Tu_Mu_Value;		 // C151. 241
+	Uns				Tu_ResetAlarm_Value;	 // C152. 242
+	Uns 			Rsvd20[17];		 //С153-169 243-259
 } TRamGroupC;
 
 // Группа D (Адрес = 260, Количество = 20 )  	- Команды
 typedef struct _TRamGroupD
 {
-	TTaskReset     TaskClose;           // D0. 260 Задание закрыто
-	TTaskReset     TaskOpen;            // D1. 261 Задание открыто
-	Uns            RevOpen;             // D2. 262 Обороты на открытие
-	Uns            RevClose;            // D3. 263 Обороты на закрытие
-	Uns	       reserv264;			// D4  264 резерв
-	Uns            CalibReset;          // D5. 265 Сброс калибровки
-	TValveCmd      ControlWord;         // D6. 266 Команда управления
-	Uns	       PrtReset;      		// D7. 267 Сброс защит
-	Uns            SetDefaults;         // D8. 268 Задание параметров по умолчанию
-	Uns 		Rsvd1;				// D9. 269 отчистка журнала событий
-	Uns            CycleReset;			// D10. 270 Сброс счетчика циклов
-	Uns		RsReset;				// D11. 271 Сброс связи
-	Uns 		   Rsvd[8];				// D12-19. 272-279 Резерв
+	TTaskReset     	TaskClose;           // D0. 260 Задание закрыто
+	TTaskReset     	TaskOpen;            // D1. 261 Задание открыто
+	Uns            	RevOpen;             // D2. 262 Обороты на открытие
+	Uns           	RevClose;            // D3. 263 Обороты на закрытие
+	Uns	       		reserv264;			// D4  264 резерв
+	Uns            	CalibReset;          // D5. 265 Сброс калибровки
+	TValveCmd      	ControlWord;         // D6. 266 Команда управления
+	Uns	       		PrtReset;      		// D7. 267 Сброс защит
+	Uns           	SetDefaults;         // D8. 268 Задание параметров по умолчанию
+	Uns 			Rsvd1;				// D9. 269 отчистка журнала событий
+	Uns            	CycleReset;			// D10. 270 Сброс счетчика циклов
+	Uns				RsReset;				// D11. 271 Сброс связи
+	Uns 		   	Rsvd[8];				// D12-19. 272-279 Резерв
 } TRamGroupD;
 
 
@@ -401,28 +428,28 @@ typedef struct _TRamGroupH
 	Uns             Password1;           // H6. 316 Основной пароль
 	Uns             Password2;           // H7. 317 Заводской пароль
 	Uns             ScFaults;            // H8. 318 Аварии КЗ
-	Uns		MuffFault;			 // H9. 319 Запись аварии МУФТА
+	Uns				MuffFault;			 // H9. 319 Запись аварии МУФТА
 	Uns             CycleCnt;            // H10. 320 Счетчик циклов
 	Uns             TemperBCPFault;      // H11. 321 запись аварии ТЕМПЕРАТУРА БКП 110
-	Uns		CmdButton;			 // H12. 322 Команда с ручек управления
-	Uns		BkpType;			 // H13. 323 тип БКП для выставления соответсвующего типа привода
+	Uns				CmdButton;			 // H12. 322 Команда с ручек управления
+	Uns				BkpType;			 // H13. 323 тип БКП для выставления соответсвующего типа привода
 	TDateVar 		HideDate;			 // H14. 324 Дата
 	//Uns			Rsvd1;			 	 // H15. 325 Резерв
-	Uns			TransCurr;			 // H16. 326 Ток перехода
+	Uns				TransCurr;			 // H16. 326 Ток перехода
 	TCubArray		TqCurr;				 // H17-36. 327-346 Ток поверхности
 	TCubArray		TqAngUI;			 // H37-56. 347-366 Углы нагрузки
 	TCubArray		TqAngSf;			 // H57-88. 367-386 Углы СИФУ
-	Uns             	TuState;             		 // H78. 388 Команды ТУ (открыть закрыть стопО СтопЗ)
-	Uns             	Umid;             	         // H82. 392 Среднее напряжение
-	Uns             	BKP_Temper;          // H85. 395 Температура БКП
-	Uns			Imidpr;			 	 // H86 396 Резерв
-	Uns             	IuPr;                // H88. 398 Ток фазы U
-	Uns             	IvPr;                // H89. 399 Ток фазы V
-	Uns             	IwPr;                // H90. 400 Ток фазы W
-	Uns             	Imid;				 // H91. 401 Средний ток
-  	LgUns           	Position;            // H92-93. 402-403 Положение
+	Uns             TuState;             		 // H78. 388 Команды ТУ (открыть закрыть стопО СтопЗ)
+	Uns             Umid;             	         // H82. 392 Среднее напряжение
+	Uns             BKP_Temper;          // H85. 395 Температура БКП
+	Uns				Imidpr;			 	 // H86 396 Резерв
+	Uns             IuPr;                // H88. 398 Ток фазы U
+	Uns             IvPr;                // H89. 399 Ток фазы V
+	Uns             IwPr;                // H90. 400 Ток фазы W
+	Uns             Imid;				 // H91. 401 Средний ток
+  	LgUns           Position;            // H92-93. 402-403 Положение
 	LgUns  			FullStep;        	 // H94-95. 404-405 Полный ход
-	TReverseType		ReverseType;         // H97. 407 Тип реверса
+	TReverseType	ReverseType;         // H97. 407 Тип реверса
 	//-------------------------------
 	Uns				BadTask_2kHz;        // H102. 412 Регистр "плохих" задач прерывания 2 кГц
 	Uns				BadTask_200Hz;       // H103. 413 Регистр "плохих" задач прерывания 200 Гц
@@ -512,23 +539,34 @@ typedef struct _TRamLogBuff
 typedef struct _TRamGroupT
 {
 	TTek_TechReg 	TechReg;			// T1 0 Технологический регистр
-	TTek_DefReg	DefReg;				// T2 1 Регистр дефектов
-	Int 		PositionPr;			// T3 2 Текущее положение %
+	TTek_DefReg		DefReg;				// T2 1 Регистр дефектов
+	Int 			PositionPr;			// T3 2 Текущее положение %
 	TTek_ComReg  	ComReg;				// T4 3 Регистр команд
-	Uns 		CycleCnt;			// T5 4 Счетчик циклов
-	Uns		Rsvd1;				// T6 5 Резерв
+	Uns 			CycleCnt;			// T5 4 Счетчик циклов
+	Uns				Rsvd1;				// T6 5 Резерв
 	Uns 		 	Iu;					// T7 6 Ток фазы U
 	Uns 		 	Rsvd2[9];			// T8-16 7-15 Резерв
 	Uns 			Ur;					// T17 16 Напряжение входной сети
-	Uns				Torque;				// T18 17 Резерв
+	Uns				Rsvd17;				// T18 17 Резерв
 	Uns 		 	Speed;				// T19 18 Текущая скорость
 	Uns			 	Rsvd4;				// T20 19 Резерв
-	Uns 		 	Rsvd3;				// T21 20 Текущий момент нагрузки Н*м
+	Uns 		 	Torque;				// T21 20 Текущий момент нагрузки Н*м
 	TTek_Discrete 	TsTu;				// T22 21 ТС/ТУ
 	Uns				Rsvd6[4];			// T23-26 22-25 Резерв
 	Uns				RsStation;			// T27 26 Адрес станции (только для чтения) 40027
-	Uns				Rsvd7;				// T28 27 Резерв
-	Uns				Rsvd8[12];			// T29-40 28-39 Резерв
+	Uns				MuDu;				// T28 27 Резерв
+	Uns				Rsvd28;				// T29 28 Резерв
+	Uns				PoVersion;			// T30 29 Резерв
+	TTEK_FaultReg	FaultReg;			// T31 30 допалнительный регистр защит
+	Uns				Rsvd32;				// T32 31 Резерв
+	Uns				Rsvd33;				// T33 32 Резерв
+	Uns				Rsvd34;				// T34 33 Резерв
+	Uns				Rsvd35;				// T35 34 Резерв
+	Uns				Rsvd36;				// T36 35 Резерв
+	Uns				Rsvd37;				// T37 36 Резерв
+	Uns				Rsvd38;				// T38 37 Резерв
+	Uns				Rsvd39;				// T39 38 Резерв
+	Uns				Rsvd40;				// T40 39 Резерв
 } TRamGroupT;
 
 

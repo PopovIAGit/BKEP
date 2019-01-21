@@ -283,7 +283,7 @@ static void async_unwrap_eof(TMbBBHandle Port, char byte)
 			{
 				TIMER_RESET(&Port->Frame.TimerConn);
 				//Port->Frame.ConnFlag = 1;
-				Port->Frame.ConnFlagCount=30;
+				Port->Frame.ConnFlagCount = g_Ram.ramGroupC.ConnFlagCountBCP;//30;
 				Port->Frame.RetryCounter = 0;
 				Port->Frame.MsgCount++;
 				Port->RxPacket.Flag = 1;

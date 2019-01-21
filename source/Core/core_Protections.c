@@ -419,10 +419,9 @@ void Core_DevProc_FaultIndic(TCoreProtections *p)
 		p->outDefects.Dev.bit.Dac = (Uns) g_Peref.Dac.Error;
 
 		// Ошибка нет связи с БКП
-		if (g_Comm.Bluetooth.ModeProtocol != 2 && tmpTime++>20 && p->outFaults.Dev.bit.NoBCP_Connect == 0)
-			p->outFaults.Dev.bit.NoBCP_Connect = (g_Comm.mbBkp.Frame.ConnFlagCount==0);
+		if (g_Comm.Bluetooth.ModeProtocol != 2 && tmpTime++> 20 && p->outFaults.Dev.bit.NoBCP_Connect == 0)
+			p->outFaults.Dev.bit.NoBCP_Connect = (g_Comm.mbBkp.Frame.ConnFlagCount == 0);
 		    //p->outFaults.Dev.bit.NoBCP_Connect = !g_Comm.mbBkp.Frame.ConnFlag;
-
 
 		//p->outDefects.Dev.bit.NoBCP_Connect = !g_Comm.mbBkp.Frame.ConnFlag;
 	}
