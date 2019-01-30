@@ -38,7 +38,7 @@ const struct ADDR_PARAM_ATS48 addr_params_altistar48[] = {
 const struct MENU_PARAM params[] = {
 		"   р0.пегепб    ", "    ", 	0,  65535,  	0, M_EDIT|M_RMAX(4),						//0
 		"   р1.пегепб    ", "    ", 	0,  65535,  	0, M_EDIT|M_RMAX(4),						//1
-		"   р2.пегепб    ", "    ", 	0,  65535,  	0, M_EDIT|M_SIGN|M_RMAX(4),						//2
+		"   р2.пегепб    ", "    ", 	0,  65535,  	0, M_EDIT|M_SIGN|M_RMAX(4),					//2
 		"   р3.пегепб    ", "    ", 	0,  65535,  	0, M_DCOM|M_RMAX(4),						//3
 		"   р4.пегепб    ", "    ", 	0,  65535,  	0, M_EDIT|M_RMAX(4),						//4
 		"   р5.пегепб    ", "    ", 	0,  65535,  	0, M_EDIT|M_RMAX(4),						//5
