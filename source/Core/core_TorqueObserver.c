@@ -121,7 +121,7 @@ void Core_TorqueInit(TTorqObs *p)
 		memcpy(CurrArray, CurrArray50000, sizeof(CurrArray));
 	}
 
-	if (g_Ram.ramGroupC.DriveType == dt35000_F48 )
+	if (g_Ram.ramGroupC.DriveType == dt35000_F48 || g_Ram.ramGroupC.DriveType == dt15000_D10_T )
 		{
 			//CurrArray = CurrArray50000;//{400, 600, 800, 1200, 1600};
 			memcpy(CurrArray, CurrArray35000, sizeof(CurrArray));

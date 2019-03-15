@@ -650,7 +650,7 @@ void Peref_10HzCalc(TPeref *p)	// 10 Ãö
 				}
 			}
 		}
-		else if (g_Ram.ramGroupC.DriveType < dt35000_F48)
+		else if (g_Ram.ramGroupC.DriveType < dt35000_F48 || g_Ram.ramGroupC.DriveType == dt15000_D10_T)
 		{
 			CUR_SENSOR_GAIN = 1;
 			if (g_Ram.ramGroupC.IU_Mpy != 6000 || g_Ram.ramGroupC.IV_Mpy != 6000 || g_Ram.ramGroupC.IW_Mpy != 6000)

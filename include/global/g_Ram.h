@@ -51,8 +51,8 @@ typedef union _TTek_TechReg
 		Uns Opening:1;		// 8
 		Uns Closing:1;		// 9
 		Uns Stop:1;			// 10
-		Uns Rsvd11;			// 11-12
-		Uns Rsvd12;
+		Uns Rsvd11:1;			// 11-12
+		Uns Rsvd12:1;
 		Uns Ten:1;			// 13
 		Uns Rsvd14:1;		// 14
 		Uns Ready:1;		// 15
@@ -169,12 +169,12 @@ typedef union _TTek_Discrete
 typedef struct _TRamGroupA
 {
 	TStatusReg      Status;         // 0. 500 Статус работы
-	TFltUnion	    Faults;	// 1-4. 501-504 Аварии
+	TFltUnion	    Faults;	        // 1-4. 501-504 Аварии
 	TInputReg       StateTu;     	// 5. 505 Состояние дискретных входов
-	TOutputReg      StateTs;	// 6. 506 Состояние дискретных выходов
+	TOutputReg      StateTs;	    // 6. 506 Состояние дискретных выходов
 	Uns             Position;       // 7. 507 Положение
 	Uns             Torque;         // 8. 508 Момент
-	Int             Speed;		// 9. 509 Скорость
+	Int             Speed;		    // 9. 509 Скорость
 	Uns             Ur;             // 10. 510 Напряжение фазы R
   	Uns             Us;             // 11. 511 Напряжение фазы S
   	Uns             Ut;             // 12. 512 Напряжение фазы T
@@ -194,7 +194,7 @@ typedef struct _TRamGroupA
 	Uns				VoltageDown;	// 27. 527 Падение напряжения
 	Uns				RevErrValue;	// 28. 526 Колво сбоев датчика положения
 	Int 			Rsvd1;
-	Uns 			Rsvd[9];	// 29-39. 528-539 Резерв
+	Uns 			Rsvd[9];	    // 29-39. 528-539 Резерв
 } TRamGroupA;
 
 // Группа B (Адрес = 40, Количество = 100) - Параметры пользователя
@@ -545,14 +545,25 @@ typedef struct _TRamGroupT
 	Uns 			CycleCnt;			// T5 4 Счетчик циклов
 	Uns				Rsvd1;				// T6 5 Резерв
 	Uns 		 	Iu;					// T7 6 Ток фазы U
-	Uns 		 	Rsvd2[9];			// T8-16 7-15 Резерв
+	Uns             Rsvd8;              // T8 7 Резерв
+	Uns             Rsvd9;              // T9 8 Резерв
+	Uns             Rsvd10;             // T10 9 Резерв
+	Uns             Rsvd11;             // T11 10 Резерв
+	Uns             Rsvd12;             // T12 11 Резерв
+	Uns             Rsvd13;             // T13 12 Резерв
+	Uns             Rsvd14;             // T14 13 Резерв
+	Uns             Rsvd15;             // T15 14 Резерв
+	Uns             Rsvd16;             // T16 15 Резерв
 	Uns 			Ur;					// T17 16 Напряжение входной сети
 	Uns				Rsvd17;				// T18 17 Резерв
 	Uns 		 	Speed;				// T19 18 Текущая скорость
 	Uns			 	Rsvd4;				// T20 19 Резерв
 	Uns 		 	Torque;				// T21 20 Текущий момент нагрузки Н*м
 	TTek_Discrete 	TsTu;				// T22 21 ТС/ТУ
-	Uns				Rsvd6[4];			// T23-26 22-25 Резерв
+	Uns				Rsvd23;  			// T23 22 Резерв
+	Uns             Rsvd24;             // T24 23 Резерв
+	Uns             Rsvd25;             // T25 24 Резерв
+	Uns             Rsvd26;             // T26 25 Резерв
 	Uns				RsStation;			// T27 26 Адрес станции (только для чтения) 40027
 	Uns				MuDu;				// T28 27 Резерв
 	Uns				Rsvd28;				// T29 28 Резерв
