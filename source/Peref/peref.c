@@ -87,7 +87,29 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
 
     // TU
     // забираем отмасштабированный сигнал с ј÷ѕ на вход фильтра 1-ого пор€дка
-    switch(p->NumCalcTU_18kHz)
+
+    	p->InDigSignal.sigOpen.Input =p->InDigSignalObserver.UOpenOut;
+    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigOpen);
+
+    	p->InDigSignal.sigClose.Input = p->InDigSignalObserver.UCloseOut;
+    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigClose);
+
+    	p->InDigSignal.sigStopOpen.Input = p->InDigSignalObserver.UStopOpenOut;
+    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigStopOpen);
+
+        p->InDigSignal.sigMU.Input = p->InDigSignalObserver.UMuOut;
+        Peref_SinObserverUpdateFloat(&p->InDigSignal.sigMU);
+
+    	p->InDigSignal.sigResetAlarm.Input = p->InDigSignalObserver.UResetAlarmOut;
+    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigResetAlarm);
+
+    	p->InDigSignal.sigStopClose.Input = p->InDigSignalObserver.UStopCloseOut;
+    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigStopClose);
+
+    	p->InDigSignal.sigDU.Input = p->InDigSignalObserver.UDuOut;
+    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigDU);
+
+/*	 switch(p->NumCalcTU_18kHz)
     {
     case 0:
     	p->UfltrOpen.Input 		= p->InDigSignalObserver.UOpenOut;
@@ -140,7 +162,7 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
 		break;
 
     	default: p->NumCalcTU_18kHz=0; break;
-    }
+    }*/
 
 	/*
 	p->UfltrOpen.Input 		= p->InDigSignalObserver.UOpenOut;
