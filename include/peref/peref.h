@@ -118,6 +118,8 @@ void Peref_AvtoCalibTu(TPeref *);
 void I2CDevUpdate(TPeref *);
 void RTC_Control(void);
 
+void Peref18kHZStop(TPeref *);
+
 //------------------- Глобальные переменные --------------------------------
 extern	TPeref	g_Peref;
 

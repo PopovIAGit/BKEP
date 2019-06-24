@@ -87,7 +87,7 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
 
     // TU
     // забираем отмасштабированный сигнал с ј÷ѕ на вход фильтра 1-ого пор€дка
-
+/*
     	p->InDigSignal.sigOpen.Input =p->InDigSignalObserver.UOpenOut;
     	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigOpen);
 
@@ -108,8 +108,12 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
 
     	p->InDigSignal.sigDU.Input = p->InDigSignalObserver.UDuOut;
     	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigDU);
+*/
 
-/*	 switch(p->NumCalcTU_18kHz)
+
+
+
+	switch(p->NumCalcTU_18kHz)
     {
     case 0:
     	p->UfltrOpen.Input 		= p->InDigSignalObserver.UOpenOut;
@@ -126,10 +130,10 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
     	p->NumCalcTU_18kHz=2;
     	break;
     case 2:
-    	p->UfltrStopOpen.Input 	= p->InDigSignalObserver.UStopOpenOut;
+    /*	p->UfltrStopOpen.Input 	= p->InDigSignalObserver.UStopOpenOut;
     	peref_ApFilter1Calc(&p->UfltrStopOpen);
     	p->InDigSignal.sigStopOpen.Input = p->UfltrStopOpen.Output;
-    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigStopOpen);
+    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigStopOpen);*/
     	p->NumCalcTU_18kHz=3;
     	break;
     case 3:
@@ -147,14 +151,14 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
 		p->NumCalcTU_18kHz=5;
 		break;
     case 5:
-    	p->UfltrStopClose.Input = p->InDigSignalObserver.UStopCloseOut;
+    /*	p->UfltrStopClose.Input = p->InDigSignalObserver.UStopCloseOut;
     	peref_ApFilter1Calc(&p->UfltrStopClose);
     	p->InDigSignal.sigStopClose.Input = p->UfltrStopClose.Output;
-    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigStopClose);
+    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigStopClose);*/
 		p->NumCalcTU_18kHz=6;
 		break;
     case 6:
-    	p->UfltrDU.Input 		= p->InDigSignalObserver.UDuOut;
+    	p->UfltrDU.Input     = p->InDigSignalObserver.UDuOut;
     	peref_ApFilter1Calc(&p->UfltrDU);
     	p->InDigSignal.sigDU.Input = p->UfltrDU.Output;
     	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigDU);
@@ -162,7 +166,7 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
 		break;
 
     	default: p->NumCalcTU_18kHz=0; break;
-    }*/
+    }
 
 	/*
 	p->UfltrOpen.Input 		= p->InDigSignalObserver.UOpenOut;
@@ -236,15 +240,48 @@ void Peref_18kHzCalc(TPeref *p) // 18 к√ц
 
     Peref_PhaseOrderUpdate(&p->phaseOrder);
 
-
-
-
     if (!p->sinObserver.IV.CurAngle)
 	{
 	    p->Phifltr.Input = p->sinObserver.US.CurAngle;
 	}
-
     //-------------------------------------------------------------
+}
+LgUns sum, sum2;
+Uns out, out2 = 0;
+
+void Peref18kHZStop(TPeref *p)
+{
+
+	p->InDigSignal.sigStopOpen.Input = p->InDigSignalObserver.UStopOpenOut;
+   	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigStopOpen);
+
+   	p->InDigSignal.sigStopClose.Input = p->InDigSignalObserver.UStopCloseOut;
+   	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigStopClose);
+/*
+   	g_Comm.digitInterface.dinStopClose.inputDIN = p->InDigSignal.sigStopClose.Output;
+   	g_Comm.digitInterface.dinStopOpen.inputDIN = p->InDigSignal.sigStopOpen.Output;
+*/
+/*	static Uns timer = 0;
+
+	if (timer < 200) {
+		timer++;
+		sum += //TU_SIG_STOP_OPEN;//(Uns)p->InDigSignalObserver.UStopOpenOut;
+		sum2 += //TU_SIG_STOP_CLOSE;
+	}
+	else
+	{
+		out = sum/timer;
+		out2 = sum2/timer;
+		sum = 0;
+		sum2 = 0;
+		timer = 0;
+	}
+
+	if (out >= 10000) g_Comm.digitInterface.Inputs.bit.StopOpen = 1;
+	else if (out < 5000) g_Comm.digitInterface.Inputs.bit.StopOpen = 0;
+
+	if (out2 >= 10000) g_Comm.digitInterface.Inputs.bit.StopClose = 1;
+	else if (out2 < 5000) g_Comm.digitInterface.Inputs.bit.StopClose = 0;*/
 }
 
 //---------------------------------------------------
