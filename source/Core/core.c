@@ -142,6 +142,7 @@ void Core_CalibStop (TCore *p)
 				p->MotorControl.CalibStop = 1;
 				Core_ValveDriveStop(&p->VlvDrvCtrl);
 				p->VlvDrvCtrl.EvLog.Value = CMD_STOP;
+				p->VlvDrvCtrl.EvLog.Source = CMD_SRC_BLOCK;
 			}
 	}
 }

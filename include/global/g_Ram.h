@@ -657,7 +657,9 @@ typedef struct TRam
 
 #define REG_CONTROL				GetAdr(ramGroupD.ControlWord)
 #define REG_TASKCLOSE			GetAdr(ramGroupD.TaskClose)
+#define REG_REVCLOSE			GetAdr(ramGroupD.RevClose)
 #define REG_RSRESET				GetAdr(ramGroupD.RsReset)
+#define REG_COM_REG				GetAdr(ramGroupT.ComReg)
 
 
 #define REG_CALIB_STATE		GetAdr(ramGroupH.CalibState)

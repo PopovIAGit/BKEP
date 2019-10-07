@@ -17,7 +17,7 @@ extern "C" {
 
 
 #define DEVICE_GROUP				4 			// Группа устройств
-#define VERSION						13			// Версия проекта
+#define VERSION						14			// Версия проекта
 #define MODULE_VERSION				40			// Версия модулей и спецификации
 #define SUBVERSION					01			// Подверсия проекта
 

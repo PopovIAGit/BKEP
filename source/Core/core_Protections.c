@@ -788,11 +788,11 @@ void Core_Protections50HZUpdate2(TCoreProtections *p)
 
 		if(g_Ram.ramGroupB.DevDate.bit.Year == 0 && g_Ram.ramGroupB.DevTime.bit.Hour == 0)
 		{
-			p->outDefects.Dev.bit.BatteryLow = 1;
+			p->outDefects.Dev.bit.TimeNotSet = 1;
 		}
 		else
 		{
-			p->outDefects.Dev.bit.BatteryLow = 0;
+			p->outDefects.Dev.bit.TimeNotSet = 0;
 		}
 
 	/*if (g_Ram.ramGroupB.DevDate.bit.Year != 0 && g_Ram.ramGroupH.HideDate.all == 0)

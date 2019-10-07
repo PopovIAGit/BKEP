@@ -185,7 +185,7 @@ typedef union _TLoadReg {
 #define DEV_TMP_MASK		0x0060
 #define DEV_RSC_MASK		0x0800
 //#define DEV_EVLOG_MASK	0x0400
-#define DEV_EVLOG_MASK		0x4FFF
+#define DEV_EVLOG_MASK		0x5FFF
 typedef union _TDeviceReg {
 	Uns all;
   struct {
@@ -201,7 +201,7 @@ typedef union _TDeviceReg {
 		Uns Dac:1;			// 9     Сбой ЦАП
 		Uns LowPower:1;		// 10     Выключение БКД
 		Uns NoBCP_Connect:1;// 11   нет связи с БКП
-		Uns BatteryLow:1;	// 12   Замена батарейки через 3 года
+		Uns TimeNotSet:1;	// 12   Время не задано
 		Uns BlueNoLaunch:1;	// 13	не запустился БКЭП
 		Uns BCP_ErrorType:1;// 14	не верный тип БКП
 		Uns Rsvd:1;       	// 15 Резерв

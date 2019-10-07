@@ -15,7 +15,7 @@ Uns 			prevCmd = 0, delayStart = 2.0 * Prd50HZ;
 
 char LogEvBufIndex = 0;
 bool LogEvMainDataFlag = false;
-Byte LogEvBufCurIndex = 0;
+char LogEvBufCurIndex = 0;
 Byte LogEvBufSeconds = 0;
 Bool ReadLogFlag = False;
 
@@ -364,22 +364,23 @@ void DataBufferPre(TStat *s)
 	{
 		PreTimer = 0;
 
-		s->LogEventBuffer[LogEvBufIndex].LogStatus 	 	= g_Ram.ramGroupA.Status;
-		s->LogEventBuffer[LogEvBufIndex].LogPositionPr	= g_Ram.ramGroupA.PositionPr;
-		s->LogEventBuffer[LogEvBufIndex].LogTorque	 	= g_Ram.ramGroupA.Torque;
-		s->LogEventBuffer[LogEvBufIndex].LogUr		 	= g_Ram.ramGroupA.Ur;
-		s->LogEventBuffer[LogEvBufIndex].LogUs		 	= g_Ram.ramGroupA.Us;
-		s->LogEventBuffer[LogEvBufIndex].LogUt		 	= g_Ram.ramGroupA.Ut;
-		s->LogEventBuffer[LogEvBufIndex].LogIu		 	= g_Ram.ramGroupA.Iu;
-		s->LogEventBuffer[LogEvBufIndex].LogIv		 	= g_Ram.ramGroupA.Iv;
-		s->LogEventBuffer[LogEvBufIndex].LogIw		 	= g_Ram.ramGroupA.Iw;
-		s->LogEventBuffer[LogEvBufIndex].LogTemper	 	= g_Ram.ramGroupA.TemperBKP;
-		s->LogEventBuffer[LogEvBufIndex].LogInputs	 	= g_Ram.ramGroupA.StateTu.all;
-		s->LogEventBuffer[LogEvBufIndex].LogOutputs 	= g_Ram.ramGroupA.StateTs.all;
+		s->LogEventBuffer[0] = s->LogEventBuffer[1];
+		s->LogEventBuffer[1] = s->LogEventBuffer[2];
+		s->LogEventBuffer[2] = s->LogEventBuffer[3];
+		s->LogEventBuffer[3] = s->LogEventBuffer[4];
 
-		// Инкрементируем текущий индекс в буфере. Предыдущие накопленные данные не удаляем.
-		if (++LogEvBufIndex >= LOG_EV_BUF_CELL_COUNT)
-			{ LogEvBufIndex = 0; }
+		s->LogEventBuffer[4].LogStatus 	 	= g_Ram.ramGroupA.Status;
+		s->LogEventBuffer[4].LogPositionPr	= g_Ram.ramGroupA.PositionPr;
+		s->LogEventBuffer[4].LogTorque	 	= g_Ram.ramGroupA.Torque;
+		s->LogEventBuffer[4].LogUr		 	= g_Ram.ramGroupA.Ur;
+		s->LogEventBuffer[4].LogUs		 	= g_Ram.ramGroupA.Us;
+		s->LogEventBuffer[4].LogUt		 	= g_Ram.ramGroupA.Ut;
+		s->LogEventBuffer[4].LogIu		 	= g_Ram.ramGroupA.Iu;
+		s->LogEventBuffer[4].LogIv		 	= g_Ram.ramGroupA.Iv;
+		s->LogEventBuffer[4].LogIw		 	= g_Ram.ramGroupA.Iw;
+		s->LogEventBuffer[4].LogTemper	 	= g_Ram.ramGroupA.TemperBKP;
+		s->LogEventBuffer[4].LogInputs	 	= g_Ram.ramGroupA.StateTu.all;
+		s->LogEventBuffer[4].LogOutputs 	= g_Ram.ramGroupA.StateTs.all;
 	}
 }
 
@@ -431,26 +432,29 @@ void LogEvControl(TStat *s)
 			WritePar(Addr, s->LogEvent.Data, LOG_EV_DATA_CNT);										// Записываем параметры в момент возникновения события
 
 			LogEvMainDataFlag = true;
-			LogEvBufCurIndex = LogEvBufIndex;
+			LogEvBufCurIndex = LOG_EV_BUF_CELL_COUNT;
 			s->LogEvent.WriteFlag = false;															// Сбрасываем флаг разрешения записи. По этому флагу записываются только параметры в момент события
 
 			// После записи основной ячейки, формируем начальный адрес буфера
 			Addr = LOG_EV_BUF_START_ADDR + g_Ram.ramGroupH.LogEvAddr * LOG_EV_BUF_DATA_CNT * LOG_EV_BUF_DATA_CELL;
+			return;
 		}
 
 	}
 
 	if ((IsMemLogReady()) && (LogEvMainDataFlag))
 	{
-		if (--LogEvBufIndex < 0)										// Декрементируем индекс буфера, т.к. записываем сначала данные 1 секунды и так далее до 5-й секунды
-			LogEvBufIndex = (LOG_EV_BUF_CELL_COUNT - 1);				// Индекс массива начинается не с 1, а с 0
+		if (LogEvBufCurIndex > 0)
+		{
+			WriteLog(Addr, ToUnsPtr(&s->LogEventBuffer[LogEvBufCurIndex - 1]), LOG_EV_BUF_DATA_CNT);		// Пишем в память
 
-		WriteLog(Addr, ToUnsPtr(&s->LogEventBuffer[LogEvBufIndex]), LOG_EV_BUF_DATA_CNT);		// Пишем в память
+			LogEvBufCurIndex--;
 
-		Addr += LOG_EV_BUF_DATA_CNT;							// Увеличиваем адрес на количество записанный из буфера данных
+			Addr += LOG_EV_BUF_DATA_CNT;							// Увеличиваем адрес на количество записанный из буфера данных
+		}
 
-
-		if (LogEvBufIndex == LogEvBufCurIndex)	{				// Если индексы сравнялись, значит мы дошли до самого последнего (5-я секунда)
+		if (LogEvBufCurIndex == 0)					// Если индексы сравнялись, значит мы дошли до самого последнего (5-я секунда)
+		{
 			LogEvMainDataFlag = false;							// Записали все ячейки из буфера сбрасываем флаг записи основного события (0-я секунда)
 			if (++g_Ram.ramGroupH.LogEvAddr >= LOG_EV_CNT)					// Инкрементируем начальный адрес записи и проверяем его выход за пределы установленой области
 				g_Ram.ramGroupH.LogEvAddr = 0;								// Если вышел за установленую область, то присваиваем самый первый адрес
@@ -493,7 +497,7 @@ void GetCurrentCmd(TStat *s)
 		case CMD_CLR_LOG: 		LogControlWord = bcmLogClear; 			break;
 		case CMD_RES_CYCLE:		LogControlWord = bcmCycleReset;			break;
 		case CMD_DEFAULTS_FACT: LogControlWord = bcmSetDefaultsFact;	break;
-		case CMD_DEFSTOP:		LogControlWord = bcmDefStop;	g_Core.VlvDrvCtrl.EvLog.Source = 0;	break;
+		case CMD_DEFSTOP:		LogControlWord = bcmDefStop;	g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_BLOCK;	break;
 		case CDM_DISCROUT_TEST: LogControlWord = bcmDiscrOutTest;		break;
 		case CMD_DISCRIN_TEST: 	LogControlWord = bcmDiscrInTest; 		break;
 		case CMD_ON_BLT: 		LogControlWord = bcmBlueOn; 			break;

@@ -256,6 +256,11 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 							else if (Packet->ParamMode==MCBSP_TYPE) g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_BLUETOOTH;
 							//g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_SERIAL;
 						}
+						if (Addr == REG_COM_REG)
+						{
+							if (Packet->ParamMode==UART_TYPE) g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_SERIAL;
+							else if (Packet->ParamMode==MCBSP_TYPE) g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_BLUETOOTH;
+						}
 						return WriteData(Packet->Addr, Packet->Data, Packet->Count);
 						//if (!Port->Frame.Exception) SerialCommRefresh();
 					case 5:
@@ -342,6 +347,11 @@ __inline Byte WriteData(Uns Addr, Uns *Data, Uns Count)
 			g_Stat.LogParam.MbIndex++;
 		}
 		if (Addr==REG_TASK_TIME || Addr==REG_TASK_DATE)
+		{
+			g_Stat.LogParam.MbBuffer[g_Stat.LogParam.MbIndex] = i + Addr;			// Запомнили адрес параметра, инкрементировали индекс
+			g_Stat.LogParam.MbIndex++;
+		}
+		if ((Addr >= REG_TASKCLOSE)&&(Addr <= REG_REVCLOSE))
 		{
 			g_Stat.LogParam.MbBuffer[g_Stat.LogParam.MbIndex] = i + Addr;			// Запомнили адрес параметра, инкрементировали индекс
 			g_Stat.LogParam.MbIndex++;
