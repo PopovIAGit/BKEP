@@ -165,7 +165,7 @@ typedef struct {
 		Uns					MoveOnFlag;			// флаг что было начато движение (для работы с УПП)
 		Uns					SoftStarterConnTimer;
 		Uns					FireContErr_Timer;	// таймер для определения не замкнутости контактора в режиме пожарки
-
+		Uns 				BCPConTimer;
 }TCoreProtections;
 
 //------------------- Глобальные переменные --------------------------------

@@ -389,6 +389,7 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 	}
 }
 
+
 // Индикация аварий процесса и устройства
 void Core_DevProc_FaultIndic(TCoreProtections *p)
 {
@@ -420,7 +421,19 @@ void Core_DevProc_FaultIndic(TCoreProtections *p)
 
 		// Ошибка нет связи с БКП
 		if (g_Comm.Bluetooth.ModeProtocol != 2 && tmpTime++> 20 && p->outFaults.Dev.bit.NoBCP_Connect == 0)
-			p->outFaults.Dev.bit.NoBCP_Connect = (g_Comm.mbBkp.Frame.ConnFlagCount == 0);
+		{
+			if (g_Comm.mbBkp.Frame.ConnFlagCount == 0)
+			{
+				if (p->BCPConTimer++ >= g_Ram.ramGroupC.BCPConTime)
+				{
+					p->BCPConTimer = g_Ram.ramGroupC.BCPConTime;
+					p->outFaults.Dev.bit.NoBCP_Connect = 1;
+				}
+
+			}else p->BCPConTimer = 0;
+		}
+
+
 		    //p->outFaults.Dev.bit.NoBCP_Connect = !g_Comm.mbBkp.Frame.ConnFlag;
 
 		//p->outDefects.Dev.bit.NoBCP_Connect = !g_Comm.mbBkp.Frame.ConnFlag;
@@ -535,6 +548,7 @@ void Core_ProtectionsClear(TCoreProtections *p)
 	g_Core.Status.bit.Fault = 0;
 	g_Core.Status.bit.Defect = 0;
 	p->outFaults.Dev.bit.NoBCP_Connect = 0;
+	p->BCPConTimer = 0;
 
 	p->outFaults.Dev.all = 0;					// сбросили все аварии
 	p->outFaults.Net.all = 0;
