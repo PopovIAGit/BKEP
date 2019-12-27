@@ -13,6 +13,8 @@
 #define ADC_conv_DIN(value, gain, offset)\
 		( ( (LgInt)value - (LgInt)offset)* gain) 
 
+Uns BtnStopKVOKVZofftimer = 0;
+
 void Comm_TuTsInit (TDigitalInterface *p)
 {
 	p->TypeVoltSignal 				 = (Uns *)&g_Ram.ramGroupB.InputType;
@@ -76,33 +78,51 @@ void Comm_TuTsInit (TDigitalInterface *p)
 	p->dinDu.timer 					 = 0;
 }
 
-void Comm_TuTsUpdate (TDigitalInterface *p)	//50 Гц
+void Comm_TuTsUpdate (TDigitalInterface *p)	//200 Гц
 {
 	static TOutputReg OutputRegTmp;
 	static Uns TuEnbReleTimer;
 
 	// ---------------------- ТЕЛЕСИГНАЛИЗАЦИЯ-------------------------------
-	if (!(g_Ram.ramGroupA.Status.bit.Opened || g_Ram.ramGroupA.Status.bit.Closed))
+
+	if (g_Ram.ramGroupA.Faults.Dev.bit.LowPower)		// если выключение то размыкаем КВО и КВЗ, требование ДИТ(Якушев) 02.12.19
 	{
-		p->Outputs.bit.Opened  = !g_Ram.ramGroupA.Status.bit.Opened;	// 0	Открыто
-		p->Outputs.bit.Closed  = !g_Ram.ramGroupA.Status.bit.Closed;	// 1	Закрыто
+		p->Outputs.bit.Opened  = 0;	// 0	Открыто
+		p->Outputs.bit.Closed  = 0;	// 1	Закрыто
+		BtnStopKVOKVZofftimer = 0;
+		g_Comm.BtnStopFlag = 0;
 	}
 	else
 	{
-		p->Outputs.bit.Opened  = !g_Ram.ramGroupA.Status.bit.Opened;	    // 0	Открыто
-		p->Outputs.bit.Closed  = !g_Ram.ramGroupA.Status.bit.Closed;	    // 1	Закрыто
+		if (g_Comm.BtnStopFlag)							// размыкание КВО КВЗ при повороте ручки стоп - требование Обриев 05.12.19
+		{
+			p->Outputs.bit.Opened  = 0;	// 0	Открыто
+			p->Outputs.bit.Closed  = 0;	// 1	Закрыто
+
+			if(BtnStopKVOKVZofftimer++ >=  g_Ram.ramGroupC.TimeBtnStopKVOKVZ*20)
+			{
+				BtnStopKVOKVZofftimer = 0;
+				g_Comm.BtnStopFlag = 0;
+			}
+		}
+		else
+		{
+			p->Outputs.bit.Opened  = !g_Ram.ramGroupA.Status.bit.Opened;	// 0	Открыто
+			p->Outputs.bit.Closed  = !g_Ram.ramGroupA.Status.bit.Closed;	// 1	Закрыто
+		}
 	}
 
-	p->Outputs.bit.Mufta   = g_Ram.ramGroupA.Status.bit.Mufta;	    	// 2	Муфта
-	p->Outputs.bit.Fault   = g_Ram.ramGroupA.Status.bit.Fault;	    	// 3	Авария
-	p->Outputs.bit.Defect  = g_Ram.ramGroupA.Status.bit.Defect;	    	// 4	Дефект
+	p->Outputs.bit.Mufta  = g_Ram.ramGroupA.Status.bit.Mufta;	    	// 2	Муфта
+	p->Outputs.bit.Fault  = g_Ram.ramGroupA.Status.bit.Fault;	    	// 3	Авария
+	p->Outputs.bit.Defect = g_Ram.ramGroupA.Status.bit.Defect;	    	// 4	Дефект
+
 	if(g_Core.Protections.outFaults.Proc.bit.MuDuDef)
 	{
-		p->Outputs.bit.MUDU    = 0;			// 7	МУ/ДУ
+		p->Outputs.bit.MUDU    = 0;										// 7	МУ/ДУ
 	}
 	else
 	{
-		p->Outputs.bit.MUDU    = !g_Ram.ramGroupA.Status.bit.MuDu;			// 7	МУ/ДУ
+		p->Outputs.bit.MUDU    = !g_Ram.ramGroupA.Status.bit.MuDu;		// 7	МУ/ДУ
 	}
 
 	p->Outputs.bit.Opening = g_Ram.ramGroupA.Status.bit.Opening;		// 5	Открывается

@@ -97,6 +97,7 @@ Uns Comm_LocalButtonUpdate(TCommMPU *p)
 			{
 				p->btn3Param.timer = 0;
 				result |= BTN_STOP;
+				g_Comm.BtnStopFlag = 1;
 			}
 		}
 	}

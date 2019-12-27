@@ -16,6 +16,7 @@ Int TemperM10 = -10;
 Int TemperM40 = -40;
 
 Uns tmpTime=0;
+Uns FlagDisconect = 0;
 
 //ToDo добавить нет движения как аварию встроенного датчика положения
 
@@ -420,22 +421,43 @@ void Core_DevProc_FaultIndic(TCoreProtections *p)
 		p->outDefects.Dev.bit.Dac = (Uns) g_Peref.Dac.Error;
 
 		// Ошибка нет связи с БКП
-		if (g_Comm.Bluetooth.ModeProtocol != 2 && tmpTime++> 20 && p->outFaults.Dev.bit.NoBCP_Connect == 0)
+		if(g_Comm.Bluetooth.ModeProtocol != 2 && p->outFaults.Dev.bit.NoBCP_Connect == 0)
 		{
-			if (g_Comm.mbBkp.Frame.ConnFlagCount == 0)
+			if(g_Comm.mbBkp.Frame.ConnFlagCount == 0)
 			{
-				if (p->BCPConTimer++ >= g_Ram.ramGroupC.BCPConTime)
+				if (FlagDisconect == 0)
 				{
-					p->BCPConTimer = g_Ram.ramGroupC.BCPConTime;
-					p->outFaults.Dev.bit.NoBCP_Connect = 1;
+					FlagDisconect = 1;
+					g_Ram.ramGroupC.CounterDisconect++;
 				}
 
-			}else p->BCPConTimer = 0;
+				if (g_Ram.ramGroupA.Status.bit.Stop)
+				{
+					if(p->BCPConTimer++ >= g_Ram.ramGroupC.BCPConTime)
+					{
+						p->BCPConTimer = g_Ram.ramGroupC.BCPConTime;
+						p->outFaults.Dev.bit.NoBCP_Connect = 1;
+					}
+				}
+				else if (g_Ram.ramGroupA.Status.bit.Stop == 0)
+				{
+					if(p->BCPConTimer++ >= g_Ram.ramGroupC.BCPConTimeMove)
+					{
+						p->BCPConTimer = g_Ram.ramGroupC.BCPConTimeMove;
+						p->outFaults.Dev.bit.NoBCP_Connect = 1;
+					}
+				}
+			}
+			else
+			{
+				FlagDisconect = 0;
+				p->BCPConTimer = 0;
+			}
+
 		}
 
 
-		    //p->outFaults.Dev.bit.NoBCP_Connect = !g_Comm.mbBkp.Frame.ConnFlag;
-
+	    //p->outFaults.Dev.bit.NoBCP_Connect = !g_Comm.mbBkp.Frame.ConnFlag;
 		//p->outDefects.Dev.bit.NoBCP_Connect = !g_Comm.mbBkp.Frame.ConnFlag;
 	}
 }
