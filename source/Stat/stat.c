@@ -139,6 +139,7 @@ void InitTables(void)
 	ImCmdLogAddrsTable[3] = GetAdr(ramGroupH.LogControlWord);
 	ImCmdLogAddrsTable[4] = GetAdr(ramGroupA.Status);
 	ImCmdLogAddrsTable[5] = GetAdr(ramGroupA.StateTs);
+	ImCmdLogAddrsTable[6] = GetAdr(ramGroupA.Position);
 
 	ImParamLogAddrsTable[0] = GetAdr(ramGroupB.DevTime);
 	ImParamLogAddrsTable[1] = GetAdr(ramGroupB.DevDate);
@@ -502,6 +503,7 @@ void GetCurrentCmd(TStat *s)
 		case CMD_DISCRIN_TEST: 	LogControlWord = bcmDiscrInTest; 		break;
 		case CMD_ON_BLT: 		LogControlWord = bcmBlueOn; 			break;
 		case CMD_OFF_BLT: 		LogControlWord = bcmBlueOff; 			break;
+		case CMD_FIX_POS:	    LogControlWord = bcmFixPos; 			break;
 		default: LogControlWord = bcmNone; break;
 	}
 

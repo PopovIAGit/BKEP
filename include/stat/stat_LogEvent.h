@@ -17,7 +17,7 @@
 #define LOG_EV_DATA_CELL		1									// Количество структур в основной записи журнала
 
 #define LOG_EV_BUF_START_ADDR	0									// Начальный адрес буфера журнала
-#define LOG_EV_BUF_DATA_CNT		sizeof(TRamLogBuff)					  	// Количество полей в одной ячейке буфера
+#define LOG_EV_BUF_DATA_CNT		sizeof(TRamLogBuff)					// Количество полей в одной ячейке буфера
 #define LOG_EV_BUF_DATA_CELL	5									// Количество ячеек буфера в одной записи
 
 #define LOG_EV_BUF_CELL_COUNT	5									// Количество структур в буфере журнала событий
@@ -34,7 +34,7 @@
 
 // 7500 полей
 #define LOG_CMD_START_ADDR		2000								// Начальный адрес журнала команд
-#define LOG_CMD_DATA_CNT		6	//было 5 с появлением дискретных выходов добавилось								// Количество записываемых в память полей
+#define LOG_CMD_DATA_CNT		7 //добавилось 1 поле положение								//было 5 с появлением дискретных выходов добавилось								// Количество записываемых в память полей
 #define LOG_CMD_CNT				800								    // Емкость журнала команд (количество записей)
 
 // 2500 полей
@@ -50,7 +50,7 @@
 
 #define FAULTS_COUNT_DEF			4				// Количество регистров дефектов
 #define LOG_EV_BUF_DATA_COUNT		20				// Определяет емкость буфера журнала событий
-#define LOG_CMD_BUF_DATA_COUNT		6				// Определяет емкость буфера журнала команд
+#define LOG_CMD_BUF_DATA_COUNT		7//6				// Определяет емкость буфера журнала команд
 #define LOG_PARAM_BUF_DATA_COUNT	5				// Определяет емкость буфера журнала изменения параметров
 //ma LogSIM
 #define LOG_SIM_BUF_DATA_COUNT		13				// Определяет емкость буфера журнала SimID

@@ -11,16 +11,16 @@
 
 #define IM_LOGEV_REC_ADDR		g_Ram.ramGroupH.LogEvAddr			// Текущий адрес журнала событий
 #define IM_LOGCMD_REC_ADDR		g_Ram.ramGroupH.LogCmdAddr			// Текущий адрес журнала команд
-#define IM_LOGPAR_REC_ADDR		g_Ram.ramGroupH.LogParamAddr			// Текущий адрес журнала изм. параметров
+#define IM_LOGPAR_REC_ADDR		g_Ram.ramGroupH.LogParamAddr		// Текущий адрес журнала изм. параметров
 //ma LogSIM
 #define IM_LOGSIM_REC_ADDR		g_Ram.ramGroupH.LogSimAddr			// Текущий адрес журнала SIM
 
 
 #define IM_LOGEV_REC_CNT		g_Ram.ramGroupH.LogEvCount			// Количество записей журнала событий
-#define IM_LOGCMD_REC_CNT		g_Ram.ramGroupH.LogCmdCount		// Количество записей журнала команд
+#define IM_LOGCMD_REC_CNT		g_Ram.ramGroupH.LogCmdCount			// Количество записей журнала команд
 #define IM_LOGPAR_REC_CNT		g_Ram.ramGroupH.LogParamCount		// Количество записей журнала изм. параметров
 //ma LogSIM
-#define IM_LOGSIM_REC_CNT		g_Ram.ramGroupH.LogSimCount		// Количество записей журнала SimID
+#define IM_LOGSIM_REC_CNT		g_Ram.ramGroupH.LogSimCount			// Количество записей журнала SimID
 
 
 #define IM_LOGEV_BUF_CELL_CNT			LOG_EV_BUF_CELL_COUNT		// Количество ячеек буфера журнала событий
