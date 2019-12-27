@@ -243,7 +243,8 @@ typedef enum
 	bcmDiscrOutTest,			// Тест дискретных выходов
 	bcmDiscrInTest,				// Тест дискретных входов
 	bcmBlueOn,					// включение Bluetooth
-	bcmBlueOff					// выключение Bluetooth
+	bcmBlueOff,					// выключение Bluetooth
+	bcmFixPos					// команда фиксации положения
 } TBurCmd;
 
 
