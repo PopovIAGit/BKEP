@@ -44,7 +44,13 @@ static char timerExpired(unsigned int *Timer);
 static void BkpConnTrEnable(char Level);
 
 Uns BkpEncPostion=0;
+Uns BkpEncPostionPrev = 0;
+Uns goodPosition = 0;
+Byte   skipDefectFl = 0;
 	Uns BkpEncErr=0;
+
+Uns  Data;
+Uns  Error_counter = 0;
 
 void SciMasterConnBetweenBlockInit(TMbBBHandle Port)
 {
@@ -54,7 +60,7 @@ void SciMasterConnBetweenBlockInit(TMbBBHandle Port)
 	memset(&Port->Stat,     0, sizeof(TScStat));
 
 	Port->Params.UartID      = BKP_SCI_ID;
-	//Port->Params.BrrValue    = SCI_BRR(BKP_SCI_BAUD);
+	//Port->Params.BrrValue  = SCI_BRR(BKP_SCI_BAUD);
 	Port->Params.BrrValue    = BKP_SCI_BAUD+1;
 	Port->Params.Parity      = BKP_SCI_PARITY;
 	Port->Params.Mode        = 1;
@@ -171,6 +177,8 @@ void SciMasterConnBetweenBlockUpdate(TMbBBHandle Port)
 void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 {
 
+	Int Delta;
+	Uns absDelta;
 
 	SciMasterConnBetweenBlockUpdate(bPort);
 
@@ -200,12 +208,72 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
     BkpEncErr 				|= (Uns) bPort->RxPacket.Data[3] << 0;
     BkpEncPostion 			= (Uns) bPort->RxPacket.Data[2] << 8;
     BkpEncPostion 			|= (Uns) bPort->RxPacket.Data[1] << 0;
-    g_Ram.ramGroupH.Position 		= 32767-BkpEncPostion;
+
+    //-----------------------------------------------------------
+/*
+    	// Проверка на сбой данных
+    	if (BkpEncPostion > 0x7fff)			// 1) Если данные, считанные с энкодера превышают максимальный диапазон,
+    	{
+    		Error_counter++;			// то инкрементируем счетчик ошибок, а принятые данные не воспринимаем
+    		return;
+    	}
+    	// Разница между текущим и предыдущим
+    	Delta = BkpEncPostion - BkpEncPostionPrev;
+    	absDelta = abs(Delta);
+
+    	if (skipDefectFl)								// 2a) Висит флаг о том, что данные перескочили
+    	{
+    		if (absDelta)										// если произошло изменение
+    		{
+    			 if (absDelta < 5)
+    			 {
+    				goodPosition = (goodPosition + Delta)&0x7fff;	// Корректируем goodPosition
+    				g_Ram.ramGroupH.Position  = goodPosition;
+    			 }
+    			 else if (REV_MAX - 5 < absDelta)		// Переход через 0
+    			 {
+    				 goodPosition = (goodPosition + absDelta)&0x7fff;
+    				 g_Ram.ramGroupH.Position  = goodPosition;
+    			 }
+    			 else
+    			{
+    				 Error_counter++;							// Если просто скачок данных то не в счет, увеличиваем счетчик ошибок
+    			}
+			}
+    			if (( (Int)(goodPosition - 5 - 2) < (Int)Data)\
+    			  &&(Data < goodPosition + 5 + 2))	// Если произошел скачок обратно в goodposition - сбрасываем флаг
+    			{
+    				skipDefectFl = false;
+    			}
+
+    	}
+    	else 													// 2б) Нормальное состояние (перескока не было)
+    	{
+    		if ((5 <= absDelta)\
+    	       &&(absDelta <= REV_MAX - 5))			// 3) Если 5 < Delta < 16383-5 - "скачок данных")
+    		{
+    			skipDefectFl = true;
+    			goodPosition = BkpEncPostionPrev;
+    			Error_counter++;
+    		}
+    		else
+    		{
+    			 g_Ram.ramGroupH.Position 		= 32767-BkpEncPostion;						// 4) Нормальные условия работы энкодера
+    		}
+    	}
+    	BkpEncPostionPrev = Data;
+*/
+
+
+
+    //------------------------------------------------------------
+
+    g_Ram.ramGroupH.Position 		= 32767-BkpEncPostion; // Data
     g_Ram.ramGroupC.HallBlock.all 	= bPort->RxPacket.Data[5] & 0x1F;
     g_Ram.ramGroupH.BKP_Temper 		= (int16) bPort->RxPacket.Data[6];
     if (g_Ram.ramGroupH.BKP_Temper > 128)
-	g_Ram.ramGroupH.BKP_Temper -= 255;
-    g_Core.Status.bit.Ten 		= !(bPort->RxPacket.Data[7] & 0xF);
+	g_Ram.ramGroupH.BKP_Temper 		-= 255;
+    g_Core.Status.bit.Ten 			= !(bPort->RxPacket.Data[7] & 0xF);
     g_Ram.ramGroupH.BkpType 		= (bPort->RxPacket.Data[7] >> 4) & 0xF;
     g_Ram.ramGroupA.RevErrValue		= BkpEncErr;
 

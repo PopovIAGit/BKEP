@@ -100,6 +100,7 @@ typedef struct
 	Uns CmdReg;								// Регистр команд
 	Uns CmdRegPrev;							// Предыдущее значение регистра команд 
 	Uns *StatDigOut;							// регистр состояния дискретных выходов
+	Uns *Position;
 	Uns Data[LOG_CMD_BUF_DATA_COUNT];		// Буфер журнала команд
 } TLogCmd, *pTLogCmd;
 

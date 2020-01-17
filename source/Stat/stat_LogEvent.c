@@ -96,6 +96,7 @@ void LogCmdUpdate(TLogCmd *p)
 			p->CmdReg = 0;				// ќбнулили регистр команд
 		*pBuf++ = *p->StatusReg;		// —татусный регистр блока
 		*pBuf++ = *p->StatDigOut;		// регистр состо€ни€ дискретных выходов
+		*pBuf++ = *p->Position;
 		
 		p->WriteFlag = true;
 		p->ExecFlag  = false;

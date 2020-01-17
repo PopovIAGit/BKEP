@@ -191,9 +191,9 @@ typedef struct _TRamGroupA
 	Int             TemperBKP;      // 23. 523 Температура блока БКП
 	Uns             VersionPO;      // 24. 524 Версия ПО
 	Uns             VersionPOBkp;   // 25. 525 Версия ПО БКП
-	Uns				VoltageDown;	// 27. 527 Падение напряжения
-	Uns				RevErrValue;	// 28. 526 Колво сбоев датчика положения
-	Int 			Rsvd1;
+	Uns				VoltageDown;	// 26. 527 Падение напряжения
+	Uns				RevErrValue;	// 27. 526 Колво сбоев датчика положения
+	Uns 			Rsvd28;			// 28. 527 Ошибочное положение для записи
 	Uns 			Rsvd[9];	    // 29-39. 528-539 Резерв
 } TRamGroupA;
 
@@ -263,7 +263,7 @@ typedef struct _TRamGroupC
 	Uns				reserv105;				// C15. 105 Резерв
 	Uns             SetDefaults;        	// C16. 106 Задание параметров по умолчанию
 	Uns				ConnFlagCountBCP;		// C17. 107 временная задержка на определение аварии связь с БКП
-	Uns             Rsvd18;          		// C18. 108 резерв
+	Uns             ModbusPauseStart;       // C18. 108 пауза при старте на модбас и ТС - 09,01,2020 - требование Обриев (и здравый смысл)
 	Uns             BrakePause;         	// C19. 109 Пауза перед торможением
 	Uns             BrakeTime;          	// C20. 110 Время торможения
 	Uns       		StopShnTime;   			// C21. 111 Время торможения динамическим торможением
@@ -442,8 +442,8 @@ typedef struct _TRamGroupH
 	TCubArray		TqCurr;				 // H17-36. 327-346 Ток поверхности
 	TCubArray		TqAngUI;			 // H37-56. 347-366 Углы нагрузки
 	TCubArray		TqAngSf;			 // H57-88. 367-386 Углы СИФУ
-	Uns             TuState;             		 // H78. 388 Команды ТУ (открыть закрыть стопО СтопЗ)
-	Uns             Umid;             	         // H82. 392 Среднее напряжение
+	Uns             TuState;             // H78. 388 Команды ТУ (открыть закрыть стопО СтопЗ)
+	Uns             Umid;             	 // H82. 392 Среднее напряжение
 	Uns             BKP_Temper;          // H85. 395 Температура БКП
 	Uns				Imidpr;			 	 // H86 396 Резерв
 	Uns             IuPr;                // H88. 398 Ток фазы U
@@ -478,7 +478,8 @@ typedef struct _TRamGroupH
 	Uns				LogReset;			 // H128. 438 Сброс журналов
 	TLedRegBKP 		BkpIndication;		 // H129. 439 Индикация на БКП
 	//-------------------------------
-	Uns 			Rsvd9[60];			 // H130-189. 440-499 Резерв
+	Uns				PosFix;				 // H130. 440
+	Uns 			Rsvd9[59];			 // H131-189. 441-499 Резерв
 } TRamGroupH;
 
 // Группа E (Адрес 500+40, Количество 32)

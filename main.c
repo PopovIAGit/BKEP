@@ -2,6 +2,8 @@
 /*                                 main.c                                 */
 /**************************************************************************/
 
+// все изменения подписываем - зачем и кто распорядился.
+
 #include "core.h"
 #include "comm.h"
 #include "peref.h"
@@ -13,10 +15,19 @@ extern void InterruptUpdate(void);
 
 void main(void)
 {
+
+	// 1. пауза модбаса
+	// 2. защита по энкодеру (3 посылки и игнор в простое)
+	// 3. изменение положения в простое в журнал
+	// 4. изменение ТС в журнал
+	// 5. изменение ТУ в журнал
+	// 6.
+
+
 	// Сначала инициализируется процессор
 	InitHardware();
 	memset(&g_Core, 	0, sizeof(TCore));
-	memset(&g_Ram, 	    	0, sizeof(TRam));
+	memset(&g_Ram, 	    0, sizeof(TRam));
 	memset(&g_Comm, 	0, sizeof(TComm));
 	memset(&g_Peref,	0, sizeof(TPeref));
 	memset(&g_Stat,		0, sizeof(TStat));
@@ -35,6 +46,8 @@ void main(void)
 	ERTM;
 
 	EnableInterrupts();
+
+	PauseModbus = g_Ram.ramGroupC.ModbusPauseStart; // 09.01.2020 - требование Обриев (и здравый смысл)
 
 	while(1)
 	{

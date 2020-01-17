@@ -107,6 +107,8 @@ void g_Ram_Init(TRam *p)
 //---------------------------------------------------
 void g_Ram_Update(TRam *p)
 {
+	if (PauseModbus) PauseModbus--;
+
     p->ramGroupA.Temper = g_Peref.TSens.Temper;
 
     //------ Core -> RAM ------------------------------------

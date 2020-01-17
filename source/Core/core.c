@@ -18,6 +18,10 @@ TFM25V10 Eeprom2;
 
 TCore	g_Core;
 
+Uns PrevPosition = 0;
+Uns DeltaPos = 0;
+Uns PrevTsState = 0;
+
 //выбор микросхем
 __inline void Eeprom1CsSet(Byte Lev)  {SC_EEPROM1 = !Lev;}
 __inline void Eeprom2CsSet(Byte Lev)  {SC_EEPROM2 = !Lev;}
@@ -48,8 +52,35 @@ void Core_Init(TCore *p)
 	Core_ProtectionsInit(&p->Protections);	// Защиты
 	Core_DisplayFaultsInit(&p->DisplayFaults);
 
-	p->Status.bit.Stop 			= 1;					// При включение выставляем стоп
+	p->Status.bit.Stop 				= 1;					// При включение выставляем стоп
 	g_Ram.ramGroupH.ContGroup 		= cgStop;
+}
+
+void Core_PosFixControl(void)
+{
+	if (g_Ram.ramGroupA.Status.bit.Stop)
+	{
+		DeltaPos = abs(g_Ram.ramGroupA.Position - PrevPosition);
+
+		if (DeltaPos > 5)
+		{
+			g_Ram.ramGroupH.PosFix = g_Ram.ramGroupA.Position;
+			g_Core.VlvDrvCtrl.EvLog.Value = CMD_FIX_POS;
+			g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_BLOCK;
+		}
+	}
+	else
+	{
+		g_Ram.ramGroupH.PosFix = g_Ram.ramGroupA.Position;
+	}
+	PrevPosition = g_Ram.ramGroupA.Position;
+
+	if (g_Ram.ramGroupA.StateTs.all != PrevTsState)
+	{
+		g_Core.VlvDrvCtrl.EvLog.Value = CMD_FIX_POS;
+		g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_BLOCK;
+	}
+	PrevTsState = g_Ram.ramGroupA.StateTs.all;
 }
 
 // Функция задания момента в зависимости от положения и направления движения

@@ -23,6 +23,7 @@
 TPeref	g_Peref;
 Uns LocalPoss = 0;
 
+Uns PauseModbus = 0;
 
 __inline void peref_74HC595CsSet(Byte Lev) {CS_RELE = !Lev;}
 

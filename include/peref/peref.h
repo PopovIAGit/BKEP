@@ -122,6 +122,7 @@ void Peref18kHZStop(TPeref *);
 
 //------------------- Глобальные переменные --------------------------------
 extern	TPeref	g_Peref;
+extern Uns PauseModbus;
 
 #ifdef __cplusplus
 }

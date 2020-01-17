@@ -158,8 +158,6 @@ void Comm_ControlModbusUpdateAltistar48(TComm *p)
 void Comm_Update(TComm *p)
 {
 
-	//Uint16 lAddr;
-
 //	if (g_Comm.Bluetooth.ModeProtocol == 0)
 //	{
 		// Команда на сброс связи
@@ -172,8 +170,14 @@ void Comm_Update(TComm *p)
 			g_Ram.ramGroupD.RsReset = 0;
 		}
 
+	if (PauseModbus == 0)
+	{
+
 		ModBusUpdate(&g_Comm.mbAsu); 	// slave канал связи с верхним уровнем АСУ
-	//}
+		//}
+	}
+
+
 
 	if (/*g_Comm.Bluetooth.ModeProtocol == 0 &&*/ g_Ram.ramGroupB.StopMethod == smDynBreak)
 	{
@@ -189,13 +193,13 @@ void Comm_Update(TComm *p)
 			switch (CommandATS48)
 			{
 			case 1:
-							mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.State1), 1);
-							break;
+					mb_read_ATS48(&g_Comm, GetAdr(ramGroupATS.State1), 1);
+					break;
 			case 2:
 			//	if (g_Ram.ramGroupATS.Control1.all != 0)
 			//	{
 					mb_write_ATS48(&g_Comm, GetAdr(ramGroupATS.Control1), 1,
-							g_Ram.ramGroupATS.Control1.all);
+					g_Ram.ramGroupATS.Control1.all);
 				//}
 				break;
 			case 3:

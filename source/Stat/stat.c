@@ -139,7 +139,7 @@ void InitTables(void)
 	ImCmdLogAddrsTable[3] = GetAdr(ramGroupH.LogControlWord);
 	ImCmdLogAddrsTable[4] = GetAdr(ramGroupA.Status);
 	ImCmdLogAddrsTable[5] = GetAdr(ramGroupA.StateTs);
-	ImCmdLogAddrsTable[6] = GetAdr(ramGroupA.Position);
+	ImCmdLogAddrsTable[6] = GetAdr(ramGroupH.PosFix);
 
 	ImParamLogAddrsTable[0] = GetAdr(ramGroupB.DevTime);
 	ImParamLogAddrsTable[1] = GetAdr(ramGroupB.DevDate);
@@ -241,6 +241,7 @@ void InitLogCmd(TLogCmd *lc)
 	lc->StatDigOut	= &g_Ram.ramGroupA.StateTs.all;		// Указатель на регистр дискретных выходов
 	lc->CmdReg		= 0;								// Регистр команд
 	lc->CmdRegPrev	= 0;								// Предыдущее значение регистра команд
+	lc->Position	= &g_Ram.ramGroupH.PosFix;
 	memset(&lc->Data[0],	0, sizeof(LOG_CMD_BUF_DATA_COUNT));	// Буфер журнала команд
 
 }

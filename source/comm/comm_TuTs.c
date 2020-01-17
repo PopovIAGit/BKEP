@@ -83,9 +83,41 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//200 Ãö
 	static TOutputReg OutputRegTmp;
 	static Uns TuEnbReleTimer;
 
+
+
+		if (!(*p->TypeLogicSignal & OPEN_BIT))
+			DIN_Update_On(&p->dinOpen, p->TypeVoltSignal, OPEN_BIT);
+		else
+			DIN_Update_Off(&p->dinOpen, p->TypeVoltSignal, OPEN_BIT);
+
+		if (!(*p->TypeLogicSignal&CLOSE_BIT)) DIN_Update_On(&p->dinClose, p->TypeVoltSignal, CLOSE_BIT);
+		else DIN_Update_Off(&p->dinClose, p->TypeVoltSignal, CLOSE_BIT);
+
+		if (!(*p->TypeLogicSignal&STOP_OPEN_BIT)) DIN_Update_On(&p->dinStopOpen, p->TypeVoltSignal, STOP_OPEN_BIT);
+		else DIN_Update_Off(&p->dinStopOpen, p->TypeVoltSignal, STOP_OPEN_BIT);
+
+		if (!(*p->TypeLogicSignal&MU_BIT)) DIN_Update_On(&p->dinMu, p->TypeVoltSignal, MU_BIT);
+		else DIN_Update_Off(&p->dinMu, p->TypeVoltSignal, MU_BIT);
+
+		if (!(*p->TypeLogicSignal&RESETALARM_BIT)) DIN_Update_On(&p->dinResetAlarm, p->TypeVoltSignal, RESETALARM_BIT);
+		else DIN_Update_Off(&p->dinResetAlarm, p->TypeVoltSignal, RESETALARM_BIT);
+
+		if (!(*p->TypeLogicSignal&STOP_CLOSE_BIT)) DIN_Update_On(&p->dinStopClose, p->TypeVoltSignal, STOP_CLOSE_BIT);
+		else DIN_Update_Off(&p->dinStopClose, p->TypeVoltSignal, STOP_CLOSE_BIT);
+
+		if (!(*p->TypeLogicSignal&DU_BIT)) DIN_Update_On(&p->dinDu, p->TypeVoltSignal, DU_BIT);
+		else DIN_Update_Off(&p->dinDu, p->TypeVoltSignal, DU_BIT);
+
+
+	if (PauseModbus > 0)
+	{
+		return;
+	}
+
+
 	// ---------------------- ÒÅËÅÑÈÃÍÀËÈÇÀÖÈß-------------------------------
 
-	if (g_Ram.ramGroupA.Faults.Dev.bit.LowPower)		// åñëè âûêëþ÷åíèå òî ðàçìûêàåì ÊÂÎ è ÊÂÇ, òðåáîâàíèå ÄÈÒ(ßêóøåâ) 02.12.19
+/*	if (g_Ram.ramGroupA.Faults.Dev.bit.LowPower)		// åñëè âûêëþ÷åíèå òî ðàçìûêàåì ÊÂÎ è ÊÂÇ, òðåáîâàíèå ÄÈÒ(ßêóøåâ) 02.12.19
 	{
 		p->Outputs.bit.Opened  = 0;	// 0	Îòêðûòî
 		p->Outputs.bit.Closed  = 0;	// 1	Çàêðûòî
@@ -93,7 +125,7 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//200 Ãö
 		g_Comm.BtnStopFlag = 0;
 	}
 	else
-	{
+	{*/
 		if (g_Comm.BtnStopFlag)							// ðàçìûêàíèå ÊÂÎ ÊÂÇ ïðè ïîâîðîòå ðó÷êè ñòîï - òðåáîâàíèå Îáðèåâ 05.12.19
 		{
 			p->Outputs.bit.Opened  = 0;	// 0	Îòêðûòî
@@ -110,7 +142,7 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//200 Ãö
 			p->Outputs.bit.Opened  = !g_Ram.ramGroupA.Status.bit.Opened;	// 0	Îòêðûòî
 			p->Outputs.bit.Closed  = !g_Ram.ramGroupA.Status.bit.Closed;	// 1	Çàêðûòî
 		}
-	}
+//	}
 
 	p->Outputs.bit.Mufta  = g_Ram.ramGroupA.Status.bit.Mufta;	    	// 2	Ìóôòà
 	p->Outputs.bit.Fault  = g_Ram.ramGroupA.Status.bit.Fault;	    	// 3	Àâàðèÿ
@@ -118,11 +150,11 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//200 Ãö
 
 	if(g_Core.Protections.outFaults.Proc.bit.MuDuDef)
 	{
-		p->Outputs.bit.MUDU    = 0;										// 7	ÌÓ/ÄÓ
+		p->Outputs.bit.MUDU = 0;										// 7	ÌÓ/ÄÓ
 	}
 	else
 	{
-		p->Outputs.bit.MUDU    = !g_Ram.ramGroupA.Status.bit.MuDu;		// 7	ÌÓ/ÄÓ
+		p->Outputs.bit.MUDU = !g_Ram.ramGroupA.Status.bit.MuDu;			// 7	ÌÓ/ÄÓ
 	}
 
 	p->Outputs.bit.Opening = g_Ram.ramGroupA.Status.bit.Opening;		// 5	Îòêðûâàåòñÿ
@@ -139,7 +171,7 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//200 Ãö
 				OutputRegTmp.all = g_Ram.ramGroupG.OutputReg.all;
 			}
 
-		if (OutputRegTmp.all != g_Ram.ramGroupA.StateTs.all)
+		if (OutputRegTmp.all != g_Ram.ramGroupA.StateTs.all)  //ToDo ×ÒÎ ÝÒÎ ÒÀÊÎÅ!!!!!!!!!!!!
 		{
 			ENB_RELE = 0;
 			g_Ram.ramGroupA.StateTs.all = OutputRegTmp.all;
@@ -157,29 +189,6 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//200 Ãö
 	//g_Ram.ramGroupH.ADC_CLOSE=g_Peref.AdcClose;
 	//g_Ram.ramGroupH.ADC_STOP=g_Peref.AdcStop;
 	//g_Ram.ramGroupH.ADC_TEST_BLOCK=g_Peref.AdcTestBlock;
-
-	if (!(*p->TypeLogicSignal & OPEN_BIT))
-		DIN_Update_On(&p->dinOpen, p->TypeVoltSignal, OPEN_BIT);
-	else
-		DIN_Update_Off(&p->dinOpen, p->TypeVoltSignal, OPEN_BIT);
-
-	if (!(*p->TypeLogicSignal&CLOSE_BIT)) DIN_Update_On(&p->dinClose, p->TypeVoltSignal, CLOSE_BIT);
-	else DIN_Update_Off(&p->dinClose, p->TypeVoltSignal, CLOSE_BIT);
-
-	if (!(*p->TypeLogicSignal&STOP_OPEN_BIT)) DIN_Update_On(&p->dinStopOpen, p->TypeVoltSignal, STOP_OPEN_BIT);
-	else DIN_Update_Off(&p->dinStopOpen, p->TypeVoltSignal, STOP_OPEN_BIT);
-
-	if (!(*p->TypeLogicSignal&MU_BIT)) DIN_Update_On(&p->dinMu, p->TypeVoltSignal, MU_BIT);
-	else DIN_Update_Off(&p->dinMu, p->TypeVoltSignal, MU_BIT);
-
-	if (!(*p->TypeLogicSignal&RESETALARM_BIT)) DIN_Update_On(&p->dinResetAlarm, p->TypeVoltSignal, RESETALARM_BIT);
-	else DIN_Update_Off(&p->dinResetAlarm, p->TypeVoltSignal, RESETALARM_BIT);
-
-	if (!(*p->TypeLogicSignal&STOP_CLOSE_BIT)) DIN_Update_On(&p->dinStopClose, p->TypeVoltSignal, STOP_CLOSE_BIT);
-	else DIN_Update_Off(&p->dinStopClose, p->TypeVoltSignal, STOP_CLOSE_BIT);
-
-	if (!(*p->TypeLogicSignal&DU_BIT)) DIN_Update_On(&p->dinDu, p->TypeVoltSignal, DU_BIT);
-	else DIN_Update_Off(&p->dinDu, p->TypeVoltSignal, DU_BIT);
 
 }
 //-----------------------------------------------------

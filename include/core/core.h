@@ -144,6 +144,8 @@ void Protections_MuffFlag(void);
 
 void Core_TechProgon(void);				// режим тех прогона
 
+void Core_PosFixControl(void);
+
 extern TCore g_Core;
 extern volatile Uns setTorque;
 #endif // CORE_

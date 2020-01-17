@@ -5,7 +5,7 @@
 
 Uns ImEvLogMainAddrsTable[20];
 Uns ImEvLogBufAddrsTable[12];
-Uns ImCmdLogAddrsTable[6];
+Uns ImCmdLogAddrsTable[7];
 Uns ImParamLogAddrsTable[5];
 Uns ImSimLogAddrsTable[13];
 Uns countByte=0;
