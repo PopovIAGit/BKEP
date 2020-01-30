@@ -84,7 +84,6 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//200 Гц
 	static Uns TuEnbReleTimer;
 
 
-
 		if (!(*p->TypeLogicSignal & OPEN_BIT))
 			DIN_Update_On(&p->dinOpen, p->TypeVoltSignal, OPEN_BIT);
 		else
@@ -117,7 +116,7 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//200 Гц
 
 	// ---------------------- ТЕЛЕСИГНАЛИЗАЦИЯ-------------------------------
 
-/*	if (g_Ram.ramGroupA.Faults.Dev.bit.LowPower)		// если выключение то размыкаем КВО и КВЗ, требование ДИТ(Якушев) 02.12.19
+	if (g_Ram.ramGroupA.Faults.Dev.bit.LowPower)		// если выключение то размыкаем КВО и КВЗ, требование ДИТ(Якушев) 02.12.19
 	{
 		p->Outputs.bit.Opened  = 0;	// 0	Открыто
 		p->Outputs.bit.Closed  = 0;	// 1	Закрыто
@@ -125,7 +124,7 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//200 Гц
 		g_Comm.BtnStopFlag = 0;
 	}
 	else
-	{*/
+	{
 		if (g_Comm.BtnStopFlag)							// размыкание КВО КВЗ при повороте ручки стоп - требование Обриев 05.12.19
 		{
 			p->Outputs.bit.Opened  = 0;	// 0	Открыто
@@ -142,7 +141,7 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//200 Гц
 			p->Outputs.bit.Opened  = !g_Ram.ramGroupA.Status.bit.Opened;	// 0	Открыто
 			p->Outputs.bit.Closed  = !g_Ram.ramGroupA.Status.bit.Closed;	// 1	Закрыто
 		}
-//	}
+	}
 
 	p->Outputs.bit.Mufta  = g_Ram.ramGroupA.Status.bit.Mufta;	    	// 2	Муфта
 	p->Outputs.bit.Fault  = g_Ram.ramGroupA.Status.bit.Fault;	    	// 3	Авария
