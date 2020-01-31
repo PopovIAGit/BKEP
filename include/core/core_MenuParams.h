@@ -190,7 +190,7 @@ const struct MENU_PARAM params[] = {
 		"Ñ59.ÂÐÅÌ ÌÀÊÑ U ", "C   ",      1,    250,    220, M_FACT|M_RMAX(2)|M_PREC(1),				//149
 		"C60.ÇÀÙ ÌÈÍ U   ", "    ", 	 0,      1,  	 1, M_LIST|M_SADR(153),						//150
 		"Ñ61.ÓÐÎÂ ÌÈÍ U  ", "B   ",     90,    220,    115, M_FACT|M_RMAX(2),						//151
-		"Ñ62.ÂÐ ÌÈÍ U Í  ", "C   ",      1,    200,     10, M_FACT|M_RMAX(2)|M_PREC(1),				//152
+		"Ñ62.ÂÐ ÌÈÍ U Í  ", "C   ",      1,    200,     11, M_FACT|M_RMAX(2)|M_PREC(1),				//152	// PIA 31.01.2020 קעמ בû םו למנדאכא םוטסןנ ןנט מבנûגו
 		"Ñ63.ÂÐÅÌ ÌÈÍ U  ", "C   ",      1,    250,    220, M_FACT|M_RMAX(2)|M_PREC(1),				//153
 		"   C64.ÐÅÇÅÐÂ   ", "    ",      0,  65535,      0, M_SHOW|M_RMAX(4),						//154
 		"   C65.ÐÅÇÅÐÂ   ", "    ",      0,  65535,      0, M_SHOW|M_RMAX(4),						//155

@@ -837,7 +837,7 @@ void Core_TechProgon(void)
 	    stopTimer = 0;
 	    if (!isComandDone)			// Если команда еще не была подана
 	    {
-		if (progonDelay++ > 50)	// 50 = 5 сек на 10 Гц
+		if (progonDelay++ > 150)	// 50 = 5 сек на 10 Гц
 		{
 		    if (g_Ram.ramGroupC.progonCycles != 0)
 		    {
