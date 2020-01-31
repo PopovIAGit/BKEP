@@ -97,10 +97,82 @@ Uns Comm_LocalButtonUpdate(TCommMPU *p)
 			{
 				p->btn3Param.timer = 0;
 				result |= BTN_STOP;
-				g_Comm.BtnStopFlag = 1;
 			}
 		}
 	}
 	return result;
+}
+
+// SDV ЦПА
+#define DELAY_TIMEOUT 150 	// 150 = 3 сек на 50 Гц
+
+#define KVO_KVZ_OFF_DEFAULT { \
+		&g_Ram.ramGroupA.StateTu.all, \
+		&g_Ram.ramGroupC.TimeBtnStopKVOKVZ, \
+		DELAY_TIMEOUT, \
+		0, 0, 0 }
+
+TKVOKVZoff KvoKvzOff = KVO_KVZ_OFF_DEFAULT;
+
+// Функция формирования флага по размыканию КВО и КВЗ при стопе
+// Вход - факт поворота ручки стоп и факт прохождения команды СТОП по ТУ
+// Выход - флаг размыкания КВО и КВЗ
+Bool OffKVOKVZ_Control (TKVOKVZoff *p, Uns btnStatus)	// 50 Hz
+{
+	if (g_Ram.ramGroupA.Faults.Dev.bit.LowPower)		// Нет питания? Гасим КВО и КВЗ
+	{
+		return 1;
+	}
+
+	if (g_Comm.bkpNotConnected)							// БКП еще не вышел на связь? Гасим КВО и КВЗ
+	{
+		return 1;
+	}
+
+	if (!g_Ram.ramGroupB.KvoKvzOffOnStop)				// Если разрыв КВО и КВЗ при стопе выключен - дальше не идем
+	{
+		return 0;
+	}
+
+	if (p->delayFlag)							// Если висит флаг задержки
+	{											// то просто отсчитваем таймер и игнорируем состояние ручек управления и ТУ
+		p->offFlag = false;
+		if (p->timer++ >= p->delayTimeout)		// Когда таймер истек просто обнуляем флаг задержки
+		{
+			p->timer = 0;
+			p->delayFlag = false;
+		}
+	}
+	else if (!p->offFlag) 						// Если флаг размыкания КВО и КВЗ снят
+	{											// то смотрим на состояние кнопок и ТУ
+		if ((btnStatus & BTN_STOP)||	// Если нажата кнопка СТОП на МПУ то выставляем флаг разрывани КВО и КВЗ
+			(*p->pTuState & (TU_STOP_OPEN | TU_STOP_CLOSE)) ) // Если пришел СТОП по ТУ - аналогично
+		{
+			// Выставляем флаг по разрыву КВО и КВЗ только после того, как пускатели разомкнулись
+			if (CONTACTOR_1_CONTROL && CONTACTOR_2_CONTROL)
+			{
+				p->offFlag = true;
+			}
+		}
+	}
+	else										// если флаг выключения КВО и КВЗ активен
+	{
+		if(p->timer++ >= *p->pOnTimeout * 5)	// Отсчитываем таймер.
+		{										// по окончанию таймера, проверяем, ушел ли стоп
+			if ((btnStatus & BTN_STOP)||
+				(*p->pTuState & (TU_STOP_OPEN | TU_STOP_CLOSE)) )
+			{									// если СТОП не ушел, то удерживаем таймер
+				p->timer = *p->pOnTimeout;
+			}
+			else								// если СТОП ушел, то снимаем все флаги
+			{
+				p->timer = 0;					// снимаем флаг разрыва КВО и КВЗ
+				p->offFlag = false;				// и выставляем флаг задержки, чтобы выждать паузу, прежде чем опять смотреть на состояние ТУ и Кнопок
+				p->delayFlag = true;
+			}
+		}
+	}
+
+	return p->offFlag;
 }
 

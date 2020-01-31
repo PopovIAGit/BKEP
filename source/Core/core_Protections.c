@@ -394,7 +394,6 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 // Индикация аварий процесса и устройства
 void Core_DevProc_FaultIndic(TCoreProtections *p)
 {
-
 	if (p->FaultDelay > 0)
 	{
 		p->FaultDelay--;
@@ -708,31 +707,31 @@ void Core_Protections50HZUpdate2(TCoreProtections *p)
 
 	//-------- Ошибка ТИП БКП ------------------------
 
-			if (g_Ram.ramGroupA.Faults.Dev.bit.NoBCP_Connect == 0  && g_Ram.ramGroupC.DriveType != 0)
+	if (g_Ram.ramGroupA.Faults.Dev.bit.NoBCP_Connect == 0  && g_Ram.ramGroupC.DriveType != 0 && !g_Comm.bkpNotConnected)
+	{
+		p->BcpTypeDubl = g_Ram.ramGroupH.BkpType*2;
+
+		if ((Uns)g_Ram.ramGroupC.DriveType > 15)
+		{
+			BCPDriveType = (Uns)g_Ram.ramGroupC.DriveType - 15;
+		}
+		else if((Uns)g_Ram.ramGroupC.DriveType <= 15)
+		{
+			BCPDriveType = (Uns)g_Ram.ramGroupC.DriveType;
+		}
+
+		if (BCPDriveType == 14) BCPDriveType = 15;
+
+		if ((p->BcpTypeDubl != BCPDriveType) && ((p->BcpTypeDubl-1) != BCPDriveType))
+		{
+			if(p->BcpTypeTimer++ >= 5*Prd50HZ)
 			{
-				p->BcpTypeDubl = g_Ram.ramGroupH.BkpType*2;
-
-				if ((Uns)g_Ram.ramGroupC.DriveType > 15)
-				{
-				    BCPDriveType = (Uns)g_Ram.ramGroupC.DriveType - 15;
-				}
-				else if((Uns)g_Ram.ramGroupC.DriveType <= 15)
-				{
-				    BCPDriveType = (Uns)g_Ram.ramGroupC.DriveType;
-				}
-
-				if (BCPDriveType == 14) BCPDriveType = 15;
-
-				if ((p->BcpTypeDubl != BCPDriveType) && ((p->BcpTypeDubl-1) != BCPDriveType))
-				{
-					if(p->BcpTypeTimer++ >= 5*Prd50HZ)
-					{
-						p->outFaults.Dev.bit.BCP_ErrorType = 1;
-						p->BcpTypeTimer = 0;
-					}
-				}
-				else p->BcpTypeTimer = 0;
+				p->outFaults.Dev.bit.BCP_ErrorType = 1;
+				p->BcpTypeTimer = 0;
 			}
+		}
+		else p->BcpTypeTimer = 0;
+	}
 		//----------------------------------------
 		//------------ Ошибка УПП -------------------------------
 

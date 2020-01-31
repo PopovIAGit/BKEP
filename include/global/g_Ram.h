@@ -51,8 +51,8 @@ typedef union _TTek_TechReg
 		Uns Opening:1;		// 8
 		Uns Closing:1;		// 9
 		Uns Stop:1;			// 10
-		Uns Rsvd11:1;			// 11-12
-		Uns Rsvd12:1;
+		Uns KVO:1;			// 11
+		Uns KVZ:1;			// 12
 		Uns Ten:1;			// 13
 		Uns Rsvd14:1;		// 14
 		Uns Ready:1;		// 15
@@ -191,9 +191,9 @@ typedef struct _TRamGroupA
 	Int             TemperBKP;      // 23. 523 Температура блока БКП
 	Uns             VersionPO;      // 24. 524 Версия ПО
 	Uns             VersionPOBkp;   // 25. 525 Версия ПО БКП
-	Uns				VoltageDown;	// 26. 527 Падение напряжения
-	Uns				RevErrValue;	// 27. 526 Колво сбоев датчика положения
-	Uns 			Rsvd28;			// 28. 527 Ошибочное положение для записи
+	Uns				VoltageDown;	// 26. 526 Падение напряжения
+	Uns				RevErrValue;	// 27. 527 Колво сбоев датчика положения
+	Uns 			Rsvd28;			// 28. 528 Ошибочное положение для записи
 	Uns 			Rsvd[9];	    // 29-39. 528-539 Резерв
 } TRamGroupA;
 
@@ -234,7 +234,7 @@ typedef struct _TRamGroupB
 	Uns				NoMoveTime;			// B32. 72 Время отсутствия движения
 	Uns				OverwayZone;		// B33. 73 Максимальный путь уплотнения
 	TPlaceType		PlaceType;			// B34. 74 место установки привода (обычн, агрегатная, пожарка)
-	Uns				reserv75;			// B35. 75 Резерв
+	Uns				KvoKvzOffOnStop;	// B35. 75 Размыкание КВО и КВЗ при СТОП, 0 - Нет, 1 - Да // SDV ЦПА
  	TStopMethod		StopMethod;			// B36. 76 Выбор типа торможения (Динамика, Противовключение)
  	Uns				ConductorSection;   // B37. 77 Сечение проводника
  	Uns             ConductorLength;	// B38. 78 Длина проводника
@@ -437,49 +437,48 @@ typedef struct _TRamGroupH
 	Uns				CmdButton;			 // H12. 322 Команда с ручек управления
 	Uns				BkpType;			 // H13. 323 тип БКП для выставления соответсвующего типа привода
 	TDateVar 		HideDate;			 // H14. 324 Дата
-	//Uns			Rsvd1;			 	 // H15. 325 Резерв
-	Uns				TransCurr;			 // H16. 326 Ток перехода
-	TCubArray		TqCurr;				 // H17-36. 327-346 Ток поверхности
-	TCubArray		TqAngUI;			 // H37-56. 347-366 Углы нагрузки
-	TCubArray		TqAngSf;			 // H57-88. 367-386 Углы СИФУ
-	Uns             TuState;             // H78. 388 Команды ТУ (открыть закрыть стопО СтопЗ)
-	Uns             Umid;             	 // H82. 392 Среднее напряжение
-	Uns             BKP_Temper;          // H85. 395 Температура БКП
-	Uns				Imidpr;			 	 // H86 396 Резерв
-	Uns             IuPr;                // H88. 398 Ток фазы U
-	Uns             IvPr;                // H89. 399 Ток фазы V
-	Uns             IwPr;                // H90. 400 Ток фазы W
-	Uns             Imid;				 // H91. 401 Средний ток
-  	LgUns           Position;            // H92-93. 402-403 Положение
-	LgUns  			FullStep;        	 // H94-95. 404-405 Полный ход
-	TReverseType	ReverseType;         // H97. 407 Тип реверса
+	Uns				TransCurr;			 // H16. 325 Ток перехода
+	TCubArray		TqCurr;				 // H17-36. 326-349 Ток поверхности
+	TCubArray		TqAngUI;			 // H37-56. 350-373 Углы нагрузки
+	TCubArray		TqAngSf;			 // H57-88. 374-397 Углы СИФУ
+	Uns             TuState;             // H78. 398 Команды ТУ (открыть закрыть стопО СтопЗ)
+	Uns             Umid;             	 // H82. 399 Среднее напряжение
+	Uns             BKP_Temper;          // H85. 400 Температура БКП
+	Uns				Imidpr;			 	 // H86  401 Резерв
+	Uns             IuPr;                // H88. 402 Ток фазы U
+	Uns             IvPr;                // H89. 403 Ток фазы V
+	Uns             IwPr;                // H90. 404 Ток фазы W
+	Uns             Imid;				 // H91. 405 Средний ток
+  	LgUns           Position;            // H92-93. 406-407 Положение
+	LgUns  			FullStep;        	 // H94-95. 408-409 Полный ход
+	TReverseType	ReverseType;         // H97. 410 Тип реверса
 	//-------------------------------
-	Uns				BadTask_2kHz;        // H102. 412 Регистр "плохих" задач прерывания 2 кГц
-	Uns				BadTask_200Hz;       // H103. 413 Регистр "плохих" задач прерывания 200 Гц
-	Uns				BadTask_50Hz[3];     // H104-106. 414-416 Регистр "плохих" задач прерывания 50 Гц
-	Uns				BadTask_10Hz;        // H107. 417 Регистр "плохих" задач прерывания 10 Гц
-	Uns				BadTask_Reset;       // H108. 418 Сброс регистров "плохих" задач
-	Uns				CpuTime;             // H109. 419 Процессорное время конкретной задачи
-	Uns				TaskList;            // H110. 420 Номер списка задач
-	Uns				TaskNumber;          // H111. 421 Номер задачи в списке
+	Uns				BadTask_2kHz;        // H102. 411 Регистр "плохих" задач прерывания 2 кГц
+	Uns				BadTask_200Hz;       // H103. 412 Регистр "плохих" задач прерывания 200 Гц
+	Uns				BadTask_50Hz[3];     // H104-106. 413-415 Регистр "плохих" задач прерывания 50 Гц
+	Uns				BadTask_10Hz;        // H107. 416 Регистр "плохих" задач прерывания 10 Гц
+	Uns				BadTask_Reset;       // H108. 417 Сброс регистров "плохих" задач
+	Uns				CpuTime;             // H109. 418 Процессорное время конкретной задачи
+	Uns				TaskList;            // H110. 419 Номер списка задач
+	Uns				TaskNumber;          // H111. 420 Номер задачи в списке
 	//-------------------------------
-	Uns      	    Rsvd2[5];		 	 // H112-116. 422-426 Резерв
-	Uns 			LogEvAddr;			 // H117. 427 Текущий адрес журнала событий
-	Uns 			LogCmdAddr;			 // H118. 428 Текущий адрес журнала команд
-	Uns 			LogParamAddr;		 // H119. 429 Текущий адрес журнала изменения параметров
-	Uns 			LogSimAddr;		     // H120. 430 Текущий адрес журнала SIM
-	Uns				LogEvCount;			 // H121. 431 Количество записанных ячеек журнала событий
-	Uns				LogCmdCount;		 // H122. 432 Количество записанных ячеек журнала команд
-	Uns				LogParamCount;		 // H123. 433 Количество записанных ячеек журнала изменения параметров
-	Uns				LogSimCount;		 // H124. 434 Количество записанных ячеек журнала SIM
-	Uns				Seconds;			 // H125. 435 Секунды
-	TContactorGroup ContGroup;			 // H126. 436 Управление контакторами
-	TBurCmd 		LogControlWord;		 // H127. 437 Команды БУР
-	Uns				LogReset;			 // H128. 438 Сброс журналов
-	TLedRegBKP 		BkpIndication;		 // H129. 439 Индикация на БКП
+	Uns      	    Rsvd2[5];		 	 // H112-116. 421-425 Резерв
+	Uns 			LogEvAddr;			 // H117. 426 Текущий адрес журнала событий
+	Uns 			LogCmdAddr;			 // H118. 427 Текущий адрес журнала команд
+	Uns 			LogParamAddr;		 // H119. 428 Текущий адрес журнала изменения параметров
+	Uns 			LogSimAddr;		     // H120. 429 Текущий адрес журнала SIM
+	Uns				LogEvCount;			 // H121. 430 Количество записанных ячеек журнала событий
+	Uns				LogCmdCount;		 // H122. 431 Количество записанных ячеек журнала команд
+	Uns				LogParamCount;		 // H123. 432 Количество записанных ячеек журнала изменения параметров
+	Uns				LogSimCount;		 // H124. 433 Количество записанных ячеек журнала SIM
+	Uns				Seconds;			 // H125. 434 Секунды
+	TContactorGroup ContGroup;			 // H126. 435 Управление контакторами
+	TBurCmd 		LogControlWord;		 // H127. 436 Команды БУР
+	Uns				LogReset;			 // H128. 437 Сброс журналов
+	TLedRegBKP 		BkpIndication;		 // H129. 438 Индикация на БКП
 	//-------------------------------
-	Uns				PosFix;				 // H130. 440
-	Uns 			Rsvd9[59];			 // H131-189. 441-499 Резерв
+	Uns				PosFix;				 // H130. 439
+	Uns 			Rsvd9[59];			 // H131-189. 440-499 Резерв
 } TRamGroupH;
 
 // Группа E (Адрес 500+40, Количество 32)

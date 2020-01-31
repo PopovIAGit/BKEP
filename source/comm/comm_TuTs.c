@@ -83,31 +83,28 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//200 Гц
 	static TOutputReg OutputRegTmp;
 	static Uns TuEnbReleTimer;
 
+	if (!(*p->TypeLogicSignal & OPEN_BIT))
+		DIN_Update_On(&p->dinOpen, p->TypeVoltSignal, OPEN_BIT);
+	else
+		DIN_Update_Off(&p->dinOpen, p->TypeVoltSignal, OPEN_BIT);
 
+	if (!(*p->TypeLogicSignal&CLOSE_BIT)) DIN_Update_On(&p->dinClose, p->TypeVoltSignal, CLOSE_BIT);
+	else DIN_Update_Off(&p->dinClose, p->TypeVoltSignal, CLOSE_BIT);
 
-		if (!(*p->TypeLogicSignal & OPEN_BIT))
-			DIN_Update_On(&p->dinOpen, p->TypeVoltSignal, OPEN_BIT);
-		else
-			DIN_Update_Off(&p->dinOpen, p->TypeVoltSignal, OPEN_BIT);
+	if (!(*p->TypeLogicSignal&STOP_OPEN_BIT)) DIN_Update_On(&p->dinStopOpen, p->TypeVoltSignal, STOP_OPEN_BIT);
+	else DIN_Update_Off(&p->dinStopOpen, p->TypeVoltSignal, STOP_OPEN_BIT);
 
-		if (!(*p->TypeLogicSignal&CLOSE_BIT)) DIN_Update_On(&p->dinClose, p->TypeVoltSignal, CLOSE_BIT);
-		else DIN_Update_Off(&p->dinClose, p->TypeVoltSignal, CLOSE_BIT);
+	if (!(*p->TypeLogicSignal&MU_BIT)) DIN_Update_On(&p->dinMu, p->TypeVoltSignal, MU_BIT);
+	else DIN_Update_Off(&p->dinMu, p->TypeVoltSignal, MU_BIT);
 
-		if (!(*p->TypeLogicSignal&STOP_OPEN_BIT)) DIN_Update_On(&p->dinStopOpen, p->TypeVoltSignal, STOP_OPEN_BIT);
-		else DIN_Update_Off(&p->dinStopOpen, p->TypeVoltSignal, STOP_OPEN_BIT);
+	if (!(*p->TypeLogicSignal&RESETALARM_BIT)) DIN_Update_On(&p->dinResetAlarm, p->TypeVoltSignal, RESETALARM_BIT);
+	else DIN_Update_Off(&p->dinResetAlarm, p->TypeVoltSignal, RESETALARM_BIT);
 
-		if (!(*p->TypeLogicSignal&MU_BIT)) DIN_Update_On(&p->dinMu, p->TypeVoltSignal, MU_BIT);
-		else DIN_Update_Off(&p->dinMu, p->TypeVoltSignal, MU_BIT);
+	if (!(*p->TypeLogicSignal&STOP_CLOSE_BIT)) DIN_Update_On(&p->dinStopClose, p->TypeVoltSignal, STOP_CLOSE_BIT);
+	else DIN_Update_Off(&p->dinStopClose, p->TypeVoltSignal, STOP_CLOSE_BIT);
 
-		if (!(*p->TypeLogicSignal&RESETALARM_BIT)) DIN_Update_On(&p->dinResetAlarm, p->TypeVoltSignal, RESETALARM_BIT);
-		else DIN_Update_Off(&p->dinResetAlarm, p->TypeVoltSignal, RESETALARM_BIT);
-
-		if (!(*p->TypeLogicSignal&STOP_CLOSE_BIT)) DIN_Update_On(&p->dinStopClose, p->TypeVoltSignal, STOP_CLOSE_BIT);
-		else DIN_Update_Off(&p->dinStopClose, p->TypeVoltSignal, STOP_CLOSE_BIT);
-
-		if (!(*p->TypeLogicSignal&DU_BIT)) DIN_Update_On(&p->dinDu, p->TypeVoltSignal, DU_BIT);
-		else DIN_Update_Off(&p->dinDu, p->TypeVoltSignal, DU_BIT);
-
+	if (!(*p->TypeLogicSignal&DU_BIT)) DIN_Update_On(&p->dinDu, p->TypeVoltSignal, DU_BIT);
+	else DIN_Update_Off(&p->dinDu, p->TypeVoltSignal, DU_BIT);
 
 	if (PauseModbus > 0)
 	{
@@ -126,23 +123,9 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//200 Гц
 	}
 	else
 	{*/
-		if (g_Comm.BtnStopFlag)							// размыкание КВО КВЗ при повороте ручки стоп - требование Обриев 05.12.19
-		{
-			p->Outputs.bit.Opened  = 0;	// 0	Открыто
-			p->Outputs.bit.Closed  = 0;	// 1	Закрыто
 
-			if(BtnStopKVOKVZofftimer++ >=  g_Ram.ramGroupC.TimeBtnStopKVOKVZ*20)
-			{
-				BtnStopKVOKVZofftimer = 0;
-				g_Comm.BtnStopFlag = 0;
-			}
-		}
-		else
-		{
-			p->Outputs.bit.Opened  = !g_Ram.ramGroupA.Status.bit.Opened;	// 0	Открыто
-			p->Outputs.bit.Closed  = !g_Ram.ramGroupA.Status.bit.Closed;	// 1	Закрыто
-		}
-//	}
+	p->Outputs.bit.Opened  = g_Comm.kvokvzOffFlag ? 0 : !g_Ram.ramGroupA.Status.bit.Opened;	// 0	Открыто // SDV ЦПА
+	p->Outputs.bit.Closed  = g_Comm.kvokvzOffFlag ? 0 : !g_Ram.ramGroupA.Status.bit.Closed;	// 1	Закрыто // SDV ЦПА
 
 	p->Outputs.bit.Mufta  = g_Ram.ramGroupA.Status.bit.Mufta;	    	// 2	Муфта
 	p->Outputs.bit.Fault  = g_Ram.ramGroupA.Status.bit.Fault;	    	// 3	Авария
@@ -164,24 +147,24 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//200 Гц
 
 	//инверсия ТС
 	//g_Ram.ramGroupA.StateTs.all = p->Outputs.all ^ g_Ram.ramGroupB.TsInvert.all;
-		OutputRegTmp.all = p->Outputs.all ^ g_Ram.ramGroupB.TsInvert.all;
+	OutputRegTmp.all = p->Outputs.all ^ g_Ram.ramGroupB.TsInvert.all;
 
-			if(g_Ram.ramGroupG.Mode)
-			{
-				OutputRegTmp.all = g_Ram.ramGroupG.OutputReg.all;
-			}
+	if(g_Ram.ramGroupG.Mode)
+	{
+		OutputRegTmp.all = g_Ram.ramGroupG.OutputReg.all;
+	}
 
-		if (OutputRegTmp.all != g_Ram.ramGroupA.StateTs.all)  //ToDo ЧТО ЭТО ТАКОЕ!!!!!!!!!!!!
-		{
-			ENB_RELE = 0;
-			g_Ram.ramGroupA.StateTs.all = OutputRegTmp.all;
-			Peref_74HC595Update(&g_Peref.ShiftReg, g_Ram.ramGroupA.StateTs);
-			//TuEnbReleTimer = (0.3 * Prd50HZ);
-			TuEnbReleTimer = (0.3 * Prd200HZ);
-		}
+	if (OutputRegTmp.all != g_Ram.ramGroupA.StateTs.all)  //ToDo ЧТО ЭТО ТАКОЕ!!!!!!!!!!!!
+	{
+		ENB_RELE = 0;
+		g_Ram.ramGroupA.StateTs.all = OutputRegTmp.all;
+		Peref_74HC595Update(&g_Peref.ShiftReg, g_Ram.ramGroupA.StateTs);
+		//TuEnbReleTimer = (0.3 * Prd50HZ);
+		TuEnbReleTimer = (0.3 * Prd200HZ);
+	}
 
-		if(TuEnbReleTimer > 0) TuEnbReleTimer--;
-		else if(TuEnbReleTimer == 0 && ENB_RELE == 0) ENB_RELE = 1;
+	if(TuEnbReleTimer > 0) TuEnbReleTimer--;
+	else if(TuEnbReleTimer == 0 && ENB_RELE == 0) ENB_RELE = 1;
 
 	// ----------------------ВЫВОД ТЕЛЕСИГНАЛИЗАЦИИ----------------------------------
 	//в группу H добавить

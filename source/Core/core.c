@@ -189,8 +189,8 @@ void Core_CalibControl(TCore *p)
 		g_Peref.Position.CancelFlag = false;
 	}
 
-		p->Status.bit.Closed = p->Status.bit.Stop && ((g_Peref.Position.Zone & CLB_CLOSE) != 0);
-		p->Status.bit.Opened = p->Status.bit.Stop && ((g_Peref.Position.Zone & CLB_OPEN)  != 0);
+	p->Status.bit.Closed = p->Status.bit.Stop && ((g_Peref.Position.Zone & CLB_CLOSE) != 0);
+	p->Status.bit.Opened = p->Status.bit.Stop && ((g_Peref.Position.Zone & CLB_OPEN)  != 0);
 
 	if(g_Ram.ramGroupD.CalibReset != 0)
 	{
@@ -236,6 +236,12 @@ void Core_CalibControl(TCore *p)
 			WriteToEeprom(REG_CALIB_STATE, &g_Ram.ramGroupH.CalibState, sizeof(ClbIndication));	// то записали состояние калибровки
 			g_Ram.ramGroupA.CalibState = g_Ram.ramGroupH.CalibState;
 		}
+	}
+
+	if (g_Comm.bkpNotConnected)		// Пока связь с БКП отсутствует, статусы "Открыто" и "Закрыто" не формируем
+	{
+		p->Status.bit.Closed = 1;
+		p->Status.bit.Opened = 1;
 	}
 }
 

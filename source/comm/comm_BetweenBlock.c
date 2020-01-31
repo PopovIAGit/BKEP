@@ -266,9 +266,18 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 
 
 
-    //------------------------------------------------------------
+    //------------------------------------------------------------ // SDV ЦПА
+    // Фильтруем числа 0, 32767 и 65535
+    if (BkpEncPostion == 32767 || BkpEncPostion == 65535 || BkpEncPostion == 0)
+    {
+    	g_Ram.ramGroupH.Position 		= 32767-BkpEncPostionPrev; // Data
+    }
+    else	// Все остальное отображаем так, как есть, но помним предыдущее значение
+    {
+    	BkpEncPostionPrev = BkpEncPostion;
+    	g_Ram.ramGroupH.Position 		= 32767-BkpEncPostion; // Data
+    }
 
-    g_Ram.ramGroupH.Position 		= 32767-BkpEncPostion; // Data
     g_Ram.ramGroupC.HallBlock.all 	= bPort->RxPacket.Data[5] & 0x1F;
     g_Ram.ramGroupH.BKP_Temper 		= (int16) bPort->RxPacket.Data[6];
     if (g_Ram.ramGroupH.BKP_Temper > 128)

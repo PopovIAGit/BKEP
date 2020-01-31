@@ -64,7 +64,7 @@ void Comm_Init(TComm *p)
 	//p->Shn.SHN_ReadFlag = 0;
 	//p->Shn.SHN_Mode = 1;
 	p->btn_reset_alarmFlag = 0;
-
+	p->bkpNotConnected = true;	// высталяем флаг, что связь с БКП еще не установлена
 }
 
 /*
@@ -257,11 +257,13 @@ static char ReadRegs(TMbPort *Port, Uint16 *Data, Uint16 Addr, Uint16 Count)
 
 void Comm_50HzCalc(TComm *p)
 {
+	static Uns connectTime = 0;
+
 	//	КОМАНДЫ С МПУ !!!
 	// передаем команду с кнопок управления
-
+	p->ButtonsState = Comm_LocalButtonUpdate(&p->localControl);
 	// передаем команду с ручек БКП
-	switch (Comm_LocalButtonUpdate(&p->localControl))
+	switch (p->ButtonsState)
 	{
 	case (BTN_STOPMU_BIT | BTN_STOPDU_BIT):
 		g_Ram.ramGroupH.CmdButton = KEY_STOP;
@@ -297,6 +299,24 @@ void Comm_50HzCalc(TComm *p)
 	}
 
 	//CommandUpdate(&g_Comm);
+	p->kvokvzOffFlag = OffKVOKVZ_Control(&KvoKvzOff, p->localControl.inputBCP_Data->all);
+
+	// Процедура работы с флагом bkpNotConnected
+	if (p->Bluetooth.ModeProtocol != 2)
+	{
+		if(g_Comm.mbBkp.Frame.ConnFlagCount == 0)// Пока связи нет обнуляем таймер
+		{
+			connectTime = 0;
+		}
+		else if (g_Comm.bkpNotConnected)		// Если связь с БКП все-таки нашлась, а флаг отсутствия связи выставлен
+		{										// отсчитываем 0,5 сек прежде чем снять флаг отсутствия связи
+			if (connectTime++ > 10)				// 10 - это 0,2 сек на частоте 50 ГЦ
+			{
+				g_Comm.bkpNotConnected = false;
+				connectTime = 0;
+			}
+		}
+	}
 }
 
 //-----------обработка источников команд -----------------------------
@@ -441,8 +461,8 @@ void TekModbusParamsUpdate(void) //??? необходимы проверки
 	tek->TechReg.bit.Ten   	 = g_Ram.ramGroupA.Status.bit.Ten;
 	tek->TechReg.bit.Ready   = !g_Ram.ramGroupA.Status.bit.Fault;
 	tek->TechReg.bit.Rsvd1   = 0;
-	tek->TechReg.bit.Rsvd11  = 0;
-	tek->TechReg.bit.Rsvd12  = 0;
+	tek->TechReg.bit.KVO     = g_Comm.kvokvzOffFlag ? 0 : !g_Ram.ramGroupA.Status.bit.Opened;		// SDV 27.01.2020 Вывод сигналов КВО и КВЗ в тех. регистр модбас
+	tek->TechReg.bit.KVZ     = g_Comm.kvokvzOffFlag ? 0 : !g_Ram.ramGroupA.Status.bit.Closed;		// после подачи СТОП по месту, КВО и КВЗ = 0, иначе это инверсия Открыто и Закрыто
 	tek->TechReg.bit.Rsvd14  = 0;
 
 	// Заполняем регистр дефектов привел в соответсвие с актом и РЭ 18.01.2019 (только для TekDefRegSwitch == 0)
