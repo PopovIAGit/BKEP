@@ -1139,7 +1139,7 @@
         <CanEdit>True</CanEdit>
       </Configuration>
       <ValueDescription>
-        <Minimum>3</Minimum>
+        <Minimum>1</Minimum>
         <Maximum>100</Maximum>
         <Default>20</Default>
         <Type>Uns</Type>
@@ -1166,6 +1166,44 @@
           <Field BitValue="0" Description="Нет" />
           <Field BitValue="1" Description="Да" />
         </Fields>
+      </ValueDescription>
+      <Info>
+        <Description />
+      </Info>
+    </Parameter>
+    <Parameter Index="В29" Name="Время срабатывания муфты по старту">
+      <Address>69</Address>
+      <Configuration>
+        <Type>Public</Type>
+        <Appointment>Regular</Appointment>
+        <CanEdit>True</CanEdit>
+      </Configuration>
+      <ValueDescription>
+        <Minimum>1</Minimum>
+        <Maximum>100</Maximum>
+        <Default>20</Default>
+        <Type>Uns</Type>
+        <Unit>сек</Unit>
+        <Coefficient>0,1</Coefficient>
+      </ValueDescription>
+      <Info>
+        <Description />
+      </Info>
+    </Parameter>
+    <Parameter Index="В30" Name="Время старта">
+      <Address>70</Address>
+      <Configuration>
+        <Type>Public</Type>
+        <Appointment>Regular</Appointment>
+        <CanEdit>True</CanEdit>
+      </Configuration>
+      <ValueDescription>
+        <Minimum>1</Minimum>
+        <Maximum>100</Maximum>
+        <Default>20</Default>
+        <Type>Uns</Type>
+        <Unit>сек</Unit>
+        <Coefficient>0,1</Coefficient>
       </ValueDescription>
       <Info>
         <Description />

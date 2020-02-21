@@ -47,7 +47,15 @@ void main(void)
 
 	EnableInterrupts();
 
-	PauseModbus = g_Ram.ramGroupC.ModbusPauseStart; // 09.01.2020 - требование Обриев (и здравый смысл)
+
+	if (g_Ram.ramGroupC.ModbusPauseStart > 10000)	// 13.02.2020 ПИА добавил заплатку что бы не отключался модбас при первом запуске
+	{
+		PauseModbus = 0;
+	}
+	else
+	{
+		PauseModbus = g_Ram.ramGroupC.ModbusPauseStart; // 09.01.2020 - требование Обриев (и здравый смысл)
+	}
 
 	while(1)
 	{

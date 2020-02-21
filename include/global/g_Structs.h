@@ -106,7 +106,7 @@ typedef struct _TPduData {
 #define PROC_DRV_T_MASK 	0x0040
 #define PROC_RESET_MASK		0x00A1
 //#define PROCESS_EVLOG_MASK	0x00A1
-#define PROCESS_EVLOG_MASK	0x03F3
+#define PROCESS_EVLOG_MASK	0x03FF
 typedef union _TProcessReg {
 	Uns all;
 	struct {

@@ -189,8 +189,8 @@ void Core_CalibControl(TCore *p)
 		g_Peref.Position.CancelFlag = false;
 	}
 
-	p->Status.bit.Closed = p->Status.bit.Stop && ((g_Peref.Position.Zone & CLB_CLOSE) != 0);
-	p->Status.bit.Opened = p->Status.bit.Stop && ((g_Peref.Position.Zone & CLB_OPEN)  != 0);
+	p->Status.bit.Closed =/*  p->Status.bit.Stop && */ ((g_Peref.Position.Zone & CLB_CLOSE) != 0); //ToDo !!! ПИА 13.02.2020 пока не съехали с концевика физически не снимаем сигнал.
+	p->Status.bit.Opened =/*  p->Status.bit.Stop &&  */((g_Peref.Position.Zone & CLB_OPEN)  != 0);
 
 	if(g_Ram.ramGroupD.CalibReset != 0)
 	{
@@ -355,7 +355,6 @@ void Core_ControlMode(TCore *p) // 50 Гц
     		if(g_Peref.sensObserver.IWout > 0) g_Ram.ramGroupC.IW_Offset++;
     		if(g_Peref.sensObserver.IWout < 0) g_Ram.ramGroupC.IW_Offset--;
     	}
-
     }
 
     switch(p->MotorControl.WorkMode)
@@ -450,33 +449,51 @@ void Protections_MuffFlag(void)
 	if(g_Core.Status.bit.Stop)				// Выключаем защиту от муфты в стопе
 	{
 		g_Core.MotorControl.MufTimer = 0;
+		g_Core.MotorControl.MufTimerStart = 0;
+		g_Core.MotorControl.accelTimer = 0;
 		return;
 	}
 
-	if (g_Ram.ramGroupC.DriveType == dt50000_F48 	//Если тип привода - ЭПЦР50000
-	    && g_Core.MotorControl.accelTimer < 1200)	//и таймер разгона еще не насчитал (400 = 6 сек * 200 hz)
+	if (g_Core.MotorControl.accelTimer < g_Ram.ramGroupB.StartTime)
 	{
-		g_Core.MotorControl.accelTimer++;			// выходим из функции, муфту не считаем
-		return;
-	}
+		g_Core.MotorControl.accelTimer++;
 
-	if (g_Ram.ramGroupA.Torque > g_Core.MotorControl.TorqueSet)
-	{
-		if (g_Core.MotorControl.MufTimer < (80 * g_Ram.ramGroupB.MuffTimer))
+		if(g_Ram.ramGroupA.Torque > g_Core.MotorControl.TorqueSet)
 		{
-			g_Core.MotorControl.MufTimer += 4;
+			if(g_Core.MotorControl.MufTimer < (80 * g_Ram.ramGroupB.MuffStartTimer))
+			{
+				g_Core.MotorControl.MufTimerStart += 4;
+			}
+
+			if(g_Core.MotorControl.MufTimer >= (80 * g_Ram.ramGroupB.MuffStartTimer))
+			{
+				g_Core.Protections.MuffFlag200Hz = 1;	//  1 выставляем муфту
+			}
 		}
-
-		if (g_Core.MotorControl.MufTimer >= (80 * g_Ram.ramGroupB.MuffTimer))
+		else
 		{
-			g_Core.Protections.MuffFlag200Hz = 1;	//  1 выставляем муфту если в течении секунды момент больше заданного
+			if(g_Core.MotorControl.MufTimerStart) g_Core.MotorControl.MufTimerStart--;
 		}
 	}
 	else
 	{
-		if (g_Core.MotorControl.MufTimer) g_Core.MotorControl.MufTimer--;
-	}
+		if(g_Ram.ramGroupA.Torque > g_Core.MotorControl.TorqueSet)
+		{
+			if(g_Core.MotorControl.MufTimer < (80 * g_Ram.ramGroupB.MuffTimer))
+			{
+				g_Core.MotorControl.MufTimer += 4;
+			}
 
+			if(g_Core.MotorControl.MufTimer >= (80 * g_Ram.ramGroupB.MuffTimer))
+			{
+				g_Core.Protections.MuffFlag200Hz = 1;	//  1 выставляем муфту
+			}
+		}
+		else
+		{
+			if(g_Core.MotorControl.MufTimer) g_Core.MotorControl.MufTimer--;
+		}
+	}
 }
 
 static void PlugBreakMode(void)

@@ -229,7 +229,8 @@ typedef struct _TRamGroupB
 	TParityMode		RsMode;				// B26. 66 Режим связи
 	Uns				MuffTimer;			// B27. 67
 	Uns				SwitcherMuDuMode;	// B28. режим с использованием переключателя МУ/ДУ на ЩТМ (опрос ТУ в режиме МУ)
-	Uns				reserv68[2];		// B29 -30. 69-70 Резерв
+	Uns				MuffStartTimer;		// B29. 69 Муфта по старту
+	Uns				StartTime;		    // В30. 70 Время разгона
 	Uns 			Sec3Mode;			// B31. 71
 	Uns				NoMoveTime;			// B32. 72 Время отсутствия движения
 	Uns				OverwayZone;		// B33. 73 Максимальный путь уплотнения

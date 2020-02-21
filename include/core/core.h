@@ -83,6 +83,7 @@ typedef struct _TDmControl {
 	Uns 		ShnControlErrTimer;		// Таймер остановки если упп не отработает
 	Uns 		ShnControlErr;			// ошибка отработки упп
 	Uns			accelTimer;				// Таймер разгона. Пока он считает, муфта не работает
+	Uns 		MufTimerStart;			// 20.02.2020 PIA добавил таймер муфты по старту
 } TDmControl;
 
 typedef struct _TCoreTemper {
