@@ -64,10 +64,10 @@ void SciMasterConnBetweenBlockInit(TMbBBHandle Port)
 	Port->Params.BrrValue    = BKP_SCI_BAUD+1;
 	Port->Params.Parity      = BKP_SCI_PARITY;
 	Port->Params.Mode        = 1;
-	Port->Params.TimeoutPre  = 5;
+	Port->Params.TimeoutPre  = 20;
 	Port->Params.TimeoutPost = 5;
 	Port->Params.TimeoutConn = CONN_SCALE/100;
-	Port->Params.RetryCount  = 3;
+	Port->Params.RetryCount  = 5; // 26.02.2020  ПИА увеличил колличество повторов до 5
 	Port->Frame.TxDelayTimeout = CONN_SCALE/250;
 	Port->Params.TrEnable    = BkpConnTrEnable;
 

@@ -454,18 +454,18 @@ void Protections_MuffFlag(void)
 		return;
 	}
 
-	if (g_Core.MotorControl.accelTimer < g_Ram.ramGroupB.StartTime)
+	if (g_Core.MotorControl.accelTimer < g_Ram.ramGroupB.StartTime*20)
 	{
 		g_Core.MotorControl.accelTimer++;
 
 		if(g_Ram.ramGroupA.Torque > g_Core.MotorControl.TorqueSet)
 		{
-			if(g_Core.MotorControl.MufTimer < (80 * g_Ram.ramGroupB.MuffStartTimer))
+			if(g_Core.MotorControl.MufTimerStart < (80 * g_Ram.ramGroupB.MuffStartTimer))
 			{
 				g_Core.MotorControl.MufTimerStart += 4;
 			}
 
-			if(g_Core.MotorControl.MufTimer >= (80 * g_Ram.ramGroupB.MuffStartTimer))
+			if(g_Core.MotorControl.MufTimerStart >= (80 * g_Ram.ramGroupB.MuffStartTimer))
 			{
 				g_Core.Protections.MuffFlag200Hz = 1;	//  1 выставляем муфту
 			}

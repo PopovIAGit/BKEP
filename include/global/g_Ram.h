@@ -640,7 +640,7 @@ typedef struct TRam
 #define REG_TU_TYPE				GetAdr(ramGroupB.InputType)
 #define REG_TU_INVERT			GetAdr(ramGroupB.TuInvert.all)
 #define REG_TS_INVERT			GetAdr(ramGroupB.TsInvert.all)
-
+#define REG_ROD_TYPE			GetAdr(ramGroupB.RodType)
 
 #define REG_DRIVE_TYPE			GetAdr(ramGroupC.DriveType)
 #define REG_MAX_TRQE			GetAdr(ramGroupC.MaxTorque)
@@ -704,6 +704,17 @@ typedef struct TRam
 #define REG_TU_RESETAL_220	GetAdr(ramGroupC.p_UResetAlarm_Mpy220)
 #define REG_TU_RESETAL_24	GetAdr(ramGroupC.p_UResetAlarm_Mpy24)
 #define REG_TU_RESETAL_OFF	GetAdr(ramGroupC.p_UResetAlarm_Offset)
+
+#define REG_CORR_CLOSE_30		GetAdr(ramGroupC.CorrClose30Trq)		// C108. 198
+#define REG_CORR_CLOSE_40		GetAdr(ramGroupC.CorrClose40Trq)		// C109. 199 Параметр для корректировки индикации малых моментов (меньше 60%)
+#define REG_CORR_CLOSE_60		GetAdr(ramGroupC.CorrClose60Trq)		// C110. 200 Параметр для корректировки индикации больших моментов (больше 60%)		Int		CorrOpen80Trq;		// C116. 206
+#define REG_CORR_CLOSE_80		GetAdr(ramGroupC.CorrClose80Trq)		// C111. 201
+#define REG_CORR_CLOSE_110		GetAdr(ramGroupC.CorrClose110Trq)	// C112. 202
+#define REG_CORR_OPEN_30		GetAdr(ramGroupC.CorrOpen30Trq)		// C113. 203
+#define REG_CORR_OPEN_40		GetAdr(ramGroupC.CorrOpen40Trq)		// C114. 204 Параметр для корректировки индикации малых моментов (меньше 60%)
+#define REG_CORR_OPEN_60		GetAdr(ramGroupC.CorrOpen60Trq)		// C115. 205 Параметр для корректировки индикации больших моментов (больше 60%)
+#define REG_CORR_OPEN_80		GetAdr(ramGroupC.CorrOpen80Trq)		// C116. 206
+#define REG_CORR_OPEN_110		GetAdr(ramGroupC.CorrOpen110Trq)		// C117. 207
 
 // Глобальные переменные модуля
 #define REG_VER_PO			GetAdr(ramGroupA.VersionPO)

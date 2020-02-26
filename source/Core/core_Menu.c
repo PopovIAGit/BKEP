@@ -236,6 +236,7 @@ void SetDefaultValues(TCoreMenu *p, Byte *groupNumber) // в Core_MenuDisplay()
 		    && (DefAddr != REG_GEAR_RATIO) // Не тип редуктора
 		    && (DefAddr != REG_FACTORY_NUMBER) // Не номер
 		    && (DefAddr != REG_PRODUCT_DATE) // Не дата изготовления
+		    && (DefAddr != REG_ROD_TYPE)     // Не тип штока
 		    && (DefAddr != REG_TASK_TIME)
 		    && (DefAddr != REG_MAX_TRQE)
 		    && (DefAddr != REG_I_NOM)
@@ -260,6 +261,16 @@ void SetDefaultValues(TCoreMenu *p, Byte *groupNumber) // в Core_MenuDisplay()
 		    && (DefAddr != REG_TU_RESETAL_220)
 		    && (DefAddr != REG_TU_RESETAL_24)
 		    && (DefAddr != REG_TU_RESETAL_OFF)
+		    && (DefAddr != REG_CORR_CLOSE_30)
+			&& (DefAddr != REG_CORR_CLOSE_40)
+			&& (DefAddr != REG_CORR_CLOSE_60)
+			&& (DefAddr != REG_CORR_CLOSE_80)
+			&& (DefAddr != REG_CORR_CLOSE_110)
+			&& (DefAddr != REG_CORR_OPEN_30)
+			&& (DefAddr != REG_CORR_OPEN_40)
+			&& (DefAddr != REG_CORR_OPEN_60)
+			&& (DefAddr != REG_CORR_OPEN_80)
+			&& (DefAddr != REG_CORR_OPEN_110)
 		    && (DefAddr != REG_TASK_DATE))
 		    || (DefAddr == REG_CODE) || (DefAddr == REG_FCODE)) //??? а надо ли перезаписывать пароли
 	    {
