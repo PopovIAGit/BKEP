@@ -1407,7 +1407,7 @@
       </Configuration>
       <ValueDescription>
         <Minimum>0</Minimum>
-        <Maximum>15</Maximum>
+        <Maximum>26</Maximum>
         <Default>0</Default>
         <Type>Enum</Type>
         <Fields>
@@ -1427,6 +1427,17 @@
           <Field BitValue="13" Description="ЭПЦР-20000 F.40" />
           <Field BitValue="14" Description="ЭПЦР-35000 F.48" />
           <Field BitValue="15" Description="ЭПЦР-50000 F.48" />
+          <Field BitValue="16" Description="ЭПЦР-100 А.25 C" />
+          <Field BitValue="17" Description="ЭПЦР-100 А.50 C" />
+          <Field BitValue="18" Description="ЭПЦР-400 Б.20 C" />
+          <Field BitValue="19" Description="ЭПЦР-400 Б.50 C" />
+          <Field BitValue="20" Description="ЭПЦР-800 В.40 C" />
+          <Field BitValue="21" Description="ЭПЦР-1000 В.20 C" />
+          <Field BitValue="22" Description="ЭПЦР-4000 Г.9 C" />
+          <Field BitValue="23" Description="ЭПЦР-4000 Г.18 C" />
+          <Field BitValue="24" Description="ЭПЦР-10000 Д.6 С" />
+          <Field BitValue="25" Description="ЭПЦР-10000 Д.12 С" />
+          <Field BitValue="26" Description="ЭПЦР-15000 Д.10 ДАТН" />
         </Fields>
       </ValueDescription>
       <Info>
