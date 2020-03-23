@@ -406,7 +406,9 @@ static void MoveMode(void)
 				|| g_Ram.ramGroupA.Faults.Net.bit.OvR
 				|| g_Ram.ramGroupA.Faults.Net.bit.OvS
 				|| g_Ram.ramGroupA.Faults.Net.bit.OvT
-				|| g_Ram.ramGroupA.Faults.Load.bit.PhlU
+				|| g_Ram.ramGroupA.Faults.Net.bit.BvR
+				|| g_Ram.ramGroupA.Faults.Net.bit.BvS
+				|| g_Ram.ramGroupA.Faults.Net.bit.BvT
 				|| g_Ram.ramGroupA.Faults.Load.bit.PhlU
 				|| g_Ram.ramGroupA.Faults.Load.bit.PhlV
 				|| g_Ram.ramGroupA.Faults.Load.bit.PhlW)
@@ -421,6 +423,11 @@ static void MoveMode(void)
 //	else
 //		g_Ram.ramGroupA.Torque = g_Core.TorqObs.Indication; // отображаем текущий момент
 
+	// TODO Заплатка для ЭПЦ-15000/20000. На пониженном напряжении отваливаются контакторы. Поэтому если контакторы отвалились в движении - обнуляем таймер разгона
+	if (g_Ram.ramGroupA.Faults.Net.bit.BvR && g_Ram.ramGroupA.Faults.Net.bit.BvS && g_Ram.ramGroupA.Faults.Net.bit.BvT)
+	{
+		g_Core.MotorControl.accelTimer = 0; 	// Если все три фазы оборвались, то обнуляем таймер
+	}
 
 		//ToDo Статус выставлять в зависимости от типа штока + добавить сигнал не корректной обратной связи!!!
 	if(g_Peref.phaseOrder.Direction == 1)
