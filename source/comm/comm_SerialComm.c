@@ -304,7 +304,28 @@ __inline Byte UpdatePacket(TMbPacket *Packet)
 						//return WriteData(Packet->Addr, Packet->Data, Packet->Count);
 					default: return EX_ILLEGAL_FUNCTION;
 				}
-				case MB_WRITE_REG: return 0; //ToDo реализовать фукцию записи одного регистра, как ипользуемую на объектах АК Транснефть
+				case MB_WRITE_REG:
+
+					switch(Res)
+							{
+							case 1:
+							if (Addr>=REG_TASKCLOSE && Addr<=REG_RSRESET){
+								if (Packet->ParamMode==UART_TYPE) g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_SERIAL;
+								else if (Packet->ParamMode==MCBSP_TYPE) g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_BLUETOOTH;
+							}
+							if (Addr == REG_SET_DEFAULTS){
+								if (Packet->ParamMode==UART_TYPE) g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_SERIAL;
+								else if (Packet->ParamMode==MCBSP_TYPE) g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_BLUETOOTH;
+								//g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_SERIAL;
+							}
+							if (Addr == REG_COM_REG)
+							{
+								if (Packet->ParamMode==UART_TYPE) g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_SERIAL;
+								else if (Packet->ParamMode==MCBSP_TYPE) g_Core.VlvDrvCtrl.EvLog.Source = CMD_SRC_BLUETOOTH;
+							}
+							return WriteData(Packet->Addr, Packet->Data, 1);
+							default: return EX_ILLEGAL_FUNCTION;
+							}
 			default: return EX_ILLEGAL_FUNCTION;
 		}
 		return 0;

@@ -6,7 +6,7 @@
 
 // Идентификатор блока
 #define DEVICE_ID		6001	// Идентификатор БУР-Т
-#define DEVICE_YEAR		2017
+#define DEVICE_YEAR		2020
 
 /*
 #if BUR_M			// Только для модификации M
