@@ -261,7 +261,7 @@ typedef struct _TRamGroupC
 	Uns				reserv102;				// С12. 102 Резерв
 	Uns             MuffZone;           	// C13. 103 Расстояние сброса муфты
 	Uns				PosSensPow;				// C14. 104 Тип датчика положения
-	Uns				reserv105;				// C15. 105 Резерв
+	Uns			    DisplResTout;			// 15.Время сброса индикатора				// C15. 105 Резерв
 	Uns             SetDefaults;        	// C16. 106 Задание параметров по умолчанию
 	Uns				ConnFlagCountBCP;		// C17. 107 временная задержка на определение аварии связь с БКП
 	Uns             ModbusPauseStart;       // C18. 108 пауза при старте на модбас и ТС - 09,01,2020 - требование Обриев (и здравый смысл)
@@ -269,7 +269,8 @@ typedef struct _TRamGroupC
 	Uns             BrakeTime;          	// C20. 110 Время торможения
 	Uns       		StopShnTime;   			// C21. 111 Время торможения динамическим торможением
 	Int				BreakZone;				// C22. 112 Число оборотов дв за которое начинаем тормозить
-	Uns				Rsvd5[9];				// C23-33. 113-123 резерв
+	Uns             IndicatorType;          // C23. 113 Тип индикатора	
+	Uns				Rsvd5[8];				// C23-33. 113-123 резерв
 	Uns				CounterDisconect;		// C32  122 Счетчик обрывов связи между БКП БКЭП (реальных а не по аварии)
 	Uns				TimeBtnStopKVOKVZ;		// C33  123 время разрыва КВО КВЗ при повороте ручки стоп
 	Uns				BCPConTimeMove;			// C34  124 Время Выставления аварии нет связи в движении
@@ -415,7 +416,8 @@ typedef struct _TRamGroupG
 	Uns			   DisplShow;			// G4. 284 Старт дисплея
 	Uns			   TestCamera;			// G5. 285 Тест с камеры
 	Uns			   TestContactor;		// G6. 286 Тест контакторов
-	Uns			   Rsvd2[12];			// G7-18. 286-298-Резерв
+	Uns            DisplTesNum;         // G7. 287 Тест диплея
+	Uns			   Rsvd2[11];			// G8-18. 288-298-Резерв
 	Uns			   DiscrInTest;			// G19. 299 Тест дискретных входов	// НЕ РЕАЛИЗОВАННО
 	Uns			   DiscrOutTest;		// G20. 300 Тест дискретных выходов
 	Bool		   IsDiscrTestActive;	// G21. 301 Активен ли тест ТС/ТУ
@@ -463,7 +465,9 @@ typedef struct _TRamGroupH
 	Uns				TaskList;            // H110. 419 Номер списка задач
 	Uns				TaskNumber;          // H111. 420 Номер задачи в списке
 	//-------------------------------
-	Uns      	    Rsvd2[5];		 	 // H112-116. 421-425 Резерв
+	Uns             BusyValue;       	 // H112.Процент исполнения
+	Uns      	    Rsvd2[3];		 	 // H113-115. 422-425 Резерв
+	Uns             StartIndic;			 // H116. 426 Индикация в старте
 	Uns 			LogEvAddr;			 // H117. 426 Текущий адрес журнала событий
 	Uns 			LogCmdAddr;			 // H118. 427 Текущий адрес журнала команд
 	Uns 			LogParamAddr;		 // H119. 428 Текущий адрес журнала изменения параметров
@@ -641,6 +645,7 @@ typedef struct TRam
 #define REG_TU_INVERT			GetAdr(ramGroupB.TuInvert.all)
 #define REG_TS_INVERT			GetAdr(ramGroupB.TsInvert.all)
 #define REG_ROD_TYPE			GetAdr(ramGroupB.RodType)
+#define REG_INDICATOR_TYPE		GetAdr(ramGroupC.IndicatorType)
 
 #define REG_DRIVE_TYPE			GetAdr(ramGroupC.DriveType)
 #define REG_MAX_TRQE			GetAdr(ramGroupC.MaxTorque)
@@ -716,6 +721,12 @@ typedef struct TRam
 #define REG_CORR_OPEN_80		GetAdr(ramGroupC.CorrOpen80Trq)		// C116. 206
 #define REG_CORR_OPEN_110		GetAdr(ramGroupC.CorrOpen110Trq)		// C117. 207
 
+#define REG_TORQUE_ADDR			GetAdr(ramGroupA.Torque)
+#define REG_START_IND			GetAdr(ramGroupH.StartIndic)
+#define REG_LOG_ADDR			GetAdr(ramGroupH.LogEvAddr)
+#define REG_LOG_TIME			GetAdr(ramGroupE.LogTime)
+#define REG_LOG_DATE			GetAdr(ramGroupE.LogDate)
+
 // Глобальные переменные модуля
 #define REG_VER_PO			GetAdr(ramGroupA.VersionPO)
 #define REG_SUBVER_PO		GetAdr(ramGroupC.SubVersionPO)
@@ -737,11 +748,43 @@ typedef struct TRam
 
 #define TU_24_220 		    GpioDataRegs.GPADAT.bit.GPIO12
 
+#define MENU_GROUPS_COUNT		4
+#define MENU_EVLOG_GROUP		4
+
 void g_Ram_Init(TRam *);
 void g_Ram_Update(TRam *);
 void RefreshParams(Uns);
 Int MinMax3IntValue (Int, Int, Int);
 Int Max3Int (Int , Int , Int );
+
+#if NEW_RAZ
+
+#define BUSY_STR_ADR		0
+#define CMD_CANC_ADR		1
+#define EXPR_STR_ADDR		4
+#define MPU_BLOCKED_ADR		32
+#define CONFIRM_ADDR		34
+
+#define NUM_ICONS				5
+#define CODE_ICO				0x00
+#define CONN_ICO				0x01
+#define BT_ICO					0x02
+#define CODEON_ICO              0x03
+#define CODEOFF_ICO             0x04
+
+/*
+char Icons[NUM_ICONS][7] =  {
+                0x1F,0x11,0x1F,0x04,0x06,0x04,0x07,
+                0x1F,0x11,0x11,0x1F,0x04,0x1F,0x00,
+                0x06,0x15,0x0D,0x06,0x0D,0x015,0x06,
+                0x0E,0x11,0x11,0x11,0x1F,0x1B,0x1F,
+                0x0E,0x11,0x10,0x10,0x1F,0x1B,0x1F,
+                };
+*/
+
+extern char Icons[NUM_ICONS][7];
+
+#endif
 
 
 extern TRam 			g_Ram;

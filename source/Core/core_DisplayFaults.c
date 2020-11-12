@@ -25,6 +25,9 @@ void Core_DisplayFaultsUpdate(TCoreDislpayFaults *p)
 	if(g_Ram.ramGroupG.Mode)
 	{
 		g_Peref.Display.data = g_Ram.ramGroupG.DisplShow;
+		#if !NEW_RAZ
+	    g_Peref.Display.data = p->Data;
+#endif
 		return;
 	}
 

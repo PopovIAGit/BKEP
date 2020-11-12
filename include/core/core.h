@@ -27,8 +27,6 @@ Outputs
 #include "stat_fm25v10.h"
 #include "core_DisplayFaults.h"
 
-//#include "core_MotorControl.h"
-
 //--------------------- Константы-------------------------------------------
 #define CMD_DEFAULTS_USER	0x0010	// Пользовательские параметры по умолчанию
 #define CMD_RES_CLB			0x0020	// Сброс калибровки датчика положения
@@ -44,6 +42,7 @@ Outputs
 #define SHN_CONTROL_ERR_TIME	(Uint16)(2.000 * Prd50HZ)		// время ожидания для определения ошибки алгоритма упп
 #define SHN_MODE_TIME			(Uint16)(0.200 * Prd50HZ)
 
+#define CANCEL_TOUT				(2.000 * Prd10HZ)
 
 #define TEN_OFF				0
 #define TEN_ON				1
@@ -98,7 +97,9 @@ typedef struct {
 	// ---
 	TCoreProtections	Protections;	// Защиты
 	// ---
+	#if !NEW_RAZ
 	TCoreMenu			menu;			// Меню
+	#endif
 	// ---
 	TTorqObs			TorqObs;		// Расчет момента
 	// ---
@@ -118,6 +119,17 @@ typedef struct {
 	TCoreTemper			Temper;			// Обработка температур БКП и БКД
 	TCoreDislpayFaults  DisplayFaults;   // Отображение аварий/неисправностей на дисплее
 
+	#if NEW_RAZ
+	Uns 				PauseModbus;	// таймер паузы модбаса при старте
+	Uns 				FirstOnFlag;	// флаг включения
+
+	Uns                 DisplayTimer;
+    Uns                 DisplayRestartTimer;
+    Bool                DisplayRestartFlag;
+    Uns     			CancelTimer;       // время до отмены
+    Uns 				DefFlag;
+    Uns					NoErrFlag;
+	#endif
 } TCore;
 
 //------------------- Глобальные переменные --------------------------------

@@ -203,8 +203,6 @@ void Core_TorqueCalc(TTorqObs *p)
 		if (p->Tmp < TORQ_MIN_PR) p->Tmp = TORQ_MIN_PR;	// проверяем на вхождение в зону от
 		if (p->Tmp > TORQ_MAX_PR) p->Tmp = TORQ_MAX_PR;   // 10 до 110 %
 
-
-
 		if (abs(Add) > p->Tmp) Add = 0;
 
 		//PU0ToValue(Tmp, p->TorqueMax);// переводим проценты в Нм относительно максимального М

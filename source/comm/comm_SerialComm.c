@@ -161,7 +161,11 @@ void ModBusUpdate(TMbHandle hPort)
 			Packet->Request   = 0;
 			if (hPort->Params.HardWareType==MCBSP_TYPE)
 			{
-				GpioDataRegs.GPATOGGLE.bit.GPIO27=1;//ENABLE_BLUETOOTH=1;//off
+#if NEW_RAZ
+				g_Peref.leds.leds.bit.Bluetooth = OFF_BT_LED;
+#else
+				GpioDataRegs.GPATOGGLE.bit.GPIO27 = 1;//ENABLE_BLUETOOTH = 1;//off
+#endif
 			}
 		}
 	}
@@ -406,7 +410,11 @@ __inline Byte WriteData(Uns Addr, Uns *Data, Uns Count)
 			return EX_ILLEGAL_DATA_VALUE;
 	}
 
+	#if NEW_RAZ
+	if (!menu.EnableEdit(Val->PaswwPrt))
+	#else
 	if (!g_Core.menu.EnableEdit(Val->PaswwPrt))
+	#endif
 	{
 		return FR_SUCCESS;
 	}

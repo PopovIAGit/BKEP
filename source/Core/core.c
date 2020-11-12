@@ -44,16 +44,21 @@ void Core_Init(TCore *p)
 	FM25V10_Init(&Eeprom2);
 
 	// Значения параметров присваиваются
+#if NEW_RAZ
+	Core_MenuInit(&menu);
+#else
 	Core_MenuInit(&p->menu);
+#endif
 
 	Core_ValveDriveInit(&p->VlvDrvCtrl);	// Управление задвижкой
 	Core_TorqueInit(&p->TorqObs);			// Расчет моментов
 	//Core_CommandsInit(&p->commands);		// Получение команд, настройка калибровки
 	Core_ProtectionsInit(&p->Protections);	// Защиты
+#if !NEW_RAZ
 	Core_DisplayFaultsInit(&p->DisplayFaults);
-
-	p->Status.bit.Stop 				= 1;					// При включение выставляем стоп
-	g_Ram.ramGroupH.ContGroup 		= cgStop;
+#endif
+	p->Status.bit.Stop 			= 1;					// При включение выставляем стоп
+	g_Ram.ramGroupH.ContGroup 	= cgStop;
 }
 
 void Core_PosFixControl(void)

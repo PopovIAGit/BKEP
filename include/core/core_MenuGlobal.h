@@ -25,7 +25,8 @@ extern "C" {
 #define MS_SHOWPAR		4		// Режим просмотра параметра
 #define MS_SHOWBIN		5		// Режим двоичного отображения
 #define MS_SETREF		6		// Режим редактирования задания
-#define MS_TEST_BLOCK	7		// Режим Тест-Блок
+#define MS_EXPRESS		7		// Режим экспресс настройки
+#define MS_DRIVE_TYPE	8		// Режим экспресс настройки
 
 // Структура конфигурации параметра
 struct MENU_VAL_CFG {
@@ -92,6 +93,36 @@ struct ADDR_PARAM_ATS48{
 struct MENU_STRING{
 	Char  Str[16];       // Строковое значение параметра
 };
+
+
+// Структура для работы с параметрами при Express настройке
+struct MENU_EXPRESS_PARAMS {
+	Char Cnt;			// Количество параметров
+	Uns  Buf[5];		// Буфер адресов параметров в структуре Ram
+};
+
+struct MENU_EXPRESS {
+	Bool Enable;							// Разрешние запуска Express настройки
+	Bool Select;							// Флаг выбора настройки
+	Byte State;								// Шаг (состояние) экспресс настройки
+	Byte Index;								// Индекс текущего параметра в текущем List'е
+	Bool First;								// Флаг первого такта
+	struct MENU_EXPRESS_PARAMS *List;		// Указатель на текущий список параметров
+	struct MENU_EXPRESS_PARAMS List1;		// Параметры экспресс настройки
+	struct MENU_EXPRESS_PARAMS List2;
+	struct MENU_EXPRESS_PARAMS List3;
+	struct MENU_EXPRESS_PARAMS List4;
+	struct MENU_EXPRESS_PARAMS List5;
+	struct MENU_EXPRESS_PARAMS List6;
+	struct MENU_EXPRESS_PARAMS List7;
+	struct MENU_EXPRESS_PARAMS List8;
+	struct MENU_EXPRESS_PARAMS List9;
+	struct MENU_EXPRESS_PARAMS List10;
+	struct MENU_EXPRESS_PARAMS List11;
+	struct MENU_EXPRESS_PARAMS List12;
+};
+
+
 // Типы параметров
 #define MT_DEC		0		// Десятичный
 #define MT_STR		1		// Строковый
@@ -100,7 +131,7 @@ struct MENU_STRING{
 #define MT_DATE		4		// Дата
 #define MT_BIN		5		// Двоичный
 #define MT_HEX		6		// Шестнадцатеричный
-#define MT_RSVD     7     	// Резервный
+#define MT_VERS     7       // Версия (2 точки xx.x.xx)
 
 // Макросы при работе с меню
 #define M_TYPE      0x0007                  // Маска для типа параметра

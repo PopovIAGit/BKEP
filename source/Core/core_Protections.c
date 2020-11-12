@@ -390,7 +390,6 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 	}
 }
 
-
 // Индикация аварий процесса и устройства
 void Core_DevProc_FaultIndic(TCoreProtections *p)
 {

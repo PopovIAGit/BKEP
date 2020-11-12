@@ -308,7 +308,6 @@ void ImReceiveData(TInfoModule *p, Byte Data)
 	p->HardwareSrc = imSrcBluetooth;
 }
 
-
 void SendData(TInfoModule *p)
 {
 	Byte Data = 0;
@@ -379,10 +378,13 @@ void BlinkBluetoothLed(TInfoModule *p)
 	if (p->BluetoothLedBlink == 1)
 	{
 		p->BluetoothLedBlink = 0;
+#if NEW_RAZ
+		g_Peref.leds.leds.bit.Bluetooth = OFF_BT_LED;
+#else
 		GpioDataRegs.GPATOGGLE.bit.GPIO27=1;
+#endif
 	}
 }
-
 
 __inline Bool FuncOne(TInfoModule *p)
 {

@@ -187,7 +187,11 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 	bPort->TxPacket.Data[5]  = 0;
 	bPort->TxPacket.Data[5]  = (g_Core.Temper.OnOffTEN)&0x01;
 	bPort->TxPacket.Data[5] |= ((g_Ram.ramGroupA.PositionPr==9999)<<1)&0x02;
+	#if NEW_RAZ
+	bPort->TxPacket.Data[5] |= ((/*g_Peref.Display.data == 999*/ g_Core.DisplayFaults.Data == 999)<<2)&0x04;
+	#else
 	bPort->TxPacket.Data[5] |= ((g_Peref.Display.data==999)<<2)&0x04;
+	#endif
 	bPort->TxPacket.Data[5] |= ((g_Ram.ramGroupA.Faults.Proc.bit.NoOpen==0)<<3)&0x08;
 	bPort->TxPacket.Data[5] |= ((g_Ram.ramGroupA.Faults.Proc.bit.NoClose==0)<<4)&0x10;
 
@@ -197,9 +201,13 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 		if(g_Ram.ramGroupA.PositionPr <0 ) bPort->TxPacket.Data[6] = 0;
 		else bPort->TxPacket.Data[6] = g_Ram.ramGroupA.PositionPr*0.1;	// положение в %
 	}
+	#if NEW_RAZ
+		if (/*g_Peref.Display.data*/ g_Core.DisplayFaults.Data >= 999) bPort->TxPacket.Data[7] = 99;
+	else bPort->TxPacket.Data[7] = /*g_Peref.Display.data*/ g_Core.DisplayFaults.Data;		// код аварий
+	#else
 	if (g_Peref.Display.data>=999) bPort->TxPacket.Data[7] = 99;
 	else bPort->TxPacket.Data[7] = g_Peref.Display.data;		// код аварий
-
+#endif
 	if(!bPort->RxPacket.Flag) return;
 	bPort->RxPacket.Flag = 0;
 

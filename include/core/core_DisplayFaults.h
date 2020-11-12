@@ -23,6 +23,7 @@ typedef struct _TCoreDislpayFaults{
 		Uns					DisplFault;			// текущая отображаемая авария
 		Uns 				TestData;
 		Uns					DisplFaultFlag;		// флаг готовности считывания аварий
+		Uns 				Data;				// для сопряжения разделенок с разными экранами
 		TFltUnion			DisplFaultUnion;	// хранилище для отображения аварий
 
 }TCoreDislpayFaults;

@@ -247,6 +247,11 @@ typedef enum
 	bcmFixPos					// команда фиксации положения
 } TBurCmd;
 
+// Тип индикатора
+typedef enum {
+    it_WINSTAR = 0, // OLED WINSTAR
+    it_FUTABA       // VAC FUTABA
+} TIndicType;
 
 // Место установки БУР (пожарка - Линейная часть/Автоматика и телемеханика)
 typedef enum {

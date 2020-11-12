@@ -158,7 +158,11 @@ void Comm_TuTsUpdate (TDigitalInterface *p)	//200 Ãö
 	{
 		ENB_RELE = 0;
 		g_Ram.ramGroupA.StateTs.all = OutputRegTmp.all;
+		#if NEW_RAZ
+		Peref_74HC595UpdateTs(&g_Peref.ShiftReg, g_Ram.ramGroupA.StateTs);
+		#else
 		Peref_74HC595Update(&g_Peref.ShiftReg, g_Ram.ramGroupA.StateTs);
+		#endif
 		//TuEnbReleTimer = (0.3 * Prd50HZ);
 		TuEnbReleTimer = (0.3 * Prd200HZ);
 	}

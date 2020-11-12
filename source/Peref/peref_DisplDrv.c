@@ -9,6 +9,7 @@
 
 Uns testData;
 
+#if !NEW_RAZ
 void DisplDrvInit(TPerefDisplay *p)
 {
 	p->data = 0;
@@ -91,4 +92,4 @@ void DisplDrvUpdate(TPerefDisplay *p)
 		BCD_FIX = 0;
 	}
 }
-
+#endif

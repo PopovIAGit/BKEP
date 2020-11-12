@@ -87,10 +87,10 @@ __inline Int Sign(Int Value) {return ((Value < 0) ? -1 : 1);}
 //extern Uns LIntersection(Uns P1_1, Uns P1_2, Uns P2_1, Uns P2_2);
 
 // Переменные-разделители
-/*extern Char FloatSeparator;
+extern Char FloatSeparator;
 extern Char FloatPositive;
 extern Char TimeSeparator;
-extern Char DateSeparator;*/
+extern Char DateSeparator;
 
 /*union _TTimeVar;
 union _TDateVar;*/

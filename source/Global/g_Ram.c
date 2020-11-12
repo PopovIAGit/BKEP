@@ -107,12 +107,14 @@ void g_Ram_Init(TRam *p)
 //---------------------------------------------------
 void g_Ram_Update(TRam *p)
 {
+	static Uns prevIndType = 123;			// Предыдущий тип индикатора
+
 	if (PauseModbus) PauseModbus--;
 
     p->ramGroupA.Temper = g_Peref.TSens.Temper;
 
     //------ Core -> RAM ------------------------------------
-    p->ramGroupA.Status = g_Core.Status;
+    p->ramGroupA.Status 		 = g_Core.Status;
     p->ramGroupA.Faults.Net.all  = (g_Core.Protections.outFaults.Net.all  | g_Core.Protections.outDefects.Net.all);
     p->ramGroupA.Faults.Load.all = (g_Core.Protections.outFaults.Load.all | g_Core.Protections.outDefects.Load.all);
     p->ramGroupA.Faults.Proc.all = (g_Core.Protections.outFaults.Proc.all | g_Core.Protections.outDefects.Proc.all);
@@ -159,7 +161,15 @@ void g_Ram_Update(TRam *p)
   //  p->ramGroupA.Speed = LVS_flag;
     p->ramGroupA.CycleCnt = p->ramGroupH.CycleCnt;
 
-    p->ramGroupA.Position 		= p->ramGroupH.Position;
+    if (p->ramGroupG.TestCamera)
+    {
+    	p->ramGroupA.Position = !p->ramGroupA.Faults.Dev.bit.PosSens ? p->ramGroupH.Position : 65535;
+    }
+    else
+    {
+    	p->ramGroupA.Position 		= p->ramGroupH.Position;
+    }
+
     p->ramGroupH.FullStep 		= g_Peref.Position.FullStep;
     //p->ramGroupA.StateTu.all 	= g_Comm.digitInterface.Inputs.all;
     //p->ramGroupA.StateTs.all 	= g_Comm.digitInterface.Outputs.all;
@@ -186,7 +196,15 @@ void g_Ram_Update(TRam *p)
     p->ramGroupA.Status.bit.MiddlePosition = !p->ramGroupA.Faults.Proc.bit.NoCalib & !p->ramGroupA.Status.bit.Opened & !p->ramGroupA.Status.bit.Closed;
 
 
-
+#if NEW_RAZ
+    if (prevIndType != g_Ram.ramGroupC.IndicatorType)	// Если тип индикатора был изменен
+	{
+		prevIndType = g_Ram.ramGroupC.IndicatorType;	// Пересбрасываем дисплей
+		DisplayReset(&g_Peref.Display, (Uns)g_Ram.ramGroupC.IndicatorType);
+		//WritePar(GetAdr(GroupC.IndicatorType), &Ram.GroupC.IndicatorType, 1);
+	}
+#endif
+	//-------------------------------------------
     Uns PassAddr;
     //-------- Для первого включения -----------------------
 	if (g_Ram.ramGroupH.Password1 == 65535 && g_Ram.ramGroupH.Password2 == 65535)
@@ -201,14 +219,8 @@ void g_Ram_Update(TRam *p)
 	}
 
 	SetModBusParams();
-
-
     //------------------------------------------------------
-
-
-
     ReWriteParams();
-
 }
 //---------------------------------------------------
 
@@ -314,6 +326,12 @@ void RefreshParams(Uns addr)
 			g_Peref.InDigSignalObserver.parSensors.p_UDu_Mpy		= &g_Ram.ramGroupC.p_UDu_Mpy220;
 		}
 	}
+#if NEW_RAZ
+		else if (addr == REG_INDICATOR_TYPE)	{
+		DisplayReset(&g_Peref.Display, (Uns)g_Ram.ramGroupC.IndicatorType);
+	}
+#endif
+
 }
 //---------------------------------------------------
 Int MinMax3IntValue (Int val1, Int val2, Int val3)

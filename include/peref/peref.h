@@ -29,8 +29,14 @@
 #include "peref_ADT75Drv.h"
 #include "peref_DacMCP4276Drv.h"
 #include "peref_RtcDS3231Drv.h"
-#include "peref_DisplDrv.h"			// PIA 13.10.15
 #include "peref_74HC595.h"
+
+#if NEW_RAZ
+#include "peref_display.h"
+#include "peref_displhal.h"
+#else
+#include "peref_DisplDrv.h"            //ToDo NewRaz
+#endif
 //
 #ifdef __cplusplus
 extern "C" {
@@ -100,13 +106,20 @@ typedef struct {
 	Uns				TaktTuSensUpdate;
 	TSinSignalObserver  		InDigSignal;			// Вычисление RMS
 	//-----------------------------
-	TPerefDisplay			Display;
+#if NEW_RAZ
+	TDisplay            Display;
+	TPeref_74hc595      DisplReg;
+	TPeref_74hc595      LedReg;
+#else
+	TPerefDisplay       Display;                // ToDo NewRaz
+#endif
 	TPeref_74hc595 			ShiftReg;
 	Uns 				TU_Offset_Calib_timer;
 	Uns				TU_Mpy_Calib_timer;
 	//-----------------------------
 	Uns 				NumCalcTU_18kHz;
 	Uns 				NumCalcTU_50Hz;
+	Char				Key;
 } TPeref;
 
 //------------------- Протатипы функций ------------------------------------
@@ -117,6 +130,7 @@ void Peref_10HzCalc (TPeref *);
 void Peref_AvtoCalibTu(TPeref *);
 void I2CDevUpdate(TPeref *);
 void RTC_Control(void);
+void Peref_Key(TPeref *);
 
 void Peref18kHZStop(TPeref *);
 

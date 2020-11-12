@@ -25,9 +25,25 @@ Uns LocalPoss = 0;
 
 Uns PauseModbus = 0;
 
-__inline void peref_74HC595CsSet(Byte Lev) {CS_RELE = !Lev;}
 
+__inline void peref_74HC595CsSet(Byte Lev) {CS_RELE = !Lev;}
+#if NEW_RAZ
+
+char Icons[NUM_ICONS][7] =	{
+					0x1F,0x11,0x1F,0x04,0x06,0x04,0x07,
+					0x1F,0x11,0x11,0x1F,0x04,0x1F,0x00,
+					0x06,0x15,0x0D,0x06,0x0D,0x015,0x06,
+					0x0E,0x11,0x11,0x11,0x1F,0x1B,0x1F,
+					0x0E,0x11,0x10,0x10,0x1F,0x1B,0x1F,
+				};
+__inline void DisplTest(void);
+__inline void DisplayCsSet(Byte Lev) {CS_DISPL = !Lev;}
+__inline void peref_LedCsSet(Byte Lev) {CS_LED = !Lev;}
+#endif
 Bool RtcStart    = False;
+Bool PagingControl(Byte);
+Byte pagingState = 0;	// Статус пролистывани
+Char NewKey = KEY_NONE;
 
 //---------------------------------------------------
 void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновление
@@ -74,46 +90,165 @@ void Peref_Init(TPeref *p) // ??? инит фильтров унести в переодическое обновлени
     ADT75_Init(&p->TSens);
     MCP4276_Init(&p->Dac);
     DS3231_Init(&p->Rtc);
-    DisplDrvInit(&p->Display);
     p->Rtc.Data = (char *) &p->RtcData;
     //-------Драйвер сдвигового регистра для ТС------
     p->ShiftReg.CsFunc = &peref_74HC595CsSet;
     Peref_74HC595Init(&p->ShiftReg);
 
+#if NEW_RAZ
+
+    p->LedReg.CsFunc = &peref_LedCsSet;
+    Peref_74HC595Init(&p->LedReg);
+    p->LedReg.Data = 65535;
+    p->LedReg.ShiftReg.all = 65535;
+
+#if !DISPL
+    p->DisplReg.CsFunc = &DisplayCsSet;
+    Peref_74HC595Init(&p->DisplReg);
+    p->DisplReg.Data = 0;
+    p->DisplReg.ShiftReg.all = 0;
+#endif
+    g_Peref.Display.CsFunc = &DisplayCsSet;
+    DISPL_init(&g_Peref.Display);
+    DISPL_AddSymb(&g_Peref.Display,0,ToPtr(Icons), NUM_ICONS);
+#else
+     DisplDrvInit(&p->Display);   // ToDo NewRaz
+#endif
 }
+
+#if NEW_RAZ
+void Peref_Key(TPeref *p)
+{
+	static Char PrevKey = KEY_NONE;
+	static Bool readyForNewCmd = true;
+
+	if (BTN_CANCEL && BTN_LEFT && BTN_RIGHT && BTN_UP && BTN_DOWN && BTN_ENTER)
+	{
+		NewKey = KEY_NONE;
+	}
+	else if (!BTN_CANCEL)
+	{
+		NewKey = KEY_ESCAPE;
+		pagingState = 0;
+	}
+	else if (!BTN_LEFT)
+	{
+		NewKey = KEY_LEFT;
+		if (menu.State == MS_EDITPAR)
+			pagingState = 2;// статус пролистывания - пролистывание значений
+		else
+			pagingState = 1;// статус пролистывания - пролистывание параметров
+	}
+	else if (!BTN_RIGHT)
+	{
+		NewKey = KEY_RIGHT;
+		if (menu.State == MS_EDITPAR)
+			pagingState = 2;// статус пролистывания - пролистывание значений
+		else
+			pagingState = 1;// статус пролистывания - пролистывание параметров
+	}
+	else if (!BTN_UP)
+	{
+		NewKey = KEY_UP;
+		if (menu.State == MS_EDITPAR)
+			pagingState = 2;// статус пролистывания - пролистывание значений
+		else
+			pagingState = 1;// статус пролистывания - пролистывание параметров
+	}
+	else if (!BTN_DOWN)
+	{
+		NewKey = KEY_DOWN;
+		if (menu.State == MS_EDITPAR)
+			pagingState = 2;// статус пролистывания - пролистывание значений
+		else
+			pagingState = 1;// статус пролистывания - пролистывание параметров
+	}
+	else if (!BTN_ENTER)
+	{
+		NewKey = KEY_ENTER;
+		pagingState = 0;
+	}
+
+	if (PrevKey != NewKey)
+		readyForNewCmd = true;
+
+	if (readyForNewCmd)
+	{
+		p->Key = NewKey;
+		menu.Key = p->Key;
+		p->Key = 0;
+		readyForNewCmd = false;
+	}
+
+	readyForNewCmd = PagingControl(pagingState);
+	PrevKey = NewKey;
+
+	  if(menu.State == MS_SELPAR && menu.Key == KEY_ENTER && !g_Ram.ramGroupA.Status.bit.Stop) // если не в стопе и пришел запрос на редактирование то сбрасываем его
+	  {
+		  menu.Key = KEY_NONE;
+	  }
+
+	  if (menu.SleepActive)
+	  {
+		  if (p->Key != 0)
+		  {
+			  menu.Key = KEY_ESCAPE;
+		  }
+	  }
+
+	 	  // Когда едем, то на дежурный режим не реагируем
+	  if (!g_Ram.ramGroupA.Status.bit.Stop)
+	  {
+		  menu.SleepTimer = 0;
+	  }
+}
+
+// Функция обработки "пролистывания" параметров
+Bool PagingControl(Byte status)	// 50
+{
+	static Uns timer = 0;
+	static Uns timerTout = 0;
+	Uns timeout = 50;
+	switch (status)
+	{
+		case 0:
+			timerTout = 0;
+			timer = 0;
+			return false;
+		case 1:
+			timerTout++;
+			if (timerTout < 75) timeout = 65;
+			else if (timerTout < 150) timeout = 40;
+			else timeout = 40;
+
+			if (timer++ >= timeout)
+			{
+				timer = 0;
+				return true;
+			}
+			return false;
+		case 2:
+			timer++;
+			if (timer >= 100)
+			{
+				timer = 0;
+				return 2;
+			}
+			return false;
+		default:
+			timerTout = 0;
+			timer = 0;
+			return false;
+	}
+}
+#endif
+
 //---------------------------------------------------
 void Peref_18kHzCalc(TPeref *p) // 18 кГц
 {
     //-------------------- Фильтруем АЦП-------------------------------
-
     // TU
     // забираем отмасштабированный сигнал с АЦП на вход фильтра 1-ого порядка
-/*
-    	p->InDigSignal.sigOpen.Input =p->InDigSignalObserver.UOpenOut;
-    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigOpen);
-
-    	p->InDigSignal.sigClose.Input = p->InDigSignalObserver.UCloseOut;
-    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigClose);
-
-    	p->InDigSignal.sigStopOpen.Input = p->InDigSignalObserver.UStopOpenOut;
-    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigStopOpen);
-
-        p->InDigSignal.sigMU.Input = p->InDigSignalObserver.UMuOut;
-        Peref_SinObserverUpdateFloat(&p->InDigSignal.sigMU);
-
-    	p->InDigSignal.sigResetAlarm.Input = p->InDigSignalObserver.UResetAlarmOut;
-    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigResetAlarm);
-
-    	p->InDigSignal.sigStopClose.Input = p->InDigSignalObserver.UStopCloseOut;
-    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigStopClose);
-
-    	p->InDigSignal.sigDU.Input = p->InDigSignalObserver.UDuOut;
-    	Peref_SinObserverUpdateFloat(&p->InDigSignal.sigDU);
-*/
-
-
-
-
 	switch(p->NumCalcTU_18kHz)
     {
     case 0:
@@ -360,7 +495,6 @@ void Peref_50HzCalc(TPeref *p)	// 50 Гц
     	}
     }
 
-
     /*switch(p->NumCalcTU_50Hz){
     	case 0:
     		p->U3fltrOpen.Input 		= p->InDigSignal.sigOpen.Output;
@@ -445,9 +579,6 @@ void Peref_50HzCalc(TPeref *p)	// 50 Гц
 	g_Comm.digitInterface.dinStopClose.inputDIN = p->InDigSignal.sigStopClose.Output;
 	g_Comm.digitInterface.dinResetAlarm.inputDIN = p->InDigSignal.sigResetAlarm.Output;
 
-
-
-
     peref_ApFilter1Calc(&p->Phifltr);
     if (!g_Core.Status.bit.Stop)
 	p->AngleUI = _IQtoIQ16(p->Phifltr.Output);
@@ -461,7 +592,35 @@ void Peref_50HzCalc(TPeref *p)	// 50 Гц
     p->Imid = _IQtoIQ16(p->Imfltr.Output);
 
     I2CDevUpdate(p);
+#if NEW_RAZ
+    if (g_Ram.ramGroupG.Mode) DisplTest();              // если тест то тест дисплея
+#endif
 }
+
+#if NEW_RAZ
+__inline void DisplTest(void)
+{
+    switch(g_Ram.ramGroupG.DisplTesNum)
+    {
+        case 1:
+            strcpy(g_Peref.Display.HiStr, "AБВГДЕЁЖЗИЙКЛМНО");
+            strcpy(g_Peref.Display.LoStr, "абвгдеёжзийклмно");
+            break;
+        case 2:
+            strcpy(g_Peref.Display.HiStr, "ПРСТУФХЦЧШЩЪЫЬЭЮ");
+            strcpy(g_Peref.Display.LoStr, "прстуфхцчшщъыьэю");
+            break;
+        case 3:
+            strcpy(g_Peref.Display.HiStr, "Я0123456789()!?&");
+            strcpy(g_Peref.Display.LoStr, "я№#~%^*_+-\\/<>'$");
+            break;
+        default:
+            strcpy(g_Peref.Display.HiStr, "                ");
+            strcpy(g_Peref.Display.LoStr, "                ");
+            break;
+    }
+}
+#endif
 
 void Peref_AvtoCalibTu(TPeref *p)
 {
