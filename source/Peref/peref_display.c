@@ -1,9 +1,11 @@
-#if NEW_RAZ
+
 
 #include "peref.h"
 #include "csl\csl_io.h"
 #include "csl\csl_spi.h"
 #include "g_Structs.h"
+
+#if NEW_RAZ
 
 // Макросы формирования таймингов
 /*

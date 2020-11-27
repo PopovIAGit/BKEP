@@ -242,7 +242,8 @@ void Core_MenuInit(TCoreMenu *p)
 		p->GetExpressState = GetExpressState;*/
 
 	// Выводим момент
-		g_Ram.ramGroupH.StartIndic = 8;
+	//	g_Ram.ramGroupH.StartIndic = 8;
+		g_Ram.ramGroupH.StartIndic = REG_TORQUE_ADDR;
 #else
 	p->Data = ToPtr(&g_Ram);      	// Указатель на буфер данных
 	p->Group.Count = GROUP_COUNT;    // Количество групп
