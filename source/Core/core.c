@@ -189,6 +189,9 @@ void Core_CalibControl(TCore *p)
 		g_Peref.Position.CancelFlag = false;
 	}
 
+	// Зона смещения передается только когда привод в стопе. В движении зона смещения равна нулю
+	g_Ram.ramGroupH.PositionAccTemp = p->Status.bit.Stop ? g_Ram.ramGroupB.PositionAcc : 0;
+
 	p->Status.bit.Closed =/*  p->Status.bit.Stop && */ ((g_Peref.Position.Zone & CLB_CLOSE) != 0); //ToDo !!! ПИА 13.02.2020 пока не съехали с концевика физически не снимаем сигнал.
 	p->Status.bit.Opened =/*  p->Status.bit.Stop &&  */((g_Peref.Position.Zone & CLB_OPEN)  != 0);
 
