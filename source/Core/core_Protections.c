@@ -710,7 +710,15 @@ void Core_Protections50HZUpdate2(TCoreProtections *p)
 	{
 		p->BcpTypeDubl = g_Ram.ramGroupH.BkpType*2;
 
-		if ((Uns)g_Ram.ramGroupC.DriveType > 15)
+		if ((Uns)g_Ram.ramGroupC.DriveType == 27) // Ёѕ÷-10000 ƒ.12 с ”фимским движком(27-й по счету) - это Ёѕ÷-10000
+		{
+			BCPDriveType = 10;
+		}
+		else if ((Uns)g_Ram.ramGroupC.DriveType == 28) // Ёѕ÷-10000 ƒ.12 с ”фимским движком(27-й по счету) - это Ёѕ÷-10000
+				{
+					BCPDriveType = 8;
+				}
+		else if ((Uns)g_Ram.ramGroupC.DriveType > 15)
 		{
 			BCPDriveType = (Uns)g_Ram.ramGroupC.DriveType - 15;
 		}

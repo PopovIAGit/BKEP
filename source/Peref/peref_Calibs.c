@@ -30,7 +30,7 @@ void Peref_CalibInit(TPerefPosition *p)
 	p->GearInv		= CalcClbGearInv(&g_Peref.Position);
 	p->FstepInv		= 0;
 	p->PosSensPow	= &g_Ram.ramGroupC.PosSensPow;
-	p->PositionAcc	= &g_Ram.ramGroupB.PositionAcc;
+	p->PositionAcc	= &g_Ram.ramGroupH.PositionAccTemp;
 	p->RodType		= ToPtr(&g_Ram.ramGroupB.RodType);
 	p->AbsPosition	= ToPtr(&g_Ram.ramGroupH.Position);	// ??? Заменить на данные с энкодера
 	p->PositionPr	= &g_Ram.ramGroupA.PositionPr;

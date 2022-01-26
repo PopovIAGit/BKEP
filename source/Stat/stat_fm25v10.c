@@ -38,6 +38,11 @@ void FM25V10_Init(TFM25V10 *p)
 
 	p->BusyTimer = 0;
 	SPI_init(p->SpiId, SPI_MASTER, 0, p->SpiBaud, 8);
+
+	FM25V10_WriteDisable(p);			// «апретить запись (на тот случай, если она была разрешена)
+
+	DelayUs(5);
+
 	if (FM25V10_ReadStatus(p)) p->Error = TRUE;				// —татусный регистр должен быть пустой
 }
 

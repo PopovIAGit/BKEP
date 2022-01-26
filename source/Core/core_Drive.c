@@ -2,10 +2,10 @@
 #include "core.h"
 
 	Uns FirstUpdate = 0;
-	Int InomDef[26]  	     = {13,11,18,52,52,47 ,56 ,110,85  ,148 ,240 ,294 ,358 ,574 ,840 ,11,9 ,13,32,32,33 ,73 ,85 ,95  ,150, 294};		// default значения для Inom для разных приводов
-	Int MomMaxDef[26]  	     = {10,10,40,40,80,100,400,400,1000,1000,1000,1500,2000,3500,5000,10,10,40,40,80,100,400,400,1000,1000,1500};	//				для Mmax
-	Int TransCurrDef[11] 	 = {1500,1000,1000,1000,1000,1000,1100,1100,1100,700,300};			//				для TransCur править
-	Int GearRatioDef[26] 	 = {5250,5250,7560,5320,7560,7560,16720,16720,25146,25146,14400,14400,14400,16800,15600,5250,5250,7560,5320,7560,7560,16720,16720,25146,25146,14400};		//для передаточного числа редуктора
+	Int InomDef[28]  	     = {13,11,18,52,52,47 ,56 ,110,85  ,148 ,240 ,294 ,358 ,574 ,840 ,11,9 ,13,32,32,33 ,73 ,85 ,95  ,150, 294, 170, 75};		// default значения для Inom для разных приводов
+	Int MomMaxDef[28]  	     = {10,10,40,40,80,100,400,400,1000,1000,1000,1500,2000,3500,5000,10,10,40,40,80,100,400,400,1000,1000,1500,1000, 400};	//				для Mmax
+	Int TransCurrDef[13] 	 = {1500,1000,1000,1000,1000,1000,1100,1100,1100,700,300,400, 150};			//				для TransCur править
+	Int GearRatioDef[28] 	 = {5250,5250,7560,5320,7560,7560,16720,16720,25146,25146,14400,14400,14400,16800,15600,5250,5250,7560,5320,7560,7560,16720,16720,25146,25146,14400,25146,16720};		//для передаточного числа редуктора
 
 
 	void Core_Drive_Update(void)
@@ -117,9 +117,17 @@
                 PFUNC_blkRead(&drive26,         (Int *)(&g_Ram.ramGroupH.TqCurr),   LENGTH_TRQ);
                 PFUNC_blkRead(&TransCurrDef[10], (Int *)(&g_Ram.ramGroupH.TransCurr),          1);
                 break;
+			case dt10000_D12_U2:
+                PFUNC_blkRead(&drive27,         (Int *)(&g_Ram.ramGroupH.TqCurr),   LENGTH_TRQ);
+                PFUNC_blkRead(&TransCurrDef[11], (Int *)(&g_Ram.ramGroupH.TransCurr),          1);
+                break;
+			case dt4000_G18_U2:
+			                PFUNC_blkRead(&drive28,         (Int *)(&g_Ram.ramGroupH.TqCurr),   LENGTH_TRQ);
+			                PFUNC_blkRead(&TransCurrDef[12], (Int *)(&g_Ram.ramGroupH.TransCurr),          1);
+			                break;
 		    }
 
-		if ((g_Ram.ramGroupC.DriveType < 27)&&(g_Ram.ramGroupC.DriveType != 0))
+		if ((g_Ram.ramGroupC.DriveType < 29)&&(g_Ram.ramGroupC.DriveType != 0))
 		{
 			if ((g_Ram.ramGroupC.GearRatio != GearRatioDef[g_Ram.ramGroupC.DriveType - 1])
 					|| (g_Ram.ramGroupC.Inom!= InomDef[g_Ram.ramGroupC.DriveType - 1])
@@ -139,7 +147,7 @@
 
 	void Drive_ReWrite_Update(void)
 	{
-		if ((g_Ram.ramGroupC.DriveType < 27)&&(g_Ram.ramGroupC.DriveType != 0))
+		if ((g_Ram.ramGroupC.DriveType < 29)&&(g_Ram.ramGroupC.DriveType != 0))
 		{
 			if ((g_Ram.ramGroupC.GearRatio != GearRatioDef[g_Ram.ramGroupC.DriveType - 1])
 					|| (g_Ram.ramGroupC.Inom!= InomDef[g_Ram.ramGroupC.DriveType - 1])
