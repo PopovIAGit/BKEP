@@ -145,6 +145,13 @@ typedef struct _TBKPData {
 } TBKPData,*TBKPDataHandle;
 
 
+
+extern  Uns BCP9_PTR_reset;
+extern Uns BCP9_Set_close;
+extern Uns BCP9_Set_open;
+extern Uns BCP9_SetB_def;
+extern Uns BCP9_SetC_def;
+
 // Прототипы функций
 
 

@@ -199,12 +199,14 @@ void Core_MenuDisplay(TCoreMenu *p)	// 50 Ãö
 		g_Core.VlvDrvCtrl.EvLog.Value = CMD_DEFAULTS_USER;
 		p->setDefaultGroupNumber = 1;
 		g_Ram.ramGroupD.SetDefaults = 0;
+		BCP9_SetB_def = 1;
 	}
 	if (g_Ram.ramGroupC.SetDefaults)
 	{
 		g_Core.VlvDrvCtrl.EvLog.Value = CMD_DEFAULTS_FACT;
 		p->setDefaultGroupNumber = 2;
 		g_Ram.ramGroupC.SetDefaults = 0;
+		BCP9_SetC_def = 1;
 	}
 
 	if (p->setDefaultGroupNumber)

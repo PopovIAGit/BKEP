@@ -153,28 +153,52 @@ void Core_CalibStop (TCore *p)
 	Bool StopFlag = False; // внутенний флаг остановки
 	LgInt Position = p->VlvDrvCtrl.Valve.Position;
 
-	if(p->VlvDrvCtrl.Valve.Position == POS_UNDEF) //Если целевое положение не определено то уходим
+	if (g_Ram.ramGroupC.BKP91)
 	{
-		p->MotorControl.TargetPos = POS_UNDEF;
-		return;
+		if (g_Ram.ramGroupA.PositionPr >= 9999) return;
+
+		if(p->Status.bit.Stop) return;
+
+		if((p->MotorControl.RequestDir > 0) && (g_Ram.ramGroupA.PositionPr >= 1000 - g_Ram.ramGroupC.BreakZone)) StopFlag = True;
+		if((p->MotorControl.RequestDir < 0) && (g_Ram.ramGroupA.PositionPr <= 0 + g_Ram.ramGroupC.BreakZone)) StopFlag = True;
+
+				if (StopFlag)	// Если пора останавливаться
+				{
+
+							p->MotorControl.CalibStop = 1;
+							Core_ValveDriveStop(&p->VlvDrvCtrl);
+							p->VlvDrvCtrl.EvLog.Value = CMD_STOP;
+							p->VlvDrvCtrl.EvLog.Source = CMD_SRC_BLOCK;
+
+				}
+
+
 	}
-	p->MotorControl.TargetPos = (g_Peref.Position.LinePos - Position);
-
-	if(p->Status.bit.Stop) return;
-
-	if((p->MotorControl.RequestDir < 0) && (p->MotorControl.TargetPos <= g_Ram.ramGroupC.BreakZone)) StopFlag = True;
-	if((p->MotorControl.RequestDir > 0) && (p->MotorControl.TargetPos >= -g_Ram.ramGroupC.BreakZone)) StopFlag = True;
-
-	if (StopFlag)	// Если пора останавливаться
+	else
 	{
-		if(p->VlvDrvCtrl.Valve.BreakFlag) p->MotorControl.OverWayFlag = 1;	//
-		else	// Если
-			{
-				p->MotorControl.CalibStop = 1;
-				Core_ValveDriveStop(&p->VlvDrvCtrl);
-				p->VlvDrvCtrl.EvLog.Value = CMD_STOP;
-				p->VlvDrvCtrl.EvLog.Source = CMD_SRC_BLOCK;
-			}
+		if(p->VlvDrvCtrl.Valve.Position == POS_UNDEF) //Если целевое положение не определено то уходим
+		{
+			p->MotorControl.TargetPos = POS_UNDEF;
+			return;
+		}
+		p->MotorControl.TargetPos = (g_Peref.Position.LinePos - Position);
+
+		if(p->Status.bit.Stop) return;
+
+		if((p->MotorControl.RequestDir < 0) && (p->MotorControl.TargetPos <= g_Ram.ramGroupC.BreakZone)) StopFlag = True;
+		if((p->MotorControl.RequestDir > 0) && (p->MotorControl.TargetPos >= -g_Ram.ramGroupC.BreakZone)) StopFlag = True;
+
+		if (StopFlag)	// Если пора останавливаться
+		{
+			if(p->VlvDrvCtrl.Valve.BreakFlag) p->MotorControl.OverWayFlag = 1;	//
+			else	// Если
+				{
+					p->MotorControl.CalibStop = 1;
+					Core_ValveDriveStop(&p->VlvDrvCtrl);
+					p->VlvDrvCtrl.EvLog.Value = CMD_STOP;
+					p->VlvDrvCtrl.EvLog.Source = CMD_SRC_BLOCK;
+				}
+		}
 	}
 }
 
@@ -192,8 +216,29 @@ void Core_CalibControl(TCore *p)
 	// Зона смещения передается только когда привод в стопе. В движении зона смещения равна нулю
 	g_Ram.ramGroupH.PositionAccTemp = p->Status.bit.Stop ? g_Ram.ramGroupB.PositionAcc : 0;
 
+	if (!g_Ram.ramGroupC.BKP91){
 	p->Status.bit.Closed =/*  p->Status.bit.Stop && */ ((g_Peref.Position.Zone & CLB_CLOSE) != 0); //ToDo !!! ПИА 13.02.2020 пока не съехали с концевика физически не снимаем сигнал.
 	p->Status.bit.Opened =/*  p->Status.bit.Stop &&  */((g_Peref.Position.Zone & CLB_OPEN)  != 0);
+	}
+	else
+	{
+		if (g_Ram.ramGroupA.CalibState != csCalib)
+		{
+			p->Status.bit.Closed = 0;
+			p->Status.bit.Opened = 0;
+		}
+		else
+		{
+			if (g_Ram.ramGroupA.PositionPr >= 1000)
+					p->Status.bit.Opened = 1;
+			else p->Status.bit.Opened = 0;
+					if (g_Ram.ramGroupA.PositionPr<=0)
+						p->Status.bit.Closed = 1;
+					else p->Status.bit.Closed = 0;
+		}
+
+
+	}
 
 	if(g_Ram.ramGroupD.CalibReset != 0)
 	{
@@ -205,6 +250,9 @@ void Core_CalibControl(TCore *p)
 		{
 			g_Ram.ramGroupD.TaskClose = trReset;
 			g_Ram.ramGroupD.TaskOpen  = trReset;
+
+			BCP9_Set_close = trReset;
+			BCP9_Set_open = trReset;
 
 			p->VlvDrvCtrl.EvLog.Value = CMD_RES_CLB;
 		}
@@ -255,6 +303,12 @@ void StopPowerControl(void)
 	g_Core.Status.bit.Opening 	= 0;
 	g_Core.Status.bit.Closing 	= 0;
 	g_Core.Status.bit.Test 		= 0;
+
+	if (g_Ram.ramGroupC.BKP91)
+	{
+		g_Ram.ramGroupC.BreakControl = 1;
+
+	}
 
 	if (g_Core.Status.bit.Fault)
 	{
@@ -331,6 +385,12 @@ void StartPowerControl(TValveCmd ControlWord)
 			g_Core.MotorControl.WorkMode = wmStart;
 			g_Core.Status.bit.Test = 1;
 			break;
+	}
+
+	if (g_Ram.ramGroupC.BKP91)
+	{
+		g_Ram.ramGroupC.BreakControl = 0;
+
 	}
 }
 
@@ -810,6 +870,7 @@ void Core_MuDuControl(TCore *p)
 	{
 		if(!p->Status.bit.Stop) p->VlvDrvCtrl.Mpu.CancelFlag = true;
 		else {
+			BCP9_PTR_reset = 1;
 			Core_ProtectionsClear(&p->Protections);
 			if (g_Ram.ramGroupB.StopMethod == smDynBreak )
 			{

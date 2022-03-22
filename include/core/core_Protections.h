@@ -103,6 +103,16 @@
 #define BatteryLow_CODE		41
 #define BlueNoLaunch_CODE	42
 
+#define BCP9_DRV_T			51
+#define BCP9_POSSENS			52
+#define BCP9_MEMORY1			53
+#define BCP9_CALIBRATION			54
+#define BCP9_RTC			54
+#define BCP9_TSENS			55
+#define BCP9_TH			56
+#define BCP9_TL			57
+#define BCP9_DAC			58
+#define BCP9_MEMORY2			59
 
 //--------------------- Макросы --------------------------------------------
 #define PRT_CFG_SET(CanBeReseted, Level, Bit, Hyst) \

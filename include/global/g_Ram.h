@@ -193,8 +193,9 @@ typedef struct _TRamGroupA
 	Uns             VersionPOBkp;   // 25. 525 Версия ПО БКП
 	Uns				VoltageDown;	// 26. 526 Падение напряжения
 	Uns				RevErrValue;	// 27. 527 Колво сбоев датчика положения
-	Uns 			Rsvd28;			// 28. 528 Ошибочное положение для записи
-	Uns 			Rsvd[9];	    // 29-39. 528-539 Резерв
+	Uns 			TemperED;		// 28. 528 температура ЭД для БКП 9.1
+	TBCP9Reg		BCP9Reg;		// 29. 529 faults from BCP91
+	Uns 			Rsvd[8];	    // 30-39. 530-539 Резерв
 } TRamGroupA;
 
 // Группа B (Адрес = 40, Количество = 100) - Параметры пользователя
@@ -253,7 +254,7 @@ typedef struct _TRamGroupC
   	Uns             MaxTorque;          	// C4. 94 Максимальный момент привода
 	Uns             Inom;               	// C5. 95 Номинальный ток
   	Uns             GearRatio;          	// C6. 96 Передаточное число редуктора
-  	Uns				reserv97;	    		// С7. 97 Резерв
+  	Uns				BKP91;	    			// С7. 97 Резерв
   	Uns				TekDefRegSwitch;		// С8. 98 Резерв
 	THallBlock      HallBlock;          	// C9. 99 Состояние датчиков холла блока
 	Uns             SubVersionPO;	    	// C10. 100 Подверсия ПО
@@ -269,7 +270,8 @@ typedef struct _TRamGroupC
 	Uns             BrakeTime;          	// C20. 110 Время торможения
 	Uns       		StopShnTime;   			// C21. 111 Время торможения динамическим торможением
 	Int				BreakZone;				// C22. 112 Число оборотов дв за которое начинаем тормозить
-	Uns				Rsvd5[9];				// C23-33. 113-123 резерв
+	Uns				BreakControl;			// c23. 113 управление тормозом БКП9.1
+	Uns				Rsvd5[8];				// C24-33. 114-123 резерв
 	Uns				CounterDisconect;		// C32  122 Счетчик обрывов связи между БКП БКЭП (реальных а не по аварии)
 	Uns				TimeBtnStopKVOKVZ;		// C33  123 время разрыва КВО КВЗ при повороте ручки стоп
 	Uns				BCPConTimeMove;			// C34  124 Время Выставления аварии нет связи в движении

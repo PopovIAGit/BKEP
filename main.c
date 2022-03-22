@@ -57,6 +57,12 @@ void main(void)
 		PauseModbus = g_Ram.ramGroupC.ModbusPauseStart; // 09.01.2020 - требование Обриев (и здравый смысл)
 	}
 
+	if (g_Ram.ramGroupC.BKP91)
+		{
+			g_Ram.ramGroupC.BreakControl = 1;
+
+		}
+
 	while(1)
 	{
 		Comm_Update(&g_Comm);

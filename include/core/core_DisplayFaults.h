@@ -24,6 +24,7 @@ typedef struct _TCoreDislpayFaults{
 		Uns 				TestData;
 		Uns					DisplFaultFlag;		// флаг готовности считывания аварий
 		TFltUnion			DisplFaultUnion;	// хранилище для отображения аварий
+		TBCP9Reg			DisplFaultBKP9;
 
 }TCoreDislpayFaults;
 

@@ -72,82 +72,98 @@ Uint32 CalcClbPercentToAbs(TPerefPosition *p, Uint16 Percent)
 void Peref_Calibration(TPerefPosition *p)
 {
 	LgUns Data;
-
-	// Задание/сброс Закрыто
-	if(p->Command->TaskClose != 0)
-	{
-		switch(p->Command->TaskClose)
+		// Задание/сброс Закрыто
+		if(p->Command->TaskClose != 0)
 		{
-			case 1: // Выставляем
-				if(!CheckStatus(p, CLB_CLOSE)) break;
-				p->Indication->ClosePos = *p->AbsPosition;
-				p->Indication->Status |= CLB_CLOSE;
+			BCP9_Set_close = p->Command->TaskClose;
+
+			if (g_Ram.ramGroupC.BKP91 == 0)
+			{
+			switch(p->Command->TaskClose)
+			{
+
+				case 1: // Выставляем
+					if(!CheckStatus(p, CLB_CLOSE)) break;
+					p->Indication->ClosePos = *p->AbsPosition;
+					p->Indication->Status |= CLB_CLOSE;
+					break;
+				case 2: // Снимаем
+					if (!CheckStatus(p, 0)) break;
+					p->Indication->ClosePos = 0;
+					p->Indication->Status &= CLB_OPEN;
+					break;
+			}
+			}
+			p->Command->TaskClose = 0;
+		}
+
+		//Задание/сброс Открыто
+		if(p->Command->TaskOpen != 0)
+		{
+			BCP9_Set_open = p->Command->TaskOpen;
+			if (g_Ram.ramGroupC.BKP91 == 0){
+			switch(p->Command->TaskOpen)
+			{
+
+			case 1:	//Выставляем
+				if(!CheckStatus(p, CLB_OPEN)) break;
+				p->Indication->OpenPos = *p->AbsPosition;
+				p->Indication->Status |= CLB_OPEN;
 				break;
 			case 2: // Снимаем
 				if (!CheckStatus(p, 0)) break;
-				p->Indication->ClosePos = 0;
-				p->Indication->Status &= CLB_OPEN;
+				p->Indication->OpenPos = 0;
+				p->Indication->Status &= CLB_CLOSE;
 				break;
+			}
+			}
+			p->Command->TaskOpen = 0;
 		}
-		p->Command->TaskClose = 0;
-	}
 
-	//Задание/сброс Открыто
-	if(p->Command->TaskOpen != 0)
-	{
-		switch(p->Command->TaskOpen)
+		// задание количества оборотов на Открытие
+		if (p->Command->RevOpen > 0)
 		{
-		case 1:	//Выставляем
-			if(!CheckStatus(p, CLB_OPEN)) break;
-			p->Indication->OpenPos = *p->AbsPosition;
-			p->Indication->Status |= CLB_OPEN;
-			break;
-		case 2: // Снимаем
-			if (!CheckStatus(p, 0)) break;
-			p->Indication->OpenPos = 0;
-		    p->Indication->Status &= CLB_CLOSE;
-			break;
+			if (g_Ram.ramGroupC.BKP91 == 0){
+			if (CheckStatus(p, CLB_FLAG))
+			{
+				p->Indication->ClosePos = *p->AbsPosition;
+				Data = CalcClbAbsRev(p, p->Command->RevOpen);
+			//	Data = (((LgUns)p->GearRatio * (LgUns)p->Command->RevOpen) << *p->PosSensPow)/10;
+				if (*p->RodType) Data = p->Indication->ClosePos - Data;
+				else Data = p->Indication->ClosePos + Data;
+				p->Indication->OpenPos = Data & p->RevMax;
+				p->Indication->Status = CLB_FLAG;
+			}
+			}
+			p->Command->RevOpen = 0;
 		}
-		p->Command->TaskOpen = 0;
-	}
 
-	// задание количества оборотов на Открытие
-	if (p->Command->RevOpen > 0)
-	{
-		if (CheckStatus(p, CLB_FLAG))
+		// задание количества оборотов на Закрытие
+		if (p->Command->RevClose > 0)
 		{
-			p->Indication->ClosePos = *p->AbsPosition;
-			Data = CalcClbAbsRev(p, p->Command->RevOpen);
-		//	Data = (((LgUns)p->GearRatio * (LgUns)p->Command->RevOpen) << *p->PosSensPow)/10;
-			if (*p->RodType) Data = p->Indication->ClosePos - Data;
-			else Data = p->Indication->ClosePos + Data;
-			p->Indication->OpenPos = Data & p->RevMax;
-			p->Indication->Status = CLB_FLAG;
+			if (g_Ram.ramGroupC.BKP91 == 0){
+			if (CheckStatus(p, CLB_FLAG))
+			{
+				p->Indication->OpenPos = *p->AbsPosition;
+				Data = CalcClbAbsRev(p, p->Command->RevClose);
+				//Data = (((LgUns)p->GearRatio * (LgUns)p->Command->RevClose) << *p->PosSensPow)/10;
+				if (*p->RodType) Data = p->Indication->OpenPos + Data;
+				else Data = p->Indication->OpenPos - Data;
+				p->Indication->ClosePos = Data & p->RevMax;
+				p->Indication->Status = CLB_FLAG;
+			}
+			}
+			p->Command->RevClose = 0;
 		}
-		p->Command->RevOpen = 0;
-	}
 
-	// задание количества оборотов на Закрытие
-	if (p->Command->RevClose > 0)
-	{
-		if (CheckStatus(p, CLB_FLAG))
-		{
-			p->Indication->OpenPos = *p->AbsPosition;
-			Data = CalcClbAbsRev(p, p->Command->RevClose);
-			//Data = (((LgUns)p->GearRatio * (LgUns)p->Command->RevClose) << *p->PosSensPow)/10;
-			if (*p->RodType) Data = p->Indication->OpenPos + Data;
-			else Data = p->Indication->OpenPos - Data;
-			p->Indication->ClosePos = Data & p->RevMax;
-			p->Indication->Status = CLB_FLAG;
-		}
-		p->Command->RevClose = 0;
-	}
 }
 
 void Peref_CalibUpdate(TPerefPosition *p)
 {
 	ClbIndication *Indic = p->Indication;
 	LgUns Position, ClosePos, OpenPos;
+
+	if (g_Ram.ramGroupC.BKP91 == 1) return;
 
 	if (*p->RodType)									// если выбран обратный тип штока
 	{
@@ -281,6 +297,12 @@ void Peref_SpeedCalc(TPerefPosition *p)
 
 		Uns	Prd5Hz = 5,
 				SP_CALC_TOUT = Prd50HZ / Prd5Hz;
+
+		if (g_Ram.ramGroupC.BKP91 == 1) {
+
+			p->speedMPS = 0;
+			return;
+		}
 
 	if (++Timer >= (Uns) SP_CALC_TOUT)
 	{
