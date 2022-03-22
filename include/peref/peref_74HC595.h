@@ -53,48 +53,12 @@ typedef struct TPeref_74hc595 {
 	Uns			EmptyData;				// Отключение неиспользуемых реле в третьей микросхеме в каскаде
 	TCs_Func    CsFunc;						// Функция chip select'а
 
-	Uns		Set11;
-	Uns		Set12;
-	Uns		Set21;
-	Uns		Set22;
-	Uns		Set31;
-	Uns		Set32;
-	Uns		Set41;
-	Uns		Set42;
-	Uns		Set51;
-	Uns		Set52;
-	Uns		Set61;
-	Uns		Set62;
-	Uns		Set71;
-	Uns		Set72;
-	Uns		Set81;
-	Uns		Set82;
-
-	Uns		Timer1;
-	Uns		Timer2;
-	Uns		Timer3;
-	Uns		Timer4;
-	Uns		Timer5;
-	Uns		Timer6;
-	Uns		Timer7;
-	Uns		Timer8;
-
 } TPeref_74hc595;
 
 //------------------- Глобальные переменные --------------------------------
 //------------------- Протатипы функций ------------------------------------
 
 void Peref_74HC595Init(TPeref_74hc595 *);
-#if !NEW_RAZ
 void Peref_74HC595Update(TPeref_74hc595 *, TOutputReg);
-#else
-void Peref_74HC595UpdateTs(TPeref_74hc595 *, TOutputReg);
-void Peref_74HC595UpdateLed(TPeref_74hc595 *, TLedReg *);
-void Peref_74HC595UpdateDisp(TPeref_74hc595 *);
-void Peref_74HC595UpdateDispRW(TPeref_74hc595 *, Uns set);
-void Peref_74HC595UpdateDispEN(TPeref_74hc595 *, Uns set);
-void Peref_74HC595UpdateDispRS(TPeref_74hc595 *, Uns set);
-void Peref_74HC595UpdateDispSendData(TPeref_74hc595 *, Byte Data);
-#endif
 
 #endif /* PEREF_74HC595_H_ */

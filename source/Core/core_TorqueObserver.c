@@ -22,6 +22,8 @@ Int AnUIArray100A50[CUB_COUNT2] 	= { 50,  55,   65,   69,   73}; //для эпц100а50
 Int AnUIArray[CUB_COUNT2] 			= {25, 35, 50, 65, 70,  80};	// добавил 70 	PIA 14.11.17
 Int AnUIArray100A25[CUB_COUNT2] 	= {50,  61,   69,   74,   80};  // для эпцр 100 а25
 
+Int AnUIArrayEPZR2000[CUB_COUNT2]	= {40,50,55,65,70,75};
+
 void CubInit(TCubStr *p, TCubConfig *Cfg)	//инициализация куба
 {
 	register TCubPoint *Pt;
@@ -138,6 +140,10 @@ void Core_TorqueInit(TTorqObs *p)
 		//AnUIArray = AnUIArray100A50;//{ 50,  55,   65,   69,   73};
 		memcpy(AnUIArray, AnUIArray100A50, sizeof(AnUIArray));
 	}
+	if (g_Ram.ramGroupC.DriveType == dt2000_EPZR)
+	{
+		memcpy(AnUIArray, AnUIArrayEPZR2000, sizeof(AnUIArray));
+	}
 
 	p->TqCurr.X_Value = (Int *)&g_Ram.ramGroupH.Umid;// - VoltTmp;
 	p->TqCurr.X_Array = VoltArray;
@@ -202,6 +208,8 @@ void Core_TorqueCalc(TTorqObs *p)
 
 		if (p->Tmp < TORQ_MIN_PR) p->Tmp = TORQ_MIN_PR;	// проверяем на вхождение в зону от
 		if (p->Tmp > TORQ_MAX_PR) p->Tmp = TORQ_MAX_PR;   // 10 до 110 %
+
+
 
 		if (abs(Add) > p->Tmp) Add = 0;
 

@@ -27,44 +27,30 @@ extern "C" {
 #define ECN_ADDR2			GpioDataRegs.GPADAT.bit.GPIO5
 */
 //--- LED's ------------------------------------------
-#if NEW_RAZ
-
-#define CS_LED              GpioDataRegs.GPCDAT.bit.GPIO66
-#define WORK_DSP_LED        GpioDataRegs.GPADAT.bit.GPIO29
-
-#else
-
-#define LED_OPEN            GpioDataRegs.GPADAT.bit.GPIO22
-#define LED_MUFTA           GpioDataRegs.GPADAT.bit.GPIO23
-#define LED_DEFECT          GpioDataRegs.GPADAT.bit.GPIO24
-#define LED_CLOSE           GpioDataRegs.GPADAT.bit.GPIO25
-#define LED_CONNECT         GpioDataRegs.GPADAT.bit.GPIO26
+#define LED_OPEN			GpioDataRegs.GPADAT.bit.GPIO22
+#define LED_MUFTA			GpioDataRegs.GPADAT.bit.GPIO23
+#define LED_DEFECT			GpioDataRegs.GPADAT.bit.GPIO24
+#define LED_CLOSE		    GpioDataRegs.GPADAT.bit.GPIO25
+#define LED_CONNECT			GpioDataRegs.GPADAT.bit.GPIO26
 #define ENABLE_BLUETOOTH    GpioDataRegs.GPADAT.bit.GPIO27
-#define WORK_DSP_LED        GpioDataRegs.GPADAT.bit.GPIO29
-#define LED_FAULT           GpioDataRegs.GPBDAT.bit.GPIO34
-#define LED_MUDU            GpioDataRegs.GPCDAT.bit.GPIO64
-#define LED_MPZ             GpioDataRegs.GPCDAT.bit.GPIO65
-#define LED_MPO             GpioDataRegs.GPCDAT.bit.GPIO66
+#define WORK_DSP_LED		GpioDataRegs.GPADAT.bit.GPIO29
+#define LED_FAULT			GpioDataRegs.GPBDAT.bit.GPIO34
+#define LED_MUDU		    GpioDataRegs.GPCDAT.bit.GPIO64
+#define LED_MPZ			    GpioDataRegs.GPCDAT.bit.GPIO65
+#define LED_MPO			    GpioDataRegs.GPCDAT.bit.GPIO66
 
-#endif
 
 //----Display----------------------------------
 
-#if NEW_RAZ
-#define ENB_DISPL           GpioDataRegs.GPCDAT.bit.GPIO65
-#define ON_DISPL            GpioDataRegs.GPCDAT.bit.GPIO70
-#define CS_DISPL            GpioDataRegs.GPCDAT.bit.GPIO64
-#else
-#define BCD_A               GpioDataRegs.GPADAT.bit.GPIO1
-#define BCD_B               GpioDataRegs.GPADAT.bit.GPIO2
-#define BCD_C               GpioDataRegs.GPADAT.bit.GPIO3
-#define BCD_D               GpioDataRegs.GPADAT.bit.GPIO4
+#define BCD_A				GpioDataRegs.GPADAT.bit.GPIO1
+#define BCD_B				GpioDataRegs.GPADAT.bit.GPIO2
+#define BCD_C				GpioDataRegs.GPADAT.bit.GPIO3
+#define BCD_D				GpioDataRegs.GPADAT.bit.GPIO4
 
 #define BCD_FIX				GpioDataRegs.GPADAT.bit.GPIO5
 
-#define DIG1                GpioDataRegs.GPADAT.bit.GPIO7
-#define DIG2                GpioDataRegs.GPADAT.bit.GPIO8
-#endif
+#define DIG1				GpioDataRegs.GPADAT.bit.GPIO7
+#define DIG2				GpioDataRegs.GPADAT.bit.GPIO8
 
 //--- MODBUS -----------------------------------------
 
@@ -88,14 +74,8 @@ extern "C" {
 //-----------------------------------------------
 //--- BUTTON's ---------------------------------------
 #define TY_24				GpioDataRegs.GPBDAT.bit.GPIO40 // 24 или 220 ТУ
-#define BTN_RESET_ALARM 	        GpioDataRegs.GPBDAT.bit.GPIO47
+
 #define BUTTON_BLUE			GpioDataRegs.GPBDAT.bit.GPIO46 // активация bluetooth канала
-#define BTN_CANCEL			GpioDataRegs.GPADAT.bit.GPIO2
-#define BTN_LEFT			GpioDataRegs.GPADAT.bit.GPIO3
-#define BTN_RIGHT			GpioDataRegs.GPADAT.bit.GPIO4
-#define BTN_UP				GpioDataRegs.GPADAT.bit.GPIO5
-#define BTN_DOWN			GpioDataRegs.GPADAT.bit.GPIO6
-#define BTN_ENTER			GpioDataRegs.GPADAT.bit.GPIO7
 
 //--- SENSORS ---------------------------------------- PIA 03.04.14
 

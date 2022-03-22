@@ -52,6 +52,19 @@ Byte   skipDefectFl = 0;
 Uns  Data;
 Uns  Error_counter = 0;
 
+Uns BCP9_PTR_reset = 0;
+Uns BCP9_Set_close = 0;
+Uns BCP9_Set_open = 0;
+Uns BCP9_SetB_def = 0;
+Uns BCP9_SetC_def = 0;
+
+Uns TimerPtrReset = 0;
+Uns TimerSetB = 0;
+Uns timerSetC = 0;
+Uns TimerSetClos = 0;
+Uns TimerSetOpen = 0;
+
+
 void SciMasterConnBetweenBlockInit(TMbBBHandle Port)
 {
 	memset(&Port->RxPacket, 0, sizeof(TScPacket));
@@ -163,6 +176,8 @@ void SciMasterConnBetweenBlockUpdate(TMbBBHandle Port)
 		Port->TxPacket.Len   = 0;
 		Port->TxPacket.Fcs   = INIT_FCS;
 
+
+
 		SCI_rx_disable(Port->Params.UartID);
 		if(sci_err)
 		{
@@ -181,17 +196,107 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 	Uns absDelta;
 
 	SciMasterConnBetweenBlockUpdate(bPort);
+//	g_Ram.ramGroupC.BKP91 = 1;
+if (g_Ram.ramGroupC.BKP91)
+{
+	// передача
+	bPort->TxPacket.Data[4]  = g_Ram.ramGroupC.BreakControl & 0x1;
+	bPort->TxPacket.Data[4] |= (BCP9_Set_close & 0x3) << 1;
+	if (BCP9_Set_close )
+		{
+			if(TimerSetClos++ >= Prd18kHZ)
+				{
+					BCP9_Set_close = 0;
+					TimerSetClos = 0;
+				}
+
+		}
+
+	bPort->TxPacket.Data[4] |= (BCP9_Set_open & 0x3) << 3;
+	if (BCP9_Set_open)
+	{
+		if (TimerSetOpen++ >=Prd18kHZ)
+		{
+			BCP9_Set_open = 0;
+			TimerSetOpen = 0;
+		}
+
+	}
+
+	bPort->TxPacket.Data[4] |= (BCP9_SetB_def & 0x1) << 5;
+	if (BCP9_SetB_def)
+	{
+		if (TimerSetB++ >= Prd18kHZ)
+		{
+			BCP9_SetB_def = 0;
+			TimerSetB = 0;
+		}
+
+	}
+
+	bPort->TxPacket.Data[4] |= (BCP9_SetC_def & 0x1) << 6;
+	if (BCP9_SetC_def)
+	{
+		if (timerSetC++ >= Prd18kHZ)
+		{
+			BCP9_SetC_def = 0;
+			timerSetC = 0;
+		}
+
+	}
+	bPort->TxPacket.Data[4] |= (BCP9_PTR_reset & 0x1) << 7;
+	if (BCP9_PTR_reset)
+	{
+		if (TimerPtrReset++ >= Prd18kHZ)
+		{
+			BCP9_PTR_reset = 0;
+			TimerPtrReset = 0;
+		}
+
+	}
+
+	TStatusReg tmpStetus = g_Ram.ramGroupA.Status;
+
+	if (g_Ram.ramGroupA.Status.bit.Test)	tmpStetus.bit.Test = g_Ram.ramGroupA.Status.bit.Defect;
+	if (g_Ram.ramGroupA.Status.bit.Defect) tmpStetus.bit.Test = g_Ram.ramGroupA.Status.bit.Defect;
+	bPort->TxPacket.Data[5] = g_Ram.ramGroupC.BreakZone & 0xFF;;
+//	bPort->TxPacket.Data[5] = (g_Ram.ramGroupA.Status.all >> 8) & 0xFF;
+	bPort->TxPacket.Data[6] = (tmpStetus.all) & 0xFF;
+
+	bPort->TxPacket.Data[7] = g_Peref.Display.data;
+
+	// прием
+	if(!bPort->RxPacket.Flag) return;
+		bPort->RxPacket.Flag = 0;
+
+	 g_Ram.ramGroupA.VersionPOBkp 	=  bPort->RxPacket.Data[0] + 5000;
+	 g_Ram.ramGroupA.PositionPr 	=  bPort->RxPacket.Data[1];
+	 g_Ram.ramGroupA.PositionPr 	|= bPort->RxPacket.Data[2]<<8;
+	 g_Ram.ramGroupH.CalibState 	=  bPort->RxPacket.Data[3]& 0x3;
+	 g_Ram.ramGroupA.BCP9Reg.all 	= bPort->RxPacket.Data[3]>>2;
+	 g_Ram.ramGroupA.BCP9Reg.all    |= bPort->RxPacket.Data[7]<<5;
+
+	 g_Ram.ramGroupC.HallBlock.all		=  bPort->RxPacket.Data[4] & 0xF;
+	 g_Ram.ramGroupA.TemperBKP		= (int16)(bPort->RxPacket.Data[5]);
+	 if (g_Ram.ramGroupA.TemperBKP > 128)
+		 g_Ram.ramGroupA.TemperBKP -= 255;
+	 g_Ram.ramGroupA.TemperED		= (int16)(bPort->RxPacket.Data[6]);
+	 if (g_Ram.ramGroupA.TemperED > 128)
+		 g_Ram.ramGroupA.TemperED -= 255;
+
+
+}
+else
+{
+	g_Ram.ramGroupA.BCP9Reg.all = 0;
+	g_Ram.ramGroupA.TemperED = 0;
 
 	bPort->TxPacket.Data[4]  = g_Ram.ramGroupH.BkpIndication.all;  // индикация светодиодов
 	//bPort->TxPacket.Data[5] = g_Core.Temper.OnOffTEN;			  // управление теном
 	bPort->TxPacket.Data[5]  = 0;
 	bPort->TxPacket.Data[5]  = (g_Core.Temper.OnOffTEN)&0x01;
 	bPort->TxPacket.Data[5] |= ((g_Ram.ramGroupA.PositionPr==9999)<<1)&0x02;
-	#if NEW_RAZ
-	bPort->TxPacket.Data[5] |= ((/*g_Peref.Display.data == 999*/ g_Core.DisplayFaults.Data == 999)<<2)&0x04;
-	#else
 	bPort->TxPacket.Data[5] |= ((g_Peref.Display.data==999)<<2)&0x04;
-	#endif
 	bPort->TxPacket.Data[5] |= ((g_Ram.ramGroupA.Faults.Proc.bit.NoOpen==0)<<3)&0x08;
 	bPort->TxPacket.Data[5] |= ((g_Ram.ramGroupA.Faults.Proc.bit.NoClose==0)<<4)&0x10;
 
@@ -201,13 +306,9 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 		if(g_Ram.ramGroupA.PositionPr <0 ) bPort->TxPacket.Data[6] = 0;
 		else bPort->TxPacket.Data[6] = g_Ram.ramGroupA.PositionPr*0.1;	// положение в %
 	}
-	#if NEW_RAZ
-		if (/*g_Peref.Display.data*/ g_Core.DisplayFaults.Data >= 999) bPort->TxPacket.Data[7] = 99;
-	else bPort->TxPacket.Data[7] = /*g_Peref.Display.data*/ g_Core.DisplayFaults.Data;		// код аварий
-	#else
 	if (g_Peref.Display.data>=999) bPort->TxPacket.Data[7] = 99;
 	else bPort->TxPacket.Data[7] = g_Peref.Display.data;		// код аварий
-#endif
+
 	if(!bPort->RxPacket.Flag) return;
 	bPort->RxPacket.Flag = 0;
 
@@ -218,61 +319,6 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
     BkpEncPostion 			|= (Uns) bPort->RxPacket.Data[1] << 0;
 
     //-----------------------------------------------------------
-/*
-    	// Проверка на сбой данных
-    	if (BkpEncPostion > 0x7fff)			// 1) Если данные, считанные с энкодера превышают максимальный диапазон,
-    	{
-    		Error_counter++;			// то инкрементируем счетчик ошибок, а принятые данные не воспринимаем
-    		return;
-    	}
-    	// Разница между текущим и предыдущим
-    	Delta = BkpEncPostion - BkpEncPostionPrev;
-    	absDelta = abs(Delta);
-
-    	if (skipDefectFl)								// 2a) Висит флаг о том, что данные перескочили
-    	{
-    		if (absDelta)										// если произошло изменение
-    		{
-    			 if (absDelta < 5)
-    			 {
-    				goodPosition = (goodPosition + Delta)&0x7fff;	// Корректируем goodPosition
-    				g_Ram.ramGroupH.Position  = goodPosition;
-    			 }
-    			 else if (REV_MAX - 5 < absDelta)		// Переход через 0
-    			 {
-    				 goodPosition = (goodPosition + absDelta)&0x7fff;
-    				 g_Ram.ramGroupH.Position  = goodPosition;
-    			 }
-    			 else
-    			{
-    				 Error_counter++;							// Если просто скачок данных то не в счет, увеличиваем счетчик ошибок
-    			}
-			}
-    			if (( (Int)(goodPosition - 5 - 2) < (Int)Data)\
-    			  &&(Data < goodPosition + 5 + 2))	// Если произошел скачок обратно в goodposition - сбрасываем флаг
-    			{
-    				skipDefectFl = false;
-    			}
-
-    	}
-    	else 													// 2б) Нормальное состояние (перескока не было)
-    	{
-    		if ((5 <= absDelta)\
-    	       &&(absDelta <= REV_MAX - 5))			// 3) Если 5 < Delta < 16383-5 - "скачок данных")
-    		{
-    			skipDefectFl = true;
-    			goodPosition = BkpEncPostionPrev;
-    			Error_counter++;
-    		}
-    		else
-    		{
-    			 g_Ram.ramGroupH.Position 		= 32767-BkpEncPostion;						// 4) Нормальные условия работы энкодера
-    		}
-    	}
-    	BkpEncPostionPrev = Data;
-*/
-
-
 
     //------------------------------------------------------------ // SDV ЦПА
     // Фильтруем числа 0, 32767 и 65535
@@ -295,7 +341,7 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
     g_Ram.ramGroupA.RevErrValue		= BkpEncErr;
 
     g_Core.Protections.outFaults.Dev.bit.PosSens = (bPort->RxPacket.Data[2] << 7) & 0x01;
-
+}
     bPort->TxPacket.Flag = 1;
 }
 

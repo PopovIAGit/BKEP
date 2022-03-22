@@ -127,12 +127,7 @@ void Comm_ControlModbusUpdateAltistar48(TComm *p)
 		p->mbShn.Packet.Data[0] = p->ioATS48.DataOutput[0];
 
 		NumParam = p->ioATS48.Addr - REG_CONTROL_ATS48;
-		#if NEW_RAZ
-			PFUNC_blkRead((Ptr)&menu.AtsParams[NumParam], (Uns*)(&Addr), 1);
-		#else
-			PFUNC_blkRead((Ptr)&g_Core.menu.AtsParams[NumParam], (Uns*)(&Addr), 1);
-		#endif
-		
+		PFUNC_blkRead((Ptr)&g_Core.menu.AtsParams[NumParam], (Uns*)(&Addr), 1);
 		p->mbShn.Packet.Addr = Addr;
 
 		p->mbShn.Packet.Count = p->ioATS48.CountOutput;
@@ -183,7 +178,8 @@ void Comm_Update(TComm *p)
 	}
 
 
-	if (g_Ram.ramGroupB.StopMethod == smDynBreak)
+
+	if (/*g_Comm.Bluetooth.ModeProtocol == 0 &&*/ g_Ram.ramGroupB.StopMethod == smDynBreak)
 	{
 		ModBusUpdate(&g_Comm.mbShn);  // master канал связи с устройством плавного пуска
 
@@ -291,10 +287,7 @@ void Comm_50HzCalc(TComm *p)
 		{
 			g_Ram.ramGroupD.PrtReset = 1;
 			p->btn_reset_alarmFlag = 1;
-			#if NEW_RAZ
-			#else
 			g_Peref.Display.data = 999;
-			#endif
 			p->btn_reset_alarmTimer =0;
 		}
 
@@ -456,12 +449,6 @@ Uns DigitCmdModeUpdate (Uns *Output)
 void TekModbusParamsUpdate(void) //??? необходимы проверки
 {
 	TRamGroupT *tek = &g_Ram.ramGroupT;
-
-	GpioDataRegs.GPCDAT.bit.GPIO65 = 0; // вклюяние дисплея
-
-#if NEW_RAZ
-    g_Core.FirstOnFlag = 0;
-#endif
 
 	// Заполняем технологический регистр
 	tek->TechReg.bit.Opened  = g_Ram.ramGroupA.Status.bit.Opened;

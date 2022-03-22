@@ -120,9 +120,28 @@ typedef union _TProcessReg {
 		Uns MuDuDef:1;		// 7     Ошибка по дискретным входам Му/Ду
 		Uns SoftStarter:1;	// 8	 Ошибка УПП
 		Uns FireContErr:1;	// 9	 не замкнут конитактор в режиме пожрка
-		Uns Rsvd:6;			// 11-15  Резерв
+		Uns Rsvd:6;			// 10-15  Резерв
 	} bit;
 } TProcessReg;
+
+typedef union _TBCP9Reg {
+	Uns all;
+	struct {
+				Uns Drv_T:1;		// 0     Нет движения
+				Uns PosSens:1;		// 1     Сбой датчика положения
+				Uns Memory1:1;		// 2     Сбой памяти 1
+				Uns Calibration:1;	// 3     Момент калибровки
+				Uns RTC:1;			// 4     Сбой часов реального времени
+				Uns TSens:1;		// 5     Сбой датчика температуры
+				Uns Th_BCP:1;		// 6     Перегрев блока
+				Uns Tl_BCP:1;		// 7     Переохлождение блока
+				Uns Rsvd7:1;		// 8     Резерв
+				Uns Rsvd8:1;		// 9     Резерв
+				Uns Dac:1;			// 10     Сбой ЦАП
+				Uns Memory2:1;		// 11    Memory2 Error
+				Uns Rsvd:4;			// 12-15  Резерв
+	} bit;
+} TBCP9Reg;
 
 // Диагностика сети
 #define NET_UV_MASK			0x0007
@@ -247,11 +266,6 @@ typedef enum
 	bcmFixPos					// команда фиксации положения
 } TBurCmd;
 
-// Тип индикатора
-typedef enum {
-    it_WINSTAR = 0, // OLED WINSTAR
-    it_FUTABA       // VAC FUTABA
-} TIndicType;
 
 // Место установки БУР (пожарка - Линейная часть/Автоматика и телемеханика)
 typedef enum {
@@ -303,7 +317,8 @@ typedef enum {
 	dt10000_D12_S 	= 25,
 	dt15000_D10_T   = 26,
 	dt10000_D12_U2 	= 27,
-	dt4000_G18_U2 	= 28
+	dt4000_G18_U2 	= 28,
+	dt2000_EPZR = 29
 }TDriveType;
 
 // Управление работой защит

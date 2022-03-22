@@ -326,7 +326,6 @@ void Stat_Update(TStat *p)	// 50 Гц
 
 
 }*/
-
 //---------------------------------------------------
 // Работа с Eeprom
 Bool ReadWriteEeprom(pFM25V10 eeprom, Byte func, Uns addr, Uns *pData, Uns count)

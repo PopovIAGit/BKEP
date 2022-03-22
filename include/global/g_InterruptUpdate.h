@@ -79,9 +79,8 @@ TPeriodicalFunction Task2kHz[] =          //Ќе более 8-х задач
 	PrdElemInit(SerialCommTimings,						&g_Comm.mbBt),	//на 2 к√ц
 	PrdElemInit(FM25V10_Update,							&Eeprom1),		//на 2 к√ц
 	PrdElemInit(FM25V10_Update,							&Eeprom2),		//на 2 к√ц
-#if NEW_RAZ
-	PrdElemInit(DISPL_Update,                           &g_Peref.Display),
-#endif
+
+
 };
 // ================================ 200 √ц ==================================
 
@@ -94,11 +93,9 @@ TPeriodicalFunction Task200Hz[] =       	//не более  20-ти задач
 	PrdElemInit(LogCmdControl,							&g_Stat),
 	PrdElemInit(LogParamMbExec,							&g_Stat),
 	PrdElemInit(LogParamControl,						&g_Stat),
-	PrdElemInit(LogSimControl,							&g_Stat),   //ma LogSim
+	PrdElemInit(LogSimControl,							&g_Stat), //ma LogSim
 	PrdElemInit(ImTimer,				                &g_Stat.Im),// на 200√
-#if !NEW_RAZ
-	PrdElemInit(DisplDrvUpdate,             			&g_Peref.Display),      //ToDo NewRaz
-#endif
+	PrdElemInit(DisplDrvUpdate,             			&g_Peref.Display),
 	PrdElemInit(Comm_TuTsUpdate,						&g_Comm.digitInterface),
 	PrdElemInit(Protections_MuffFlag,						NULL),
 	PrdElemInit(Core_VoltageDown,								NULL),
@@ -150,18 +147,11 @@ TPeriodicalFunction Task50Hz[] =        //не более  80-ти задач
 	PrdElemInit(Core_ProtectionsAlarmUpdate,	&g_Core.Protections.underColdBCP),
 	PrdElemInit(Comm_50HzCalc,					&g_Comm),
 	PrdElemInit(GetCurrentCmd,					&g_Stat),
-	#if NEW_RAZ
-	PrdElemInit(Core_SetDeff,					&menu),
-	#else
 	PrdElemInit(Core_MenuDisplay,				&g_Core.menu),
-	#endif
 	PrdElemInit(Core_Protections50HZUpdate,		&g_Core.Protections),
 	PrdElemInit(Core_Protections50HZUpdate2,	&g_Core.Protections),
 	PrdElemInit(Comm_CommandUpdate,				&g_Comm),
 	PrdElemInit(Peref_AvtoCalibTu,			&g_Peref),
-	#if NEW_RAZ
-	PrdElemInit(Peref_Key,						&g_Peref), 		//
-	#endif
 	PrdElemInit(Core_ProtectionI2TUpdate,		&g_Core.Protections.I2t)
 
 };
@@ -172,10 +162,6 @@ TPeriodicalFunction Task10Hz[] =        //не более  200-т задач
 {
     PrdElemInit(Peref_Calibration, 			&g_Peref.Position),
 	PrdElemInit(CalcClbCycle, 				&g_Peref.Position),
-#if NEW_RAZ
-	PrdElemInit(Core_MenuUpdate,			&menu),			// 1
-	PrdElemInit(Core_MENU_Display,			&menu),			// 2
-#endif
 	PrdElemInit(g_Ram_Update,				&g_Ram),
 	PrdElemInit(Peref_SpeedCalc,			&g_Peref.Position),
 	PrdElemInit(Peref_LedsUpdate,			&g_Peref.leds),
@@ -188,13 +174,8 @@ TPeriodicalFunction Task10Hz[] =        //не более  200-т задач
 	PrdElemInit(Core_DevProc_FaultIndic,	&g_Core.Protections),
 	PrdElemInit(Core_OnOff_TEN,             &g_Core.Temper),
 	PrdElemInit(TekModbusParamsUpdate,		NULL),				//на 10 √ц
-#if !NEW_RAZ
 	PrdElemInit(Core_DisplayFaultsUpdate,	&g_Core.DisplayFaults),				//на 10 √ц
-#endif
 	PrdElemInit(BlinkBluetoothLed,			&g_Stat.Im),				//на 10 √ц
-#if NEW_RAZ
-	PrdElemInit(DisplayStart,				NULL),	//	20
-#endif
 	PrdElemInit(Core_TechProgon,			NULL),
 
 

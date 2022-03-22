@@ -25,14 +25,11 @@ void Core_DisplayFaultsUpdate(TCoreDislpayFaults *p)
 	if(g_Ram.ramGroupG.Mode)
 	{
 		g_Peref.Display.data = g_Ram.ramGroupG.DisplShow;
-		#if !NEW_RAZ
-	    g_Peref.Display.data = p->Data;
-#endif
 		return;
 	}
 
 	// если нет не одной аварии гасим дисплей
-	if (!g_Ram.ramGroupA.Faults.Dev.all && !g_Ram.ramGroupA.Faults.Proc.all && !g_Ram.ramGroupA.Faults.Net.all && !g_Ram.ramGroupA.Faults.Load.all)
+	if (!g_Ram.ramGroupA.Faults.Dev.all && !g_Ram.ramGroupA.Faults.Proc.all && !g_Ram.ramGroupA.Faults.Net.all && !g_Ram.ramGroupA.Faults.Load.all && !g_Ram.ramGroupA.BCP9Reg.all)
 	{
 		g_Peref.Display.data = 999;
 		p->DisplFaultUnion.Proc.all = 0;
@@ -45,13 +42,14 @@ void Core_DisplayFaultsUpdate(TCoreDislpayFaults *p)
 	}
 //--------------------- если показали все коды и время обнулено то готовы к приему нового пакета данных
 
-	if(p->DisplFaultUnion.Proc.all==0 && p->DisplFaultUnion.Net.all==0 && p->DisplFaultUnion.Dev.all==0 && p->DisplFaultUnion.Load.all==0 && p->DisplFaulstTimer==0)
+	if(p->DisplFaultUnion.Proc.all==0 && p->DisplFaultUnion.Net.all==0 && p->DisplFaultUnion.Dev.all==0 && p->DisplFaultUnion.Load.all==0 && p->DisplFaulstTimer==0 && p->DisplFaultBKP9.all == 0)
 		p->DisplFaultFlag = 0;
 
 //------------------------------------------------------ если готовы к приему то копируем все аварии
 	if (!p->DisplFaultFlag)
 	{
 		p->DisplFaultUnion = g_Ram.ramGroupA.Faults;
+		p->DisplFaultBKP9.all = g_Ram.ramGroupA.BCP9Reg.all;
 		p->DisplFaultFlag = 1;
 		p->DisplFaulstTimer = 0;
 	}
@@ -254,6 +252,66 @@ void Core_DisplayFaultsUpdate(TCoreDislpayFaults *p)
 			p->DisplFaultUnion.Dev.bit.LowPower = 0;
 			p->DisplFault = 999;
 		}
+		else if (p->DisplFaultBKP9.bit.Drv_T)
+		{
+			p->DisplFaulstTimer = DISPL_FAULT_TIME;
+			p->DisplFaultBKP9.bit.Drv_T = 0;
+			p->DisplFault = BCP9_DRV_T;
+		}
+		else if (p->DisplFaultBKP9.bit.PosSens)
+				{
+					p->DisplFaulstTimer = DISPL_FAULT_TIME;
+					p->DisplFaultBKP9.bit.PosSens = 0;
+					p->DisplFault = BCP9_POSSENS;
+				}
+		else if (p->DisplFaultBKP9.bit.Memory1)
+				{
+					p->DisplFaulstTimer = DISPL_FAULT_TIME;
+					p->DisplFaultBKP9.bit.Memory1 = 0;
+					p->DisplFault = BCP9_MEMORY1;
+				}
+		else if (p->DisplFaultBKP9.bit.Calibration)
+				{
+					p->DisplFaulstTimer = DISPL_FAULT_TIME;
+					p->DisplFaultBKP9.bit.Calibration = 0;
+					p->DisplFault = BCP9_CALIBRATION;
+				}
+		else if (p->DisplFaultBKP9.bit.RTC)
+				{
+					p->DisplFaulstTimer = DISPL_FAULT_TIME;
+					p->DisplFaultBKP9.bit.RTC = 0;
+					p->DisplFault = BCP9_RTC;
+				}
+		else if (p->DisplFaultBKP9.bit.TSens)
+				{
+					p->DisplFaulstTimer = DISPL_FAULT_TIME;
+					p->DisplFaultBKP9.bit.TSens = 0;
+					p->DisplFault = BCP9_TSENS;
+				}
+		else if (p->DisplFaultBKP9.bit.Th_BCP)
+				{
+					p->DisplFaulstTimer = DISPL_FAULT_TIME;
+					p->DisplFaultBKP9.bit.Th_BCP = 0;
+					p->DisplFault = BCP9_TH;
+				}
+		else if (p->DisplFaultBKP9.bit.Tl_BCP)
+				{
+					p->DisplFaulstTimer = DISPL_FAULT_TIME;
+					p->DisplFaultBKP9.bit.Tl_BCP = 0;
+					p->DisplFault = BCP9_TL;
+				}
+		else if (p->DisplFaultBKP9.bit.Dac)
+				{
+					p->DisplFaulstTimer = DISPL_FAULT_TIME;
+					p->DisplFaultBKP9.bit.Dac = 0;
+					p->DisplFault = BCP9_DAC;
+				}
+		else if (p->DisplFaultBKP9.bit.Memory2)
+				{
+					p->DisplFaulstTimer = DISPL_FAULT_TIME;
+					p->DisplFaultBKP9.bit.Memory2 = 0;
+					p->DisplFault = BCP9_MEMORY2;
+				}
 
 
 }

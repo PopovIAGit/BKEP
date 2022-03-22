@@ -336,7 +336,13 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 	switch (++State)
 	{
 	case 1:  //Muffta
+		if (g_Ram.ramGroupC.BKP91 == 0)
 		p->NoMove.Cfg.bit.Enable = ((g_Core.MotorControl.WorkMode & wmMove) != 0);
+		else
+		{
+			if (g_Ram.ramGroupA.PositionPr == 9999) p->NoMove.Cfg.bit.Enable = 0;
+			else p->NoMove.Cfg.bit.Enable = ((g_Core.MotorControl.WorkMode & wmMove) != 0);
+		}
 		break;
 	case 2:  // Защиты по наряжению
 		Enable = (g_Ram.ramGroupC.Uv != pmOff) && (!p->outDefects.Dev.bit.LowPower) && (!p->outFaults.Net.bit.BvR)&& (!p->outFaults.Net.bit.BvS)&& (!p->outFaults.Net.bit.BvT);						// Понижеие напряжения
@@ -390,9 +396,12 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 	}
 }
 
+
 // Индикация аварий процесса и устройства
 void Core_DevProc_FaultIndic(TCoreProtections *p)
 {
+	if (g_Ram.ramGroupC.BKP91)	p->NoMove.Input = (Int *) &g_Ram.ramGroupA.PositionPr;
+
 	if (p->FaultDelay > 0)
 	{
 		p->FaultDelay--;
@@ -404,10 +413,19 @@ void Core_DevProc_FaultIndic(TCoreProtections *p)
 	p->outDefects.Proc.all &= ~PROC_CALIB_MASK;
 	if (g_Ram.ramGroupC.CalibIndic != pmOff)
 	{
+		if (g_Ram.ramGroupC.BKP91)
+		{
+			p->outDefects.Proc.bit.NoClose = !(g_Ram.ramGroupH.CalibState & csClose);
+			p->outDefects.Proc.bit.NoOpen = !(g_Ram.ramGroupH.CalibState & csOpen);
+			p->outDefects.Proc.bit.NoCalib = !(g_Ram.ramGroupH.CalibState & csCalib);
+		}
+		else
+		{
 		p->outDefects.Proc.bit.NoClose = !(g_Ram.ramGroupH.CalibState & csClose);
 		p->outDefects.Proc.bit.NoOpen = !(g_Ram.ramGroupH.CalibState & csOpen);
 		p->outDefects.Proc.bit.NoCalib = !(g_Ram.ramGroupH.CalibState & csCalib);
-	}
+		}
+		}
 
 	if (g_Ram.ramGroupC.ErrIndic != pmOff)
 	{
@@ -706,7 +724,7 @@ void Core_Protections50HZUpdate2(TCoreProtections *p)
 
 	//-------- Ошибка ТИП БКП ------------------------
 
-	if (g_Ram.ramGroupA.Faults.Dev.bit.NoBCP_Connect == 0  && g_Ram.ramGroupC.DriveType != 0 && !g_Comm.bkpNotConnected)
+	if (g_Ram.ramGroupA.Faults.Dev.bit.NoBCP_Connect == 0  && g_Ram.ramGroupC.DriveType != 0 && !g_Comm.bkpNotConnected && !g_Ram.ramGroupC.BKP91)
 	{
 		p->BcpTypeDubl = g_Ram.ramGroupH.BkpType*2;
 
@@ -912,7 +930,7 @@ void Core_Protections18kHzUpdate(TCoreProtections *p)
 	}
 	else
 		g_Core.Status.bit.Defect = 0;
-	if (p->outFaults.Dev.all || p->outFaults.Load.all || p->outFaults.Net.all || p->outFaults.Proc.all)
+	if (p->outFaults.Dev.all || p->outFaults.Load.all || p->outFaults.Net.all || p->outFaults.Proc.all || g_Ram.ramGroupA.BCP9Reg.all)
 	{
 		g_Core.Status.bit.Fault = 1;
 	}

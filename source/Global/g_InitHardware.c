@@ -230,107 +230,9 @@ void InitGpio(void)
 
 	//входы DIR - направление 1 - выход 0 - вход. DAT - начальное состояние
 
-#if NEW_RAZ
-	//входы DIR - направление 1 - выход 0 - вход. DAT - начальное состояние
-        GpioCtrlRegs.GPADIR.bit.GPIO2 = 0;    //SB_OTMENA
-        GpioDataRegs.GPADAT.bit.GPIO2 = 1;
+	//GpioCtrlRegs.GPADIR.bit.GPIO13	= 0;	//MOD_FAULT
+	//GpioDataRegs.GPADAT.bit.GPIO13	= 0;
 
-        GpioCtrlRegs.GPADIR.bit.GPIO3 = 0;    //SB_VLEVO
-        GpioDataRegs.GPADAT.bit.GPIO3 = 1;
-
-        GpioCtrlRegs.GPADIR.bit.GPIO4 = 0;    //SB_VPRAVO
-        GpioDataRegs.GPADAT.bit.GPIO4 = 1;
-
-        GpioCtrlRegs.GPADIR.bit.GPIO5 = 0;    //SB_VVERH
-        GpioDataRegs.GPADAT.bit.GPIO5 = 1;
-
-        GpioCtrlRegs.GPADIR.bit.GPIO6 = 0;    //SB_VNIZ
-        GpioDataRegs.GPADAT.bit.GPIO6 = 1;
-
-        GpioCtrlRegs.GPADIR.bit.GPIO7 = 0;    //SB_OK
-        GpioDataRegs.GPADAT.bit.GPIO7 = 1;
-
-        GpioCtrlRegs.GPBDIR.bit.GPIO44 = 0;    //CONTACTOR_1
-        GpioDataRegs.GPBDAT.bit.GPIO44 = 0;
-
-        GpioCtrlRegs.GPBDIR.bit.GPIO45 = 0;    //CONTACTOR_2
-        GpioDataRegs.GPBDAT.bit.GPIO45 = 0;
-
-        GpioCtrlRegs.GPBPUD.bit.GPIO46 = 1;
-        GpioCtrlRegs.GPBDIR.bit.GPIO46 = 0;    //кнопка акривации bluetooth
-        GpioDataRegs.GPBDAT.bit.GPIO46 = 0;
-
-        GpioCtrlRegs.GPBPUD.bit.GPIO47 = 1;
-        GpioCtrlRegs.GPBDIR.bit.GPIO47 = 0;    //кнопка сброс аварий
-        GpioDataRegs.GPBDAT.bit.GPIO47 = 0;
-
-	//выходы
-
-        GpioCtrlRegs.GPADIR.bit.GPIO0   = 1;    //ENB_RELE
-        GpioDataRegs.GPADAT.bit.GPIO0   = 1;
-
-        GpioCtrlRegs.GPADIR.bit.GPIO9   = 1;    //CS_RELE
-        GpioDataRegs.GPADAT.bit.GPIO9   = 1;
-
-        GpioCtrlRegs.GPADIR.bit.GPIO10  = 1;    //R1_KONT - управление контактором ЗАКРЫТЬ
-        GpioDataRegs.GPADAT.bit.GPIO10  = 1;
-
-        GpioCtrlRegs.GPADIR.bit.GPIO11  = 1;    //R2_KONT - управление контактором ОТКРЫТЬ
-        GpioDataRegs.GPADAT.bit.GPIO11  = 1;
-
-        GpioCtrlRegs.GPADIR.bit.GPIO12  = 1;    //ON_TY - 24/220
-        GpioDataRegs.GPADAT.bit.GPIO12  = 1;
-
-        GpioCtrlRegs.GPADIR.bit.GPIO29  = 1;    // WORK_DSP_LED
-        GpioDataRegs.GPADAT.bit.GPIO29  = 1;
-
-        GpioCtrlRegs.GPADIR.bit.GPIO30  = 1;    //ON_I_OUT
-        GpioDataRegs.GPADAT.bit.GPIO30  = 0;
-
-        GpioCtrlRegs.GPBDIR.bit.GPIO50  = 1;    //RS485_DIR_SHN - УПП
-        GpioDataRegs.GPBDAT.bit.GPIO50  = 0;
-
-        GpioCtrlRegs.GPBDIR.bit.GPIO51  = 1;    //RS485_DIR_ASU - АСУ
-        GpioDataRegs.GPBDAT.bit.GPIO51  = 0;
-
-        GpioCtrlRegs.GPBDIR.bit.GPIO52  = 1;    //RS485_DIR_BKD - БКД
-        GpioDataRegs.GPBDAT.bit.GPIO52  = 0;
-
-        GpioCtrlRegs.GPBDIR.bit.GPIO53  = 1;    //RS485_DIR_BT  - Bluetooth
-        GpioDataRegs.GPBDAT.bit.GPIO53  = 1;
-
-        GpioCtrlRegs.GPCDIR.bit.GPIO64  = 1;    //CS_IND
-        GpioDataRegs.GPCDAT.bit.GPIO64  = 0;
-
-        GpioCtrlRegs.GPCDIR.bit.GPIO65  = 1;    //ENB_IND
-        GpioDataRegs.GPCDAT.bit.GPIO65  = 1;
-
-        GpioCtrlRegs.GPCDIR.bit.GPIO66  = 1;    //CS_LEDS
-        GpioDataRegs.GPCDAT.bit.GPIO66  = 0;
-
-        GpioCtrlRegs.GPCDIR.bit.GPIO69  = 1;    //ON_DEV
-        GpioDataRegs.GPCDAT.bit.GPIO69  = 0;
-
-        GpioCtrlRegs.GPCDIR.bit.GPIO70  = 1;    //LCD_ON
-        GpioDataRegs.GPCDAT.bit.GPIO70  = 0;
-
-        GpioCtrlRegs.GPCDIR.bit.GPIO78  = 1;    //SC_EEPROM2
-        GpioDataRegs.GPCDAT.bit.GPIO78  = 0;
-
-        GpioCtrlRegs.GPCDIR.bit.GPIO79  = 1;    //SC_EEPROM1
-        GpioDataRegs.GPCDAT.bit.GPIO79  = 0;
-
-        GpioCtrlRegs.GPCDIR.bit.GPIO80  = 1;    //SC_EEPROM1
-        GpioDataRegs.GPCDAT.bit.GPIO80  = 0;
-
-        GpioCtrlRegs.GPCDIR.bit.GPIO81  = 1;    //SC_EEPROM1
-        GpioDataRegs.GPCDAT.bit.GPIO81  = 0;
-
-        GpioCtrlRegs.GPCDIR.bit.GPIO82  = 1;    //SC_EEPROM1
-        GpioDataRegs.GPCDAT.bit.GPIO82  = 0;
-
-
-#else
 	GpioCtrlRegs.GPBDIR.bit.GPIO44	= 0;	//CONTACTOR_1
 	GpioDataRegs.GPBDAT.bit.GPIO44	= 0;
 
@@ -458,7 +360,7 @@ void InitGpio(void)
 
 	GpioCtrlRegs.GPCDIR.bit.GPIO79	= 1;	//SC_EEPROM1
 	GpioDataRegs.GPCDAT.bit.GPIO79	= 0;
-#endif
+
 	EDIS;
 }
 

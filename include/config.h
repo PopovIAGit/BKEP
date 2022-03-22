@@ -40,9 +40,6 @@
 #define F_HSPCLK			(SYSCLK / HSPCLK_DIV)
 #define F_LSPCLK			(SYSCLK / LSPCLK_DIV)
 
-#define ON_BT_LED   0
-#define OFF_BT_LED  1
-
 // Макрос статической проверки, который проверяет истинность выражения "expr"
 // если выражение ложно, макрос выводит сообщение об ошибке во время компиляции
 #define CONCAT2(First, Second) (First ## Second)

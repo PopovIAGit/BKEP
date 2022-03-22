@@ -62,21 +62,18 @@ void Peref_LedsInit(pLeds p, Uns freq)
 
 }
 //--------------------------------------------------------
-Uns BlinkConnect=0;
 void Peref_LedsUpdate(pLeds p)
 {
+
+	Uns BlinkConnect=0;
 
 	if (g_Comm.Bluetooth.State<7) return;
 
 	g_Ram.ramGroupH.BkpIndication.all = 0;
 
-	if(g_Comm.mbAsu.Serial.RsState == 0)
-	{
-		BlinkConnect = 1;
-	}
-	else
-	{
-		BlinkConnect = 0;
+	if (g_Comm.mbAsu.Serial.RsState==0) BlinkConnect=1;
+	else {
+		BlinkConnect=0;
 	}
 	//if (g_Comm.mbBkp.Frame.ConnFlag==1) BlinkConnect++;
 	//if (g_Comm.mbShn.Serial.RsState==0) BlinkConnect++;
@@ -93,19 +90,10 @@ void Peref_LedsUpdate(pLeds p)
 
 	//-------Моргание лампочкой процессора-----------------------------
 	LedTurnOnOff(&p->ledConnect, p->ledConnect.status);
-#if !NEW_RAZ
-	if (BlinkConnect == 1)
-        LED_CONNECT = p->ledConnect.status;
-    else
-        LED_CONNECT = 1;
-
+	if (BlinkConnect==1) LED_CONNECT = p->ledConnect.status;
+	else LED_CONNECT = 1;
 	p->leds.bit.Connect = p->ledConnect.status;
-#else
-	if (BlinkConnect == 1)
-		p->leds.bit.Connect = p->ledConnect.status;
-    else
-    	p->leds.bit.Connect = 1;
-#endif
+
 	// ------Авария----------------------------------------
 	//------------------------------------------------------------------
 	if (*p->pStatus & STATUS_OPENED)						// Если статус - "открыто"
@@ -152,6 +140,9 @@ void Peref_LedsUpdate(pLeds p)
 	else 													// Если статус не "муфта"
 		p->leds.all |= LED_MUFTA_MASK;						// Гасим светодиод
 
+
+
+
 	// ------Авария----------------------------------------
 	if (*p->pStatus & STATUS_FAULT)// Если авария
 	{
@@ -181,37 +172,9 @@ void Peref_LedsUpdate(pLeds p)
 	    p->leds.bit.MuDu = 1;
 	}
 
-#if NEW_RAZ
-  if(g_Core.Protections.outFaults.Proc.bit.MuDuDef)
-        {
-                p->leds.bit.MuDu = 0;
-        }
-        else if(g_Ram.ramGroupB.MuDuSetup == mdOff)
-        {
-                p->leds.bit.MuDu = 1;
-        }
 
-        if (g_Core.Protections.outFaults.Proc.bit.MuDuDef)
-        {
-                g_Ram.ramGroupH.BkpIndication.bit.MuDu = 0;
-        }
-        else if (g_Ram.ramGroupB.MuDuSetup == mdOff)
-        {
-                g_Ram.ramGroupH.BkpIndication.bit.MuDu = 1;
-        }
-        else if (g_Ram.ramGroupB.MuDuSetup != mdOff)
-        {
-                g_Ram.ramGroupH.BkpIndication.bit.MuDu = ~p->leds.bit.MuDu;
-        }
-#endif
+	if(g_Ram.ramGroupG.Mode)	p->leds.all = ~g_Ram.ramGroupG.LedsReg.all;
 
-	if(g_Ram.ramGroupG.Mode)
-        {
-          p->leds.all = ~g_Ram.ramGroupG.LedsReg.all;
-        }
-	else
-	{
-	#if !NEW_RAZ
 	LED_MUFTA	=  p->leds.bit.Mufta;		asm(" RPT #9 || NOP");
 
 	LED_DEFECT	=  p->leds.bit.Defect;		asm(" RPT #9 || NOP");
@@ -258,8 +221,7 @@ void Peref_LedsUpdate(pLeds p)
 	{
 		g_Ram.ramGroupH.BkpIndication.bit.MuDu = ~p->leds.bit.MuDu;
 	}
-	 #endif
-	}
+
 
 	//g_Ram.ramGroupH.BkpIndication.bit.MuDu  = ~p->leds.bit.MuDu;
 	g_Ram.ramGroupH.BkpIndication.bit.Open  = ~p->leds.bit.Open;
@@ -270,9 +232,6 @@ void Peref_LedsUpdate(pLeds p)
 	g_Ram.ramGroupH.BkpIndication.bit.Defect= ~p->leds.bit.Defect;
 	g_Ram.ramGroupH.BkpIndication.bit.Mufta = ~p->leds.bit.Mufta;
 
-#if NEW_RAZ
-	Peref_74HC595UpdateLed(&g_Peref.LedReg, &p->leds);
-#endif
 }
 //--------------------------------------------------------
 
