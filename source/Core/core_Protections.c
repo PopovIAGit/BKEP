@@ -341,7 +341,7 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 		else
 		{
 			if (g_Ram.ramGroupA.PositionPr == 9999) p->NoMove.Cfg.bit.Enable = 0;
-			else p->NoMove.Cfg.bit.Enable = ((g_Core.MotorControl.WorkMode & wmMove) != 0);
+			else p->NoMove.Cfg.bit.Enable = ((g_Core.MotorControl.WorkMode & wmMove) != 0) && (stepMode.stepModeStatus != smsInPause);
 		}
 		break;
 	case 2:  // Защиты по наряжению
@@ -371,7 +371,7 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 
 		break;
 	case 3:  // Защиты по току
-		Enable = (g_Ram.ramGroupC.Phl != pmOff) && (!g_Core.Status.bit.Stop);					// Обрыв выходных фаз (двиг.)
+		Enable = (g_Ram.ramGroupC.Phl != pmOff) && (!g_Core.Status.bit.Stop) && (stepMode.stepModeStatus != smsInPause);	// Обрыв выходных фаз (двиг.)
 		p->breakCurrU.Cfg.bit.Enable = Enable;
 		p->breakCurrV.Cfg.bit.Enable = Enable;
 		p->breakCurrW.Cfg.bit.Enable = Enable;

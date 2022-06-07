@@ -374,6 +374,13 @@ typedef enum {
 	tmHandControl 	= 3		// Ручное управление
 }TTenMode;
 
+// Статус шагового режима
+typedef enum {
+	smsStop 	= 0, 	// Привод остановлен
+	smsMoving	= 1, 	// Привод в движении
+	smsInPause 	= 2		// Привод в паузе
+}TStepModeStatus;
+
 // Структуры для ТЭКовского модбаса
 
 // Регистры ТЭКа

@@ -240,8 +240,11 @@ typedef struct _TRamGroupB
  	TStopMethod		StopMethod;			// B36. 76 Выбор типа торможения (Динамика, Противовключение)
  	Uns				ConductorSection;   // B37. 77 Сечение проводника
  	Uns             ConductorLength;	// B38. 78 Длина проводника
- 	Int				VoltCorr;			// B39.
- 	Uns 			Rsvd[10];			// B40 41 42 43 44 45 46 47 48 49 -49. 77-89
+ 	Int				VoltCorr;			// B39. 79
+ 	Uns				StepMode;			// В40. 80 Шаговый режим. 0 -Выключен; 1 - Включен.
+ 	Uns				StepCount;			// В41. 81 Количество "шагов" при работе в шаговом режиме. Т.е. сколько раз привод остановится при перемещении из крайнего в крайнее
+ 	Uns				StepPauseTime;		// В42. 82 Время паузы после каждого шага.
+ 	Uns 			Rsvd[7];			// B43 44 45 46 47 48 49 -49. 77-89
 } TRamGroupB;
 
 // Группа C (Адрес = 90, Количество = 120) - Заводские параметры
@@ -656,6 +659,8 @@ typedef struct TRam
 
 #define REG_TASK_TIME			GetAdr(ramGroupB.DevTime)
 #define REG_TASK_DATE			GetAdr(ramGroupB.DevDate)
+#define REG_STEP_COUNT			GetAdr(ramGroupB.StepCount)
+#define REG_STEP_PAUSE_TIME		GetAdr(ramGroupB.StepPauseTime)
 
 #define REG_PASSW1_NEW			GetAdr(ramGroupH.Password1)
 #define REG_PASSW2_NEW			GetAdr(ramGroupH.Password2)

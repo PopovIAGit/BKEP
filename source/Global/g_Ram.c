@@ -314,6 +314,10 @@ void RefreshParams(Uns addr)
 			g_Peref.InDigSignalObserver.parSensors.p_UDu_Mpy		= &g_Ram.ramGroupC.p_UDu_Mpy220;
 		}
 	}
+	else if ((addr == REG_STEP_COUNT)||(addr == REG_STEP_PAUSE_TIME))
+	{
+		Core_StepModeInit(&stepMode);
+	}
 }
 //---------------------------------------------------
 Int MinMax3IntValue (Int val1, Int val2, Int val3)

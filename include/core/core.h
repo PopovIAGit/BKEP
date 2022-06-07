@@ -120,6 +120,17 @@ typedef struct {
 
 } TCore;
 
+// Структура для работы с шаговым режимом
+typedef struct {
+	TStepModeStatus	stepModeStatus;		// Статус шагового режима (0 - остановлен; 1 - в движении; 2 - в паузе)
+	Uns 			stepLength;			// Длина шага при движении. Измеряется в % положения калибровки
+	Uns				pauseTimer;			// Таймер для отсчета длительности паузы
+	Uns				pauseTimeout;		// Длительности паузы
+	Uns				absDeltaPos;		// Разница между текущим и базовым положением (абсолютная)
+	Int				positionBase;		// Базовое положение. Это положение, относительно которого отмеряется длина шага.
+	Int				*pCurrentPos;		// Текущее положение электопривода в процентах открытия (указатель на GrA->PositionPr)
+} TStepMode;
+
 //------------------- Глобальные переменные --------------------------------
 extern Uns LVS_flag;
 //------------------- Протатипы функций ------------------------------------
@@ -144,10 +155,13 @@ void Core_ProtectionsBreakRST(TCoreProtections *);
 void Protections_MuffFlag(void);
 
 void Core_TechProgon(void);				// режим тех прогона
+void Core_StepModeInit(TStepMode *);
+void Core_StepModeUpdate(TStepMode *);	// шаговый режим
 
 void Core_PosFixControl(void);
 
 extern TCore g_Core;
+extern TStepMode stepMode;
 extern volatile Uns setTorque;
 #endif // CORE_
 

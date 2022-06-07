@@ -17,6 +17,7 @@ TFM25V10 Eeprom1;
 TFM25V10 Eeprom2;
 
 TCore	g_Core;
+TStepMode stepMode;
 
 Uns PrevPosition = 0;
 Uns DeltaPos = 0;
@@ -54,6 +55,8 @@ void Core_Init(TCore *p)
 
 	p->Status.bit.Stop 				= 1;					// При включение выставляем стоп
 	g_Ram.ramGroupH.ContGroup 		= cgStop;
+
+	Core_StepModeInit(&stepMode);
 }
 
 void Core_PosFixControl(void)
@@ -310,6 +313,8 @@ void StopPowerControl(void)
 
 	}
 
+	stepMode.stepModeStatus = smsStop;
+
 	if (g_Core.Status.bit.Fault)
 	{
 		g_Core.MotorControl.WorkMode = wmStop;  // Переходим в стейт машину стоп
@@ -391,6 +396,10 @@ void StartPowerControl(TValveCmd ControlWord)
 	{
 		g_Ram.ramGroupC.BreakControl = 0;
 
+		if (g_Ram.ramGroupB.StepMode)	// Если активен шаговый режим - запоминаем текущее положение в переменную positionBase
+		{
+			stepMode.stepModeStatus = smsMoving;
+		}
 	}
 }
 
@@ -456,6 +465,7 @@ static void StopMode(void)
 
 	g_Core.Protections.MoveOnFlag 	= 0;
 	g_Core.MotorControl.accelTimer          = 0;		// таймер разгона
+	stepMode.stepModeStatus = smsStop;
 }
 
 static void MoveMode(void)
@@ -493,15 +503,24 @@ static void MoveMode(void)
 	}
 
 		//ToDo Статус выставлять в зависимости от типа штока + добавить сигнал не корректной обратной связи!!!
-	if(g_Peref.phaseOrder.Direction == 1)
+
+	if (!g_Ram.ramGroupB.StepMode) // Если шаговый режим выключен, выставляем статусы "Откр-ся" и "Закр-ся" в зависимости от обратной связи от контакторов
 	{
-	    if (CONTACTOR_1_STATUS && g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
-	    if (CONTACTOR_2_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
+		if(g_Peref.phaseOrder.Direction == 1)
+		{
+			if (CONTACTOR_1_STATUS && g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
+			if (CONTACTOR_2_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
+		}
+		else if(g_Peref.phaseOrder.Direction == -1)
+		{
+			if (CONTACTOR_2_STATUS && g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
+			if (CONTACTOR_1_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
+		}
 	}
-	else if(g_Peref.phaseOrder.Direction == -1)
+	else	// StepMode == 1 // Если включен шаговый режим, то статусы "Откр-ся" и "Закр-ся" не зависят от обратной связи от контакторов
 	{
-	    if (CONTACTOR_2_STATUS && g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
-	    if (CONTACTOR_1_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
+		if (g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
+		if (g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
 	}
 
 
@@ -962,8 +981,61 @@ void Core_TechProgon(void)
     }
 }
 
+// Инициализация шагового режима
+void Core_StepModeInit(TStepMode *p)
+{
+	p->stepModeStatus = smsStop;
+	// Расчитываем длину шага
+	p->stepLength = 1000/g_Ram.ramGroupB.StepCount;    // 1000 это 100.0 % перемещения
+	p->pauseTimer = 0;
+	p->pauseTimeout = g_Ram.ramGroupB.StepPauseTime*Prd10HZ;
+	p->absDeltaPos = 0;
+	p->pCurrentPos = &g_Ram.ramGroupA.PositionPr;
 
+}
 
+// Функция выполнения шагового режима, при перемещении из одного крайнего положения в другое
+void Core_StepModeUpdate(TStepMode *p)	// 10 Hz
+{
+	if (!g_Ram.ramGroupB.StepMode) 				// Если шаговый режим выключен - выходим
+		return;
+
+	if (!g_Ram.ramGroupC.BKP91)					// Шаговый режим активен тольео если БКЭП настроен на работу с ЭПЗР. В противном случае - покидаем функцию
+		return;
+
+    if (g_Ram.ramGroupA.CalibState != csCalib) 	// Без калибровки шаговый режим не работает
+    	return;
+
+    switch (p->stepModeStatus)
+    {
+		case smsStop:
+			p->pauseTimer = 0;
+			p->positionBase = *p->pCurrentPos;
+			break;
+
+		case smsMoving:
+			p->absDeltaPos = abs(p->positionBase - *p->pCurrentPos);	// Расчитываем разницу между текущим и базовым положением
+			if (p->absDeltaPos >= p->stepLength)	// Когда разница станет более длины шага - останавливаемся
+			{
+				p->positionBase = *p->pCurrentPos;	// Запоминаем
+				p->stepModeStatus = smsInPause;		// Переключаемся в режим "пауза"
+				g_Ram.ramGroupH.ContGroup = cgStop;	// Выключаем магнитный пускатель
+			}
+			break;
+
+		case smsInPause:
+			if (p->pauseTimer++ > p->pauseTimeout)
+			{
+				p->pauseTimer = 0;
+				p->positionBase = *p->pCurrentPos;	// Запоминаем
+				p->stepModeStatus = smsMoving;		// Переключаемся в режим "движение"
+				g_Core.MotorControl.WorkMode = wmStart;	// выполняем запуск привода
+			}
+			break;
+
+		default: break;
+    }
+}
 
 
 
