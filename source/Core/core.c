@@ -543,6 +543,15 @@ void Protections_MuffFlag(void)
 		return;
 	}
 
+	// Выклюсаем защиту если это БКП-91 и мы находимся в режиме паузы
+	if ((stepMode.stepModeStatus == smsInPause)&&(g_Ram.ramGroupC.BKP91 == 1))
+	{
+		g_Core.MotorControl.MufTimer = 0;
+		g_Core.MotorControl.MufTimerStart = 0;
+		g_Core.MotorControl.accelTimer = 0;
+		return;
+	}
+
 	if (g_Core.MotorControl.accelTimer < g_Ram.ramGroupB.StartTime*20)
 	{
 		g_Core.MotorControl.accelTimer++;
