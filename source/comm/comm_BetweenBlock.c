@@ -269,7 +269,7 @@ if (g_Ram.ramGroupC.BKP91)
 	if(!bPort->RxPacket.Flag) return;
 		bPort->RxPacket.Flag = 0;
 
-	 g_Ram.ramGroupA.VersionPOBkp 	=  bPort->RxPacket.Data[0] + 5000;
+	 g_Ram.ramGroupA.VersionPOBkp 	=  bPort->RxPacket.Data[0] + 9000;
 	 g_Ram.ramGroupA.PositionPr 	=  bPort->RxPacket.Data[1];
 	 g_Ram.ramGroupA.PositionPr 	|= bPort->RxPacket.Data[2]<<8;
 	 g_Ram.ramGroupH.CalibState 	=  bPort->RxPacket.Data[3]& 0x3;
