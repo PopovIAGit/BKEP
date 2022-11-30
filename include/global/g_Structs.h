@@ -318,7 +318,9 @@ typedef enum {
 	dt15000_D10_T   = 26,
 	dt10000_D12_U2 	= 27,
 	dt4000_G18_U2 	= 28,
-	dt2000_EPZR = 29
+	dt2000_EPZR 	= 29,
+	dt4000_EPZR 	= 30,
+	dtNUM_OF = 31
 }TDriveType;
 
 // ”правление работой защит
