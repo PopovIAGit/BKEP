@@ -80,7 +80,7 @@ void SciMasterConnBetweenBlockInit(TMbBBHandle Port)
 	Port->Params.TimeoutPre  = 20;
 	Port->Params.TimeoutPost = 5;
 	Port->Params.TimeoutConn = CONN_SCALE/100;
-	Port->Params.RetryCount  = 5; // 26.02.2020  ПИА увеличил колличество повторов до 5
+	Port->Params.RetryCount  = 5; // 26.02.2020  ГЏГ€ГЂ ГіГўГҐГ«ГЁГ·ГЁГ« ГЄГ®Г«Г«ГЁГ·ГҐГ±ГІГўГ® ГЇГ®ГўГІГ®Г°Г®Гў Г¤Г® 5
 	Port->Frame.TxDelayTimeout = CONN_SCALE/250;
 	Port->Params.TrEnable    = BkpConnTrEnable;
 
@@ -199,7 +199,7 @@ void SciMasterConnBetweenBlockCommTimer(TMbBBHandle bPort)
 //	g_Ram.ramGroupC.BKP91 = 1;
 if (g_Ram.ramGroupC.BKP91)
 {
-	// передача
+	// ГЇГҐГ°ГҐГ¤Г Г·Г 
 	bPort->TxPacket.Data[4]  = g_Ram.ramGroupC.BreakControl & 0x1;
 	bPort->TxPacket.Data[4] |= (BCP9_Set_close & 0x3) << 1;
 	if (BCP9_Set_close )
@@ -265,11 +265,13 @@ if (g_Ram.ramGroupC.BKP91)
 
 	bPort->TxPacket.Data[7] = g_Peref.Display.data;
 
-	// прием
+	// ГЇГ°ГЁГҐГ¬
 	if(!bPort->RxPacket.Flag) return;
 		bPort->RxPacket.Flag = 0;
 
+
 	 g_Ram.ramGroupA.VersionPOBkp 	=  bPort->RxPacket.Data[0] + 9000;
+
 	 g_Ram.ramGroupA.PositionPr 	=  bPort->RxPacket.Data[1];
 	 g_Ram.ramGroupA.PositionPr 	|= bPort->RxPacket.Data[2]<<8;
 	 g_Ram.ramGroupH.CalibState 	=  bPort->RxPacket.Data[3]& 0x3;
@@ -291,8 +293,8 @@ else
 	g_Ram.ramGroupA.BCP9Reg.all = 0;
 	g_Ram.ramGroupA.TemperED = 0;
 
-	bPort->TxPacket.Data[4]  = g_Ram.ramGroupH.BkpIndication.all;  // индикация светодиодов
-	//bPort->TxPacket.Data[5] = g_Core.Temper.OnOffTEN;			  // управление теном
+	bPort->TxPacket.Data[4]  = g_Ram.ramGroupH.BkpIndication.all;  // ГЁГ­Г¤ГЁГЄГ Г¶ГЁГї Г±ГўГҐГІГ®Г¤ГЁГ®Г¤Г®Гў
+	//bPort->TxPacket.Data[5] = g_Core.Temper.OnOffTEN;			  // ГіГЇГ°Г ГўГ«ГҐГ­ГЁГҐ ГІГҐГ­Г®Г¬
 	bPort->TxPacket.Data[5]  = 0;
 	bPort->TxPacket.Data[5]  = (g_Core.Temper.OnOffTEN)&0x01;
 	bPort->TxPacket.Data[5] |= ((g_Ram.ramGroupA.PositionPr==9999)<<1)&0x02;
@@ -304,10 +306,10 @@ else
 	else
 	{
 		if(g_Ram.ramGroupA.PositionPr <0 ) bPort->TxPacket.Data[6] = 0;
-		else bPort->TxPacket.Data[6] = g_Ram.ramGroupA.PositionPr*0.1;	// положение в %
+		else bPort->TxPacket.Data[6] = g_Ram.ramGroupA.PositionPr*0.1;	// ГЇГ®Г«Г®Г¦ГҐГ­ГЁГҐ Гў %
 	}
 	if (g_Peref.Display.data>=999) bPort->TxPacket.Data[7] = 99;
-	else bPort->TxPacket.Data[7] = g_Peref.Display.data;		// код аварий
+	else bPort->TxPacket.Data[7] = g_Peref.Display.data;		// ГЄГ®Г¤ Г ГўГ Г°ГЁГ©
 
 	if(!bPort->RxPacket.Flag) return;
 	bPort->RxPacket.Flag = 0;
@@ -320,13 +322,13 @@ else
 
     //-----------------------------------------------------------
 
-    //------------------------------------------------------------ // SDV ЦПА
-    // Фильтруем числа 0, 32767 и 65535
+    //------------------------------------------------------------ // SDV Г–ГЏГЂ
+    // Г”ГЁГ«ГјГІГ°ГіГҐГ¬ Г·ГЁГ±Г«Г  0, 32767 ГЁ 65535
     if (BkpEncPostion == 32767 || BkpEncPostion == 65535 || BkpEncPostion == 0)
     {
     	g_Ram.ramGroupH.Position 		= 32767-BkpEncPostionPrev; // Data
     }
-    else	// Все остальное отображаем так, как есть, но помним предыдущее значение
+    else	// Г‚Г±ГҐ Г®Г±ГІГ Г«ГјГ­Г®ГҐ Г®ГІГ®ГЎГ°Г Г¦Г ГҐГ¬ ГІГ ГЄ, ГЄГ ГЄ ГҐГ±ГІГј, Г­Г® ГЇГ®Г¬Г­ГЁГ¬ ГЇГ°ГҐГ¤Г»Г¤ГіГ№ГҐГҐ Г§Г­Г Г·ГҐГ­ГЁГҐ
     {
     	BkpEncPostionPrev = BkpEncPostion;
     	g_Ram.ramGroupH.Position 		= 32767-BkpEncPostion; // Data

@@ -1,9 +1,9 @@
 /*======================================================================
-Имя файла:          core.c
-Автор:
-Версия файла:
-Дата изменения:
-Описание: Работа ЯДРА
+Г€Г¬Гї ГґГ Г©Г«Г :          core.c
+ГЂГўГІГ®Г°:
+Г‚ГҐГ°Г±ГЁГї ГґГ Г©Г«Г :
+Г„Г ГІГ  ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГї:
+ГЋГЇГЁГ±Г Г­ГЁГҐ: ГђГ ГЎГ®ГІГ  ГџГ„ГђГЂ
 ======================================================================*/
 
 #include "core.h"
@@ -23,7 +23,7 @@ Uns PrevPosition = 0;
 Uns DeltaPos = 0;
 Uns PrevTsState = 0;
 
-//выбор микросхем
+//ГўГ»ГЎГ®Г° Г¬ГЁГЄГ°Г®Г±ГµГҐГ¬
 __inline void Eeprom1CsSet(Byte Lev)  {SC_EEPROM1 = !Lev;}
 __inline void Eeprom2CsSet(Byte Lev)  {SC_EEPROM2 = !Lev;}
 
@@ -38,22 +38,22 @@ static void ShnControlErrCheck(void);
 //---------------------------------------------------
 void Core_Init(TCore *p)
 {
-	// Инициализация епром
+	// Г€Г­ГЁГ¶ГЁГ Г«ГЁГ§Г Г¶ГЁГї ГҐГЇГ°Г®Г¬
 	Eeprom1.CsFunc = &Eeprom1CsSet;
 	FM25V10_Init(&Eeprom1);
 	Eeprom2.CsFunc = &Eeprom2CsSet;
 	FM25V10_Init(&Eeprom2);
 
-	// Значения параметров присваиваются
+	// Г‡Г­Г Г·ГҐГ­ГЁГї ГЇГ Г°Г Г¬ГҐГІГ°Г®Гў ГЇГ°ГЁГ±ГўГ ГЁГўГ ГѕГІГ±Гї
 	Core_MenuInit(&p->menu);
 
-	Core_ValveDriveInit(&p->VlvDrvCtrl);	// Управление задвижкой
-	Core_TorqueInit(&p->TorqObs);			// Расчет моментов
-	//Core_CommandsInit(&p->commands);		// Получение команд, настройка калибровки
-	Core_ProtectionsInit(&p->Protections);	// Защиты
+	Core_ValveDriveInit(&p->VlvDrvCtrl);	// Г“ГЇГ°Г ГўГ«ГҐГ­ГЁГҐ Г§Г Г¤ГўГЁГ¦ГЄГ®Г©
+	Core_TorqueInit(&p->TorqObs);			// ГђГ Г±Г·ГҐГІ Г¬Г®Г¬ГҐГ­ГІГ®Гў
+	//Core_CommandsInit(&p->commands);		// ГЏГ®Г«ГіГ·ГҐГ­ГЁГҐ ГЄГ®Г¬Г Г­Г¤, Г­Г Г±ГІГ°Г®Г©ГЄГ  ГЄГ Г«ГЁГЎГ°Г®ГўГЄГЁ
+	Core_ProtectionsInit(&p->Protections);	// Г‡Г Г№ГЁГІГ»
 	Core_DisplayFaultsInit(&p->DisplayFaults);
 
-	p->Status.bit.Stop 				= 1;					// При включение выставляем стоп
+	p->Status.bit.Stop 				= 1;					// ГЏГ°ГЁ ГўГЄГ«ГѕГ·ГҐГ­ГЁГҐ ГўГ»Г±ГІГ ГўГ«ГїГҐГ¬ Г±ГІГ®ГЇ
 	g_Ram.ramGroupH.ContGroup 		= cgStop;
 
 	Core_StepModeInit(&stepMode);
@@ -86,27 +86,27 @@ void Core_PosFixControl(void)
 	PrevTsState = g_Ram.ramGroupA.StateTs.all;
 }
 
-// Функция задания момента в зависимости от положения и направления движения
+// Г”ГіГ­ГЄГ¶ГЁГї Г§Г Г¤Г Г­ГЁГї Г¬Г®Г¬ГҐГ­ГІГ  Гў Г§Г ГўГЁГ±ГЁГ¬Г®Г±ГІГЁ Г®ГІ ГЇГ®Г«Г®Г¦ГҐГ­ГЁГї ГЁ Г­Г ГЇГ°Г ГўГ«ГҐГ­ГЁГї Г¤ГўГЁГ¦ГҐГ­ГЁГї
 void Core_DefineCtrlParams(TCore *p) // 50 hz
 {
-	Int MaxZone, CloseZone, OpenZone;	// максимальный размер зоны, зона открытия, зона закрытия
+	Int MaxZone, CloseZone, OpenZone;	// Г¬Г ГЄГ±ГЁГ¬Г Г«ГјГ­Г»Г© Г°Г Г§Г¬ГҐГ° Г§Г®Г­Г», Г§Г®Г­Г  Г®ГІГЄГ°Г»ГІГЁГї, Г§Г®Г­Г  Г§Г ГЄГ°Г»ГІГЁГї
 
-	if(g_Ram.ramGroupB.ValveType == vtShiber)		// Если задвижка шиберная
+	if(g_Ram.ramGroupB.ValveType == vtShiber)		// Г…Г±Г«ГЁ Г§Г Г¤ГўГЁГ¦ГЄГ  ГёГЁГЎГҐГ°Г­Г Гї
 	{
-		g_Ram.ramGroupB.BreakMode = vtNone;			// всегда работаем без уплотнения
+		g_Ram.ramGroupB.BreakMode = vtNone;			// ГўГ±ГҐГЈГ¤Г  Г°Г ГЎГ®ГІГ ГҐГ¬ ГЎГҐГ§ ГіГЇГ«Г®ГІГ­ГҐГ­ГЁГї
 	}
 
-	MaxZone = (g_Ram.ramGroupA.FullWay >> 1) - 1;	// определяем максимальный размер зон открыто/закрыто
+	MaxZone = (g_Ram.ramGroupA.FullWay >> 1) - 1;	// Г®ГЇГ°ГҐГ¤ГҐГ«ГїГҐГ¬ Г¬Г ГЄГ±ГЁГ¬Г Г«ГјГ­Г»Г© Г°Г Г§Г¬ГҐГ° Г§Г®Г­ Г®ГІГЄГ°Г»ГІГ®/Г§Г ГЄГ°Г»ГІГ®
 
 	CloseZone = g_Ram.ramGroupB.CloseZone;
-	if (CloseZone > MaxZone) CloseZone = MaxZone; // если заданя больше максимума задаем максимум
+	if (CloseZone > MaxZone) CloseZone = MaxZone; // ГҐГ±Г«ГЁ Г§Г Г¤Г Г­Гї ГЎГ®Г«ГјГёГҐ Г¬Г ГЄГ±ГЁГ¬ГіГ¬Г  Г§Г Г¤Г ГҐГ¬ Г¬Г ГЄГ±ГЁГ¬ГіГ¬
 
 	OpenZone = g_Ram.ramGroupB.OpenZone;
-	if (OpenZone > MaxZone) OpenZone = MaxZone;   // если заданя больше максимума задаем максимум
+	if (OpenZone > MaxZone) OpenZone = MaxZone;   // ГҐГ±Г«ГЁ Г§Г Г¤Г Г­Гї ГЎГ®Г«ГјГёГҐ Г¬Г ГЄГ±ГЁГ¬ГіГ¬Г  Г§Г Г¤Г ГҐГ¬ Г¬Г ГЄГ±ГЁГ¬ГіГ¬
 	OpenZone = g_Ram.ramGroupA.FullWay - OpenZone;
 
-	if(!p->MotorControl.RequestDir) p->MotorControl.TorqueSet = 0; // Если не задано необходиоме направление вращения то задние момента 0
-	else if(p->MotorControl.RequestDir > 0)	 // Выставляем задание на момент в зависимости от направления и калибровки
+	if(!p->MotorControl.RequestDir) p->MotorControl.TorqueSet = 0; // Г…Г±Г«ГЁ Г­ГҐ Г§Г Г¤Г Г­Г® Г­ГҐГ®ГЎГµГ®Г¤ГЁГ®Г¬ГҐ Г­Г ГЇГ°Г ГўГ«ГҐГ­ГЁГҐ ГўГ°Г Г№ГҐГ­ГЁГї ГІГ® Г§Г Г¤Г­ГЁГҐ Г¬Г®Г¬ГҐГ­ГІГ  0
+	else if(p->MotorControl.RequestDir > 0)	 // Г‚Г»Г±ГІГ ГўГ«ГїГҐГ¬ Г§Г Г¤Г Г­ГЁГҐ Г­Г  Г¬Г®Г¬ГҐГ­ГІ Гў Г§Г ГўГЁГ±ГЁГ¬Г®Г±ГІГЁ Г®ГІ Г­Г ГЇГ°Г ГўГ«ГҐГ­ГЁГї ГЁ ГЄГ Г«ГЁГЎГ°Г®ГўГЄГЁ
 	{
 		p->MotorControl.TorqueSet = g_Ram.ramGroupB.MoveOpenTorque;
 		p->MotorControl.BreakFlag = 0;
@@ -145,15 +145,15 @@ void Core_DefineCtrlParams(TCore *p) // 50 hz
 		}
 	}
 
-	// пересчитываем задание на момент
+	// ГЇГҐГ°ГҐГ±Г·ГЁГІГ»ГўГ ГҐГ¬ Г§Г Г¤Г Г­ГЁГҐ Г­Г  Г¬Г®Г¬ГҐГ­ГІ
 	p->MotorControl.TorqueSetPr = (Uns)(((LgUns)p->MotorControl.TorqueSet * 100)/p->TorqObs.TorqueMax);
 
 }
 
-// Остановка по калибровке
+// ГЋГ±ГІГ Г­Г®ГўГЄГ  ГЇГ® ГЄГ Г«ГЁГЎГ°Г®ГўГЄГҐ
 void Core_CalibStop (TCore *p)
 {
-	Bool StopFlag = False; // внутенний флаг остановки
+	Bool StopFlag = False; // ГўГ­ГіГІГҐГ­Г­ГЁГ© ГґГ«Г ГЈ Г®Г±ГІГ Г­Г®ГўГЄГЁ
 	LgInt Position = p->VlvDrvCtrl.Valve.Position;
 
 	if (g_Ram.ramGroupC.BKP91)
@@ -162,10 +162,11 @@ void Core_CalibStop (TCore *p)
 
 		if(p->Status.bit.Stop) return;
 
+
 		if((p->MotorControl.RequestDir > 0) && (g_Ram.ramGroupA.PositionPr >= 1000 - g_Ram.ramGroupC.BreakZone)) StopFlag = True;
 		if((p->MotorControl.RequestDir < 0) && (g_Ram.ramGroupA.PositionPr <= 0 + g_Ram.ramGroupC.BreakZone)) StopFlag = True;
 
-				if (StopFlag)	// Если пора останавливаться
+				if (StopFlag)	// Г…Г±Г«ГЁ ГЇГ®Г°Г  Г®Г±ГІГ Г­Г ГўГ«ГЁГўГ ГІГјГ±Гї
 				{
 
 							p->MotorControl.CalibStop = 1;
@@ -176,10 +177,11 @@ void Core_CalibStop (TCore *p)
 				}
 
 
+
 	}
 	else
 	{
-		if(p->VlvDrvCtrl.Valve.Position == POS_UNDEF) //Если целевое положение не определено то уходим
+		if(p->VlvDrvCtrl.Valve.Position == POS_UNDEF) //Г…Г±Г«ГЁ Г¶ГҐГ«ГҐГўГ®ГҐ ГЇГ®Г«Г®Г¦ГҐГ­ГЁГҐ Г­ГҐ Г®ГЇГ°ГҐГ¤ГҐГ«ГҐГ­Г® ГІГ® ГіГµГ®Г¤ГЁГ¬
 		{
 			p->MotorControl.TargetPos = POS_UNDEF;
 			return;
@@ -191,10 +193,10 @@ void Core_CalibStop (TCore *p)
 		if((p->MotorControl.RequestDir < 0) && (p->MotorControl.TargetPos <= g_Ram.ramGroupC.BreakZone)) StopFlag = True;
 		if((p->MotorControl.RequestDir > 0) && (p->MotorControl.TargetPos >= -g_Ram.ramGroupC.BreakZone)) StopFlag = True;
 
-		if (StopFlag)	// Если пора останавливаться
+		if (StopFlag)	// Г…Г±Г«ГЁ ГЇГ®Г°Г  Г®Г±ГІГ Г­Г ГўГ«ГЁГўГ ГІГјГ±Гї
 		{
 			if(p->VlvDrvCtrl.Valve.BreakFlag) p->MotorControl.OverWayFlag = 1;	//
-			else	// Если
+			else	// Г…Г±Г«ГЁ
 				{
 					p->MotorControl.CalibStop = 1;
 					Core_ValveDriveStop(&p->VlvDrvCtrl);
@@ -205,7 +207,7 @@ void Core_CalibStop (TCore *p)
 	}
 }
 
-// Управление калибровкой
+// Г“ГЇГ°Г ГўГ«ГҐГ­ГЁГҐ ГЄГ Г«ГЁГЎГ°Г®ГўГЄГ®Г©
 void Core_CalibControl(TCore *p)
 {
 	g_Peref.Position.ResetFlag = !p->Status.bit.Stop;
@@ -216,11 +218,11 @@ void Core_CalibControl(TCore *p)
 		g_Peref.Position.CancelFlag = false;
 	}
 
-	// Зона смещения передается только когда привод в стопе. В движении зона смещения равна нулю
+	// Г‡Г®Г­Г  Г±Г¬ГҐГ№ГҐГ­ГЁГї ГЇГҐГ°ГҐГ¤Г ГҐГІГ±Гї ГІГ®Г«ГјГЄГ® ГЄГ®ГЈГ¤Г  ГЇГ°ГЁГўГ®Г¤ Гў Г±ГІГ®ГЇГҐ. Г‚ Г¤ГўГЁГ¦ГҐГ­ГЁГЁ Г§Г®Г­Г  Г±Г¬ГҐГ№ГҐГ­ГЁГї Г°Г ГўГ­Г  Г­ГіГ«Гѕ
 	g_Ram.ramGroupH.PositionAccTemp = p->Status.bit.Stop ? g_Ram.ramGroupB.PositionAcc : 0;
 
 	if (!g_Ram.ramGroupC.BKP91){
-	p->Status.bit.Closed =/*  p->Status.bit.Stop && */ ((g_Peref.Position.Zone & CLB_CLOSE) != 0); //ToDo !!! ПИА 13.02.2020 пока не съехали с концевика физически не снимаем сигнал.
+	p->Status.bit.Closed =/*  p->Status.bit.Stop && */ ((g_Peref.Position.Zone & CLB_CLOSE) != 0); //ToDo !!! ГЏГ€ГЂ 13.02.2020 ГЇГ®ГЄГ  Г­ГҐ Г±ГєГҐГµГ Г«ГЁ Г± ГЄГ®Г­Г¶ГҐГўГЁГЄГ  ГґГЁГ§ГЁГ·ГҐГ±ГЄГЁ Г­ГҐ Г±Г­ГЁГ¬Г ГҐГ¬ Г±ГЁГЈГ­Г Г«.
 	p->Status.bit.Opened =/*  p->Status.bit.Stop &&  */((g_Peref.Position.Zone & CLB_OPEN)  != 0);
 	}
 	else
@@ -262,7 +264,7 @@ void Core_CalibControl(TCore *p)
 		g_Ram.ramGroupD.CalibReset = 0;
 	}
 
-	// Команда на сброс счетчика циклов
+	// ГЉГ®Г¬Г Г­Г¤Г  Г­Г  Г±ГЎГ°Г®Г± Г±Г·ГҐГІГ·ГЁГЄГ  Г¶ГЁГЄГ«Г®Гў
 	if(g_Ram.ramGroupD.CycleReset != 0 )
 	{
 		if (!p->Status.bit.Stop )
@@ -278,31 +280,31 @@ void Core_CalibControl(TCore *p)
 		g_Ram.ramGroupD.CycleReset = 0;
 	}
 
-	if (IsMemParReady())																	// если есть готовность к записи параметров
+	if (IsMemParReady())																	// ГҐГ±Г«ГЁ ГҐГ±ГІГј ГЈГ®ГІГ®ГўГ­Г®Г±ГІГј ГЄ Г§Г ГЇГЁГ±ГЁ ГЇГ Г°Г Г¬ГҐГІГ°Г®Гў
 	{
-		if (g_Ram.ramGroupH.CycleCnt != p->PrevCycle)										// если счетчик циклов обновился
+		if (g_Ram.ramGroupH.CycleCnt != p->PrevCycle)										// ГҐГ±Г«ГЁ Г±Г·ГҐГІГ·ГЁГЄ Г¶ГЁГЄГ«Г®Гў Г®ГЎГ­Г®ГўГЁГ«Г±Гї
 		{
-			WriteToEeprom(REG_CYCLE_CNT, &g_Ram.ramGroupH.CycleCnt, 1);						// записали параметр счетчик циклов
-			p->PrevCycle = g_Ram.ramGroupH.CycleCnt;										// запомнили записанный параметр, для последующей проверки
+			WriteToEeprom(REG_CYCLE_CNT, &g_Ram.ramGroupH.CycleCnt, 1);						// Г§Г ГЇГЁГ±Г Г«ГЁ ГЇГ Г°Г Г¬ГҐГІГ° Г±Г·ГҐГІГ·ГЁГЄ Г¶ГЁГЄГ«Г®Гў
+			p->PrevCycle = g_Ram.ramGroupH.CycleCnt;										// Г§Г ГЇГ®Г¬Г­ГЁГ«ГЁ Г§Г ГЇГЁГ±Г Г­Г­Г»Г© ГЇГ Г°Г Г¬ГҐГІГ°, Г¤Г«Гї ГЇГ®Г±Г«ГҐГ¤ГіГѕГ№ГҐГ© ГЇГ°Г®ГўГҐГ°ГЄГЁ
 		}
-		else if (g_Ram.ramGroupH.CalibState != g_Ram.ramGroupA.CalibState)					// если состояние калибровки изменилось
+		else if (g_Ram.ramGroupH.CalibState != g_Ram.ramGroupA.CalibState)					// ГҐГ±Г«ГЁ Г±Г®Г±ГІГ®ГїГ­ГЁГҐ ГЄГ Г«ГЁГЎГ°Г®ГўГЄГЁ ГЁГ§Г¬ГҐГ­ГЁГ«Г®Г±Гј
 		{
-			WriteToEeprom(REG_CALIB_STATE, &g_Ram.ramGroupH.CalibState, sizeof(ClbIndication));	// то записали состояние калибровки
+			WriteToEeprom(REG_CALIB_STATE, &g_Ram.ramGroupH.CalibState, sizeof(ClbIndication));	// ГІГ® Г§Г ГЇГЁГ±Г Г«ГЁ Г±Г®Г±ГІГ®ГїГ­ГЁГҐ ГЄГ Г«ГЁГЎГ°Г®ГўГЄГЁ
 			g_Ram.ramGroupA.CalibState = g_Ram.ramGroupH.CalibState;
 		}
 	}
 
-	if (g_Comm.bkpNotConnected)		// Пока связь с БКП отсутствует, статусы "Открыто" и "Закрыто" не формируем
+	if (g_Comm.bkpNotConnected)		// ГЏГ®ГЄГ  Г±ГўГїГ§Гј Г± ГЃГЉГЏ Г®ГІГ±ГіГІГ±ГІГўГіГҐГІ, Г±ГІГ ГІГіГ±Г» "ГЋГІГЄГ°Г»ГІГ®" ГЁ "Г‡Г ГЄГ°Г»ГІГ®" Г­ГҐ ГґГ®Г°Г¬ГЁГ°ГіГҐГ¬
 	{
 		p->Status.bit.Closed = 1;
 		p->Status.bit.Opened = 1;
 	}
 }
 
-// Действия выполняемые при стопе
+// Г„ГҐГ©Г±ГІГўГЁГї ГўГ»ГЇГ®Г«Г­ГїГҐГ¬Г»ГҐ ГЇГ°ГЁ Г±ГІГ®ГЇГҐ
 void StopPowerControl(void)
 {
-	g_Core.Status.bit.Stop 		= 1;	// выставили статус стоп
+	g_Core.Status.bit.Stop 		= 1;	// ГўГ»Г±ГІГ ГўГЁГ«ГЁ Г±ГІГ ГІГіГ± Г±ГІГ®ГЇ
 	g_Core.Status.bit.Opening 	= 0;
 	g_Core.Status.bit.Closing 	= 0;
 	g_Core.Status.bit.Test 		= 0;
@@ -313,11 +315,12 @@ void StopPowerControl(void)
 
 	}
 
+
 	stepMode.stepModeStatus = smsStop;
 
 	if (g_Core.Status.bit.Fault)
 	{
-		g_Core.MotorControl.WorkMode = wmStop;  // Переходим в стейт машину стоп
+		g_Core.MotorControl.WorkMode = wmStop;  // ГЏГҐГ°ГҐГµГ®Г¤ГЁГ¬ Гў Г±ГІГҐГ©ГІ Г¬Г ГёГЁГ­Гі Г±ГІГ®ГЇ
 	}
 	else if (g_Core.MotorControl.CalibStop)
 	{
@@ -338,7 +341,7 @@ void StopPowerControl(void)
 		}
 
 	g_Core.MotorControl.CalibStop = 0;
-	g_Core.VlvDrvCtrl.StartDelay = (Uns)START_DELAY_TIME; // Выставляем задержку перед следующим пуском
+	g_Core.VlvDrvCtrl.StartDelay = (Uns)START_DELAY_TIME; // Г‚Г»Г±ГІГ ГўГ«ГїГҐГ¬ Г§Г Г¤ГҐГ°Г¦ГЄГі ГЇГҐГ°ГҐГ¤ Г±Г«ГҐГ¤ГіГѕГ№ГЁГ¬ ГЇГіГ±ГЄГ®Г¬
 	g_Core.TorqObs.ObsEnable = false;
 	g_Core.Protections.SoftStarterTimer = 0;
 	g_Core.Protections.SoftStarterTimer2 = 0;
@@ -348,13 +351,13 @@ void StopPowerControl(void)
 	g_Core.Protections.VoltErrFlag = 0;
 }
 
-// Действия при пуске
+// Г„ГҐГ©Г±ГІГўГЁГї ГЇГ°ГЁ ГЇГіГ±ГЄГҐ
 void StartPowerControl(TValveCmd ControlWord)
 {
-	//Если КЗ то return
+	//Г…Г±Г«ГЁ ГЉГ‡ ГІГ® return
 	if (g_Ram.ramGroupA.Faults.Load.all & LOAD_SHC_MASK) return;
 
-	// сброс аварий необходимый для пуска
+	// Г±ГЎГ°Г®Г± Г ГўГ Г°ГЁГ© Г­ГҐГ®ГЎГµГ®Г¤ГЁГ¬Г»Г© Г¤Г«Гї ГЇГіГ±ГЄГ 
 	Core_ProtectionsReset(&g_Core.Protections);
 
 	if(g_Core.Protections.outFaults.Dev.all || g_Core.Protections.outFaults.Load.all ||g_Core.Protections.outFaults.Net.all ||g_Core.Protections.outFaults.Proc.all)
@@ -396,19 +399,21 @@ void StartPowerControl(TValveCmd ControlWord)
 	{
 		g_Ram.ramGroupC.BreakControl = 0;
 
-		if (g_Ram.ramGroupB.StepMode)	// Если активен шаговый режим - запоминаем текущее положение в переменную positionBase
+
+		if (g_Ram.ramGroupB.StepMode)	// Г…Г±Г«ГЁ Г ГЄГІГЁГўГҐГ­ ГёГ ГЈГ®ГўГ»Г© Г°ГҐГ¦ГЁГ¬ - Г§Г ГЇГ®Г¬ГЁГ­Г ГҐГ¬ ГІГҐГЄГіГ№ГҐГҐ ГЇГ®Г«Г®Г¦ГҐГ­ГЁГҐ Гў ГЇГҐГ°ГҐГ¬ГҐГ­Г­ГіГѕ positionBase
 		{
 			stepMode.stepModeStatus = smsMoving;
 		}
+
 	}
 }
 
-// Стэйт машина
-void Core_ControlMode(TCore *p) // 50 Гц
+// Г‘ГІГЅГ©ГІ Г¬Г ГёГЁГ­Г 
+void Core_ControlMode(TCore *p) // 50 ГѓГ¶
 {
     p->Status.bit.Mufta = p->Protections.outFaults.Proc.bit.Mufta;
 
-	// выставляем состояние замкнутости контакторов МПО МПЗ
+	// ГўГ»Г±ГІГ ГўГ«ГїГҐГ¬ Г±Г®Г±ГІГ®ГїГ­ГЁГҐ Г§Г Г¬ГЄГ­ГіГІГ®Г±ГІГЁ ГЄГ®Г­ГІГ ГЄГІГ®Г°Г®Гў ГЊГЏГЋ ГЊГЏГ‡
 
     if(p->Status.bit.Stop)
     {
@@ -448,23 +453,23 @@ static void StopMode(void)
 		if (g_Ram.ramGroupATS.State1.bit.ReadyToSwitchOn == 0)
 		{
 			g_Ram.ramGroupATS.Control1.bit.DecelStopReq = 0;
-			g_Core.MotorControl.RequestDir  = 0;		// сбрасываем необходимое направение движения
+			g_Core.MotorControl.RequestDir  = 0;		// Г±ГЎГ°Г Г±Г»ГўГ ГҐГ¬ Г­ГҐГ®ГЎГµГ®Г¤ГЁГ¬Г®ГҐ Г­Г ГЇГ°Г ГўГҐГ­ГЁГҐ Г¤ГўГЁГ¦ГҐГ­ГЁГї
 			g_Core.MotorControl.ShnControlErrTimer = 0;
-			g_Ram.ramGroupA.Torque 			= 0;		// отображаем момент
-			g_Ram.ramGroupH.ContGroup 		= cgStop; 	// Подали команду на стоп контакторам
+			g_Ram.ramGroupA.Torque 			= 0;		// Г®ГІГ®ГЎГ°Г Г¦Г ГҐГ¬ Г¬Г®Г¬ГҐГ­ГІ
+			g_Ram.ramGroupH.ContGroup 		= cgStop; 	// ГЏГ®Г¤Г Г«ГЁ ГЄГ®Г¬Г Г­Г¤Гі Г­Г  Г±ГІГ®ГЇ ГЄГ®Г­ГІГ ГЄГІГ®Г°Г Г¬
 
 		}
 	}
 	else
 	{
-		g_Core.MotorControl.RequestDir  = 0;		// сбрасываем необходимое направение движения
+		g_Core.MotorControl.RequestDir  = 0;		// Г±ГЎГ°Г Г±Г»ГўГ ГҐГ¬ Г­ГҐГ®ГЎГµГ®Г¤ГЁГ¬Г®ГҐ Г­Г ГЇГ°Г ГўГҐГ­ГЁГҐ Г¤ГўГЁГ¦ГҐГ­ГЁГї
 		g_Core.MotorControl.ShnControlErrTimer = 0;
-		g_Ram.ramGroupA.Torque 			= 0;		// отображаем момент
-		g_Ram.ramGroupH.ContGroup 		= cgStop; 	// Подали команду на стоп контакторам
+		g_Ram.ramGroupA.Torque 			= 0;		// Г®ГІГ®ГЎГ°Г Г¦Г ГҐГ¬ Г¬Г®Г¬ГҐГ­ГІ
+		g_Ram.ramGroupH.ContGroup 		= cgStop; 	// ГЏГ®Г¤Г Г«ГЁ ГЄГ®Г¬Г Г­Г¤Гі Г­Г  Г±ГІГ®ГЇ ГЄГ®Г­ГІГ ГЄГІГ®Г°Г Г¬
 	}
 
 	g_Core.Protections.MoveOnFlag 	= 0;
-	g_Core.MotorControl.accelTimer          = 0;		// таймер разгона
+	g_Core.MotorControl.accelTimer          = 0;		// ГІГ Г©Г¬ГҐГ° Г°Г Г§ГЈГ®Г­Г 
 	stepMode.stepModeStatus = smsStop;
 }
 
@@ -472,7 +477,7 @@ static void MoveMode(void)
 {
 //	if (g_Ram.ramGroupC.DriveType == 1)
 //	{
-		//ToDo Убрать или привести к нормальному виду.
+		//ToDo Г“ГЎГ°Г ГІГј ГЁГ«ГЁ ГЇГ°ГЁГўГҐГ±ГІГЁ ГЄ Г­Г®Г°Г¬Г Г«ГјГ­Г®Г¬Гі ГўГЁГ¤Гі.
 		if (g_Ram.ramGroupA.Faults.Net.bit.UvR
 				|| g_Ram.ramGroupA.Faults.Net.bit.UvS
 				|| g_Ram.ramGroupA.Faults.Net.bit.UvT
@@ -490,21 +495,21 @@ static void MoveMode(void)
 		}
 		else
 		{
-			g_Ram.ramGroupA.Torque = g_Core.TorqObs.Indication; // отображаем текущий момент
+			g_Ram.ramGroupA.Torque = g_Core.TorqObs.Indication; // Г®ГІГ®ГЎГ°Г Г¦Г ГҐГ¬ ГІГҐГЄГіГ№ГЁГ© Г¬Г®Г¬ГҐГ­ГІ
 		}
 //	}
 //	else
-//		g_Ram.ramGroupA.Torque = g_Core.TorqObs.Indication; // отображаем текущий момент
+//		g_Ram.ramGroupA.Torque = g_Core.TorqObs.Indication; // Г®ГІГ®ГЎГ°Г Г¦Г ГҐГ¬ ГІГҐГЄГіГ№ГЁГ© Г¬Г®Г¬ГҐГ­ГІ
 
-	// TODO Заплатка для ЭПЦ-15000/20000. На пониженном напряжении отваливаются контакторы. Поэтому если контакторы отвалились в движении - обнуляем таймер разгона
+	// TODO Г‡Г ГЇГ«Г ГІГЄГ  Г¤Г«Гї ГќГЏГ–-15000/20000. ГЌГ  ГЇГ®Г­ГЁГ¦ГҐГ­Г­Г®Г¬ Г­Г ГЇГ°ГїГ¦ГҐГ­ГЁГЁ Г®ГІГўГ Г«ГЁГўГ ГѕГІГ±Гї ГЄГ®Г­ГІГ ГЄГІГ®Г°Г». ГЏГ®ГЅГІГ®Г¬Гі ГҐГ±Г«ГЁ ГЄГ®Г­ГІГ ГЄГІГ®Г°Г» Г®ГІГўГ Г«ГЁГ«ГЁГ±Гј Гў Г¤ГўГЁГ¦ГҐГ­ГЁГЁ - Г®ГЎГ­ГіГ«ГїГҐГ¬ ГІГ Г©Г¬ГҐГ° Г°Г Г§ГЈГ®Г­Г 
 	if (g_Ram.ramGroupA.Faults.Net.bit.BvR && g_Ram.ramGroupA.Faults.Net.bit.BvS && g_Ram.ramGroupA.Faults.Net.bit.BvT)
 	{
-		g_Core.MotorControl.accelTimer = 0; 	// Если все три фазы оборвались, то обнуляем таймер
+		g_Core.MotorControl.accelTimer = 0; 	// Г…Г±Г«ГЁ ГўГ±ГҐ ГІГ°ГЁ ГґГ Г§Г» Г®ГЎГ®Г°ГўГ Г«ГЁГ±Гј, ГІГ® Г®ГЎГ­ГіГ«ГїГҐГ¬ ГІГ Г©Г¬ГҐГ°
 	}
 
-		//ToDo Статус выставлять в зависимости от типа штока + добавить сигнал не корректной обратной связи!!!
+		//ToDo Г‘ГІГ ГІГіГ± ГўГ»Г±ГІГ ГўГ«ГїГІГј Гў Г§Г ГўГЁГ±ГЁГ¬Г®Г±ГІГЁ Г®ГІ ГІГЁГЇГ  ГёГІГ®ГЄГ  + Г¤Г®ГЎГ ГўГЁГІГј Г±ГЁГЈГ­Г Г« Г­ГҐ ГЄГ®Г°Г°ГҐГЄГІГ­Г®Г© Г®ГЎГ°Г ГІГ­Г®Г© Г±ГўГїГ§ГЁ!!!
 
-	if (!g_Ram.ramGroupB.StepMode) // Если шаговый режим выключен, выставляем статусы "Откр-ся" и "Закр-ся" в зависимости от обратной связи от контакторов
+	if (!g_Ram.ramGroupB.StepMode) // Г…Г±Г«ГЁ ГёГ ГЈГ®ГўГ»Г© Г°ГҐГ¦ГЁГ¬ ГўГ»ГЄГ«ГѕГ·ГҐГ­, ГўГ»Г±ГІГ ГўГ«ГїГҐГ¬ Г±ГІГ ГІГіГ±Г» "ГЋГІГЄГ°-Г±Гї" ГЁ "Г‡Г ГЄГ°-Г±Гї" Гў Г§Г ГўГЁГ±ГЁГ¬Г®Г±ГІГЁ Г®ГІ Г®ГЎГ°Г ГІГ­Г®Г© Г±ГўГїГ§ГЁ Г®ГІ ГЄГ®Г­ГІГ ГЄГІГ®Г°Г®Гў
 	{
 		if(g_Peref.phaseOrder.Direction == 1)
 		{
@@ -517,7 +522,7 @@ static void MoveMode(void)
 			if (CONTACTOR_1_STATUS && g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
 		}
 	}
-	else	// StepMode == 1 // Если включен шаговый режим, то статусы "Откр-ся" и "Закр-ся" не зависят от обратной связи от контакторов
+	else	// StepMode == 1 // Г…Г±Г«ГЁ ГўГЄГ«ГѕГ·ГҐГ­ ГёГ ГЈГ®ГўГ»Г© Г°ГҐГ¦ГЁГ¬, ГІГ® Г±ГІГ ГІГіГ±Г» "ГЋГІГЄГ°-Г±Гї" ГЁ "Г‡Г ГЄГ°-Г±Гї" Г­ГҐ Г§Г ГўГЁГ±ГїГІ Г®ГІ Г®ГЎГ°Г ГІГ­Г®Г© Г±ГўГїГ§ГЁ Г®ГІ ГЄГ®Г­ГІГ ГЄГІГ®Г°Г®Гў
 	{
 		if (g_Core.MotorControl.RequestDir > 0)  g_Core.Status.bit.Opening = 1;
 		if (g_Core.MotorControl.RequestDir < 0)  g_Core.Status.bit.Closing = 1;
@@ -535,7 +540,7 @@ static void MoveMode(void)
 
 void Protections_MuffFlag(void)
 {
-	if(g_Core.Status.bit.Stop)				// Выключаем защиту от муфты в стопе
+	if(g_Core.Status.bit.Stop)				// Г‚Г»ГЄГ«ГѕГ·Г ГҐГ¬ Г§Г Г№ГЁГІГі Г®ГІ Г¬ГіГґГІГ» Гў Г±ГІГ®ГЇГҐ
 	{
 		g_Core.MotorControl.MufTimer = 0;
 		g_Core.MotorControl.MufTimerStart = 0;
@@ -543,7 +548,7 @@ void Protections_MuffFlag(void)
 		return;
 	}
 
-	// Выклюсаем защиту если это БКП-91 и мы находимся в режиме паузы
+	// Г‚Г»ГЄГ«ГѕГ±Г ГҐГ¬ Г§Г Г№ГЁГІГі ГҐГ±Г«ГЁ ГЅГІГ® ГЃГЉГЏ-91 ГЁ Г¬Г» Г­Г ГµГ®Г¤ГЁГ¬Г±Гї Гў Г°ГҐГ¦ГЁГ¬ГҐ ГЇГ ГіГ§Г»
 	if ((stepMode.stepModeStatus == smsInPause)&&(g_Ram.ramGroupC.BKP91 == 1))
 	{
 		g_Core.MotorControl.MufTimer = 0;
@@ -565,7 +570,7 @@ void Protections_MuffFlag(void)
 
 			if(g_Core.MotorControl.MufTimerStart >= (80 * g_Ram.ramGroupB.MuffStartTimer))
 			{
-				g_Core.Protections.MuffFlag200Hz = 1;	//  1 выставляем муфту
+				g_Core.Protections.MuffFlag200Hz = 1;	//  1 ГўГ»Г±ГІГ ГўГ«ГїГҐГ¬ Г¬ГіГґГІГі
 			}
 		}
 		else
@@ -584,7 +589,7 @@ void Protections_MuffFlag(void)
 
 			if(g_Core.MotorControl.MufTimer >= (80 * g_Ram.ramGroupB.MuffTimer))
 			{
-				g_Core.Protections.MuffFlag200Hz = 1;	//  1 выставляем муфту
+				g_Core.Protections.MuffFlag200Hz = 1;	//  1 ГўГ»Г±ГІГ ГўГ«ГїГҐГ¬ Г¬ГіГґГІГі
 			}
 		}
 		else
@@ -596,7 +601,7 @@ void Protections_MuffFlag(void)
 
 static void PlugBreakMode(void)
 {
-	g_Ram.ramGroupA.Torque = 0;				// отображаем момент
+	g_Ram.ramGroupA.Torque = 0;				// Г®ГІГ®ГЎГ°Г Г¦Г ГҐГ¬ Г¬Г®Г¬ГҐГ­ГІ
 
 	if (g_Core.MotorControl.PlugBreakTimer > 0) g_Core.MotorControl.PlugBreakTimer--;
 	switch (g_Core.MotorControl.PlugBreakStep)
@@ -739,7 +744,7 @@ void Core_LowPowerControl(TCore *p)
     if (p->Protections.FaultDelay > 0)
 	return;
 
-	// Событие выключения блока----------------------------------------------------
+	// Г‘Г®ГЎГ»ГІГЁГҐ ГўГ»ГЄГ«ГѕГ·ГҐГ­ГЁГї ГЎГ«Г®ГЄГ ----------------------------------------------------
 	if ((g_Ram.ramGroupA.Ur < 60) && (g_Ram.ramGroupA.Us < 60)
 			&& (g_Ram.ramGroupA.Ut < 60))
 	{
@@ -755,7 +760,7 @@ void Core_LowPowerControl(TCore *p)
 
 	ShCState = p->Protections.ShcTmpState & LOAD_SHC_MASK; //p->Protections.outFaults.Load.all & LOAD_SHC_MASK;
 
-	// сброс ложного срабатывания КЗ
+	// Г±ГЎГ°Г®Г± Г«Г®Г¦Г­Г®ГЈГ® Г±Г°Г ГЎГ ГІГ»ГўГ Г­ГЁГї ГЉГ‡
 	if (ShCState && !p->Protections.outDefects.Dev.bit.LowPower)
 	    {
 		if (p->ShcResetTimer++ >= (2 * Prd200HZ))
@@ -766,13 +771,13 @@ void Core_LowPowerControl(TCore *p)
 		    }
 	    }
 
-	// Запись КЗ----------------------------------------------------------------------
+	// Г‡Г ГЇГЁГ±Гј ГЉГ‡----------------------------------------------------------------------
 	if (ShCState && !g_Ram.ramGroupH.ScFaults && p->Protections.outDefects.Dev.bit.LowPower)
 	{
 		if (IsMemParReady())
 		{
 			g_Ram.ramGroupH.ScFaults = ShCState;
-			WriteToEeprom(REG_SHC_FAULT, &g_Ram.ramGroupH.ScFaults, 1);			// то записали состояние КЗ
+			WriteToEeprom(REG_SHC_FAULT, &g_Ram.ramGroupH.ScFaults, 1);			// ГІГ® Г§Г ГЇГЁГ±Г Г«ГЁ Г±Г®Г±ГІГ®ГїГ­ГЁГҐ ГЉГ‡
 		}
 		p->ShcResetTimer = 0;
 	}
@@ -793,13 +798,13 @@ void Core_LowPowerControl(TCore *p)
 	// 3 sec -----------------------------------------------------------------------
 	if (g_Ram.ramGroupB.Sec3Mode)
 	{
-	    if (p->Protections.outDefects.Dev.bit.LowPower)	// Если питание	пропало
+	    if (p->Protections.outDefects.Dev.bit.LowPower)	// Г…Г±Г«ГЁ ГЇГЁГІГ Г­ГЁГҐ	ГЇГ°Г®ГЇГ Г«Г®
 	    {
 		    p->Sec3Timer++;
 		    p->PowerLostFlag = 1;
 		    g_Ram.ramGroupD.ControlWord = vcwStop;
 	    }
-	    else if (p->PowerLostFlag && (!p->Protections.outDefects.Dev.bit.LowPower))	// Если питание вернулось
+	    else if (p->PowerLostFlag && (!p->Protections.outDefects.Dev.bit.LowPower))	// Г…Г±Г«ГЁ ГЇГЁГІГ Г­ГЁГҐ ГўГҐГ°Г­ГіГ«Г®Г±Гј
 	    {
 		    if (p->Sec3Timer < (4 * Prd200HZ))
 		    {
@@ -813,7 +818,7 @@ void Core_LowPowerControl(TCore *p)
 		    p->PowerLostFlag = 0;
 		    p->SaveDirection = 0;
 	    }
-	    else											// Если питание еще не пропало
+	    else											// Г…Г±Г«ГЁ ГЇГЁГІГ Г­ГЁГҐ ГҐГ№ГҐ Г­ГҐ ГЇГ°Г®ГЇГ Г«Г®
 	    {
 		    p->Sec3Timer = 0;
 		    if (p->Status.bit.Closing) p->SaveDirection = vcwClose;
@@ -919,23 +924,23 @@ void Core_MuDuControl(TCore *p)
 void Core_OnOff_TEN(TCoreTemper *t)
 {
 	g_Ram.ramGroupA.TemperBKP = g_Ram.ramGroupH.BKP_Temper + g_Ram.ramGroupC.CorrTemper;
-	if (g_Ram.ramGroupA.TemperBKP >= g_Ram.ramGroupC.TenOffValue) 		// если температура больше температуры выкючения - выключаем = 1
+	if (g_Ram.ramGroupA.TemperBKP >= g_Ram.ramGroupC.TenOffValue) 		// ГҐГ±Г«ГЁ ГІГҐГ¬ГЇГҐГ°Г ГІГіГ°Г  ГЎГ®Г«ГјГёГҐ ГІГҐГ¬ГЇГҐГ°Г ГІГіГ°Г» ГўГ»ГЄГѕГ·ГҐГ­ГЁГї - ГўГ»ГЄГ«ГѕГ·Г ГҐГ¬ = 1
 		t->OnOffTEN = TEN_OFF;
-	else if (g_Ram.ramGroupA.TemperBKP <= g_Ram.ramGroupC.TenOnValue)	// иначе если температура ниже температуры включения - включаем = 0
+	else if (g_Ram.ramGroupA.TemperBKP <= g_Ram.ramGroupC.TenOnValue)	// ГЁГ­Г Г·ГҐ ГҐГ±Г«ГЁ ГІГҐГ¬ГЇГҐГ°Г ГІГіГ°Г  Г­ГЁГ¦ГҐ ГІГҐГ¬ГЇГҐГ°Г ГІГіГ°Г» ГўГЄГ«ГѕГ·ГҐГ­ГЁГї - ГўГЄГ«ГѕГ·Г ГҐГ¬ = 0
 		t->OnOffTEN = TEN_ON ;
 }
 
 void Core_TechProgon(void)
 {
-    static Uns progonDelay = 0,			// Задержка перед пуском, когда привод достигает крайней точки
-	    halfCycle = 0,			// Полцикла (открыто -> закрыто или закрыто -> открыто). Два полцикла равны 1 циклу
-	    stopTimer = 0;			// Таймер задержки снятия режима прогона, если стоп
-    static Byte isComandDone = false;		// Флаг, подана ли команда. Команда должна подаваться только 1 раз из положения закрыто или открыто
+    static Uns progonDelay = 0,			// Г‡Г Г¤ГҐГ°Г¦ГЄГ  ГЇГҐГ°ГҐГ¤ ГЇГіГ±ГЄГ®Г¬, ГЄГ®ГЈГ¤Г  ГЇГ°ГЁГўГ®Г¤ Г¤Г®Г±ГІГЁГЈГ ГҐГІ ГЄГ°Г Г©Г­ГҐГ© ГІГ®Г·ГЄГЁ
+	    halfCycle = 0,			// ГЏГ®Г«Г¶ГЁГЄГ«Г  (Г®ГІГЄГ°Г»ГІГ® -> Г§Г ГЄГ°Г»ГІГ® ГЁГ«ГЁ Г§Г ГЄГ°Г»ГІГ® -> Г®ГІГЄГ°Г»ГІГ®). Г„ГўГ  ГЇГ®Г«Г¶ГЁГЄГ«Г  Г°Г ГўГ­Г» 1 Г¶ГЁГЄГ«Гі
+	    stopTimer = 0;			// Г’Г Г©Г¬ГҐГ° Г§Г Г¤ГҐГ°Г¦ГЄГЁ Г±Г­ГїГІГЁГї Г°ГҐГ¦ГЁГ¬Г  ГЇГ°Г®ГЈГ®Г­Г , ГҐГ±Г«ГЁ Г±ГІГ®ГЇ
+    static Byte isComandDone = false;		// Г”Г«Г ГЈ, ГЇГ®Г¤Г Г­Г  Г«ГЁ ГЄГ®Г¬Г Г­Г¤Г . ГЉГ®Г¬Г Г­Г¤Г  Г¤Г®Г«Г¦Г­Г  ГЇГ®Г¤Г ГўГ ГІГјГ±Гї ГІГ®Г«ГјГЄГ® 1 Г°Г Г§ ГЁГ§ ГЇГ®Г«Г®Г¦ГҐГ­ГЁГї Г§Г ГЄГ°Г»ГІГ® ГЁГ«ГЁ Г®ГІГЄГ°Г»ГІГ®
 
     if (g_Ram.ramGroupC.progonCycles == 0)
 	return;
 
-    if (g_Ram.ramGroupA.Status.bit.Fault || g_Ram.ramGroupA.CalibState != csCalib) 	// Без калибровки режим тестового прогона не работает
+    if (g_Ram.ramGroupA.Status.bit.Fault || g_Ram.ramGroupA.CalibState != csCalib) 	// ГЃГҐГ§ ГЄГ Г«ГЁГЎГ°Г®ГўГЄГЁ Г°ГҐГ¦ГЁГ¬ ГІГҐГ±ГІГ®ГўГ®ГЈГ® ГЇГ°Г®ГЈГ®Г­Г  Г­ГҐ Г°Г ГЎГ®ГІГ ГҐГІ
     {
 	g_Ram.ramGroupC.progonCycles = 0;
 	g_Core.Status.bit.CycleMode = 0;
@@ -951,9 +956,9 @@ void Core_TechProgon(void)
 	if (g_Ram.ramGroupA.Status.bit.Closed || g_Ram.ramGroupA.Status.bit.Opened)
 	{
 	    stopTimer = 0;
-	    if (!isComandDone)			// Если команда еще не была подана
+	    if (!isComandDone)			// Г…Г±Г«ГЁ ГЄГ®Г¬Г Г­Г¤Г  ГҐГ№ГҐ Г­ГҐ ГЎГ»Г«Г  ГЇГ®Г¤Г Г­Г 
 	    {
-		if (progonDelay++ > 150)	// 50 = 5 сек на 10 Гц
+		if (progonDelay++ > 150)	// 50 = 5 Г±ГҐГЄ Г­Г  10 ГѓГ¶
 		{
 		    if (g_Ram.ramGroupC.progonCycles != 0)
 		    {
@@ -961,7 +966,7 @@ void Core_TechProgon(void)
 		    }
 		    isComandDone = true;
 		    progonDelay = 0;
-		    if (++halfCycle == 2) // Два полцикла = один полный цикл
+		    if (++halfCycle == 2) // Г„ГўГ  ГЇГ®Г«Г¶ГЁГЄГ«Г  = Г®Г¤ГЁГ­ ГЇГ®Г«Г­Г»Г© Г¶ГЁГЄГ«
 		    {
 			halfCycle = 0;
 			g_Ram.ramGroupC.progonCycles--;
@@ -977,9 +982,9 @@ void Core_TechProgon(void)
 	else
 	{
 	    isComandDone = false;
-	    if (g_Ram.ramGroupA.Status.bit.Stop) // Если выполнилось это условие, то во время прогона поступила команда "стоп"
+	    if (g_Ram.ramGroupA.Status.bit.Stop) // Г…Г±Г«ГЁ ГўГ»ГЇГ®Г«Г­ГЁГ«Г®Г±Гј ГЅГІГ® ГіГ±Г«Г®ГўГЁГҐ, ГІГ® ГўГ® ГўГ°ГҐГ¬Гї ГЇГ°Г®ГЈГ®Г­Г  ГЇГ®Г±ГІГіГЇГЁГ«Г  ГЄГ®Г¬Г Г­Г¤Г  "Г±ГІГ®ГЇ"
 	    {
-		if (stopTimer++ > 20)	// Снимаем статус режима прогона с задержкой в 2 секунды
+		if (stopTimer++ > 20)	// Г‘Г­ГЁГ¬Г ГҐГ¬ Г±ГІГ ГІГіГ± Г°ГҐГ¦ГЁГ¬Г  ГЇГ°Г®ГЈГ®Г­Г  Г± Г§Г Г¤ГҐГ°Г¦ГЄГ®Г© Гў 2 Г±ГҐГЄГіГ­Г¤Г»
 		{
 		    g_Ram.ramGroupC.progonCycles = 0;
 		    g_Core.Status.bit.CycleMode = 0;
@@ -990,12 +995,12 @@ void Core_TechProgon(void)
     }
 }
 
-// Инициализация шагового режима
+// Г€Г­ГЁГ¶ГЁГ Г«ГЁГ§Г Г¶ГЁГї ГёГ ГЈГ®ГўГ®ГЈГ® Г°ГҐГ¦ГЁГ¬Г 
 void Core_StepModeInit(TStepMode *p)
 {
 	p->stepModeStatus = smsStop;
-	// Расчитываем длину шага
-	p->stepLength = 1000/g_Ram.ramGroupB.StepCount;    // 1000 это 100.0 % перемещения
+	// ГђГ Г±Г·ГЁГІГ»ГўГ ГҐГ¬ Г¤Г«ГЁГ­Гі ГёГ ГЈГ 
+	p->stepLength = 1000/g_Ram.ramGroupB.StepCount;    // 1000 ГЅГІГ® 100.0 % ГЇГҐГ°ГҐГ¬ГҐГ№ГҐГ­ГЁГї
 	p->pauseTimer = 0;
 	p->pauseTimeout = g_Ram.ramGroupB.StepPauseTime*Prd10HZ;
 	p->absDeltaPos = 0;
@@ -1003,16 +1008,16 @@ void Core_StepModeInit(TStepMode *p)
 
 }
 
-// Функция выполнения шагового режима, при перемещении из одного крайнего положения в другое
+// Г”ГіГ­ГЄГ¶ГЁГї ГўГ»ГЇГ®Г«Г­ГҐГ­ГЁГї ГёГ ГЈГ®ГўГ®ГЈГ® Г°ГҐГ¦ГЁГ¬Г , ГЇГ°ГЁ ГЇГҐГ°ГҐГ¬ГҐГ№ГҐГ­ГЁГЁ ГЁГ§ Г®Г¤Г­Г®ГЈГ® ГЄГ°Г Г©Г­ГҐГЈГ® ГЇГ®Г«Г®Г¦ГҐГ­ГЁГї Гў Г¤Г°ГіГЈГ®ГҐ
 void Core_StepModeUpdate(TStepMode *p)	// 10 Hz
 {
-	if (!g_Ram.ramGroupB.StepMode) 				// Если шаговый режим выключен - выходим
+	if (!g_Ram.ramGroupB.StepMode) 				// Г…Г±Г«ГЁ ГёГ ГЈГ®ГўГ»Г© Г°ГҐГ¦ГЁГ¬ ГўГ»ГЄГ«ГѕГ·ГҐГ­ - ГўГ»ГµГ®Г¤ГЁГ¬
 		return;
 
-	if (!g_Ram.ramGroupC.BKP91)					// Шаговый режим активен тольео если БКЭП настроен на работу с ЭПЗР. В противном случае - покидаем функцию
+	if (!g_Ram.ramGroupC.BKP91)					// ГГ ГЈГ®ГўГ»Г© Г°ГҐГ¦ГЁГ¬ Г ГЄГІГЁГўГҐГ­ ГІГ®Г«ГјГҐГ® ГҐГ±Г«ГЁ ГЃГЉГќГЏ Г­Г Г±ГІГ°Г®ГҐГ­ Г­Г  Г°Г ГЎГ®ГІГі Г± ГќГЏГ‡Гђ. Г‚ ГЇГ°Г®ГІГЁГўГ­Г®Г¬ Г±Г«ГіГ·Г ГҐ - ГЇГ®ГЄГЁГ¤Г ГҐГ¬ ГґГіГ­ГЄГ¶ГЁГѕ
 		return;
 
-    if (g_Ram.ramGroupA.CalibState != csCalib) 	// Без калибровки шаговый режим не работает
+    if (g_Ram.ramGroupA.CalibState != csCalib) 	// ГЃГҐГ§ ГЄГ Г«ГЁГЎГ°Г®ГўГЄГЁ ГёГ ГЈГ®ГўГ»Г© Г°ГҐГ¦ГЁГ¬ Г­ГҐ Г°Г ГЎГ®ГІГ ГҐГІ
     	return;
 
     switch (p->stepModeStatus)
@@ -1023,12 +1028,12 @@ void Core_StepModeUpdate(TStepMode *p)	// 10 Hz
 			break;
 
 		case smsMoving:
-			p->absDeltaPos = abs(p->positionBase - *p->pCurrentPos);	// Расчитываем разницу между текущим и базовым положением
-			if (p->absDeltaPos >= p->stepLength)	// Когда разница станет более длины шага - останавливаемся
+			p->absDeltaPos = abs(p->positionBase - *p->pCurrentPos);	// ГђГ Г±Г·ГЁГІГ»ГўГ ГҐГ¬ Г°Г Г§Г­ГЁГ¶Гі Г¬ГҐГ¦Г¤Гі ГІГҐГЄГіГ№ГЁГ¬ ГЁ ГЎГ Г§Г®ГўГ»Г¬ ГЇГ®Г«Г®Г¦ГҐГ­ГЁГҐГ¬
+			if (p->absDeltaPos >= p->stepLength)	// ГЉГ®ГЈГ¤Г  Г°Г Г§Г­ГЁГ¶Г  Г±ГІГ Г­ГҐГІ ГЎГ®Г«ГҐГҐ Г¤Г«ГЁГ­Г» ГёГ ГЈГ  - Г®Г±ГІГ Г­Г ГўГ«ГЁГўГ ГҐГ¬Г±Гї
 			{
-				p->positionBase = *p->pCurrentPos;	// Запоминаем
-				p->stepModeStatus = smsInPause;		// Переключаемся в режим "пауза"
-				g_Ram.ramGroupH.ContGroup = cgStop;	// Выключаем магнитный пускатель
+				p->positionBase = *p->pCurrentPos;	// Г‡Г ГЇГ®Г¬ГЁГ­Г ГҐГ¬
+				p->stepModeStatus = smsInPause;		// ГЏГҐГ°ГҐГЄГ«ГѕГ·Г ГҐГ¬Г±Гї Гў Г°ГҐГ¦ГЁГ¬ "ГЇГ ГіГ§Г "
+				g_Ram.ramGroupH.ContGroup = cgStop;	// Г‚Г»ГЄГ«ГѕГ·Г ГҐГ¬ Г¬Г ГЈГ­ГЁГІГ­Г»Г© ГЇГіГ±ГЄГ ГІГҐГ«Гј
 			}
 			break;
 
@@ -1036,9 +1041,9 @@ void Core_StepModeUpdate(TStepMode *p)	// 10 Hz
 			if (p->pauseTimer++ > p->pauseTimeout)
 			{
 				p->pauseTimer = 0;
-				p->positionBase = *p->pCurrentPos;	// Запоминаем
-				p->stepModeStatus = smsMoving;		// Переключаемся в режим "движение"
-				g_Core.MotorControl.WorkMode = wmStart;	// выполняем запуск привода
+				p->positionBase = *p->pCurrentPos;	// Г‡Г ГЇГ®Г¬ГЁГ­Г ГҐГ¬
+				p->stepModeStatus = smsMoving;		// ГЏГҐГ°ГҐГЄГ«ГѕГ·Г ГҐГ¬Г±Гї Гў Г°ГҐГ¦ГЁГ¬ "Г¤ГўГЁГ¦ГҐГ­ГЁГҐ"
+				g_Core.MotorControl.WorkMode = wmStart;	// ГўГ»ГЇГ®Г«Г­ГїГҐГ¬ Г§Г ГЇГіГ±ГЄ ГЇГ°ГЁГўГ®Г¤Г 
 			}
 			break;
 
