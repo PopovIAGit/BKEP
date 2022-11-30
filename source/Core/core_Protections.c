@@ -1,10 +1,10 @@
 /*======================================================================
- Имя файла:          core_Protections.h
- Автор:				Попов И.А.
- Версия файла:		1.01
- Дата изменения:		10.06.2015
- Описание:
- модуль защит электропривода
+ Г€Г¬Гї ГґГ Г©Г«Г :          core_Protections.h
+ ГЂГўГІГ®Г°:				ГЏГ®ГЇГ®Гў Г€.ГЂ.
+ Г‚ГҐГ°Г±ГЁГї ГґГ Г©Г«Г :		1.01
+ Г„Г ГІГ  ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГї:		10.06.2015
+ ГЋГЇГЁГ±Г Г­ГЁГҐ:
+ Г¬Г®Г¤ГіГ«Гј Г§Г Г№ГЁГІ ГЅГ«ГҐГЄГІГ°Г®ГЇГ°ГЁГўГ®Г¤Г 
  ======================================================================*/
 
 #include "core.h"
@@ -18,16 +18,16 @@ Int TemperM40 = -40;
 Uns tmpTime=0;
 Uns FlagDisconect = 0;
 
-//ToDo добавить нет движения как аварию встроенного датчика положения
+//ToDo Г¤Г®ГЎГ ГўГЁГІГј Г­ГҐГІ Г¤ГўГЁГ¦ГҐГ­ГЁГї ГЄГ ГЄ Г ГўГ Г°ГЁГѕ ГўГ±ГІГ°Г®ГҐГ­Г­Г®ГЈГ® Г¤Г ГІГ·ГЁГЄГ  ГЇГ®Г«Г®Г¦ГҐГ­ГЁГї
 
 void Core_ProtectionsInit(TCoreProtections *p)
 {
-	//---------ЗАЩИТЫ ПРОЦЕССА--------------------------------------------------------
-	//---------Муфта--------------------------------------------------------
+	//---------Г‡ГЂГ™Г€Г’Г› ГЏГђГЋГ–Г…Г‘Г‘ГЂ--------------------------------------------------------
+	//---------ГЊГіГґГІГ --------------------------------------------------------
 
-	// Муфта выставляется в core.c
+	// ГЊГіГґГІГ  ГўГ»Г±ГІГ ГўГ«ГїГҐГІГ±Гї Гў core.c
 
-	//---------Нет Движенния-----------------------------------------------
+	//---------ГЌГҐГІ Г„ГўГЁГ¦ГҐГ­Г­ГЁГї-----------------------------------------------
 
 	p->NoMove.Cfg.all = PRT_CFG_SET(CAN_BE_MUFTA, INP_LESS_LEVEL, NoMove_bit, HYST_OFF);
 	p->NoMove.Input = (Int *) &g_Ram.ramGroupA.Position;
@@ -38,8 +38,8 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->NoMove.Scale = PROTECT_SCALE;
 	p->NoMove.Signal = 0;
 
-	//---------ЗАЩИТЫ ПО НАПРЯЖЕНИЮ---------------------------------------
-	//---------Пониженное напряжение (авария)---------------------------------------
+	//---------Г‡ГЂГ™Г€Г’Г› ГЏГЋ ГЌГЂГЏГђГџГ†Г…ГЌГ€Гћ---------------------------------------
+	//---------ГЏГ®Г­ГЁГ¦ГҐГ­Г­Г®ГҐ Г­Г ГЇГ°ГїГ¦ГҐГ­ГЁГҐ (Г ГўГ Г°ГЁГї)---------------------------------------
 
 	p->underVoltageR.Cfg.all = PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_LESS_LEVEL, UvR_bit, 20);
 	p->underVoltageS.Cfg.all = PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_LESS_LEVEL, UvS_bit, 20);
@@ -69,7 +69,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underVoltageS.Scale = PROTECT_SCALE;
 	p->underVoltageT.Scale = PROTECT_SCALE;
 
-	//---------Пониженное напряжение (неисправность)---------------------------------------
+	//---------ГЏГ®Г­ГЁГ¦ГҐГ­Г­Г®ГҐ Г­Г ГЇГ°ГїГ¦ГҐГ­ГЁГҐ (Г­ГҐГЁГ±ГЇГ°Г ГўГ­Г®Г±ГІГј)---------------------------------------
 
 	p->underDefVoltageR.Cfg.all = PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL, UvR_bit, 20);
 	p->underDefVoltageS.Cfg.all = PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL, UvS_bit, 20);
@@ -99,7 +99,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underDefVoltageS.Scale = PROTECT_SCALE;
 	p->underDefVoltageT.Scale = PROTECT_SCALE;
 
-	//---------Повышенное напряжение (авария)------------------------------------------
+	//---------ГЏГ®ГўГ»ГёГҐГ­Г­Г®ГҐ Г­Г ГЇГ°ГїГ¦ГҐГ­ГЁГҐ (Г ГўГ Г°ГЁГї)------------------------------------------
 	p->overVoltageR.Cfg.all = PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_GREATER_LEVEL, OvR_bit, 20);
 	p->overVoltageS.Cfg.all = PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_GREATER_LEVEL, OvS_bit, 20);
 	p->overVoltageT.Cfg.all = PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_GREATER_LEVEL, OvT_bit, 20);
@@ -128,7 +128,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overVoltageS.Scale = PROTECT_SCALE;
 	p->overVoltageT.Scale = PROTECT_SCALE;
 
-	//---------Повышенное напряжение (неисправность)------------------------------------------
+	//---------ГЏГ®ГўГ»ГёГҐГ­Г­Г®ГҐ Г­Г ГЇГ°ГїГ¦ГҐГ­ГЁГҐ (Г­ГҐГЁГ±ГЇГ°Г ГўГ­Г®Г±ГІГј)------------------------------------------
 	p->overDefVoltageR.Cfg.all = PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL, OvR_bit, 20);
 	p->overDefVoltageS.Cfg.all = PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL, OvS_bit, 20);
 	p->overDefVoltageT.Cfg.all = PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL, OvT_bit, 20);
@@ -157,7 +157,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overDefVoltageS.Scale = PROTECT_SCALE;
 	p->overDefVoltageT.Scale = PROTECT_SCALE;
 
-	//---------Повышенное напряжение на 47% (АВАРИЯ) ------------------------------------------
+	//---------ГЏГ®ГўГ»ГёГҐГ­Г­Г®ГҐ Г­Г ГЇГ°ГїГ¦ГҐГ­ГЁГҐ Г­Г  47% (ГЂГ‚ГЂГђГ€Гџ) ------------------------------------------
 	p->overMax_VoltageR.Cfg.all = PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_GREATER_LEVEL, OvR_max_bit, 20);
 	p->overMax_VoltageS.Cfg.all = PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_GREATER_LEVEL, OvS_max_bit, 20);
 	p->overMax_VoltageT.Cfg.all = PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_GREATER_LEVEL, OvT_max_bit, 20);
@@ -186,7 +186,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overMax_VoltageS.Scale = PROTECT_SCALE;
 	p->overMax_VoltageT.Scale = PROTECT_SCALE;
 
-	//---------Обрыв фаз напряжения (R S T  авария)-----------------------
+	//---------ГЋГЎГ°Г»Гў ГґГ Г§ Г­Г ГЇГ°ГїГ¦ГҐГ­ГЁГї (R S T  Г ГўГ Г°ГЁГї)-----------------------
 	p->breakVoltR.Cfg.all = PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_LESS_LEVEL, BvR_bit, 20);
 	p->breakVoltS.Cfg.all = PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_LESS_LEVEL, BvS_bit, 20);
 	p->breakVoltT.Cfg.all = PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_LESS_LEVEL, BvT_bit, 20);
@@ -214,8 +214,8 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->breakVoltR.Scale = PROTECT_SCALE;
 	p->breakVoltS.Scale = PROTECT_SCALE;
 	p->breakVoltT.Scale = PROTECT_SCALE;
-	//---------ЗАЩИТЫ ПО ТОКУ---------------------------------------------
-	//---------Обрыв фаз по току (U V W неисправность)---------------------------------
+	//---------Г‡ГЂГ™Г€Г’Г› ГЏГЋ Г’ГЋГЉГ“---------------------------------------------
+	//---------ГЋГЎГ°Г»Гў ГґГ Г§ ГЇГ® ГІГ®ГЄГі (U V W Г­ГҐГЁГ±ГЇГ°Г ГўГ­Г®Г±ГІГј)---------------------------------
 	p->breakCurrU.Cfg.all = PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL, PhlU_bit, HYST_OFF);
 	p->breakCurrV.Cfg.all = PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL, PhlV_bit, HYST_OFF);
 	p->breakCurrW.Cfg.all = PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL, PhlW_bit, HYST_OFF);
@@ -247,7 +247,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->breakCurrV.Scale = PROTECT_SCALE;
 	p->breakCurrW.Scale = PROTECT_SCALE;
 
-	//---------Время-токовая перегрузка (авария)-------------------------------------
+	//---------Г‚Г°ГҐГ¬Гї-ГІГ®ГЄГ®ГўГ Гї ГЇГҐГ°ГҐГЈГ°ГіГ§ГЄГ  (Г ГўГ Г°ГЁГї)-------------------------------------
 	p->I2t.Cfg.bit.Hyst = HYST_OFF;
 	p->I2t.Cfg.bit.Num = I2t_bit;
 	p->I2t.InputCurrentMid = &g_Ram.ramGroupH.Imid;
@@ -256,7 +256,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->I2t.Scale = 50;//PROTECT_SCALE;
 	Core_ProtectionI2TInit(&p->I2t);
 
-	//------Короткое замыкание----------------------------------------------
+	//------ГЉГ®Г°Г®ГІГЄГ®ГҐ Г§Г Г¬Г»ГЄГ Г­ГЁГҐ----------------------------------------------
 	p->ShC_U.Cfg.bit.Num = ShCU_bit;
 	p->ShC_V.Cfg.bit.Num = ShCV_bit;
 	p->ShC_W.Cfg.bit.Num = ShCW_bit;
@@ -281,8 +281,8 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->ShC_V.Output = &p->ShcTmpState;	//&p->outFaults.Load.all;
 	p->ShC_W.Output = &p->ShcTmpState;	//&p->outFaults.Load.all;
 
-	//------ДИАГНОСТИКА УСТРОЙСТВА------------------------------------------
-	//------Перегрев блока БКД----------------------------------------------
+	//------Г„Г€ГЂГѓГЌГЋГ‘Г’Г€ГЉГЂ Г“Г‘Г’ГђГЋГ‰Г‘Г’Г‚ГЂ------------------------------------------
+	//------ГЏГҐГ°ГҐГЈГ°ГҐГў ГЎГ«Г®ГЄГ  ГЃГЉГ„----------------------------------------------
 	p->overHeatBCD.Cfg.all = PRT_CFG_SET(CAN_BE_RESETED, INP_GREATER_LEVEL, Th_BCD_bit, 1);
 	p->overHeatBCD.Input = &g_Ram.ramGroupA.Temper;
 	p->overHeatBCD.Output = &p->outDefects.Dev.all;
@@ -291,7 +291,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overHeatBCD.Timeout = &g_Ram.ramGroupC.BvTime;
 	p->overHeatBCD.Scale = PROTECT_SCALE;
 
-	//------Переохлаждение блока БКД----------------------------------------
+	//------ГЏГҐГ°ГҐГ®ГµГ«Г Г¦Г¤ГҐГ­ГЁГҐ ГЎГ«Г®ГЄГ  ГЃГЉГ„----------------------------------------
 	p->underColdBCD.Cfg.all = PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL, Tl_BCD_bit, 1);
 	p->underColdBCD.Input = &g_Ram.ramGroupA.Temper;
 	p->underColdBCD.Output = &p->outDefects.Dev.all;
@@ -300,7 +300,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->underColdBCD.Timeout = &g_Ram.ramGroupC.BvTime;
 	p->underColdBCD.Scale = PROTECT_SCALE;
 
-	//------Перегрев блока БКП----------------------------------------------
+	//------ГЏГҐГ°ГҐГЈГ°ГҐГў ГЎГ«Г®ГЄГ  ГЃГЉГЏ----------------------------------------------
 	p->overHeatBCP.Cfg.all = PRT_CFG_SET(CAN_NOT_BE_RESETED, INP_GREATER_LEVEL, Th_BCP_bit, 1);
 	p->overHeatBCP.Input = &g_Ram.ramGroupA.TemperBKP;
 	p->overHeatBCP.Output = &p->outFaults.Dev.all;
@@ -309,7 +309,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 	p->overHeatBCP.Timeout = &g_Ram.ramGroupC.BvTime;
 	p->overHeatBCP.Scale = PROTECT_SCALE;
 
-	//------Переохлаждение блока БКП----------------------------------------
+	//------ГЏГҐГ°ГҐГ®ГµГ«Г Г¦Г¤ГҐГ­ГЁГҐ ГЎГ«Г®ГЄГ  ГЃГЉГЏ----------------------------------------
 	p->underColdBCP.Cfg.all = PRT_CFG_SET(CAN_BE_RESETED, INP_LESS_LEVEL, Tl_BCP_bit, 1);
 	p->underColdBCP.Input = &g_Ram.ramGroupA.TemperBKP;
 	p->underColdBCP.Output = &p->outDefects.Dev.all;
@@ -324,7 +324,7 @@ void Core_ProtectionsInit(TCoreProtections *p)
 
 }
 
-// Функция включения/выключения защит
+// Г”ГіГ­ГЄГ¶ГЁГї ГўГЄГ«ГѕГ·ГҐГ­ГЁГї/ГўГ»ГЄГ«ГѕГ·ГҐГ­ГЁГї Г§Г Г№ГЁГІ
 void Core_ProtectionsEnable(TCoreProtections *p)
 {
 	static Byte State = 0;
@@ -341,11 +341,12 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 		else
 		{
 			if (g_Ram.ramGroupA.PositionPr == 9999) p->NoMove.Cfg.bit.Enable = 0;
-			else p->NoMove.Cfg.bit.Enable = ((g_Core.MotorControl.WorkMode & wmMove) != 0);
+
+			else p->NoMove.Cfg.bit.Enable = ((g_Core.MotorControl.WorkMode & wmMove) != 0) && (stepMode.stepModeStatus != smsInPause);
 		}
 		break;
-	case 2:  // Защиты по наряжению
-		Enable = (g_Ram.ramGroupC.Uv != pmOff) && (!p->outDefects.Dev.bit.LowPower) && (!p->outFaults.Net.bit.BvR)&& (!p->outFaults.Net.bit.BvS)&& (!p->outFaults.Net.bit.BvT);						// Понижеие напряжения
+	case 2:  // Г‡Г Г№ГЁГІГ» ГЇГ® Г­Г Г°ГїГ¦ГҐГ­ГЁГѕ
+		Enable = (g_Ram.ramGroupC.Uv != pmOff) && (!p->outDefects.Dev.bit.LowPower) && (!p->outFaults.Net.bit.BvR)&& (!p->outFaults.Net.bit.BvS)&& (!p->outFaults.Net.bit.BvT);						// ГЏГ®Г­ГЁГ¦ГҐГЁГҐ Г­Г ГЇГ°ГїГ¦ГҐГ­ГЁГї
 		p->underVoltageR.Cfg.bit.Enable = Enable;
 		p->underVoltageS.Cfg.bit.Enable = Enable;
 		p->underVoltageT.Cfg.bit.Enable = Enable;
@@ -353,7 +354,7 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 		p->underDefVoltageS.Cfg.bit.Enable = Enable;
 		p->underDefVoltageT.Cfg.bit.Enable = Enable;
 
-		Enable = (g_Ram.ramGroupC.Ov != pmOff);						// Повышение напряжения
+		Enable = (g_Ram.ramGroupC.Ov != pmOff);						// ГЏГ®ГўГ»ГёГҐГ­ГЁГҐ Г­Г ГЇГ°ГїГ¦ГҐГ­ГЁГї
 		p->overVoltageR.Cfg.bit.Enable = Enable;
 		p->overVoltageS.Cfg.bit.Enable = Enable;
 		p->overVoltageT.Cfg.bit.Enable = Enable;
@@ -364,40 +365,40 @@ void Core_ProtectionsEnable(TCoreProtections *p)
 		p->overMax_VoltageS.Cfg.bit.Enable = Enable;
 		p->overMax_VoltageT.Cfg.bit.Enable = Enable;
 
-		Enable = (g_Ram.ramGroupC.Bv != pmOff) && (!p->outDefects.Dev.bit.LowPower);						// Обрыв фаз напряжения
+		Enable = (g_Ram.ramGroupC.Bv != pmOff) && (!p->outDefects.Dev.bit.LowPower);						// ГЋГЎГ°Г»Гў ГґГ Г§ Г­Г ГЇГ°ГїГ¦ГҐГ­ГЁГї
 		p->breakVoltR.Cfg.bit.Enable = Enable;
 		p->breakVoltS.Cfg.bit.Enable = Enable;
 		p->breakVoltT.Cfg.bit.Enable = Enable;
 
 		break;
-	case 3:  // Защиты по току
-		Enable = (g_Ram.ramGroupC.Phl != pmOff) && (!g_Core.Status.bit.Stop);					// Обрыв выходных фаз (двиг.)
+	case 3:  // Г‡Г Г№ГЁГІГ» ГЇГ® ГІГ®ГЄГі
+		Enable = (g_Ram.ramGroupC.Phl != pmOff) && (!g_Core.Status.bit.Stop) && (stepMode.stepModeStatus != smsInPause);	// ГЋГЎГ°Г»Гў ГўГ»ГµГ®Г¤Г­Г»Гµ ГґГ Г§ (Г¤ГўГЁГЈ.)
 		p->breakCurrU.Cfg.bit.Enable = Enable;
 		p->breakCurrV.Cfg.bit.Enable = Enable;
 		p->breakCurrW.Cfg.bit.Enable = Enable;
 
-		//Enable = (g_Ram.ramGroupC.ShC != pmOff) && (!g_Core.Status.bit.Stop);					// Короткое замыкание
+		//Enable = (g_Ram.ramGroupC.ShC != pmOff) && (!g_Core.Status.bit.Stop);					// ГЉГ®Г°Г®ГІГЄГ®ГҐ Г§Г Г¬Г»ГЄГ Г­ГЁГҐ
 		Enable = (g_Ram.ramGroupC.ShC != pmOff);
 		p->ShC_U.Cfg.bit.Enable = Enable;
 		p->ShC_V.Cfg.bit.Enable = Enable;
 		p->ShC_W.Cfg.bit.Enable = Enable;
 
-		p->I2t.Cfg.bit.Enable = (g_Ram.ramGroupC.I2t != pmOff) /*&& (!g_Core.Status.bit.Stop)*/;		// ВТЗ
+		p->I2t.Cfg.bit.Enable = (g_Ram.ramGroupC.I2t != pmOff) /*&& (!g_Core.Status.bit.Stop)*/;		// Г‚Г’Г‡
 		break;
-	case 4:  // Защиты устройства
+	case 4:  // Г‡Г Г№ГЁГІГ» ГіГ±ГІГ°Г®Г©Г±ГІГўГ 
 		Enable = g_Ram.ramGroupC.TemperTrack != pmOff;
 		p->overHeatBCD.Cfg.bit.Enable = Enable;
 		p->overHeatBCP.Cfg.bit.Enable = Enable;
 		p->underColdBCD.Cfg.bit.Enable = Enable;
 		p->underColdBCP.Cfg.bit.Enable = Enable;
 
-		State = 0;	// вернулись к истокам
+		State = 0;	// ГўГҐГ°Г­ГіГ«ГЁГ±Гј ГЄ ГЁГ±ГІГ®ГЄГ Г¬
 		break;
 	}
 }
 
 
-// Индикация аварий процесса и устройства
+// Г€Г­Г¤ГЁГЄГ Г¶ГЁГї Г ГўГ Г°ГЁГ© ГЇГ°Г®Г¶ГҐГ±Г±Г  ГЁ ГіГ±ГІГ°Г®Г©Г±ГІГўГ 
 void Core_DevProc_FaultIndic(TCoreProtections *p)
 {
 	if (g_Ram.ramGroupC.BKP91)	p->NoMove.Input = (Int *) &g_Ram.ramGroupA.PositionPr;
@@ -431,12 +432,12 @@ void Core_DevProc_FaultIndic(TCoreProtections *p)
 	{
 		p->outDefects.Dev.bit.Memory1 = Eeprom1.Error;
 		p->outDefects.Dev.bit.Memory2 = Eeprom2.Error;
-		//p->outFaults.Dev.bit.PosSens = 0;	//??? добавить при наличии драйвера
+		//p->outFaults.Dev.bit.PosSens = 0;	//??? Г¤Г®ГЎГ ГўГЁГІГј ГЇГ°ГЁ Г­Г Г«ГЁГ·ГЁГЁ Г¤Г°Г Г©ГўГҐГ°Г 
 		p->outDefects.Dev.bit.Rtc = (Uns) g_Peref.Rtc.Error;
 		p->outDefects.Dev.bit.TSens = (Uns) g_Peref.TSens.Error;
 		p->outDefects.Dev.bit.Dac = (Uns) g_Peref.Dac.Error;
 
-		// Ошибка нет связи с БКП
+		// ГЋГёГЁГЎГЄГ  Г­ГҐГІ Г±ГўГїГ§ГЁ Г± ГЃГЉГЏ
 		if(g_Comm.Bluetooth.ModeProtocol != 2 && p->outFaults.Dev.bit.NoBCP_Connect == 0)
 		{
 			if(g_Comm.mbBkp.Frame.ConnFlagCount == 0)
@@ -480,7 +481,7 @@ void Core_DevProc_FaultIndic(TCoreProtections *p)
 
 void EngPhOrdPrt(TCoreProtections *p)
 {
-	static Bool Flag = False;          // флаг для единичной проверки прав?е?льности чередования фазы
+	static Bool Flag = False;          // ГґГ«Г ГЈ Г¤Г«Гї ГҐГ¤ГЁГ­ГЁГ·Г­Г®Г© ГЇГ°Г®ГўГҐГ°ГЄГЁ ГЇГ°Г Гў?ГҐ?Г«ГјГ­Г®Г±ГІГЁ Г·ГҐГ°ГҐГ¤Г®ГўГ Г­ГЁГї ГґГ Г§Г»
 	static LgUns StartPos;
 	static Uns Timer = 0;
 	static Int EngPhOrdValue = 0;
@@ -522,11 +523,11 @@ void EngPhOrdPrt(TCoreProtections *p)
 	}
 }
 
-// Сброс защит при пуске
+// Г‘ГЎГ°Г®Г± Г§Г Г№ГЁГІ ГЇГ°ГЁ ГЇГіГ±ГЄГҐ
 void Core_ProtectionsReset(TCoreProtections *p)
 {
-	g_Core.MotorControl.OverWayFlag = 0;		// Сбросили отсусвие уплотнения
-//	p->MuffFlag = 0;							// отчистили статус от аварии муфты и неисправености
+	g_Core.MotorControl.OverWayFlag = 0;		// Г‘ГЎГ°Г®Г±ГЁГ«ГЁ Г®ГІГ±ГіГ±ГўГЁГҐ ГіГЇГ«Г®ГІГ­ГҐГ­ГЁГї
+//	p->MuffFlag = 0;							// Г®ГІГ·ГЁГ±ГІГЁГ«ГЁ Г±ГІГ ГІГіГ± Г®ГІ Г ГўГ Г°ГЁГЁ Г¬ГіГґГІГ» ГЁ Г­ГҐГЁГ±ГЇГ°Г ГўГҐГ­Г®Г±ГІГЁ
 //	p->outFaults.Proc.bit.Mufta = 0;
 	g_Core.Status.bit.Defect = 0;
 	//g_Core.Status.bit.Fault = 0;
@@ -552,13 +553,13 @@ void Core_ProtectionsReset(TCoreProtections *p)
 //	p->outFaults.Proc.bit.NoMove = 0;
 }
 
-// Сброс всех защит
+// Г‘ГЎГ°Г®Г± ГўГ±ГҐГµ Г§Г Г№ГЁГІ
 void Core_ProtectionsClear(TCoreProtections *p)
 {
 	Uns MuffAddr, TH_BCP_addr;
 
 	tmpTime=0;
-	g_Core.MotorControl.OverWayFlag = 0;		// Сбросили отсусвие уплотнения
+	g_Core.MotorControl.OverWayFlag = 0;		// Г‘ГЎГ°Г®Г±ГЁГ«ГЁ Г®ГІГ±ГіГ±ГўГЁГҐ ГіГЇГ«Г®ГІГ­ГҐГ­ГЁГї
 
 	g_Core.Protections.MuffFlag200Hz = 0;
 
@@ -588,12 +589,12 @@ void Core_ProtectionsClear(TCoreProtections *p)
 	p->outFaults.Dev.bit.NoBCP_Connect = 0;
 	p->BCPConTimer = 0;
 
-	p->outFaults.Dev.all = 0;					// сбросили все аварии
+	p->outFaults.Dev.all = 0;					// Г±ГЎГ°Г®Г±ГЁГ«ГЁ ГўГ±ГҐ Г ГўГ Г°ГЁГЁ
 	p->outFaults.Net.all = 0;
 	p->outFaults.Load.all = 0;
 	p->outFaults.Proc.all = 0;
 
-	p->outDefects.Dev.all = 0;					// сбросили все неисправности
+	p->outDefects.Dev.all = 0;					// Г±ГЎГ°Г®Г±ГЁГ«ГЁ ГўГ±ГҐ Г­ГҐГЁГ±ГЇГ°Г ГўГ­Г®Г±ГІГЁ
 	p->outDefects.Net.all = 0;
 	p->outDefects.Load.all = 0;
 	p->registerBrCurr = 0;
@@ -601,7 +602,7 @@ void Core_ProtectionsClear(TCoreProtections *p)
 	p->outDefects.Proc.all = 0;
 
 
-	/* ??? сброс ошибок памяти энкодера и ДТ
+	/* ??? Г±ГЎГ°Г®Г± Г®ГёГЁГЎГ®ГЄ ГЇГ Г¬ГїГІГЁ ГЅГ­ГЄГ®Г¤ГҐГ°Г  ГЁ Г„Г’
 	 Encoder.Error  = False;
 	 Eeprom1.Error  = False;
 	 Eeprom2.Error  = False;
@@ -620,34 +621,34 @@ void Core_Protections50HZUpdate(TCoreProtections *p)
 	if (p->FaultDelay > 0)
 		return;
 
-	if (p->registerBrVolt)  // Если имеются неисправности по обрыву фаз питания (в движении)
+	if (p->registerBrVolt)  // Г…Г±Г«ГЁ ГЁГ¬ГҐГѕГІГ±Гї Г­ГҐГЁГ±ГЇГ°Г ГўГ­Г®Г±ГІГЁ ГЇГ® Г®ГЎГ°Г»ГўГі ГґГ Г§ ГЇГЁГІГ Г­ГЁГї (Гў Г¤ГўГЁГ¦ГҐГ­ГЁГЁ)
 	{
-		if (p->registerBrCurr)  // Если вместе с тем имеются неисправности по обрыву фаз двигателя
+		if (p->registerBrCurr)  // Г…Г±Г«ГЁ ГўГ¬ГҐГ±ГІГҐ Г± ГІГҐГ¬ ГЁГ¬ГҐГѕГІГ±Гї Г­ГҐГЁГ±ГЇГ°Г ГўГ­Г®Г±ГІГЁ ГЇГ® Г®ГЎГ°Г»ГўГі ГґГ Г§ Г¤ГўГЁГЈГ ГІГҐГ«Гї
 		{
-			p->outDefects.Net.all = (p->outDefects.Net.all & ~NET_BV_MASK) | p->registerBrVolt;  // то выставляем обрыв фаз питания
+			p->outDefects.Net.all = (p->outDefects.Net.all & ~NET_BV_MASK) | p->registerBrVolt;  // ГІГ® ГўГ»Г±ГІГ ГўГ«ГїГҐГ¬ Г®ГЎГ°Г»Гў ГґГ Г§ ГЇГЁГІГ Г­ГЁГї
 			p->outDefects.Load.all &= ~LOAD_PHL_MASK;
 		}
 		else
-			// Если обрыва фаз двигателя не наблюдается
+			// Г…Г±Г«ГЁ Г®ГЎГ°Г»ГўГ  ГґГ Г§ Г¤ГўГЁГЈГ ГІГҐГ«Гї Г­ГҐ Г­Г ГЎГ«ГѕГ¤Г ГҐГІГ±Гї
 			p->outDefects.Net.all &= ~NET_BV_MASK;
 	}
-	else					// Если неисправность по обрыву фаз отсутствует
+	else					// Г…Г±Г«ГЁ Г­ГҐГЁГ±ГЇГ°Г ГўГ­Г®Г±ГІГј ГЇГ® Г®ГЎГ°Г»ГўГі ГґГ Г§ Г®ГІГ±ГіГІГ±ГІГўГіГҐГІ
 	{
 		p->outDefects.Load.all = (p->outDefects.Load.all & ~LOAD_PHL_MASK) | p->registerBrCurr;
 		p->outDefects.Net.all &= ~NET_BV_MASK;
 	}
 
 	if (p->outFaults.Net.bit.BvR & p->outDefects.Net.bit.UvR)
-		p->outDefects.Net.bit.UvR = 0;  // Если сработала авария по обрыву, неисправность "пониженное напр." не выставляем
+		p->outDefects.Net.bit.UvR = 0;  // Г…Г±Г«ГЁ Г±Г°Г ГЎГ®ГІГ Г«Г  Г ГўГ Г°ГЁГї ГЇГ® Г®ГЎГ°Г»ГўГі, Г­ГҐГЁГ±ГЇГ°Г ГўГ­Г®Г±ГІГј "ГЇГ®Г­ГЁГ¦ГҐГ­Г­Г®ГҐ Г­Г ГЇГ°." Г­ГҐ ГўГ»Г±ГІГ ГўГ«ГїГҐГ¬
 	if (p->outFaults.Net.bit.BvS & p->outDefects.Net.bit.UvS)
 		p->outDefects.Net.bit.UvS = 0;
 	if (p->outFaults.Net.bit.BvT & p->outDefects.Net.bit.UvT)
 		p->outDefects.Net.bit.UvT = 0;
 
-	if (prevStatus != g_Ram.ramGroupA.Status.bit.Stop) // По переходу из "движения" в "стоп" и обратно
+	if (prevStatus != g_Ram.ramGroupA.Status.bit.Stop) // ГЏГ® ГЇГҐГ°ГҐГµГ®Г¤Гі ГЁГ§ "Г¤ГўГЁГ¦ГҐГ­ГЁГї" Гў "Г±ГІГ®ГЇ" ГЁ Г®ГЎГ°Г ГІГ­Г®
 	{
-		prevStatus = g_Ram.ramGroupA.Status.bit.Stop; // переинициализируем защиту по обрыву питающих фаз как аварию или как неисправность
-		if (g_Ram.ramGroupA.Status.bit.Stop == 1)		// Если в СТОПе
+		prevStatus = g_Ram.ramGroupA.Status.bit.Stop; // ГЇГҐГ°ГҐГЁГ­ГЁГ¶ГЁГ Г«ГЁГ§ГЁГ°ГіГҐГ¬ Г§Г Г№ГЁГІГі ГЇГ® Г®ГЎГ°Г»ГўГі ГЇГЁГІГ ГѕГ№ГЁГµ ГґГ Г§ ГЄГ ГЄ Г ГўГ Г°ГЁГѕ ГЁГ«ГЁ ГЄГ ГЄ Г­ГҐГЁГ±ГЇГ°Г ГўГ­Г®Г±ГІГј
+		if (g_Ram.ramGroupA.Status.bit.Stop == 1)		// Г…Г±Г«ГЁ Гў Г‘Г’ГЋГЏГҐ
 		{
 			if (g_Ram.ramGroupB.StopMethod != smDynBreak)
 			{
@@ -663,7 +664,7 @@ void Core_Protections50HZUpdate(TCoreProtections *p)
 				p->breakVoltS.EnableLevel = (Int *) &g_Ram.ramGroupC.BvLevel;
 				p->breakVoltT.EnableLevel = (Int *) &g_Ram.ramGroupC.BvLevel;
 
-				if (p->outDefects.Net.all & NET_BV_MASK) // Если имеется неисправность по обрыву, превращаем неисправность в аварию
+				if (p->outDefects.Net.all & NET_BV_MASK) // Г…Г±Г«ГЁ ГЁГ¬ГҐГҐГІГ±Гї Г­ГҐГЁГ±ГЇГ°Г ГўГ­Г®Г±ГІГј ГЇГ® Г®ГЎГ°Г»ГўГі, ГЇГ°ГҐГўГ°Г Г№Г ГҐГ¬ Г­ГҐГЁГ±ГЇГ°Г ГўГ­Г®Г±ГІГј Гў Г ГўГ Г°ГЁГѕ
 				{
 					p->outFaults.Net.all =	(p->outFaults.Net.all & ~ NET_BV_MASK) | (p->outDefects.Net.all & NET_BV_MASK);
 					p->outDefects.Net.all &= ~NET_BV_MASK;
@@ -686,7 +687,7 @@ void Core_Protections50HZUpdate(TCoreProtections *p)
 					p->breakVoltS.EnableLevel = (Int *) &g_Ram.ramGroupC.BvLevel;
 					p->breakVoltT.EnableLevel =	(Int *) &g_Ram.ramGroupC.BvLevel;
 
-					if (p->outDefects.Net.all & NET_BV_MASK) // Если имеется неисправность по обрыву, превращаем неисправность в аварию
+					if (p->outDefects.Net.all & NET_BV_MASK) // Г…Г±Г«ГЁ ГЁГ¬ГҐГҐГІГ±Гї Г­ГҐГЁГ±ГЇГ°Г ГўГ­Г®Г±ГІГј ГЇГ® Г®ГЎГ°Г»ГўГі, ГЇГ°ГҐГўГ°Г Г№Г ГҐГ¬ Г­ГҐГЁГ±ГЇГ°Г ГўГ­Г®Г±ГІГј Гў Г ГўГ Г°ГЁГѕ
 					{
 						p->outFaults.Net.all = (p->outFaults.Net.all & ~ NET_BV_MASK)| (p->outDefects.Net.all & NET_BV_MASK);
 						p->outDefects.Net.all &= ~NET_BV_MASK;
@@ -722,17 +723,17 @@ void Core_Protections50HZUpdate2(TCoreProtections *p)
 	if (p->FaultDelay > 0)
 		return;
 
-	//-------- Ошибка ТИП БКП ------------------------
+	//-------- ГЋГёГЁГЎГЄГ  Г’Г€ГЏ ГЃГЉГЏ ------------------------
 
 	if (g_Ram.ramGroupA.Faults.Dev.bit.NoBCP_Connect == 0  && g_Ram.ramGroupC.DriveType != 0 && !g_Comm.bkpNotConnected && !g_Ram.ramGroupC.BKP91)
 	{
 		p->BcpTypeDubl = g_Ram.ramGroupH.BkpType*2;
 
-		if ((Uns)g_Ram.ramGroupC.DriveType == 27) // ЭПЦ-10000 Д.12 с Уфимским движком(27-й по счету) - это ЭПЦ-10000
+		if ((Uns)g_Ram.ramGroupC.DriveType == 27) // ГќГЏГ–-10000 Г„.12 Г± Г“ГґГЁГ¬Г±ГЄГЁГ¬ Г¤ГўГЁГ¦ГЄГ®Г¬(27-Г© ГЇГ® Г±Г·ГҐГІГі) - ГЅГІГ® ГќГЏГ–-10000
 		{
 			BCPDriveType = 10;
 		}
-		else if ((Uns)g_Ram.ramGroupC.DriveType == 28) // ЭПЦ-10000 Д.12 с Уфимским движком(27-й по счету) - это ЭПЦ-10000
+		else if ((Uns)g_Ram.ramGroupC.DriveType == 28) // ГќГЏГ–-10000 Г„.12 Г± Г“ГґГЁГ¬Г±ГЄГЁГ¬ Г¤ГўГЁГ¦ГЄГ®Г¬(27-Г© ГЇГ® Г±Г·ГҐГІГі) - ГЅГІГ® ГќГЏГ–-10000
 				{
 					BCPDriveType = 8;
 				}
@@ -758,16 +759,16 @@ void Core_Protections50HZUpdate2(TCoreProtections *p)
 		else p->BcpTypeTimer = 0;
 	}
 		//----------------------------------------
-		//------------ Ошибка УПП -------------------------------
+		//------------ ГЋГёГЁГЎГЄГ  Г“ГЏГЏ -------------------------------
 
 		if (g_Ram.ramGroupB.StopMethod == smDynBreak)
 		{
 			if ((g_Ram.ramGroupATS.State1.all & 0xFF) == 0x27)
 			{
-				p->MoveOnFlag = 1; // флаг что запустились
+				p->MoveOnFlag = 1; // ГґГ«Г ГЈ Г·ГІГ® Г§Г ГЇГіГ±ГІГЁГ«ГЁГ±Гј
 			}
 
-			// Если с УПП пришел бит "авария" && Висит флаг, что движение начато && Связь с УПП присутствует
+			// Г…Г±Г«ГЁ Г± Г“ГЏГЏ ГЇГ°ГЁГёГҐГ« ГЎГЁГІ "Г ГўГ Г°ГЁГї" && Г‚ГЁГ±ГЁГІ ГґГ«Г ГЈ, Г·ГІГ® Г¤ГўГЁГ¦ГҐГ­ГЁГҐ Г­Г Г·Г ГІГ® && Г‘ГўГїГ§Гј Г± Г“ГЏГЏ ГЇГ°ГЁГ±ГіГІГ±ГІГўГіГҐГІ
 			if(g_Ram.ramGroupATS.State1.bit.Malfunction == 1 && p->MoveOnFlag == 1 && g_Comm.mbShn.Stat.Status.bit.NoConnect == 0)
 			{
 				//
@@ -844,7 +845,7 @@ void Core_Protections50HZUpdate2(TCoreProtections *p)
 				p->VoltErrFlag = 0;
 			}
 		}
-		//----------------Замена батарейки!!!----------------------
+		//----------------Г‡Г Г¬ГҐГ­Г  ГЎГ ГІГ Г°ГҐГ©ГЄГЁ!!!----------------------
 
 		if(g_Ram.ramGroupB.DevDate.bit.Year == 0 && g_Ram.ramGroupB.DevTime.bit.Hour == 0)
 		{
@@ -861,17 +862,17 @@ void Core_Protections50HZUpdate2(TCoreProtections *p)
 		{
 			BatteryLowHideDataReg = REG_BATTERY_FAULT;
 			g_Ram.ramGroupH.HideDate.all = g_Ram.ramGroupB.DevDate.all;
-			WriteToEeprom(BatteryLowHideDataReg, &g_Ram.ramGroupH.HideDate, 1);	// то записали состояние КЗ
+			WriteToEeprom(BatteryLowHideDataReg, &g_Ram.ramGroupH.HideDate, 1);	// ГІГ® Г§Г ГЇГЁГ±Г Г«ГЁ Г±Г®Г±ГІГ®ГїГ­ГЁГҐ ГЉГ‡
 		}
 	}
 
-	if (g_Ram.ramGroupB.DevDate.bit.Year == 0 && g_Ram.ramGroupH.HideDate.all != 0)  // если часы сбросились но записанно - стираем
+	if (g_Ram.ramGroupB.DevDate.bit.Year == 0 && g_Ram.ramGroupH.HideDate.all != 0)  // ГҐГ±Г«ГЁ Г·Г Г±Г» Г±ГЎГ°Г®Г±ГЁГ«ГЁГ±Гј Г­Г® Г§Г ГЇГЁГ±Г Г­Г­Г® - Г±ГІГЁГ°Г ГҐГ¬
 	{
 		if (IsMemParReady())
 		{
 			BatteryLowHideDataReg = REG_BATTERY_FAULT;
 			g_Ram.ramGroupH.HideDate.all = 0;
-			WriteToEeprom(BatteryLowHideDataReg, &g_Ram.ramGroupH.HideDate, 1);	// то записали состояние КЗ
+			WriteToEeprom(BatteryLowHideDataReg, &g_Ram.ramGroupH.HideDate, 1);	// ГІГ® Г§Г ГЇГЁГ±Г Г«ГЁ Г±Г®Г±ГІГ®ГїГ­ГЁГҐ ГЉГ‡
 		}
 	}
 
@@ -892,7 +893,7 @@ void Core_Protections18kHzUpdate(TCoreProtections *p)
 	Core_ProtecionSHC_Update(&p->ShC_V);
 	Core_ProtecionSHC_Update(&p->ShC_W);
 
-	// Запись МУФТЫ в память!!!!!! Оо
+	// Г‡Г ГЇГЁГ±Гј ГЊГ“Г”Г’Г› Гў ГЇГ Г¬ГїГІГј!!!!!! ГЋГ®
 	if (p->MuffFlag == 1 && g_Ram.ramGroupH.MuffFault == 0)
 	{
 		if (IsMemParReady())
@@ -900,13 +901,13 @@ void Core_Protections18kHzUpdate(TCoreProtections *p)
 			g_Ram.ramGroupH.MuffFault = p->MuffFlag;
 			p->MuffFlag = 0;
 			MuffAddr = REG_MUFF_FAULT;
-			WriteToEeprom(MuffAddr, &g_Ram.ramGroupH.MuffFault, 1);	// то записали состояние КЗ
+			WriteToEeprom(MuffAddr, &g_Ram.ramGroupH.MuffFault, 1);	// ГІГ® Г§Г ГЇГЁГ±Г Г«ГЁ Г±Г®Г±ГІГ®ГїГ­ГЁГҐ ГЉГ‡
 		}
 	}
 
 	p->outFaults.Proc.bit.Mufta = g_Ram.ramGroupH.MuffFault;
 
-	// Запись температуры 110 БКП в память...
+	// Г‡Г ГЇГЁГ±Гј ГІГҐГ¬ГЇГҐГ°Г ГІГіГ°Г» 110 ГЃГЉГЏ Гў ГЇГ Г¬ГїГІГј...
 	if(g_Ram.ramGroupH.TemperBCPFault == 0 && p->outFaults.Dev.bit.Th_BCP == 1)
 	{
 		if (IsMemParReady())
@@ -953,8 +954,8 @@ void Core_Protections18kHzUpdate(TCoreProtections *p)
 			//Core_ValveDriveStop(&g_Core.VlvDrvCtrl);
 			//g_Core.VlvDrvCtrl.EvLog.Value = CMD_DEFSTOP;
 		}
-		//ToDo Обсудить реализацию режима пожарки
-		if (g_Core.Status.bit.Fault && g_Ram.ramGroupB.PlaceType != ptFire)   	// Если Включена пожарка то мы будем гореть но ехать....
+		//ToDo ГЋГЎГ±ГіГ¤ГЁГІГј Г°ГҐГ Г«ГЁГ§Г Г¶ГЁГѕ Г°ГҐГ¦ГЁГ¬Г  ГЇГ®Г¦Г Г°ГЄГЁ
+		if (g_Core.Status.bit.Fault && g_Ram.ramGroupB.PlaceType != ptFire)   	// Г…Г±Г«ГЁ Г‚ГЄГ«ГѕГ·ГҐГ­Г  ГЇГ®Г¦Г Г°ГЄГ  ГІГ® Г¬Г» ГЎГіГ¤ГҐГ¬ ГЈГ®Г°ГҐГІГј Г­Г® ГҐГµГ ГІГј....
 		{
 			Core_ValveDriveStop(&g_Core.VlvDrvCtrl);
 			g_Core.VlvDrvCtrl.EvLog.Value = CMD_DEFSTOP;
@@ -963,7 +964,7 @@ void Core_Protections18kHzUpdate(TCoreProtections *p)
 
 }
 
-// ToDo проверить в режиме пожарки! + отстроить уровни дискретного упарвления
+// ToDo ГЇГ°Г®ГўГҐГ°ГЁГІГј Гў Г°ГҐГ¦ГЁГ¬ГҐ ГЇГ®Г¦Г Г°ГЄГЁ! + Г®ГІГ±ГІГ°Г®ГЁГІГј ГіГ°Г®ГўГ­ГЁ Г¤ГЁГ±ГЄГ°ГҐГІГ­Г®ГЈГ® ГіГЇГ Г°ГўГ«ГҐГ­ГЁГї
 void Core_ProtectionFireControl(void)
 {
 	if (g_Ram.ramGroupB.PlaceType != ptFire) return;
